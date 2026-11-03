@@ -1,0 +1,63 @@
+#cloud-config
+# Template rendered by infra/azure/aca/modules/vm.bicep. The double-at tokens below are replaced with
+# base64 payloads; nothing here is secret on its own. The rendered text (including the env file with
+# secrets) becomes the VM's custom data. Do not run this file as is.
+package_update: true
+packages:
+  - ca-certificates
+  - curl
+  - gnupg
+  - nfs-common
+  - iptables
+write_files:
+  - path: /etc/rakazo/vm.env
+    permissions: "0600"
+    encoding: b64
+    content: @@VM_ENV_B64@@
+  - path: /opt/rakazo/docker-compose.yml
+    permissions: "0644"
+    encoding: b64
+    content: @@COMPOSE_B64@@
+  - path: /opt/rakazo/bootstrap.sh
+    permissions: "0755"
+    encoding: b64
+    content: @@BOOTSTRAP_B64@@
+  - path: /opt/rakazo/restrict-computer-egress.sh
+    permissions: "0755"
+    encoding: b64
+    content: @@EGRESS_SCRIPT_B64@@
+  - path: /opt/rakazo/policy.seed.yaml
+    permissions: "0644"
+    encoding: b64
+    content: @@POLICY_SEED_B64@@
+  # Log rotation and live-restore, as in infra/compose/docker-daemon.json.
+  - path: /etc/docker/daemon.json
+    permissions: "0644"
+    encoding: b64
+    content: @@DAEMON_JSON_B64@@
+  # Never start containers before /data is mounted: they would bind an empty local directory.
+  - path: /etc/systemd/system/docker.service.d/10-rakazo-data.conf
+    permissions: "0644"
+    content: |
+      [Unit]
+      RequiresMountsFor=/data
+  # Azure-specific drops on top of restrict-computer-egress.sh: the WireServer/DNS address
+  # 168.63.129.16 is public-range and so not covered, and 169.254.169.254 (IMDS, which serves this
+  # VM's custom data) is listed again on purpose.
+  - path: /etc/systemd/system/rakazo-azure-egress.service
+    permissions: "0644"
+    content: |
+      [Unit]
+      Description=Block Azure platform addresses from rakazo-c* computer bridges
+      After=docker.service rakazo-computer-egress.service
+      Wants=docker.service
+
+      [Service]
+      Type=oneshot
+      RemainAfterExit=yes
+      ExecStart=/bin/sh -c 'for d in 168.63.129.16 169.254.169.254; do iptables -C DOCKER-USER -i rakazo-c+ -d $$d -j DROP 2>/dev/null || iptables -I DOCKER-USER 1 -i rakazo-c+ -d $$d -j DROP; done'
+
+      [Install]
+      WantedBy=multi-user.target
+runcmd:
+  - [bash, /opt/rakazo/bootstrap.sh]
