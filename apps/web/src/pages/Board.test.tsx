@@ -17,6 +17,7 @@ const api = vi.hoisted(() => ({
     create: vi.fn(),
     comment: vi.fn(),
     comments: vi.fn(),
+    work: vi.fn(),
   },
 }));
 vi.mock("../lib/rpc", () => ({
@@ -97,6 +98,12 @@ function ticket(
 let client: QueryClient;
 beforeEach(() => {
   client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  api.tickets.work.mockReset().mockResolvedValue({
+    ticketId: "ticket-1",
+    phase: "ready",
+    runs: [],
+    artifacts: [],
+  });
 });
 
 async function renderBoard(stream?: AsyncIterable<{ ticketId?: string }>, refusal?: unknown) {
@@ -180,6 +187,42 @@ it("renders status columns and opens a ticket with comments", async () => {
       "flex justify-end",
     ]);
     expect(api.tickets.comments).toHaveBeenCalledWith({ ticketId: "ticket-1" }, expect.anything());
+  } finally {
+    await page.cleanup();
+  }
+});
+
+it("shows the runs and files that worked on a ticket", async () => {
+  vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
+  api.bots.list.mockResolvedValue([bot("bot-1", "Helper")]);
+  api.tickets.list.mockResolvedValue({
+    tickets: [ticket("Ship", "ticket-1", "doing", "RAK-1", "bot-1", "Details")],
+  });
+  api.tickets.comments.mockResolvedValue([]);
+  api.tickets.work.mockResolvedValue({
+    ticketId: "ticket-1",
+    phase: "waiting",
+    runs: [
+      { id: "run-2", status: "waiting_input", createdAt: "2026-10-10T10:00:00Z" },
+      { id: "run-1", status: "failed", createdAt: "2026-10-09T10:00:00Z" },
+    ],
+    artifacts: [{ id: "artifact-1", name: "report.md", runId: "run-1" }],
+  });
+  const page = await renderBoard();
+  try {
+    await act(async () =>
+      (
+        page.container.querySelector('[data-testid="board-card-ticket-1"]') as HTMLButtonElement
+      ).click(),
+    );
+    await settle();
+    const work = page.container.querySelector('[data-testid="ticket-work"]')!;
+    expect(work.querySelector("h3")?.textContent).toBe("Waiting");
+    expect(Array.from(work.querySelectorAll("li > span")).map((node) => node.textContent)).toEqual([
+      "Waiting",
+      "Failed",
+    ]);
+    expect(work.querySelector("a")?.getAttribute("href")).toBe("/app/artifacts/artifact-1");
   } finally {
     await page.cleanup();
   }

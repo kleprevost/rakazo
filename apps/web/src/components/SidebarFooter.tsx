@@ -14,6 +14,7 @@ import {
   Download,
   FolderOpen,
   Gauge,
+  LayoutDashboard,
   Link2,
   LogOut,
   Plug,
@@ -41,6 +42,7 @@ type Props = {
   onIntegrations: () => void;
   onSkills: () => void;
   onBoard?: () => void;
+  onToday?: () => void;
   links?: NavLink[];
   onLink?: (link: NavLink) => void;
   onArtifacts: () => void;
@@ -71,6 +73,7 @@ export function SidebarFooter({
   onIntegrations,
   onSkills,
   onBoard,
+  onToday,
   links = [],
   onLink,
   onArtifacts,
@@ -175,6 +178,16 @@ export function SidebarFooter({
               <ScrollText className="text-muted-foreground" strokeWidth={1.75} />
               <Trans>Skills</Trans>
             </Button>
+            {onToday ? (
+              <Button
+                variant="ghost"
+                className="h-9 w-full justify-start gap-2.5 font-normal"
+                onClick={onToday}
+              >
+                <LayoutDashboard className="text-muted-foreground" strokeWidth={1.75} />
+                <Trans>Today</Trans>
+              </Button>
+            ) : null}
             <Button
               variant="ghost"
               className="h-9 w-full justify-start gap-2.5 font-normal"

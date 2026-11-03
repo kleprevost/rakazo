@@ -105,6 +105,7 @@ describe("finalizeRun", () => {
           updateMany: vi.fn(async () => ({ count: 1 })),
         },
         attempt: { updateMany: vi.fn(async () => ({ count: 1 })) },
+        ticket: { updateManyAndReturn: vi.fn(async () => []) },
         task: { updateMany: vi.fn(async () => ({ count: 1 })) },
         thread: { update: vi.fn(async () => ({ nextEventSeq: 1 })) },
         event: { create: createEvent, deleteMany: vi.fn(async () => ({ count: 0 })) },
@@ -171,6 +172,7 @@ describe("finalizeRun", () => {
         updateMany: vi.fn(async () => ({ count: 1 })),
       },
       attempt: { updateMany: vi.fn(async () => ({ count: 1 })) },
+      ticket: { updateManyAndReturn: vi.fn(async () => []) },
       task: { updateMany: vi.fn(async () => ({ count: 1 })) },
       thread: { update: vi.fn(async () => ({ nextEventSeq: 1, nextMessageSeq: 5 })) },
       secret: { deleteMany: vi.fn(async () => ({ count: 0 })) },
@@ -246,6 +248,7 @@ describe("finalizeRun", () => {
         updateMany: vi.fn(async () => ({ count: 1 })),
       },
       attempt: { updateMany: vi.fn(async () => ({ count: 1 })) },
+      ticket: { updateManyAndReturn: vi.fn(async () => []) },
       task: { updateMany: vi.fn(async () => ({ count: 1 })) },
       thread: { update: vi.fn(async () => ({ nextEventSeq: 1 })) },
       secret: { deleteMany: vi.fn(async () => ({ count: 0 })) },
@@ -291,6 +294,7 @@ describe("finalizeRun", () => {
         create: vi.fn(async () => ({ id: "run-reply" })),
       },
       attempt: { updateMany: vi.fn(async () => ({ count: 1 })) },
+      ticket: { updateManyAndReturn: vi.fn(async () => []) },
       task: {
         updateMany: vi.fn(async () => ({ count: 1 })),
         create: vi.fn(async () => ({ id: "task-reply" })),
@@ -359,6 +363,7 @@ describe("finalizeRun", () => {
         create: vi.fn(async () => ({ id: "run-reply" })),
       },
       attempt: { updateMany: vi.fn(async () => ({ count: 1 })) },
+      ticket: { updateManyAndReturn: vi.fn(async () => []) },
       task: {
         updateMany: vi.fn(async () => ({ count: 1 })),
         create: vi.fn(async () => ({ id: "task-reply" })),
@@ -439,6 +444,7 @@ describe("finalizeRun", () => {
         create: vi.fn(async () => ({ id: "run-reply" })),
       },
       attempt: { updateMany: vi.fn(async () => ({ count: 1 })) },
+      ticket: { updateManyAndReturn: vi.fn(async () => []) },
       task: {
         updateMany: vi.fn(async () => ({ count: 1 })),
         create: vi.fn(async () => ({ id: "task-reply" })),

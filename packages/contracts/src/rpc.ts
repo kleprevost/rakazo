@@ -32,6 +32,7 @@ import {
   RenameBoardInput,
   TicketCommentSchema,
   TicketSchema,
+  TicketWorkSchema,
   UpdateTicketInput,
 } from "./board.js";
 import {
@@ -168,6 +169,7 @@ import {
 } from "./pages.js";
 import { PaymentWalletStatusSchema } from "./payments.js";
 import { MessageReactionSchema } from "./reactions.js";
+import { HireRoleInput, HireRoleOutput, RoleTemplateListItemSchema } from "./role-template.js";
 import { RoutineWatchSchema } from "./routine-watch.js";
 import {
   ROUTINE_HISTORY_PAGE_SIZE,
@@ -178,6 +180,7 @@ import {
 import { SearchQueryOutputSchema } from "./search.js";
 import { SecurityEventListInputSchema, SecurityEventSchema } from "./security-events.js";
 import { SettingsScopeSchema, SpaceSettingSchema, settingsScopeInput } from "./settings-scope.js";
+import { TodaySummarySchema } from "./today.js";
 
 const botId = z.object({ botId: Id });
 const groupId = z.object({ groupId: Id });
@@ -792,6 +795,10 @@ export const appContract = {
       .output(SpaceMemoryConfigSchema),
     disconnectProvider: oc.output(z.object({ ok: z.literal(true) })),
   },
+  roleTemplates: {
+    list: oc.output(z.array(RoleTemplateListItemSchema)),
+    hire: oc.input(HireRoleInput).output(HireRoleOutput),
+  },
   routines: {
     listForMentions: oc
       .input(z.object({ botIds: z.array(Id).min(1).max(ROUTINE_MENTION_BATCH_MAX) }))
@@ -901,6 +908,7 @@ export const appContract = {
     move: oc.input(MoveTicketInput).output(TicketSchema),
     comment: oc.input(CommentTicketInput).output(TicketCommentSchema),
     comments: oc.input(z.object({ ticketId: Id })).output(z.array(TicketCommentSchema)),
+    work: oc.input(z.object({ ticketId: Id })).output(TicketWorkSchema),
   },
   skills: {
     list: oc.input(botId).output(z.array(TaughtSkillSchema)),
@@ -1381,6 +1389,10 @@ export const appContract = {
   },
   runs: {
     list: oc.input(z.object({ filter: z.enum(["active", "recent"]) })).output(RunsListOutputSchema),
+  },
+  /** The signed-in user's bots at a glance: what needs them, what is running, what finished. */
+  today: {
+    summary: oc.output(TodaySummarySchema),
   },
   /** The signed-in user's wallet; absent when the deployment offers none. */
   paymentWallet: {

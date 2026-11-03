@@ -16,6 +16,7 @@ import {
   isActive,
   isRunWorking,
   memberName,
+  newClientId,
 } from "@rakazo/core";
 import { fetchFresh, writeSaved } from "@rakazo/core/query";
 import type { GroupAvatarMember } from "@rakazo/ui-web";
@@ -875,6 +876,22 @@ function SpaceShell() {
     await refreshBots().catch(() => undefined);
   }
 
+  /** The server creates the bot from the role; its starter task goes out as the first message. */
+  async function hireRole(templateId: string) {
+    const { bot, starterTask } = await rpc.roleTemplates.hire({ templateId });
+    openCreatedBot(bot);
+    dialogs.setCreateBotOpen(false);
+    await rpc.threads
+      .send({
+        botId: bot.id,
+        clientNonce: newClientId(),
+        imageHandling: "confirm",
+        text: starterTask,
+      })
+      .catch(() => undefined);
+    await refreshBots().catch(() => undefined);
+  }
+
   const contextBot =
     botMenu?.kind === "bot" ? bots.find((bot) => bot.id === botMenu.id) : undefined;
   const contextGroup =
@@ -1266,6 +1283,7 @@ function SpaceShell() {
           openSpaceSettings={openSpaceSettings}
           closeMobileSidebar={() => setMobileSidebarOpen(false)}
           createBot={createBot}
+          hire={{ load: () => rpc.roleTemplates.list(), onHire: hireRole }}
           clearOpenThread={() => {
             thread.resetHistory();
             thread.updateSnapshot((current) =>

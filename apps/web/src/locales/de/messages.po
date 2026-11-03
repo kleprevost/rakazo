@@ -706,6 +706,7 @@ msgid "All time"
 msgstr ""
 
 #: src/components/ApprovalRulesSettings.tsx
+#: src/pages/Today.tsx
 msgid "Allow"
 msgstr "Erlauben"
 
@@ -935,6 +936,10 @@ msgstr ""
 msgid "Ask"
 msgstr "Fragen"
 
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "Asks before"
+msgstr ""
+
 #: src/pages/shell/computer-panel.tsx
 msgid "Asleep"
 msgstr "Schläft"
@@ -1033,6 +1038,8 @@ msgstr "Avatar-Studio"
 #: src/pages/RoutineEditor.tsx
 #: src/pages/SettingsOverlay.tsx
 #: src/pages/shell/agent-import.tsx
+#: src/pages/shell/hire-role-dialog.tsx
+#: src/pages/Today.tsx
 msgid "Back"
 msgstr "Zurück"
 
@@ -1084,8 +1091,9 @@ msgid "Blocked by your organization"
 msgstr "Von deiner Organisation blockiert"
 
 #: src/lib/user-error.ts
+#: src/pages/shell/hire-role-dialog.tsx
 msgid "Blocked by your organization"
-msgstr ""
+msgstr "Von deiner Organisation blockiert"
 
 #: src/components/SidebarFooter.tsx
 #: src/pages/Board.tsx
@@ -1168,6 +1176,10 @@ msgstr ""
 #: src/pages/shell/agent-import.tsx
 msgid "Built-in"
 msgstr "Integriert"
+
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "Calendar"
+msgstr ""
 
 #: src/pages/shell/chat-header.tsx
 msgid "Call"
@@ -1252,6 +1264,7 @@ msgid "cancelled"
 msgstr "abgebrochen"
 
 #: src/components/AskCard.tsx
+#: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
 msgid "Cancelled"
 msgstr "Abgebrochen"
@@ -1285,6 +1298,7 @@ msgid "Chart failed to render: {error}"
 msgstr "Diagramm konnte nicht angezeigt werden: {error}"
 
 #: src/pages/AccountSettingsOverlay.tsx
+#: src/pages/shell/hire-role-dialog.tsx
 msgid "Chat"
 msgstr ""
 
@@ -1540,6 +1554,10 @@ msgstr "Spalte {index}"
 #: src/pages/AccountSettingsOverlay.tsx
 msgid "Comfortable"
 msgstr ""
+
+#: src/pages/Today.tsx
+msgid "Coming up"
+msgstr "Demnächst"
 
 #: src/pages/McpServersOverlay.tsx
 #: src/pages/RoutineEditor.tsx
@@ -1898,6 +1916,7 @@ msgid "Could not clear conversation"
 msgstr "Unterhaltung konnte nicht geleert werden"
 
 #: src/components/ComputerUpdateProgress.tsx
+#: src/pages/Today.tsx
 msgid "Could not complete action"
 msgstr ""
 
@@ -2048,6 +2067,10 @@ msgstr ""
 msgid "Could not grant access"
 msgstr ""
 
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "Could not hire"
+msgstr ""
+
 #: src/pages/PluginsOverlay.tsx
 msgid "Could not install connector"
 msgstr "Connector konnte nicht installiert werden"
@@ -2103,6 +2126,10 @@ msgstr "MCP-Server konnten nicht geladen werden"
 #: src/pages/model-settings/use-model-settings.ts
 msgid "Could not load model settings"
 msgstr "Modelleinstellungen konnten nicht geladen werden"
+
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "Could not load roles"
+msgstr ""
 
 #: src/pages/RoutineRunHistory.tsx
 msgid "Could not load run history"
@@ -2499,6 +2526,10 @@ msgstr ""
 msgid "Credits ($)"
 msgstr ""
 
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "CRM"
+msgstr ""
+
 #: src/lib/cron.ts
 msgid "Cron"
 msgstr "Cron"
@@ -2676,6 +2707,7 @@ msgid "Denied"
 msgstr "Abgelehnt"
 
 #: src/components/AskCard.tsx
+#: src/pages/Today.tsx
 msgid "Deny"
 msgstr "Ablehnen"
 
@@ -2815,6 +2847,10 @@ msgstr "Dokumentation"
 msgid "Document changed. Reopen to edit the latest version."
 msgstr "Das Dokument wurde geändert. Öffne es erneut, um die neueste Version zu bearbeiten."
 
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "Documents"
+msgstr ""
+
 #: src/pages/Auth.tsx
 msgid "Don’t have an account?"
 msgstr "Du hast noch kein Konto?"
@@ -2822,10 +2858,12 @@ msgstr "Du hast noch kein Konto?"
 #: src/components/AccountDataSettings.tsx
 #: src/components/ToolActivityDisclosure.tsx
 #: src/lib/ticket-status.ts
+#: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
 #: src/pages/shell/avatar-studio-popover.tsx
 #: src/pages/shell/import-setup-card.tsx
 #: src/pages/shell/message-view.tsx
+#: src/pages/Today.tsx
 msgid "Done"
 msgstr "Fertig"
 
@@ -2901,6 +2939,7 @@ msgstr "Profil bearbeiten"
 #: src/pages/admin/AdminUsersPage.tsx
 #: src/pages/AdminAccessPage.tsx
 #: src/pages/Auth.tsx
+#: src/pages/shell/hire-role-dialog.tsx
 msgid "Email"
 msgstr "E-Mail"
 
@@ -3098,6 +3137,7 @@ msgid "failed"
 msgstr "fehlgeschlagen"
 
 #: src/components/SubagentCard.tsx
+#: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
 msgid "Failed"
 msgstr "Fehlgeschlagen"
@@ -3368,6 +3408,14 @@ msgstr "Hoch"
 msgid "High"
 msgstr "Hoch"
 
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "Hire"
+msgstr ""
+
+#: src/pages/shell/create-bot-dialog.tsx
+msgid "Hire for a role"
+msgstr ""
+
 #: src/components/composer/HoldToTalk.tsx
 msgid "Hold to talk"
 msgstr "Zum Sprechen gedrückt halten"
@@ -3456,6 +3504,7 @@ msgid "In progress"
 msgstr ""
 
 #: src/lib/ticket-status.ts
+#: src/lib/work-phase.ts
 msgid "In review"
 msgstr ""
 
@@ -3514,6 +3563,7 @@ msgstr "Anweisungsverlauf"
 #: src/components/AskCard.tsx
 #: src/components/InstructionSettings.tsx
 #: src/pages/shell/agent-import.tsx
+#: src/pages/shell/hire-role-dialog.tsx
 msgid "Instructions"
 msgstr "Anweisungen"
 
@@ -4183,6 +4233,7 @@ msgid "Needs an OAuth client ID"
 msgstr "Benötigt eine OAuth-Client-ID"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/Today.tsx
 msgid "Needs attention"
 msgstr "Aufmerksamkeit erforderlich"
 
@@ -4444,6 +4495,10 @@ msgstr "Noch nichts gemerkt"
 #: src/pages/admin/AdminQuery.tsx
 msgid "Nothing to show."
 msgstr ""
+
+#: src/pages/Today.tsx
+msgid "Nothing today"
+msgstr "Heute nichts"
 
 #: src/pages/shell/bot-panel.tsx
 msgid "Notifications"
@@ -5359,6 +5414,7 @@ msgstr ""
 #: src/pages/PluginsOverlay.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
 #: src/pages/SpaceSettingOverrides.tsx
+#: src/pages/Today.tsx
 msgid "Retry"
 msgstr "Erneut versuchen"
 
@@ -5415,6 +5471,7 @@ msgstr "Routine"
 
 #: src/pages/shell/agent-import.tsx
 #: src/pages/shell/bot-panel.tsx
+#: src/pages/shell/hire-role-dialog.tsx
 msgid "Routines"
 msgstr "Routinen"
 
@@ -5447,8 +5504,10 @@ msgid "running"
 msgstr "läuft"
 
 #: src/components/SubagentCard.tsx
+#: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
 #: src/pages/RoutineEditor.tsx
+#: src/pages/Today.tsx
 msgid "Running"
 msgstr "Läuft"
 
@@ -5893,6 +5952,7 @@ msgstr "Skill {position}"
 #: src/components/SidebarFooter.tsx
 #: src/pages/Shell.tsx
 #: src/pages/shell/agent-import.tsx
+#: src/pages/shell/hire-role-dialog.tsx
 msgid "Skills"
 msgstr "Skills"
 
@@ -6484,6 +6544,10 @@ msgstr ""
 msgid "Thursday"
 msgstr "Donnerstag"
 
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "Tickets"
+msgstr ""
+
 #: src/pages/RoutineSchedule.tsx
 msgid "Time of day"
 msgstr "Uhrzeit"
@@ -6511,6 +6575,7 @@ msgid "To {0}"
 msgstr ""
 
 #: src/lib/ticket-status.ts
+#: src/lib/work-phase.ts
 msgid "To do"
 msgstr ""
 
@@ -6518,8 +6583,10 @@ msgstr ""
 msgid "To:"
 msgstr "An:"
 
+#: src/components/SidebarFooter.tsx
 #: src/pages/Artifacts.tsx
 #: src/pages/shell/chat-context.tsx
+#: src/pages/Today.tsx
 msgid "Today"
 msgstr "Heute"
 
@@ -6599,6 +6666,7 @@ msgstr "Vertrauenswürdige Websites"
 #: src/pages/Onboarding.tsx
 #: src/pages/SharedPage.tsx
 #: src/pages/SpaceSearch.tsx
+#: src/pages/Today.tsx
 msgid "Try again"
 msgstr "Erneut versuchen"
 
@@ -6882,6 +6950,10 @@ msgstr ""
 msgid "Wait a moment and test again."
 msgstr "Warte kurz und teste erneut."
 
+#: src/lib/work-phase.ts
+msgid "Waiting"
+msgstr "Wartend"
+
 #: src/lib/roster-status.ts
 msgid "Waiting in line…"
 msgstr "Wartet in der Warteschlange…"
@@ -7013,6 +7085,7 @@ msgid "Work"
 msgstr ""
 
 #: src/pages/ActivityList.tsx
+#: src/pages/Today.tsx
 msgid "Working"
 msgstr "Arbeitet"
 
@@ -7026,6 +7099,10 @@ msgstr "Arbeitsanweisungen"
 #: src/pages/shell/transcript.tsx
 msgid "Working…"
 msgstr "Wird verarbeitet…"
+
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "Works with"
+msgstr ""
 
 #: src/components/ModelCredits.tsx
 msgid "Works with your ChatGPT or Claude plan."

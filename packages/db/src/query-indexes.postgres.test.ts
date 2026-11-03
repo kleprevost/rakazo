@@ -21,7 +21,7 @@ const hotQueries = [
     name: "this month's spend for budgets",
     index: "usage_records_period_spend_idx",
     sql: `SELECT sum("costUsd"), sum("costUsd") FILTER (WHERE "userId" = $1)
-      FROM usage_records WHERE "createdAt" >= now()`,
+      FROM usage_records WHERE "createdAt" >= now()::timestamp`,
   },
   {
     name: "a bot's run lease fence",

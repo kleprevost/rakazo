@@ -41,6 +41,7 @@ import { urlSite } from "@rakazo/core/egress";
 import { approvalEffectKey } from "@rakazo/core/node/approval-effect-key";
 import { getLogger } from "@rakazo/logging";
 import { saveApprovalRule, storedBatchActions } from "./approval-settings.js";
+import { createBoardEvents } from "./board-live.js";
 import { cancelRunsInTransaction } from "./cancel-runs.js";
 import type { Prisma, PrismaClient } from "./client.js";
 import { expireComputerExecutionLeases } from "./computers.js";
@@ -1754,6 +1755,12 @@ export async function finalizeRun(
   const committed = await withTransactionRetry(() => finalizeRunOnce(prisma, input));
   if (!committed) return false;
   await notifyRealtime(realtime, committed.threadId, committed.seq);
+  for (const ticket of committed.movedTickets) {
+    await createBoardEvents(realtime).notify(input.spaceId, {
+      boardId: ticket.boardId,
+      ticketId: ticket.id,
+    });
+  }
   const timing = await readRunTimingFields(prisma, input.runId);
   if (committed.firstResponse) {
     getLogger().info("run.first_response", { "run.id": input.runId, ...timing });
@@ -1800,6 +1807,7 @@ async function finalizeRunOnce(
   seq: number;
   continuationRunId: string | null;
   firstResponse: boolean;
+  movedTickets: Array<{ id: string; boardId: string }>;
 } | null> {
   return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     await tx.$queryRaw`SELECT id FROM threads WHERE id = ${input.threadId} FOR UPDATE`;
@@ -1864,6 +1872,13 @@ async function finalizeRunOnce(
       data: { status: input.outcome },
     });
     if (task.count !== 1) throw new Error("Run task was not available to finalize");
+    // A ticket the run worked on follows it: finished work waits for review, a failure blocks.
+    // Tickets the bot or a person already moved on are left alone.
+    const movedTickets = await tx.ticket.updateManyAndReturn({
+      where: { tasks: { some: { id: input.taskId } }, status: { in: ["todo", "doing"] } },
+      data: { status: input.outcome === "completed" ? "review" : "blocked" },
+      select: { id: true, boardId: true },
+    });
 
     if (input.outcome === "failed") {
       // Before the partial reply below is saved: a reply the failure cut short answers no
@@ -1936,7 +1951,13 @@ async function finalizeRunOnce(
     }
     const continuationRunId = await createPendingSteeringRun(tx, input);
     await tx.bot.update({ where: { id: input.botId }, data: { updatedAt: now } });
-    return { threadId: lastEvent.threadId, seq: lastEvent.seq, continuationRunId, firstResponse };
+    return {
+      threadId: lastEvent.threadId,
+      seq: lastEvent.seq,
+      continuationRunId,
+      firstResponse,
+      movedTickets,
+    };
   }, FINALIZE_TRANSACTION_OPTIONS);
 }
 

@@ -706,6 +706,7 @@ msgid "All time"
 msgstr ""
 
 #: src/components/ApprovalRulesSettings.tsx
+#: src/pages/Today.tsx
 msgid "Allow"
 msgstr "허용"
 
@@ -935,6 +936,10 @@ msgstr ""
 msgid "Ask"
 msgstr "묻기"
 
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "Asks before"
+msgstr ""
+
 #: src/pages/shell/computer-panel.tsx
 msgid "Asleep"
 msgstr "절전 중"
@@ -1033,6 +1038,8 @@ msgstr "아바타 스튜디오"
 #: src/pages/RoutineEditor.tsx
 #: src/pages/SettingsOverlay.tsx
 #: src/pages/shell/agent-import.tsx
+#: src/pages/shell/hire-role-dialog.tsx
+#: src/pages/Today.tsx
 msgid "Back"
 msgstr "뒤로"
 
@@ -1084,8 +1091,9 @@ msgid "Blocked by your organization"
 msgstr "조직에서 차단했습니다"
 
 #: src/lib/user-error.ts
+#: src/pages/shell/hire-role-dialog.tsx
 msgid "Blocked by your organization"
-msgstr ""
+msgstr "조직에서 차단했습니다"
 
 #: src/components/SidebarFooter.tsx
 #: src/pages/Board.tsx
@@ -1168,6 +1176,10 @@ msgstr ""
 #: src/pages/shell/agent-import.tsx
 msgid "Built-in"
 msgstr "기본 제공"
+
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "Calendar"
+msgstr ""
 
 #: src/pages/shell/chat-header.tsx
 msgid "Call"
@@ -1252,6 +1264,7 @@ msgid "cancelled"
 msgstr "취소됨"
 
 #: src/components/AskCard.tsx
+#: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
 msgid "Cancelled"
 msgstr "취소됨"
@@ -1285,6 +1298,7 @@ msgid "Chart failed to render: {error}"
 msgstr "차트를 표시하지 못했습니다: {error}"
 
 #: src/pages/AccountSettingsOverlay.tsx
+#: src/pages/shell/hire-role-dialog.tsx
 msgid "Chat"
 msgstr ""
 
@@ -1540,6 +1554,10 @@ msgstr "열 {index}"
 #: src/pages/AccountSettingsOverlay.tsx
 msgid "Comfortable"
 msgstr ""
+
+#: src/pages/Today.tsx
+msgid "Coming up"
+msgstr "예정"
 
 #: src/pages/McpServersOverlay.tsx
 #: src/pages/RoutineEditor.tsx
@@ -1898,6 +1916,7 @@ msgid "Could not clear conversation"
 msgstr "대화 내용을 비우지 못했습니다."
 
 #: src/components/ComputerUpdateProgress.tsx
+#: src/pages/Today.tsx
 msgid "Could not complete action"
 msgstr ""
 
@@ -2048,6 +2067,10 @@ msgstr ""
 msgid "Could not grant access"
 msgstr ""
 
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "Could not hire"
+msgstr ""
+
 #: src/pages/PluginsOverlay.tsx
 msgid "Could not install connector"
 msgstr "도구 연결을 추가하지 못했습니다."
@@ -2103,6 +2126,10 @@ msgstr "MCP 서버 목록을 불러오지 못했습니다."
 #: src/pages/model-settings/use-model-settings.ts
 msgid "Could not load model settings"
 msgstr "AI 모델 설정을 불러오지 못했습니다."
+
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "Could not load roles"
+msgstr ""
 
 #: src/pages/RoutineRunHistory.tsx
 msgid "Could not load run history"
@@ -2499,6 +2526,10 @@ msgstr ""
 msgid "Credits ($)"
 msgstr ""
 
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "CRM"
+msgstr ""
+
 #: src/lib/cron.ts
 msgid "Cron"
 msgstr "Cron"
@@ -2676,6 +2707,7 @@ msgid "Denied"
 msgstr "거부됨"
 
 #: src/components/AskCard.tsx
+#: src/pages/Today.tsx
 msgid "Deny"
 msgstr "거부"
 
@@ -2815,6 +2847,10 @@ msgstr "문서"
 msgid "Document changed. Reopen to edit the latest version."
 msgstr "문서가 변경되었습니다. 최신 버전을 편집하려면 다시 여세요."
 
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "Documents"
+msgstr ""
+
 #: src/pages/Auth.tsx
 msgid "Don’t have an account?"
 msgstr "계정이 없나요?"
@@ -2822,10 +2858,12 @@ msgstr "계정이 없나요?"
 #: src/components/AccountDataSettings.tsx
 #: src/components/ToolActivityDisclosure.tsx
 #: src/lib/ticket-status.ts
+#: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
 #: src/pages/shell/avatar-studio-popover.tsx
 #: src/pages/shell/import-setup-card.tsx
 #: src/pages/shell/message-view.tsx
+#: src/pages/Today.tsx
 msgid "Done"
 msgstr "완료"
 
@@ -2901,6 +2939,7 @@ msgstr "Bot 정보 수정"
 #: src/pages/admin/AdminUsersPage.tsx
 #: src/pages/AdminAccessPage.tsx
 #: src/pages/Auth.tsx
+#: src/pages/shell/hire-role-dialog.tsx
 msgid "Email"
 msgstr "이메일"
 
@@ -3098,6 +3137,7 @@ msgid "failed"
 msgstr "실패"
 
 #: src/components/SubagentCard.tsx
+#: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
 msgid "Failed"
 msgstr "실패"
@@ -3368,6 +3408,14 @@ msgstr "높음"
 msgid "High"
 msgstr "높음"
 
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "Hire"
+msgstr ""
+
+#: src/pages/shell/create-bot-dialog.tsx
+msgid "Hire for a role"
+msgstr ""
+
 #: src/components/composer/HoldToTalk.tsx
 msgid "Hold to talk"
 msgstr ""
@@ -3456,6 +3504,7 @@ msgid "In progress"
 msgstr ""
 
 #: src/lib/ticket-status.ts
+#: src/lib/work-phase.ts
 msgid "In review"
 msgstr ""
 
@@ -3514,6 +3563,7 @@ msgstr "지침 기록"
 #: src/components/AskCard.tsx
 #: src/components/InstructionSettings.tsx
 #: src/pages/shell/agent-import.tsx
+#: src/pages/shell/hire-role-dialog.tsx
 msgid "Instructions"
 msgstr "지침"
 
@@ -4183,6 +4233,7 @@ msgid "Needs an OAuth client ID"
 msgstr "OAuth 클라이언트 ID가 필요합니다"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/Today.tsx
 msgid "Needs attention"
 msgstr "확인 필요"
 
@@ -4444,6 +4495,10 @@ msgstr "아직 기억한 내용이 없습니다"
 #: src/pages/admin/AdminQuery.tsx
 msgid "Nothing to show."
 msgstr ""
+
+#: src/pages/Today.tsx
+msgid "Nothing today"
+msgstr "오늘은 없음"
 
 #: src/pages/shell/bot-panel.tsx
 msgid "Notifications"
@@ -5359,6 +5414,7 @@ msgstr ""
 #: src/pages/PluginsOverlay.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
 #: src/pages/SpaceSettingOverrides.tsx
+#: src/pages/Today.tsx
 msgid "Retry"
 msgstr "다시 시도"
 
@@ -5415,6 +5471,7 @@ msgstr "자동 실행"
 
 #: src/pages/shell/agent-import.tsx
 #: src/pages/shell/bot-panel.tsx
+#: src/pages/shell/hire-role-dialog.tsx
 msgid "Routines"
 msgstr "자동 실행"
 
@@ -5447,8 +5504,10 @@ msgid "running"
 msgstr "실행 중"
 
 #: src/components/SubagentCard.tsx
+#: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
 #: src/pages/RoutineEditor.tsx
+#: src/pages/Today.tsx
 msgid "Running"
 msgstr "실행 중"
 
@@ -5893,6 +5952,7 @@ msgstr "스킬 {position}"
 #: src/components/SidebarFooter.tsx
 #: src/pages/Shell.tsx
 #: src/pages/shell/agent-import.tsx
+#: src/pages/shell/hire-role-dialog.tsx
 msgid "Skills"
 msgstr "스킬"
 
@@ -6484,6 +6544,10 @@ msgstr ""
 msgid "Thursday"
 msgstr "목요일"
 
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "Tickets"
+msgstr ""
+
 #: src/pages/RoutineSchedule.tsx
 msgid "Time of day"
 msgstr "실행 시각"
@@ -6511,6 +6575,7 @@ msgid "To {0}"
 msgstr ""
 
 #: src/lib/ticket-status.ts
+#: src/lib/work-phase.ts
 msgid "To do"
 msgstr ""
 
@@ -6518,8 +6583,10 @@ msgstr ""
 msgid "To:"
 msgstr "받는 사람:"
 
+#: src/components/SidebarFooter.tsx
 #: src/pages/Artifacts.tsx
 #: src/pages/shell/chat-context.tsx
+#: src/pages/Today.tsx
 msgid "Today"
 msgstr "오늘"
 
@@ -6599,6 +6666,7 @@ msgstr "신뢰할 수 있는 사이트"
 #: src/pages/Onboarding.tsx
 #: src/pages/SharedPage.tsx
 #: src/pages/SpaceSearch.tsx
+#: src/pages/Today.tsx
 msgid "Try again"
 msgstr "다시 시도"
 
@@ -6882,6 +6950,10 @@ msgstr ""
 msgid "Wait a moment and test again."
 msgstr "잠시 기다린 뒤 다시 테스트하세요."
 
+#: src/lib/work-phase.ts
+msgid "Waiting"
+msgstr "대기 중"
+
 #: src/lib/roster-status.ts
 msgid "Waiting in line…"
 msgstr "줄에서 기다리는 중…"
@@ -7013,6 +7085,7 @@ msgid "Work"
 msgstr ""
 
 #: src/pages/ActivityList.tsx
+#: src/pages/Today.tsx
 msgid "Working"
 msgstr "작업 중"
 
@@ -7026,6 +7099,10 @@ msgstr "작업 지침"
 #: src/pages/shell/transcript.tsx
 msgid "Working…"
 msgstr "처리 중…"
+
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "Works with"
+msgstr ""
 
 #: src/components/ModelCredits.tsx
 msgid "Works with your ChatGPT or Claude plan."
