@@ -1055,6 +1055,15 @@ msgstr "阻止"
 msgid "Blocked"
 msgstr "已阻塞"
 
+#: src/lib/user-error.ts
+msgid "Blocked by your organization"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/lib/run-error.ts
+msgid "Blocked by your organization"
+msgstr "已被你的组织阻止"
+
 #: src/components/SidebarFooter.tsx
 #: src/pages/Board.tsx
 msgid "Board"
@@ -7011,9 +7020,3 @@ msgstr "你的语音提供方额度已用完。"
 #: src/lib/user-error.ts
 msgid "Your voice provider key was rejected."
 msgstr "你的语音提供方拒绝了该密钥。"
-
-#. js-lingui-explicit-id
-#: src/lib/run-error.ts
-#: src/lib/user-error.ts
-msgid "Blocked by your organization"
-msgstr "已被你的组织阻止"

@@ -1055,6 +1055,15 @@ msgstr "Blockieren"
 msgid "Blocked"
 msgstr ""
 
+#: src/lib/user-error.ts
+msgid "Blocked by your organization"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/lib/run-error.ts
+msgid "Blocked by your organization"
+msgstr "Von deiner Organisation blockiert"
+
 #: src/components/SidebarFooter.tsx
 #: src/pages/Board.tsx
 msgid "Board"
@@ -7011,9 +7020,3 @@ msgstr "Dein Stimmanbieter hat kein Guthaben mehr."
 #: src/lib/user-error.ts
 msgid "Your voice provider key was rejected."
 msgstr "Der Schlüssel deines Stimmanbieters wurde abgelehnt."
-
-#. js-lingui-explicit-id
-#: src/lib/run-error.ts
-#: src/lib/user-error.ts
-msgid "Blocked by your organization"
-msgstr "Von deiner Organisation blockiert"
