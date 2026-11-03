@@ -375,6 +375,26 @@ describe("OIDC environment", () => {
       "AUTH_BREACHED_PASSWORD_CHECK_ENABLED must be true or false",
     );
   });
+  it("reads claim access control, defaulting to no restriction", () => {
+    expect(loadEnv({ ...base, ...oidc }).oidc).toMatchObject({
+      accessClaim: "groups",
+      allowedValues: [],
+      adminValues: [],
+    });
+    expect(
+      loadEnv({
+        ...base,
+        ...oidc,
+        OIDC_ACCESS_CLAIM: "roles",
+        OIDC_ALLOWED_VALUES: "Rakazo.User, Rakazo.Admin",
+        OIDC_ADMIN_VALUES: "Rakazo.Admin",
+      }).oidc,
+    ).toMatchObject({
+      accessClaim: "roles",
+      allowedValues: ["Rakazo.User", "Rakazo.Admin"],
+      adminValues: ["Rakazo.Admin"],
+    });
+  });
   it("defaults to SSO with no policy bypass", () => {
     expect(loadEnv({ ...base, ...oidc }).oidc).toMatchObject({
       name: "SSO",

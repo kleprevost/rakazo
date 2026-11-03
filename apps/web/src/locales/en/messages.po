@@ -6604,6 +6604,10 @@ msgstr "You declined"
 msgid "You have control"
 msgstr "You have control"
 
+#: src/lib/user-error.ts
+msgid "Your account does not have access"
+msgstr "Your account does not have access"
+
 #. js-lingui-explicit-id
 #: src/lib/run-error.ts
 msgid "Your Anthropic"

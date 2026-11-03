@@ -102,7 +102,7 @@ export function mcpStdioPolicy(deps: Pick<RouterDeps, "env">): McpStdioPolicy {
 /** A stdio server runs with the API's and worker's own access, so only admins add or change one. */
 export async function assertMcpStdioAdmin(
   actor: Actor,
-  deps: Pick<RouterDeps, "env" | "prisma">,
+  deps: Pick<RouterDeps, "env" | "prisma" | "auth">,
 ): Promise<void> {
   if (!(await isAdmin(deps, actor.userId)))
     throw new ORPCError("FORBIDDEN", { message: "Only admins can add local MCP servers" });
@@ -112,7 +112,7 @@ export async function assertMcpStdioAdmin(
 export async function assertMcpStdioCommand(
   command: string,
   actor: Actor,
-  deps: Pick<RouterDeps, "env" | "prisma">,
+  deps: Pick<RouterDeps, "env" | "prisma" | "auth">,
 ): Promise<void> {
   const refusal = mcpStdioRefusal(command, mcpStdioPolicy(deps));
   if (refusal) throw new ORPCError("BAD_REQUEST", { message: refusal });

@@ -8,6 +8,14 @@ import { openIdToken } from "./token-storage.js";
 const OIDC_FRESH_AGE = 5 * 60;
 const OIDC_CLOCK_SKEW = 60;
 
+const deniedStates = new WeakSet<object>();
+
+/** Whether this callback's ID token failed the access allow-list (request-local state). */
+export async function isOidcAccessDenied() {
+  const state = await getOAuthState();
+  return Boolean(state && deniedStates.has(state));
+}
+
 export interface OidcConfig {
   issuer: string;
   clientId: string;
@@ -15,6 +23,31 @@ export interface OidcConfig {
   name: string;
   scopes: string[];
   allowSignupBypass: boolean;
+  /** Claim read from the ID token for access control. */
+  accessClaim?: string;
+  /** When non-empty, only tokens carrying one of these values in the claim may sign in or link. */
+  allowedValues?: string[];
+  /** Tokens carrying one of these values in the claim are deployment admins. */
+  adminValues?: string[];
+}
+
+/** Values of an array claim. Missing, non-array or non-string entries yield nothing (fail closed). */
+export function oidcClaimValues(config: OidcConfig, claims: Record<string, unknown>): string[] {
+  const value = claims[config.accessClaim ?? "groups"];
+  return Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === "string")
+    : [];
+}
+
+export function isOidcAccessAllowed(config: OidcConfig, claims: Record<string, unknown>) {
+  const allowed = config.allowedValues ?? [];
+  if (allowed.length === 0) return true;
+  return oidcClaimValues(config, claims).some((value) => allowed.includes(value));
+}
+
+export function hasOidcAdminClaim(config: OidcConfig, claims: Record<string, unknown>) {
+  const admin = config.adminValues ?? [];
+  return oidcClaimValues(config, claims).some((value) => admin.includes(value));
 }
 
 /** Discovery never gates API startup. Failed attempts share exponential backoff. */
@@ -159,6 +192,13 @@ export function oidcDiscovery(config: OidcConfig) {
           // The provider verifies the signature, issuer, audience and nonce first.
           const info = await (await getProvider()).getUserInfo(tokens);
           if (!info?.data || !("sub" in info.data) || info.data.sub !== claims.sub) return null;
+          if (!isOidcAccessAllowed(config, claims)) {
+            // Better Auth turns a validateUserInfo error into a redirect with a code; this
+            // callback has no other way to reach it. Without request state, fail closed.
+            const state = await getOAuthState();
+            if (!state) return null;
+            deniedStates.add(state);
+          }
           const context = (await getOAuthState())?.serverContext;
           if (typeof context?.reauthUserId === "string") {
             const startedAt = context.reauthStartedAt;
@@ -251,6 +291,23 @@ export async function isCurrentOidcAccount(
       typeof claims.sub === "string" &&
       account.accountId === oidcAccountSubject(issuer, claims.sub)
     );
+  } catch {
+    return false;
+  }
+}
+
+/** Whether a stored ID token, still bound to this issuer and account, carries an admin value. */
+export async function isOidcAdminAccount(
+  config: OidcConfig,
+  account: { providerId: string; accountId: string; idToken?: string | null },
+  key: TokenKey,
+) {
+  if (!config.adminValues?.length || !(await isCurrentOidcAccount(account, config.issuer, key)))
+    return false;
+  const idToken = await openIdToken(key, account.idToken);
+  try {
+    const claims = JSON.parse(Buffer.from(idToken?.split(".")[1] ?? "", "base64url").toString());
+    return hasOidcAdminClaim(config, claims);
   } catch {
     return false;
   }

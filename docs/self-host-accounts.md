@@ -150,6 +150,25 @@ is the button label, defaulting to “SSO”. Secrets remain on the API; Compose
 OIDC credentials. The capabilities endpoint exposes only the label, discovery availability,
 and enabled authentication methods.
 
+### Claim-based access
+
+Optionally restrict SSO by an ID token claim. The API reads these; the worker does not.
+
+```env
+OIDC_ACCESS_CLAIM=roles
+OIDC_ALLOWED_VALUES=Rakazo.User,Rakazo.Admin
+OIDC_ADMIN_VALUES=Rakazo.Admin
+```
+
+With `OIDC_ALLOWED_VALUES` set, sign-in and linking require the claim (default `groups`) to be
+an array containing one of the values. A missing, empty or malformed claim is denied with
+"Your account does not have access". The check runs on every SSO sign-in; unset, SSO behaves as
+before. `OIDC_ADMIN_VALUES` makes matching users deployment admins, like `RAKAZO_ADMIN_EMAILS`,
+based on the ID token stored at their last sign-in. Admin is revoked on the next sign-in once
+the value is gone, or immediately after a denied one; `RAKAZO_ADMIN_EMAILS` admins are not
+affected, and an admin still needs a verified email. For Microsoft Entra ID see
+[enterprise/entra-id.md](enterprise/entra-id.md).
+
 Register this redirect URI at the provider (using your public `BETTER_AUTH_URL` origin):
 
 ```text

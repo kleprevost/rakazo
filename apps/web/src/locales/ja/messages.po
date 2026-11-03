@@ -6604,6 +6604,10 @@ msgstr "辞退しました"
 msgid "You have control"
 msgstr "あなたが操作中"
 
+#: src/lib/user-error.ts
+msgid "Your account does not have access"
+msgstr ""
+
 #. js-lingui-explicit-id
 #: src/lib/run-error.ts
 msgid "Your Anthropic"

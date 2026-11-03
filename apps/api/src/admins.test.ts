@@ -14,10 +14,19 @@ describe("isAdmin", () => {
     },
   } as unknown as PrismaClient;
 
+  const auth = { isSsoAdmin: async (userId: string) => userId !== "plain" };
+
   it("requires a listed, verified email", async () => {
-    const deps = { prisma, env: { adminEmails: ["admin@example.test"] } as never };
+    const deps = { prisma, auth, env: { adminEmails: ["admin@example.test"] } as never };
     expect(await isAdmin(deps, "verified")).toBe(true);
     expect(await isAdmin(deps, "unverified")).toBe(false);
-    expect(await isAdmin({ prisma, env: {} as never }, "verified")).toBe(false);
+  });
+
+  it("grants an SSO admin only once their email is verified", async () => {
+    const deps = { prisma, auth, env: {} as never };
+    expect(await isAdmin(deps, "verified")).toBe(true);
+    expect(await isAdmin(deps, "unverified")).toBe(false);
+    const revoked = { prisma, auth: { isSsoAdmin: async () => false }, env: {} as never };
+    expect(await isAdmin(revoked, "verified")).toBe(false);
   });
 });
