@@ -20,13 +20,12 @@ Not linked from the public docs site (`apps/www/src/docs.ts` lists slugs explici
 | 4 Compute + hosting | Bicep AKS, Kata pool + `rakazo-kata` RuntimeClass, network policy, kustomize manifests | #7 |
 
 ## Next: M1 gaps (one small batch)
-- Foundry keyless auth (workload identity) as a host-credentials provider.
-- Revoke live sessions when SSO access is removed (today: waits for session expiry).
-- Secret migration CLI to/from Key Vault.
+- Revoke access promptly when a user is terminated or loses their role (in progress).
+- Deferred by decision: Foundry keyless auth (API keys are fine), secret migration CLI (no running deployment yet).
 
 ## Milestone 2 — Governance (next, run policy and budgets in parallel)
 Acceptance: enforced server-side before a run starts, offline tests, admin UI only where needed.
-- Central policy: org-wide allow/deny for models, tools, integrations, computer permissions; users cannot override. Builds on per-bot approvals.
+- Central policy: see [central-policy.md](./central-policy.md). Foundation + models in progress.
 - Budgets: per user/bot/org spend limits enforced pre-run (extend existing budget code).
 - Audit to Azure Monitor / Sentinel: stream existing audit events to Log Analytics.
 - Admin roles (security admin, bot owner, viewer) mapped from Entra app roles via the OIDC claim mapping.
