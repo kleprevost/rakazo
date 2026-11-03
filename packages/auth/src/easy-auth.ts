@@ -3,8 +3,13 @@ import { createAuthEndpoint, getSessionFromCtx, isAPIError } from "better-auth/a
 import { deleteSessionCookie, parseSetCookieHeader, setSessionCookie } from "better-auth/cookies";
 import { handleOAuthUserInfo } from "better-auth/oauth2";
 import { errors } from "jose";
-import type { OidcConfig } from "./oidc.js";
-import { isOidcAccessAllowed, isOidcEmailVerified, oidcAccountSubject } from "./oidc.js";
+import type { OidcConfig, OidcDirectoryClaims } from "./oidc.js";
+import {
+  isOidcAccessAllowed,
+  isOidcEmailVerified,
+  oidcAccountSubject,
+  oidcDirectoryClaims,
+} from "./oidc.js";
 import type { OidcKeys } from "./oidc-keys.js";
 import { openIdToken } from "./token-storage.js";
 
@@ -106,6 +111,8 @@ type CreatedSession = Awaited<ReturnType<typeof handleOAuthUserInfo>>["data"];
 export interface EasyAuthDeps {
   config: OidcConfig;
   keys: OidcKeys;
+  /** Called with the verified directory claim when a person's ID token is new or changed. */
+  onClaims?: (userId: string, claims: OidcDirectoryClaims) => Promise<void>;
 }
 
 export interface EasyAuthResult {
@@ -152,22 +159,28 @@ async function resolve(
   }
   const accountId = oidcAccountSubject(config.issuer, verified.sub);
   const account = await adapter.findAccountByKey({ providerId: "oidc", accountId });
+  const directory = () => oidcDirectoryClaims(config, verified.claims);
   if (!isOidcAccessAllowed(config, verified.claims)) {
     // A denied identity must not leave an older ID token granting administration.
-    if (account)
+    if (account) {
       await ctx.context.adapter.updateMany({
         model: "account",
         where: [{ field: "id", value: account.id }],
         update: { idToken: null },
       });
+      // Only the first denial: later requests find no stored token and skip this.
+      if (account.idToken) await deps.onClaims?.(account.userId, directory());
+    }
     if (marker) await end();
     return none("denied");
   }
   const syncToken = async () => {
     if (!account) return;
     const stored = await openIdToken(ctx.context.secretConfig, account.idToken);
-    if (stored !== verified.idToken)
+    if (stored !== verified.idToken) {
       await adapter.updateAccount(account.id, { idToken: verified.idToken });
+      await deps.onClaims?.(account.userId, directory());
+    }
   };
   if (current) {
     if (marker?.value === accountId) {
@@ -198,6 +211,7 @@ async function resolve(
         account: { providerId: "oidc", accountId, idToken: verified.idToken },
       });
       if (!result.data) throw new SignInRefused();
+      await deps.onClaims?.(result.data.user.id, directory());
       try {
         await adapter.createVerificationValue({
           identifier: easyAuthMarkerKey(result.data.session.id),

@@ -429,6 +429,29 @@ describe("Easy Auth sign-in", () => {
     expect(sessions()).toHaveLength(1);
   });
 
+  it("reports the directory claim on first sign-in and when the token changes, not on repeats", async () => {
+    const seen: Array<[string, string[], string]> = [];
+    setup({
+      onDirectoryClaims: async (userId, claims, via) => {
+        seen.push([userId, claims.values, via]);
+      },
+    });
+    const first = await token({ roles: ["app.user", "role.eng"] });
+    await pass({ token: first });
+    const userId = rows("user")[0]!.id as string;
+    expect(seen).toEqual([[userId, ["app.user", "role.eng"], "easy_auth"]]);
+    await pass({ token: first });
+    expect(seen).toHaveLength(1);
+    await pass({ token: await token({ roles: ["app.user"] }) });
+    expect(seen).toHaveLength(2);
+    expect(seen[1]![1]).toEqual(["app.user"]);
+    // Denial reports once, with the values that no longer match, then stays quiet.
+    await pass({ token: await token({ roles: ["other"] }) });
+    await pass({ token: await token({ roles: ["other"] }) });
+    expect(seen).toHaveLength(3);
+    expect(seen[2]![1]).toEqual(["other"]);
+  });
+
   it("follows the sign-up policy of OIDC sign-in", async () => {
     setup({ signupsEnabled: "false" });
     expect((await pass({ token: await token() })).session).toBeNull();

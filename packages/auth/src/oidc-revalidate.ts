@@ -1,8 +1,13 @@
 import type { PrismaClient } from "@rakazo/db";
 import { recordSecurityEvent, runAsSystem } from "@rakazo/db";
 import { symmetricDecrypt, symmetricEncrypt } from "better-auth/crypto";
-import type { OidcConfig } from "./oidc.js";
-import { isCurrentOidcAccount, isOidcAccessAllowed, oidcAccountSubject } from "./oidc.js";
+import type { OidcConfig, OidcDirectoryClaims } from "./oidc.js";
+import {
+  isCurrentOidcAccount,
+  isOidcAccessAllowed,
+  oidcAccountSubject,
+  oidcDirectoryClaims,
+} from "./oidc.js";
 import { createOidcKeys } from "./oidc-keys.js";
 import type { TokenKey } from "./token-storage.js";
 import { sealIdToken } from "./token-storage.js";
@@ -20,6 +25,8 @@ export interface OidcRevalidationDeps {
   prisma: AccountDb;
   /** Ends every session of the user on every device. Returns how many existed. */
   revokeSessions: (userId: string) => Promise<number>;
+  /** Receives the refreshed ID token's directory claim, before the access check. */
+  onClaims?: (userId: string, claims: OidcDirectoryClaims) => Promise<void>;
   fetch?: typeof fetch;
   now?: () => Date;
   /** Called with the error name when one account could not be checked and will be retried. */
@@ -155,6 +162,8 @@ export function createOidcRevalidator(deps: OidcRevalidationDeps) {
       let idToken = row.idToken;
       if (tokens.idToken) {
         const claims = await verify(tokens.idToken, row.accountId);
+        // Recorded even when access is now denied, so entitlements follow the directory.
+        await deps.onClaims?.(row.userId, oidcDirectoryClaims(config, claims));
         if (!isOidcAccessAllowed(config, claims)) return endSso("access_removed");
         idToken = (await sealIdToken(key, tokens.idToken)) ?? null;
       } else if (config.allowedValues?.length) {

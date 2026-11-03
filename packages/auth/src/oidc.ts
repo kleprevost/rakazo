@@ -56,6 +56,45 @@ export function oidcClaimValues(config: OidcConfig, claims: Record<string, unkno
     : [];
 }
 
+/** What the directory said about a person, as stored in `user_directory_claims`. */
+export interface OidcDirectoryClaims {
+  values: string[];
+  /** The directory returned a link or too many values: claim grants must not be trusted. */
+  truncated: boolean;
+}
+
+const MAX_DIRECTORY_VALUES = 1_000;
+const MAX_DIRECTORY_VALUE_LENGTH = 256;
+
+/**
+ * The configured claim for entitlements. Entra replaces an oversized `groups` list with
+ * `_claim_names` (or `hasgroups`) and a link; that is recorded as truncated, never as empty.
+ */
+export function oidcDirectoryClaims(
+  config: OidcConfig,
+  claims: Record<string, unknown>,
+): OidcDirectoryClaims {
+  const name = config.accessClaim ?? "groups";
+  const names = claims._claim_names;
+  const overflow =
+    (typeof names === "object" && names !== null && name in names) ||
+    (name === "groups" && claims.hasgroups === true);
+  const all = oidcClaimValues(config, claims);
+  const values = all.filter((value) => value.length <= MAX_DIRECTORY_VALUE_LENGTH);
+  return {
+    values: values.slice(0, MAX_DIRECTORY_VALUES),
+    truncated: overflow || values.length !== all.length || values.length > MAX_DIRECTORY_VALUES,
+  };
+}
+
+const callbackClaims = new WeakMap<object, OidcDirectoryClaims>();
+
+/** The verified directory claims of this callback's ID token (request-local state). */
+export async function takeOidcDirectoryClaims() {
+  const state = await getOAuthState();
+  return state ? callbackClaims.get(state) : undefined;
+}
+
 export function isOidcAccessAllowed(config: OidcConfig, claims: Record<string, unknown>) {
   const allowed = config.allowedValues ?? [];
   if (allowed.length === 0) return true;
@@ -217,6 +256,8 @@ export function oidcDiscovery(config: OidcConfig) {
           // The provider verifies the signature, issuer, audience and nonce first.
           const info = await (await getProvider()).getUserInfo(tokens);
           if (!info?.data || !("sub" in info.data) || info.data.sub !== claims.sub) return null;
+          const callbackState = await getOAuthState();
+          if (callbackState) callbackClaims.set(callbackState, oidcDirectoryClaims(config, claims));
           if (!isOidcAccessAllowed(config, claims)) {
             // Better Auth turns a validateUserInfo error into a redirect with a code; this
             // callback has no other way to reach it. Without request state, fail closed.

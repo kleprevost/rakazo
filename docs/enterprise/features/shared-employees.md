@@ -445,3 +445,16 @@ security, the contracts in `packages/contracts/src/employees.ts` and the pure ev
 `packages/core/src/employee-access.ts`. Nothing reads them yet and no flag is needed. Not added
 yet: `employeeVersionSeen`, `instanceKind` and `usage_records.employeeId`, which arrive with the
 PRs that use them.
+
+PR 2 (directory claims and reconcile) records the verified `OIDC_ACCESS_CLAIM` values in
+`user_directory_claims` at SSO sign-in, at each revalidation (before the access check, so a user who
+just lost access is recorded too) and on Easy Auth passes when the ID token is new or changed.
+Entra overage (`_claim_names` or `hasgroups`) and oversized values are stored as `truncated`, so
+claim grants confer nothing. `packages/db/src/employee-entitlements.ts` recomputes
+`employee_entitlements` from grants and claims: per user (claims changed) and per employee (grants
+changed, in chunks of users). Each recompute reads current rows after taking a per-user advisory
+lock, applies a diff (`diffEntitlements` in `core`) and records
+`employee.entitlements_reconciled` with ids and counts when anything changed, so concurrent
+instances converge without a global loop. Expired grants drop out at the next sign-in or
+revalidation and in an hourly sweep. Nothing calls the employee-level reconcile yet: grant writes
+arrive with PR 3 and must call `reconcileEmployeeEntitlements` after committing.

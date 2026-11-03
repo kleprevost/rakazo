@@ -144,9 +144,10 @@ const fakeFetch = vi.fn(async (input: string | URL | Request, init?: RequestInit
 
 let jwk: Record<string, unknown>;
 
-function revalidator() {
+function revalidator(extra: Partial<Parameters<typeof createOidcRevalidator>[0]> = {}) {
   return createOidcRevalidator({
     config,
+    ...extra,
     key,
     prisma: prisma as never,
     fetch: fakeFetch as never,
@@ -202,6 +203,21 @@ describe("SSO revalidation", () => {
       },
     ]);
     expect(JSON.stringify(events)).not.toContain("refresh-bob");
+  });
+
+  it("reports the refreshed directory claim, also when access was just removed", async () => {
+    await addUser("alice");
+    await addUser("carol");
+    respondWith("alice", await grant("alice", { roles: ["app.user", "role.eng"] }));
+    respondWith("carol", await grant("carol", { roles: ["other"] }));
+    const seen: Array<[string, unknown]> = [];
+    await revalidator({
+      onClaims: async (userId, claims) => {
+        seen.push([userId, claims]);
+      },
+    }).run();
+    expect(seen).toContainEqual(["alice", { values: ["app.user", "role.eng"], truncated: false }]);
+    expect(seen).toContainEqual(["carol", { values: ["other"], truncated: false }]);
   });
 
   it("revokes when the new ID token no longer carries an allowed value", async () => {

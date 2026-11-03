@@ -44,12 +44,13 @@ import {
 import type { EmailLocaleOf } from "./email.js";
 import { emailLocale, passwordResetEmail, signInCodeEmail, verificationEmail } from "./email.js";
 import { hasRecentIdentityConfirmation, identityConfirmation } from "./identity-confirmation.js";
-import type { OidcConfig } from "./oidc.js";
+import type { OidcConfig, OidcDirectoryClaims } from "./oidc.js";
 import {
   isCurrentOidcAccount,
   isOidcAccessDenied,
   isOidcAdminAccount,
   oidcDiscovery,
+  takeOidcDirectoryClaims,
 } from "./oidc.js";
 import { createOidcKeys } from "./oidc-keys.js";
 import { createOidcRevalidator } from "./oidc-revalidate.js";
@@ -107,6 +108,12 @@ export interface AuthEnv {
   afterReplaceSession?: (previous: AuthSession, session: AuthSession) => Promise<void>;
   /** Runs after each sign-in, with the headers of the request that signed in. */
   afterSignIn?: (userId: string, headers?: Headers) => Promise<void>;
+  /**
+   * Receives the verified directory claim (`OIDC_ACCESS_CLAIM`) of a person at SSO sign-in, at
+   * revalidation and when an Easy Auth token changes. A failure is reported, never fatal.
+   */
+  onDirectoryClaims?: (userId: string, claims: OidcDirectoryClaims, via: string) => Promise<void>;
+  onDirectoryClaimsError?: (error: unknown) => void;
 }
 
 type AuthSession = { id: string; userId: string };
@@ -239,6 +246,14 @@ export function createAuth(prisma: PrismaClient, env: AuthEnv) {
     | Promise<{ secretConfig: TokenKey; internalAdapter: AuthContext["internalAdapter"] }>
     | undefined;
   const tokenKey = async () => (await authContext!).secretConfig;
+  const directoryClaims = async (userId: string, claims: OidcDirectoryClaims, via: string) => {
+    if (!env.onDirectoryClaims) return;
+    try {
+      await env.onDirectoryClaims(userId, claims, via);
+    } catch (error) {
+      env.onDirectoryClaimsError?.(error);
+    }
+  };
   const auth = betterAuth({
     appName: "Rakazo",
     logger: env.logger,
@@ -409,7 +424,13 @@ export function createAuth(prisma: PrismaClient, env: AuthEnv) {
       identityConfirmation(env.email, emailLocaleOf),
       ...(discovery ? [discovery.plugin] : []),
       ...(env.easyAuth && env.oidc
-        ? [easyAuthPlugin({ config: env.oidc, keys: createOidcKeys({ config: env.oidc }) })]
+        ? [
+            easyAuthPlugin({
+              config: env.oidc,
+              keys: createOidcKeys({ config: env.oidc }),
+              onClaims: (userId, claims) => directoryClaims(userId, claims, "easy_auth"),
+            }),
+          ]
         : []),
       ...(emailCodeSignIn
         ? [
@@ -722,6 +743,10 @@ export function createAuth(prisma: PrismaClient, env: AuthEnv) {
                 metadata: { method: "sso" },
               });
             }
+            if (ctx && isOidcCallback(ctx)) {
+              const claims = await takeOidcDirectoryClaims();
+              if (claims) await directoryClaims(session.userId, claims, "sign_in");
+            }
             const previous = replacedSession(ctx);
             if (previous) await env.afterReplaceSession?.(previous, session);
           },
@@ -843,6 +868,9 @@ export function createAuth(prisma: PrismaClient, env: AuthEnv) {
             key: secretConfig,
             prisma,
             onDeferred: (name) => onDeferredSink?.(name),
+            onClaims: env.onDirectoryClaims
+              ? (userId, claims) => env.onDirectoryClaims!(userId, claims, "revalidation")
+              : undefined,
             revokeSessions: async (userId) => {
               const sessions = await internalAdapter.listSessions(userId);
               if (sessions.length)
