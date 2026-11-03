@@ -62,4 +62,28 @@ describe("easyAuthMiddleware", () => {
       { create: true },
     ]);
   });
+
+  it("leaves the request body for later handlers", async () => {
+    const cases = [
+      vi.fn(async () => ({ cookie: undefined, setCookies: [] })),
+      vi.fn(async () => ({ cookie: "session=new", setCookies: ["session=new; Path=/"] })),
+    ];
+    for (const pass of cases) {
+      const app = new Hono();
+      app.use("*", easyAuthMiddleware(pass));
+      app.post("/rpc/x", async (c) => c.json(await c.req.json()));
+      const response = await app.request("/rpc/x", {
+        method: "POST",
+        body: JSON.stringify({ json: { id: "a" } }),
+        headers: {
+          "content-type": "application/json",
+          cookie: "session=old",
+          "x-ms-token-aad-id-token": "token",
+          "x-rakazo-client-ip": "6.6.6.6",
+        },
+      });
+      expect(response.status).toBe(200);
+      expect(await response.json()).toEqual({ json: { id: "a" } });
+    }
+  });
 });

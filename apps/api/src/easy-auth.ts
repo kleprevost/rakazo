@@ -1,7 +1,7 @@
 import { runAsSystem } from "@rakazo/db";
 import { getLogger } from "@rakazo/logging";
 import type { MiddlewareHandler } from "hono";
-import { requestClientIp, withClientIp } from "./client-ip.js";
+import { clientIpHeaders, requestClientIp } from "./client-ip.js";
 
 type EasyAuthPass = (
   headers: Headers,
@@ -23,7 +23,9 @@ export function easyAuthMiddleware(pass: EasyAuthPass | undefined): MiddlewareHa
     const raw = c.req.raw;
     if (!pass || (!raw.headers.has(ID_TOKEN_HEADER) && !raw.headers.get("cookie"))) return next();
     // Better Auth reads the caller's address from one header that only the API may set.
-    const { headers } = withClientIp(raw, requestClientIp(c));
+    // Headers only: building a Request here would move the body out of `raw` and leave later
+    // handlers an already-read body.
+    const headers = clientIpHeaders(raw.headers, requestClientIp(c));
     const result = await runAsSystem("authentication", () =>
       pass(headers, { create: new URL(c.req.url).pathname !== SIGN_OUT_PATH }),
     );
