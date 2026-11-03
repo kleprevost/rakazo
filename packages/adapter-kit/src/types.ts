@@ -262,6 +262,8 @@ export interface SandboxCapabilities {
   fleet?: {
     /** `inspect()` reports the image and isolation of one computer. */
     inspect: boolean;
+    /** `inspect()` also fills CPU and memory usage; some providers cannot. */
+    usage?: boolean;
   };
 }
 
@@ -269,8 +271,17 @@ export interface SandboxCapabilities {
 export interface ComputerInspection {
   runtime: "running" | "stopped" | "gone";
   /** `ref` is the reference the machine was started from; it may be a tag, not a digest. */
-  image?: { ref: string };
+  image?: {
+    ref: string /** The content digest actually running, when the provider knows it. */;
+    digest?: string;
+  };
   isolation: "container" | "microvm" | "vm" | "host" | "unknown";
+  startedAt?: string;
+  /** Provider-visible restarts of the same machine. */
+  restartCount?: number;
+  usage?: { cpuMillis?: number; memoryBytes?: number; memoryLimitBytes?: number; pids?: number };
+  egress?: { mode: "open" | "restricted" | "isolated" | "unknown"; enforced: boolean };
+  health?: "ok" | "degraded" | "unreachable";
 }
 
 export interface ConnectorTool {

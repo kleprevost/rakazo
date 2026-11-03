@@ -1196,3 +1196,43 @@ describe("KubernetesSandboxProvider", () => {
     }
   });
 });
+
+describe("Kubernetes inspection", () => {
+  const digest = `sha256:${"c".repeat(64)}`;
+
+  it("reports the running digest, restarts, start time and readiness", async () => {
+    const pod: V1Pod = {
+      ...readyPod,
+      spec: { containers: [{ name: "computer", image: "registry.example.test/computer:v1" }] },
+      status: {
+        phase: "Running",
+        containerStatuses: [
+          {
+            name: "computer",
+            image: "registry.example.test/computer:v1",
+            imageID: `registry.example.test/computer@${digest}`,
+            ready: false,
+            restartCount: 3,
+            state: { running: { startedAt: new Date("2026-01-01T00:00:00Z") } },
+          },
+        ],
+      },
+    };
+    const provider = providerFor({ readNamespacedPod: vi.fn().mockResolvedValue(pod) });
+    await expect(provider.inspect(computer, context)).resolves.toEqual({
+      runtime: "running",
+      image: { ref: `registry.example.test/computer@${digest}`, digest },
+      isolation: "container",
+      startedAt: "2026-01-01T00:00:00.000Z",
+      restartCount: 3,
+      health: "degraded",
+    });
+  });
+
+  it("reports a missing pod as gone", async () => {
+    const provider = providerFor({
+      readNamespacedPod: vi.fn().mockRejectedValue({ code: 404, statusCode: 404 }),
+    });
+    await expect(provider.inspect(computer, context)).resolves.toMatchObject({ runtime: "gone" });
+  });
+});

@@ -904,23 +904,70 @@ describe("Docker sandbox streams through the supervisor", () => {
   });
 
   it("inspects a computer through the supervisor and reports a missing one as gone", async () => {
+    const digest = `sha256:${"a".repeat(64)}`;
     const fetchMock = vi.fn(async (url: string | URL | Request) =>
-      String(url).endsWith("/computers/gone")
+      String(url).endsWith("/computers/gone/inspect")
         ? new Response("{}", { status: 404 })
-        : Response.json({ id: "box", running: true, image: "registry.example.test/computer:1" }),
+        : Response.json({
+            id: "box",
+            running: true,
+            image: "registry.example.test/computer:1",
+            imageDigest: digest,
+            startedAt: "2026-01-01T00:00:00Z",
+            restartCount: 1,
+            health: "ok",
+            usage: { cpuMillis: 20, memoryBytes: 10 },
+            egress: { mode: "restricted", enforced: true },
+          }),
     );
     vi.stubGlobal("fetch", fetchMock);
     const provider = new DockerSandboxProvider("http://supervisor.test", "test-token");
-    expect(provider.describe().capabilities.fleet).toEqual({ inspect: true });
+    expect(provider.describe().capabilities.fleet).toEqual({ inspect: true, usage: true });
     await expect(
       provider.inspect({ id: "box", botId: "bot", kind: "docker", providerRef: "box" }, context),
     ).resolves.toEqual({
       runtime: "running",
-      image: { ref: "registry.example.test/computer:1" },
+      image: { ref: "registry.example.test/computer:1", digest },
       isolation: "container",
+      startedAt: "2026-01-01T00:00:00Z",
+      restartCount: 1,
+      usage: { cpuMillis: 20, memoryBytes: 10 },
+      egress: { mode: "restricted", enforced: true },
+      health: "ok",
     });
     await expect(
       provider.inspect({ id: "gone", botId: "bot", kind: "docker", providerRef: "gone" }, context),
     ).resolves.toMatchObject({ runtime: "gone" });
+  });
+
+  it("inspects many computers in one supervisor call and keeps each outcome apart", async () => {
+    const fetchMock = vi.fn(async (_url: string | URL | Request, init?: RequestInit) =>
+      Response.json({
+        results: {
+          a: { id: "a", running: false, image: "registry.example.test/computer:1" },
+          b: { error: "(HTTP code 404) no such container - No such container: b" },
+          c: { error: "computer identity mismatch" },
+        },
+        echoed: JSON.parse(String(init?.body)),
+      }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    const provider = new DockerSandboxProvider("http://supervisor.test", "test-token");
+    const ref = (id: string) => ({
+      computer: { id, botId: `bot-${id}`, kind: "docker" as const, providerRef: id },
+      spaceId: `space-${id}`,
+    });
+    const reports = await provider.inspectMany([ref("a"), ref("b"), ref("c"), ref("d")], context);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(String(fetchMock.mock.calls[0]?.[0])).toBe("http://supervisor.test/computers/inspect");
+    expect(JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body)).computers[0]).toEqual({
+      id: "a",
+      botId: "bot-a",
+      spaceId: "space-a",
+    });
+    expect(reports.get("a")).toMatchObject({ runtime: "stopped" });
+    expect(reports.get("b")).toMatchObject({ runtime: "gone" });
+    expect(reports.get("c")).toBeNull();
+    expect(reports.get("d")).toBeNull();
   });
 });

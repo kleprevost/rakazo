@@ -1,6 +1,7 @@
+import { ORPCError } from "@orpc/server";
 import type { AdapterContext } from "@rakazo/adapter-kit";
-import { toComputerRef } from "@rakazo/adapters";
-import type { AdminComputer, AdminComputerPage } from "@rakazo/contracts";
+import { observedHealth, toComputerRef } from "@rakazo/adapters";
+import type { AdminComputer, AdminComputerDetail, AdminComputerPage } from "@rakazo/contracts";
 import { runAsSystem } from "@rakazo/db";
 import { requireAdmin } from "./admins.js";
 import type { RouterDeps } from "./router.js";
@@ -13,6 +14,13 @@ type ComputersDeps = Pick<RouterDeps, "prisma" | "sandbox"> & {
 /** Computers asked at once, and how long one may take, so a slow provider never stalls the page. */
 const INSPECT_PARALLEL = 4;
 const INSPECT_TIMEOUT_MS = 5_000;
+
+/** A computer that is not up has no health to report; otherwise stale observations read `unknown`. */
+const healthFor = (
+  state: string,
+  observation: Parameters<typeof observedHealth>[0],
+  now: Date,
+): AdminComputer["health"] => (state === "stopped" ? "unknown" : observedHealth(observation, now));
 
 const system = <T>(what: string, fn: () => Promise<T>) =>
   runAsSystem(`admin computers: ${what}`, fn);
@@ -97,7 +105,7 @@ export async function adminComputers(
     }),
   );
   const page = rows.slice(0, input.limit);
-  const [owners, runs] = await system("computer details", () =>
+  const [owners, runs, observations] = await system("computer details", () =>
     Promise.all([
       deps.prisma.user.findMany({
         where: { id: { in: [...new Set(page.map((computer) => computer.userId))] } },
@@ -108,8 +116,16 @@ export async function adminComputers(
         where: { computerId: { in: page.map((computer) => computer.id) } },
         _max: { startedAt: true, endedAt: true, lastSeenAt: true },
       }),
+      deps.prisma.computerObservation.findMany({
+        where: { computerId: { in: page.map((computer) => computer.id) } },
+        select: { computerId: true, observedAt: true, health: true },
+      }),
     ]),
   );
+  const observationById = new Map(
+    observations.map((observation) => [observation.computerId, observation]),
+  );
+  const now = new Date();
   const ownerById = new Map(owners.map((owner) => [owner.id, owner]));
   const lastRun = new Map(runs.map((run) => [run.computerId, run._max]));
   const inspected = await inBatches(page, INSPECT_PARALLEL, (computer) =>
@@ -131,10 +147,121 @@ export async function adminComputers(
         spaceName: computer.space.name,
         bots: computer.bots,
         ...(inspected[index] as Inspected),
+        health: healthFor(computer.state, observationById.get(computer.id), now),
         runningSince: computer.runningSince?.toISOString() ?? null,
         lastActivityAt: last?.toISOString() ?? null,
       };
     }),
     nextCursor: rows.length > input.limit ? (page.at(-1)?.id ?? null) : null,
+  };
+}
+
+const RUN_HISTORY = 20;
+
+const asNumber = (value: bigint | number | null | undefined) =>
+  value === null || value === undefined ? null : Number(value);
+
+/** One computer: the list row plus the latest observation, disk and restart history. */
+export async function adminComputer(
+  deps: ComputersDeps,
+  actorId: string,
+  computerId: string,
+): Promise<AdminComputerDetail> {
+  await requireAdmin(deps, actorId);
+  const computer = await system("read computer", () =>
+    deps.prisma.computer.findUnique({
+      where: { id: computerId },
+      select: {
+        id: true,
+        kind: true,
+        scope: true,
+        state: true,
+        homeKey: true,
+        providerRef: true,
+        spaceId: true,
+        userId: true,
+        runningSince: true,
+        createdAt: true,
+        diskUsedBytes: true,
+        diskFreeBytes: true,
+        space: { select: { name: true } },
+        bots: { select: { id: true, name: true }, orderBy: { name: "asc" } },
+        observation: true,
+      },
+    }),
+  );
+  if (!computer) throw new ORPCError("NOT_FOUND", { message: "Computer not found" });
+  const [owner, runs, inspected] = await Promise.all([
+    system("computer owner", () =>
+      deps.prisma.user.findUnique({
+        where: { id: computer.userId },
+        select: { name: true, email: true },
+      }),
+    ),
+    system("computer runs", () =>
+      deps.prisma.computerRun.findMany({
+        where: { computerId },
+        select: { startedAt: true, endedAt: true, endReason: true, lastSeenAt: true },
+        orderBy: { startedAt: "desc" },
+        take: RUN_HISTORY,
+      }),
+    ),
+    inspectComputer(deps, computer),
+  ]);
+  const observation = computer.observation;
+  const last = [runs[0]?.startedAt, runs[0]?.endedAt, runs[0]?.lastSeenAt, computer.runningSince]
+    .filter((at): at is Date => Boolean(at))
+    .sort((a, b) => b.getTime() - a.getTime())[0];
+  return {
+    id: computer.id,
+    kind: computer.kind,
+    scope: computer.scope,
+    state: computer.state,
+    ownerName: owner?.name ?? null,
+    ownerEmail: owner?.email ?? null,
+    spaceName: computer.space.name,
+    bots: computer.bots,
+    ...inspected,
+    health: healthFor(computer.state, observation, new Date()),
+    runningSince: computer.runningSince?.toISOString() ?? null,
+    lastActivityAt: last?.toISOString() ?? null,
+    createdAt: computer.createdAt.toISOString(),
+    imageDigest: observation?.imageDigest ?? null,
+    disk:
+      computer.diskUsedBytes !== null && computer.diskFreeBytes !== null
+        ? { usedBytes: Number(computer.diskUsedBytes), freeBytes: Number(computer.diskFreeBytes) }
+        : null,
+    observation: observation
+      ? {
+          observedAt: observation.observedAt.toISOString(),
+          runtime: observation.runtime as "running" | "stopped" | "gone",
+          startedAt: observation.startedAt?.toISOString() ?? null,
+          restartCount: observation.restartCount,
+          usage:
+            observation.cpuMillis === null &&
+            observation.memoryBytes === null &&
+            observation.pids === null
+              ? null
+              : {
+                  cpuMillis: observation.cpuMillis,
+                  memoryBytes: asNumber(observation.memoryBytes),
+                  memoryLimitBytes: asNumber(observation.memoryLimitBytes),
+                  pids: observation.pids,
+                },
+          egress:
+            observation.egressMode === null || observation.egressEnforced === null
+              ? null
+              : {
+                  mode: observation.egressMode as "open" | "restricted" | "isolated" | "unknown",
+                  enforced: observation.egressEnforced,
+                },
+        }
+      : null,
+    runs: runs.map((run) => ({
+      startedAt: run.startedAt.toISOString(),
+      endedAt: run.endedAt?.toISOString() ?? null,
+      endReason: run.endReason,
+      lastSeenAt: run.lastSeenAt?.toISOString() ?? null,
+    })),
   };
 }

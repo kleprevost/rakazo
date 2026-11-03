@@ -22,6 +22,8 @@ import { Hono } from "hono";
 import { bodyLimit } from "hono/body-limit";
 import { z } from "zod";
 import { computerImageEnsurer } from "./computer-image.js";
+import type { SupervisorInspection } from "./computer-inspection.js";
+import { imageDigestFrom, shapeInspection } from "./computer-inspection.js";
 import type { ComputerEgressMode } from "./computer-spec.js";
 import {
   assertComputerMountSources,
@@ -435,6 +437,68 @@ app.get("/computers/:id", async (c) => {
     const message = error instanceof Error ? error.message : String(error);
     return c.json({ error: message }, 404);
   }
+});
+
+/** Read-only report on one managed computer: image, restarts, usage, egress. Metadata only. */
+async function inspectManagedComputer(id: string, botId?: string, spaceId?: string) {
+  const { container, info } = await managedContainer(id, botId, spaceId);
+  const running = Boolean(info.State.Running);
+  const [image, stats] = await Promise.all([
+    docker
+      .getImage(info.Image)
+      .inspect()
+      .catch(() => undefined),
+    running ? container.stats({ stream: false }).catch(() => undefined) : undefined,
+  ]);
+  return shapeInspection(id, info, {
+    imageDigest: imageDigestFrom(image?.RepoDigests),
+    stats,
+    egressRestricted: computerEgressMode === "restricted",
+  });
+}
+
+app.get("/computers/:id/inspect", async (c) => {
+  try {
+    return c.json(
+      await inspectManagedComputer(
+        c.req.param("id"),
+        c.req.header("x-rakazo-bot-id"),
+        c.req.header("x-rakazo-space-id"),
+      ),
+    );
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    return c.json({ error: message }, 404);
+  }
+});
+
+const MAX_BATCH_INSPECT = 100;
+const BATCH_INSPECT_PARALLEL = 4;
+
+/** Many computers in one call, each checked against its own identity; a miss never fails the rest. */
+app.post("/computers/inspect", async (c) => {
+  const parsed = z
+    .object({
+      computers: z
+        .array(
+          z.object({ id: z.string().min(1), botId: z.string().min(1), spaceId: z.string().min(1) }),
+        )
+        .max(MAX_BATCH_INSPECT),
+    })
+    .safeParse(await c.req.json().catch(() => undefined));
+  if (!parsed.success) return c.json({ error: "invalid request" }, 400);
+  const results: Record<string, SupervisorInspection | { error: string }> = {};
+  const queue = [...parsed.data.computers];
+  await Promise.all(
+    Array.from({ length: BATCH_INSPECT_PARALLEL }, async () => {
+      for (let next = queue.shift(); next; next = queue.shift()) {
+        results[next.id] = await inspectManagedComputer(next.id, next.botId, next.spaceId).catch(
+          (error) => ({ error: error instanceof Error ? error.message : String(error) }),
+        );
+      }
+    }),
+  );
+  return c.json({ results });
 });
 
 app.post("/computers/:id/exec", async (c) => {

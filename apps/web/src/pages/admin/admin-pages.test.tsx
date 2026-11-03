@@ -13,6 +13,7 @@ const api = vi.hoisted(() => ({
   users: vi.fn(),
   bots: vi.fn(),
   computers: vi.fn(),
+  computer: vi.fn(),
   policy: vi.fn(),
   audit: vi.fn(),
   endSessions: vi.fn(),
@@ -51,7 +52,10 @@ vi.mock("../../lib/query", () => {
       overview: plain("overview", () => api.overview()),
       users: { list: paged("users", (input) => api.users(input)) },
       bots: { list: paged("bots", (input) => api.bots(input)) },
-      computers: { list: paged("computers", (input) => api.computers(input)) },
+      computers: {
+        list: paged("computers", (input) => api.computers(input)),
+        get: plain("computer", () => api.computer()),
+      },
       policy: plain("policy", () => api.policy()),
       audit: paged("audit", (input) => api.audit(input)),
     },
@@ -345,6 +349,7 @@ it("shows the computers page: empty, loading, error with retry, and populated", 
         image: "registry.example.test/computer:1",
         isolation: "container",
         inspection: "inspected",
+        health: "degraded",
       },
       {
         ...computer,
@@ -355,6 +360,7 @@ it("shows the computers page: empty, loading, error with retry, and populated", 
         image: null,
         isolation: null,
         inspection: "skipped_unsupported",
+        health: "unknown",
       },
     ],
     nextCursor: null,
@@ -370,9 +376,102 @@ it("shows the computers page: empty, loading, error with retry, and populated", 
     "Running",
     "registry.example.test/computer:1",
     "container",
+    "Degraded",
   ])
     expect(rows[0]).toContain(part);
-  for (const part of ["Courier", "e2b", "Stopped", "Not reported"]) expect(rows[1]).toContain(part);
+  for (const part of ["Courier", "e2b", "Stopped", "Not reported", "Unknown"])
+    expect(rows[1]).toContain(part);
+});
+
+it("opens a computer's detail: observation, disk and restart history, and its failure", async () => {
+  api.computers.mockResolvedValue({
+    computers: [
+      {
+        id: "c1",
+        kind: "docker",
+        scope: "team",
+        state: "running",
+        ownerName: "Mia",
+        ownerEmail: "mia@example.test",
+        spaceName: "Team space",
+        bots: [{ id: "b1", name: "Reporter" }],
+        image: "registry.example.test/computer:1",
+        isolation: "container",
+        inspection: "inspected",
+        health: "ok",
+        runningSince: null,
+        lastActivityAt: null,
+      },
+    ],
+    nextCursor: null,
+  });
+  api.computer.mockRejectedValue(new Error("gone"));
+  const { host } = await show(<AdminComputersPage />);
+  const open = async () => {
+    await act(async () => {
+      (host.querySelector("tbody button") as HTMLButtonElement).click();
+    });
+    await act(async () => {});
+  };
+  await open();
+  expect(document.body.querySelector('[role="alert"]')?.textContent).toContain("gone");
+
+  document.body.innerHTML = "";
+  api.computer.mockResolvedValue({
+    id: "c1",
+    kind: "docker",
+    scope: "team",
+    state: "running",
+    ownerName: "Mia",
+    ownerEmail: "mia@example.test",
+    spaceName: "Team space",
+    bots: [{ id: "b1", name: "Reporter" }],
+    image: "registry.example.test/computer:1",
+    isolation: "container",
+    inspection: "inspected",
+    health: "ok",
+    runningSince: null,
+    lastActivityAt: null,
+    createdAt: "2026-02-01T00:00:00.000Z",
+    imageDigest: `sha256:${"a".repeat(64)}`,
+    disk: { usedBytes: 5 * 1024 ** 3, freeBytes: 5 * 1024 ** 3 },
+    observation: {
+      observedAt: "2026-02-05T00:00:00.000Z",
+      runtime: "running",
+      startedAt: null,
+      restartCount: 3,
+      usage: {
+        cpuMillis: 150,
+        memoryBytes: 512 * 1024 ** 2,
+        memoryLimitBytes: 2 * 1024 ** 3,
+        pids: 9,
+      },
+      egress: { mode: "restricted", enforced: true },
+    },
+    runs: [
+      {
+        startedAt: "2026-02-04T00:00:00.000Z",
+        endedAt: null,
+        endReason: "replaced",
+        lastSeenAt: null,
+      },
+    ],
+  });
+  const second = await show(<AdminComputersPage />);
+  await act(async () => {
+    (second.host.querySelector("tbody button") as HTMLButtonElement).click();
+  });
+  for (let round = 0; round < 3; round += 1) await settle();
+  const detail = document.body.querySelector('[data-testid="admin-computer-detail"]')?.textContent;
+  for (const part of [
+    "Healthy",
+    `sha256:${"a".repeat(64)}`,
+    "Restricted",
+    "3",
+    "150 m",
+    "replaced",
+  ])
+    expect(detail).toContain(part);
 });
 
 it("suspends an AI employee after a confirming click and resumes it in one click", async () => {

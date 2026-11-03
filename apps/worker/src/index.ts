@@ -29,6 +29,7 @@ import {
   createCloudAgentConnection,
   createConnectorStack,
   createDeadJobPruner,
+  createFleetObserver,
   createIdleComputerSweeper,
   createJobReconciler,
   createMessagingContextLoader,
@@ -383,6 +384,7 @@ async function main() {
     reconcileAuditLog: createAuditLogReconciler(prisma, auditLogConfig()),
     reconcileHomeStorage: homeStorageSweeper(home),
     reconcileIdleComputers: createIdleComputerSweeper({ prisma, jobs }),
+    reconcileFleetObservations: createFleetObserver({ prisma, sandbox }),
     reconcileDeadJobs: inMemoryJobs ? undefined : createDeadJobPruner(pool),
   });
   let stopHealth: (() => Promise<void>) | undefined;

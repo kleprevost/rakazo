@@ -245,15 +245,20 @@ export class KubernetesSandboxProvider implements SandboxProvider {
     if (!pod) return { runtime: "gone", isolation: "unknown" };
     const container = pod.spec?.containers?.find((entry) => entry.name === CONTAINER_NAME);
     const running = pod.status?.phase === "Running" && !pod.metadata?.deletionTimestamp;
-    const image = pod.status?.containerStatuses?.find(
-      (entry) => entry.name === CONTAINER_NAME,
-    )?.imageID;
-    const ref = image || container?.image;
+    const status = pod.status?.containerStatuses?.find((entry) => entry.name === CONTAINER_NAME);
+    const ref = status?.imageID || container?.image;
+    const digest = status?.imageID?.match(/sha256:[0-9a-f]{64}$/)?.[0];
+    const startedAt = status?.state?.running?.startedAt;
     return {
       runtime: running ? "running" : "stopped",
-      ...(ref ? { image: { ref } } : {}),
+      ...(ref ? { image: { ref, ...(digest ? { digest } : {}) } } : {}),
       // A runtime class can name any sandbox technology, so only the default is known.
       isolation: this.runtimeClassName ? "unknown" : "container",
+      ...(running && startedAt ? { startedAt: new Date(startedAt).toISOString() } : {}),
+      ...(typeof status?.restartCount === "number" ? { restartCount: status.restartCount } : {}),
+      ...(running && typeof status?.ready === "boolean"
+        ? { health: status.ready ? ("ok" as const) : ("degraded" as const) }
+        : {}),
     };
   }
 

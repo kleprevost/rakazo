@@ -158,6 +158,14 @@ export interface SandboxProvider {
    * is true. Resolves `gone` for a reference the provider no longer holds; throws when it cannot tell.
    */
   inspect?(computer: ComputerRef, context: AdapterContext): Promise<ComputerInspection>;
+  /**
+   * `inspect` for many computers in one provider call, for sweeps. A computer the provider could
+   * not report on maps to null. Offered only alongside `inspect`.
+   */
+  inspectMany?(
+    computers: Array<{ computer: ComputerRef; spaceId: string }>,
+    context: AdapterContext,
+  ): Promise<Map<string, ComputerInspection | null>>;
   /** True only when this computer currently mounts the server's home directory. */
   hasMountedHome?(computer: ComputerRef, context: AdapterContext): Promise<boolean>;
   /** Perform idempotent provider setup after the lifecycle has captured the reference. */

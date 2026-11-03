@@ -1,6 +1,6 @@
 # Computer fleet manager (design)
 
-Design; build plan PR 1 (read-only inventory) is implemented. An Admin page where operators see every bot computer in
+Design; build plan PR 1 (read-only inventory) and PR 2 (observation) are implemented. An Admin page where operators see every bot computer in
 the install and act on them, one or in bulk: recreate from an approved image without losing the
 home folder, terminate, quarantine, hibernate, wake. Provider-neutral. It works first with the Docker
 supervisor on the ACA + VM deployment ([aca-vm.md](../aca-vm.md)) and later with the Kubernetes
@@ -344,10 +344,28 @@ ids, outcome code. Never: paths, file names, provider error text, tokens, screen
    Kubernetes providers, reusing the supervisor's existing `GET /computers/:id`; a computer on a
    provider without it reports `skipped_unsupported`. No migration, no new supervisor endpoint.
    `get` and the detail panel wait for PR 2. Tests: invariants 1, 2.
-2. **Observation.** `fleet` capability flags, `inspect`, supervisor `GET /computers/:id/inspect` and
-   batch, Kubernetes `inspect`, `computer_observations` and image/isolation columns, sweeper,
-   usage/egress/health columns in the UI. Tests: conformance for fake, recorded supervisor, k8s fake
-   client; invariant 16.
+2. **Observation.** As built: `ComputerInspection` gains the running digest, `startedAt`,
+   `restartCount`, `usage`, `egress` and `health`, and the `fleet` flags gain `usage`. Docker: the
+   supervisor's `GET /computers/:id/inspect` (digest from `RepoDigests`, one-shot stats, restart
+   count, health, egress mode) and the batch `POST /computers/inspect` (ids with identity in the
+   body, at most 100, concurrency 4), behind the existing bearer token; the provider's optional
+   `inspectMany` uses it. Kubernetes `inspect` reports the image digest, restarts, start time and
+   readiness. `ConfiguredSandbox` now forwards `inspect`/`inspectMany` (it did not before, so a
+   deployment with saved connections reported every computer unavailable). Additive migration
+   `computer_observations` (own table, row-security system-only, cascade on delete), written by
+   `createFleetObserver` on the reconciler tick about once a minute: it lists computers that may be
+   up on the configured provider, asks the provider (batched when offered), and upserts; a
+   computer it cannot reach keeps its old row and goes stale. `admin.computers.get` returns the list
+   row plus the observation, disk and the last 20 `computer_runs` stretches (the restart history);
+   `list` adds `health`, which is `unknown` for a stopped computer, a missing observation or one
+   older than three intervals (invariant 16). The page gains a Health column and a detail sheet.
+   Deviations: the observer runs inside the leader-held reconciler pass instead of one
+   `computer.fleet.observe` job per computer, which adds no job type and still has a single
+   observer; the `computers` image and isolation columns are not added (nothing reads them before
+   governance, PR 3, where the provisioned digest becomes authoritative); `list` (orphan detection)
+   stays in PR 8. Tests: supervisor shaping and endpoint auth, Docker and Kubernetes adapters,
+   the observer and staleness, admin shaping and authorization, web states, and a Postgres test
+   for the observer table.
 3. **Image governance.** `computers.images` in the policy schema, compliance flags and filter,
    "needs attention" strip, `computer.image.noncompliant` events, `enforce: block_new` at
    `provisionComputer` and the supervisor allow-list and `image` request field. Tests: 12.
@@ -402,4 +420,4 @@ Settled by the maintainer; this and later PRs follow them.
    copy of the check (invariant 12).
 
 Restart history stays `computer_runs` stretches (section 4) until a provider reports `restartCount`
-(PR 2).
+(PR 2: `restartCount` is shown beside the stretches in the detail sheet).

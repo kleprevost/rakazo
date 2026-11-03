@@ -176,6 +176,8 @@ describe("sandbox supervisor HTTP boundary", () => {
     const protectedRequests: Array<[string, string]> = [
       ["POST", "/computers"],
       ["GET", "/computers/id"],
+      ["GET", "/computers/id/inspect"],
+      ["POST", "/computers/inspect"],
       ["POST", "/computers/id/exec"],
       ["POST", "/computers/id/observe"],
       ["POST", "/computers/id/actions"],
