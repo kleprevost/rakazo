@@ -28,6 +28,8 @@ export type HireServices = Pick<
 > & {
   prisma: Pick<PrismaClient, "user">;
   createBot: ReturnType<typeof createRepos>["createBot"];
+  /** Sends the bot's first message as the user; rejects when the run cannot start. */
+  sendStarter: (actor: Actor, botId: string, text: string, clientNonce: string) => Promise<unknown>;
 };
 
 /** Every template, each with the parts central policy refuses. */
@@ -62,9 +64,10 @@ async function seedSkills(tx: Prisma.TransactionClient, actor: Actor, template: 
 }
 
 /**
- * Creates the bot, its skills and its (paused) routines in one transaction, then sends nothing
- * itself: the caller delivers `starterTask` as the bot's first message. Parts central policy
- * refuses are left out and reported, never created.
+ * Creates the bot, its skills and its (paused) routines in one transaction, then sends the
+ * starter task as the bot's first message. The idempotency key makes a retry return the same bot
+ * and the same message, and re-attempts a starter that failed. Parts central policy refuses are
+ * left out and reported, never created.
  */
 export async function hireRole(
   services: HireServices,
@@ -110,6 +113,8 @@ export async function hireRole(
   const seeded: Seeded = { routines: [] };
   const bot: Bot = await services.createBot(actor, {
     name: input.name ?? template.name,
+    // A retried hire with the same key finds the bot it already made.
+    spawnKey: `hire:${actor.userId}:${input.idempotencyKey}`,
     description: template.description,
     instructions: roleTemplateInstructions(template),
     notifyOnFinish: true,
@@ -135,5 +140,19 @@ export async function hireRole(
       getLogger().error("hired routine notice", error);
     });
   }
-  return { bot, starterTask: template.starterTask, blocked };
+  // The same send a typed message takes (model, policy and budget checks, run start). Its
+  // nonce makes a retry replay the saved message instead of adding a second one.
+  const starter = await services
+    .sendStarter(actor, bot.id, template.starterTask, `hire-starter:${input.idempotencyKey}`)
+    .then(
+      () => ({ status: "queued" as const }),
+      (error: unknown) => {
+        getLogger().error("hired starter task", error);
+        return {
+          status: "failed" as const,
+          reason: error instanceof Error ? error.message : "The first task could not be started.",
+        };
+      },
+    );
+  return { bot, starter, blocked };
 }
