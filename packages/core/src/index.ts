@@ -82,6 +82,7 @@ export * from "./refresh-coalescer.js";
 export * from "./remote-images.js";
 export * from "./response-bytes.js";
 export * from "./retry-policy.js";
+export * from "./role-templates/index.js";
 export * from "./room-settings.js";
 export * from "./routine-dispatch.js";
 export * from "./routine-mention-batcher.js";

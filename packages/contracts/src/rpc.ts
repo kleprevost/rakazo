@@ -168,6 +168,7 @@ import {
 } from "./pages.js";
 import { PaymentWalletStatusSchema } from "./payments.js";
 import { MessageReactionSchema } from "./reactions.js";
+import { HireRoleInput, HireRoleOutput, RoleTemplateListItemSchema } from "./role-template.js";
 import { RoutineWatchSchema } from "./routine-watch.js";
 import {
   ROUTINE_HISTORY_PAGE_SIZE,
@@ -791,6 +792,10 @@ export const appContract = {
       .input(z.object({ defaultMemoryScope: MemoryScopeSchema }))
       .output(SpaceMemoryConfigSchema),
     disconnectProvider: oc.output(z.object({ ok: z.literal(true) })),
+  },
+  roleTemplates: {
+    list: oc.output(z.array(RoleTemplateListItemSchema)),
+    hire: oc.input(HireRoleInput).output(HireRoleOutput),
   },
   routines: {
     listForMentions: oc
