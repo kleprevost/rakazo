@@ -1,5 +1,6 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { SecretStoreUnavailableError } from "@rakazo/adapter-kit";
+import { POLICY_DENIED_MESSAGE } from "@rakazo/contracts";
 import type { Hono } from "hono";
 import { readBoundedBody } from "./http-body.js";
 import type { WebhookDeps, WebhookSecretCache } from "./webhook-inbound.js";
@@ -9,6 +10,7 @@ import {
   parseWebhookPayload,
   WEBHOOK_MAX_BODY_BYTES,
 } from "./webhook-inbound.js";
+import { webhookDenied } from "./webhook-policy.js";
 
 export function hasValidGithubSignature(
   signature: string | undefined,
@@ -193,6 +195,9 @@ export function mountGithubWebhookRoute(
     if (!hasValidGithubSignature(c.req.header("x-hub-signature-256"), target.expected, raw)) {
       return unauthorized();
     }
+
+    if (await webhookDenied(target.bot))
+      return c.json({ error: POLICY_DENIED_MESSAGE, reason: "policy" }, 403);
 
     const githubRoutines = await deps.prisma.routine.findMany({
       where: {

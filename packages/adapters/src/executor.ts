@@ -7,7 +7,7 @@ import {
   SandboxUnresponsiveError,
 } from "@rakazo/adapter-kit";
 import type { MessageBlock, ModelRoleChoice, RunStatus } from "@rakazo/contracts";
-import { disabledBuiltinToolSet } from "@rakazo/contracts";
+import { disabledBuiltinToolSet, POLICY_DENIED_MESSAGE } from "@rakazo/contracts";
 import {
   assertTransition,
   botMessageAllowsSilence,
@@ -122,6 +122,12 @@ import { modelAcceptsImageInput } from "./model-vision.js";
 import { usesNativeShell } from "./native-shell.js";
 import { paymentWalletConnected } from "./payment-wallets.js";
 import { isRetiredModelCredentialError } from "./pi-oauth.js";
+import {
+  assertHostComputerAllowed,
+  assertRunTriggerAllowed,
+  filterToolsByBotPolicy,
+  policyDenied,
+} from "./policy-capabilities.js";
 import { loadPurchaseRedactions } from "./purchase-service.js";
 import { loadReplyContext, messageToAgentHistoryText } from "./reply-context.js";
 import { backOffRoutineAfterAccountError } from "./routine-backoff.js";
@@ -884,6 +890,19 @@ export function createRunExecutor(executorDeps: ExecutorDeps) {
             await backOffRoutineAfterAccountError(deps, run.routineId);
           }
         };
+        // A routine or webhook the policy switched off is kept, but never runs.
+        if (
+          await policyDenied(() =>
+            assertRunTriggerAllowed(run.trigger, {
+              userId: run.userId,
+              spaceId: run.spaceId,
+              surface: "run",
+            }),
+          )
+        ) {
+          await failRunBeforeModel(POLICY_DENIED_MESSAGE, run.trigger === "routine");
+          return;
+        }
         if (pinError) {
           await failRunBeforeModel(pinError, pinError === PINNED_PROVIDER_NOT_CONNECTED);
           return;
@@ -1183,13 +1202,21 @@ export function createRunExecutor(executorDeps: ExecutorDeps) {
         const pageBrowserAllowed =
           graphical && browser.describe().capabilities.page && !heldForTakeover;
         const disabledBuiltinTools = disabledBuiltinToolSet(bot.disabledBuiltinTools);
-        const userComputerOwnerId = userComputerOwner({
+        let userComputerOwnerId = userComputerOwner({
           trigger: run.trigger,
           sourceRole: sourceMessage?.role,
           messagingChannelRun: nonOwnerChatRun,
           runUserId: run.userId,
           botUserId: bot.userId,
         });
+        // Recorded only for a run that could have reached the user's computer.
+        if (
+          userComputerOwnerId &&
+          (await policyDenied(() =>
+            assertHostComputerAllowed({ userId: run.userId, spaceId: run.spaceId, surface: "run" }),
+          ))
+        )
+          userComputerOwnerId = undefined;
         let userComputer: UserComputerState;
         let userComputerScreen = false;
         if (
@@ -1238,7 +1265,7 @@ export function createRunExecutor(executorDeps: ExecutorDeps) {
             ? agentConnectionTools.filter((tool) => !disabledBuiltinTools.has(tool.name))
             : []),
         ];
-        const strategicBuiltins = filterStrategicInitiativeTools(builtins, {
+        const strategicBuiltins = filterStrategicInitiativeTools(filterToolsByBotPolicy(builtins), {
           trigger: run.trigger,
           clientNonce: run.clientNonce,
         });

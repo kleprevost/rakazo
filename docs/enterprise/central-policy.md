@@ -53,8 +53,8 @@ data:
 ## Status
 Step 1 is implemented: the full v1 schema (`PolicySchema`, strict, in `packages/contracts/src/policy.ts`),
 the loader and process-wide accessor (`packages/adapters/src/policy-runtime.ts`), and the pure
-evaluator (`packages/core/src/policy.ts`). **Only `models` is enforced**; every other section is
-parsed and validated but has no effect yet.
+evaluator (`packages/core/src/policy.ts`). **`models`, `computers`, `bots`, `messaging` and `data` are enforced**; the rest are
+parsed and validated but have no effect yet.
 
 - `RAKAZO_POLICY_FILE` points at a YAML or JSON file (JSON is read by the YAML parser). It is read
   once at API and worker startup. An unreadable or invalid file stops the process with the failing
@@ -67,6 +67,27 @@ parsed and validated but has no effect yet.
   or backup model, setting the main model and changing a bot's model are refused with `FORBIDDEN`
   and `{ reason: "policy", rule }`. Users see "Blocked by your organization". A saved choice that
   a later policy forbids is kept and fails at run time with that message.
+- `computers`, `bots`, `messaging` and `data` are enforced too (evaluators in
+  `packages/core/src/policy-capabilities.ts`, asserts in `packages/adapters/src/policy-capabilities.ts`).
+  Denials use the same `FORBIDDEN` / `policy.denied` surfaces and message.
+  - `computers.allowProviders`: refused when saving deployment or account computer settings
+    (the picker lists only allowed providers; going back to "default" is always open) and when a
+    computer starts (`provisionComputer`). A computer already running keeps running until it stops.
+  - `computers.allowHostComputer: false`: refuses choosing "this computer" as the host, pairing a
+    desktop, its websocket connection, and runs reaching the user's computer. The host computer is
+    sandbox kind `desktop`, so it must also be listed in `allowProviders` when that list is set.
+    `computers.egress` is not enforced yet.
+  - `bots`: fleet, helper (`run_subagent`, `spawn_bot`) and routine-creation tools are removed
+    from the run's tool set and refused at tool time; enabling "Manage other bots", creating or
+    enabling a routine, enabling a routine webhook and rotating a bot webhook secret are refused.
+    Existing routines and webhooks are kept: their runs fail before the model with the policy
+    message, and inbound webhook requests get 403; each records a denial.
+  - `messaging.allowSurfaces`: surface ids are the chat-app provider ids already in use
+    (`slack`, `telegram`, ...). The Rakazo apps (`web`, `desktop`, `mobile`) are always allowed and
+    need not be listed. A disallowed app is hidden from the status list, cannot be connected, its
+    webhooks get 403, inbound messages are dropped and outbound sends are refused (existing links
+    are kept).
+  - `data.allowAccountExport: false`: refuses issuing an export token and downloading with one.
 - Not yet: a capabilities flag for clients; routines, agent import and other paths that pin a model
   without going through the bot-model check are caught at run time only.
 

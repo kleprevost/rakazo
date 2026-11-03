@@ -47,6 +47,7 @@ import { agentImportSetupState, createImportedBot, previewAgentImport } from "..
 import { deleteAgentSecret, listAgentSecrets, putAgentSecret } from "../agent-secrets.js";
 import { changedBotSettings } from "../bot-setting-analytics.js";
 import { requireIdentityConfirmation } from "../identity-confirmation.js";
+import { assertBotCapabilityAllowedForRequest } from "../policy-capabilities-guard.js";
 import type { RouterDeps } from "../router.js";
 import { loadMessagePage } from "../thread-message-pages.js";
 import type { RouterContext } from "./context.js";
@@ -343,6 +344,8 @@ export function botsRoutes(ctx: RouterContext) {
           });
           if (!section) throw new IsolationError();
         }
+        if (input.fleetManagement === true)
+          await assertBotCapabilityAllowedForRequest(context.actor, "fleetManagement");
         const modelChange = await validateBotModelChange(botModelValidation(context.actor), {
           userId: context.actor.userId,
           spaceId: context.actor.spaceId,
@@ -545,6 +548,7 @@ export function botsRoutes(ctx: RouterContext) {
         return { ok: true as const };
       }),
       rotateWebhookSecret: authed.bots.rotateWebhookSecret.handler(async ({ context, input }) => {
+        await assertBotCapabilityAllowedForRequest(context.actor, "webhooks");
         const bot = await repos.getBot(context.actor, input.botId);
         const plaintext = randomBytes(32).toString("base64url");
         const stored = await deps.secrets.put(plaintext, {

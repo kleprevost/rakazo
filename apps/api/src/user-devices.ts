@@ -1,7 +1,9 @@
 import type { UserDeviceHub, UserDeviceRevokeReason, UserDevices } from "@rakazo/adapters";
 import {
+  assertHostComputerAllowed,
   createUserDeviceToken,
   hashUserDeviceToken,
+  PolicyDeniedError,
   USER_DEVICE_DISCONNECT_PATH,
   USER_DEVICE_FORWARD_PATH,
   USER_DEVICE_LIMIT,
@@ -102,6 +104,13 @@ export function mountUserDeviceRoutes(app: Hono, deps: UserDeviceRouteDeps) {
     const session = await deps.session(c.req.raw);
     if (!session) return c.json({ error: "Unauthorized" }, 401);
     const { userId, sessionId } = session;
+    try {
+      await assertHostComputerAllowed({ userId, surface: "desktop" });
+    } catch (error) {
+      if (error instanceof PolicyDeniedError)
+        return c.json({ error: error.message, reason: "policy", rule: error.rule }, 403);
+      throw error;
+    }
     await deps.devices.releaseSignedOut(userId);
     const body = await readBoundedBody(c.req.raw, 4096);
     if (body === null) return c.json({ error: "Request too large" }, 413);

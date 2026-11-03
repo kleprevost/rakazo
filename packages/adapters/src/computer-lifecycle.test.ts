@@ -15,7 +15,7 @@ import {
   SandboxUnresponsiveError,
 } from "@rakazo/adapter-kit";
 import type { PrismaClient, ThreadEvents } from "@rakazo/db";
-import { clearThread } from "@rakazo/db";
+import { clearThread, installSecurityEventStore } from "@rakazo/db";
 import { describe, expect, it, vi } from "vitest";
 import {
   acquireComputerExecutionLease,
@@ -33,6 +33,7 @@ import {
 import { checkpointComputerWorkspace } from "./computer-workspace.js";
 import { FakeSandboxProvider } from "./fake-sandbox.js";
 import { LocalAgentHomeStore } from "./home.js";
+import { setActivePolicy } from "./policy-runtime.js";
 import { SandboxUnsafeStopError } from "./sandbox-errors.js";
 
 const context = {
@@ -1980,6 +1981,24 @@ describe("Team Computer wake", () => {
 
     await expect(boot(harness)).rejects.toBeInstanceOf(SandboxAllowanceUsedError);
 
+    expect(harness.prisma.computer.updateMany).not.toHaveBeenCalled();
+    expect(harness.sandbox.provision).not.toHaveBeenCalled();
+  });
+
+  it("does not start a computer on a provider the policy does not allow", async () => {
+    const harness = wakeHarness("stopped");
+    Object.assign(harness.sandbox, { provisionKind: async () => "e2b" });
+    installSecurityEventStore({ securityEvent: { create: vi.fn() } } as never);
+    setActivePolicy({ version: 1, computers: { allowProviders: ["kubernetes"] } });
+    try {
+      await expect(boot(harness)).rejects.toMatchObject({
+        reason: "policy",
+        rule: "computers.allowProviders",
+      });
+    } finally {
+      setActivePolicy(undefined);
+      installSecurityEventStore(undefined);
+    }
     expect(harness.prisma.computer.updateMany).not.toHaveBeenCalled();
     expect(harness.sandbox.provision).not.toHaveBeenCalled();
   });

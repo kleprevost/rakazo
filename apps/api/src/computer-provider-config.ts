@@ -2,6 +2,7 @@ import { ORPCError } from "@orpc/server";
 import type { SandboxProvider, SecretStore } from "@rakazo/adapter-kit";
 import type { ResolveHostname, StoredComputerSettings } from "@rakazo/adapters";
 import {
+  activePolicy,
   assertSafeWebUrl,
   COMPUTER_PROVIDER_SECRET_KIND,
   computerProviderDescriptor,
@@ -13,10 +14,12 @@ import {
   refreshComputerProvider,
 } from "@rakazo/adapters";
 import type { Actor, ComputerProviderSettings, ComputerProviderUpdate } from "@rakazo/contracts";
+import { evaluateComputerKind } from "@rakazo/core";
 import type { PrismaClient } from "@rakazo/db";
 import { Prisma, runAsSystem } from "@rakazo/db";
 import { getLogger } from "@rakazo/logging";
 import { requireAdmin } from "./admins.js";
+import { assertComputerProviderAllowedForRequest } from "./policy-capabilities-guard.js";
 import type { RouterDeps } from "./router.js";
 import { withSerializableRetry } from "./serializable-retry.js";
 
@@ -54,7 +57,11 @@ function view(
     defaultProvider,
     values,
     savedSecrets,
-    providers: enabled ? computerProviderDescriptors(account) : [],
+    providers: enabled
+      ? computerProviderDescriptors(account).filter(
+          (descriptor) => evaluateComputerKind(activePolicy(), descriptor.id).allowed,
+        )
+      : [],
   };
 }
 
@@ -153,6 +160,7 @@ export async function updateComputerProviderSettings(
   input: ComputerProviderUpdate,
 ): Promise<ComputerProviderSettings> {
   await requireAdmin(deps, actor.userId);
+  await assertComputerProviderAllowedForRequest(actor, input.provider);
   if (input.provider !== "default" && !routesBySettings(deps.env.sandboxProvider))
     throw new ORPCError("BAD_REQUEST", { message: "This deployment cannot use computer settings" });
   const existing = await loadComputerProviderSelection(deps.prisma, deps.secrets);
@@ -262,6 +270,7 @@ export async function updateAccountComputerSettings(
   actor: Actor,
   input: ComputerProviderUpdate,
 ): Promise<ComputerProviderSettings> {
+  await assertComputerProviderAllowedForRequest(actor, input.provider);
   // Those deployments run every computer on their own provider, never one chosen in Settings,
   // and one without computers has none for an account's private computers to fall back on.
   // Going back to the default stays open, so an account can always remove its saved keys.

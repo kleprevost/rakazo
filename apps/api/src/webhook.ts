@@ -1,4 +1,5 @@
 import { SecretStoreUnavailableError } from "@rakazo/adapter-kit";
+import { POLICY_DENIED_MESSAGE } from "@rakazo/contracts";
 import { hasValidBearerToken } from "@rakazo/core";
 import type { Hono } from "hono";
 import { mountGithubWebhookRoute } from "./github-webhook.js";
@@ -11,6 +12,7 @@ import {
   parseWebhookPayload,
   WEBHOOK_MAX_BODY_BYTES,
 } from "./webhook-inbound.js";
+import { webhookDenied } from "./webhook-policy.js";
 
 export {
   formatGithubEventPrompt,
@@ -58,6 +60,9 @@ export function mountWebhookHttpRoutes(app: Hono, deps: WebhookDeps) {
     if (!target || !hasValidBearerToken(c.req.header("authorization"), target.expected)) {
       return unauthorized();
     }
+
+    if (await webhookDenied(target.bot))
+      return c.json({ error: POLICY_DENIED_MESSAGE, reason: "policy" }, 403);
 
     const payload = parseWebhookPayload(raw, c.req.header("content-type"));
     const eventPrompt = formatWebhookPrompt(payload);

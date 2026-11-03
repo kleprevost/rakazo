@@ -1,5 +1,5 @@
 import type { ConnectorCall, ConnectorTool } from "@rakazo/adapter-kit";
-import { BOT_INSTRUCTIONS_MAX_LENGTH } from "@rakazo/contracts";
+import { BOT_INSTRUCTIONS_MAX_LENGTH, POLICY_DENIED_MESSAGE } from "@rakazo/contracts";
 import { redactSecrets } from "@rakazo/core";
 import { prepareAgentConnectionResponse } from "./agent-connections.js";
 import type { FleetCardSummary } from "./approval-ask.js";
@@ -22,6 +22,11 @@ import { sanitizeConnectorError } from "./connector-safety.js";
 import { isFleetApprovalTool, prepareFleetRequest } from "./fleet-tools.js";
 import { assertConnectorToolArgs, CATALOG_EXECUTE } from "./lazy-tool-catalog.js";
 import { paidRequestEffect, restorePaidRequest } from "./paid-request.js";
+import {
+  assertBotCapabilityAllowed,
+  assertBotToolAllowed,
+  policyDenied,
+} from "./policy-capabilities.js";
 import type { PurchaseApproval } from "./purchase-gate.js";
 import {
   detectPurchase,
@@ -296,6 +301,14 @@ export async function prepareToolRequest(
   const { deps, run, bot } = ctx;
   const { name, executionId, nextApprovedTool } = request;
   let { args } = request;
+  const policyAudience = { userId: run.userId, spaceId: run.spaceId, surface: "run" };
+  if (
+    (await policyDenied(() => assertBotToolAllowed(name, policyAudience))) ||
+    (name === "update_bot" &&
+      argumentGiven(args.bot_id) &&
+      (await policyDenied(() => assertBotCapabilityAllowed("fleetManagement", policyAudience))))
+  )
+    return { error: POLICY_DENIED_MESSAGE };
   // Before the gate, so a run that may never reach the user's computer shows no approval card.
   if (USER_COMPUTER_TOOLS.has(name)) {
     if (!ctx.source.userComputerOwner || !deps.userDevices)

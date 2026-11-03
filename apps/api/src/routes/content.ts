@@ -16,6 +16,7 @@ import {
   listSpaceArtifacts,
 } from "../artifacts.js";
 import { requireIdentityConfirmation } from "../identity-confirmation.js";
+import { assertAccountExportAllowedForRequest } from "../policy-capabilities-guard.js";
 import { listSpaceRuns } from "../runs.js";
 import { querySpaceSearch } from "../search.js";
 import { loadAllMessages } from "../thread-message-pages.js";
@@ -250,6 +251,7 @@ export function contentRoutes(ctx: RouterContext) {
         };
       }),
       accountToken: authed.export.accountToken.handler(async ({ context }) => {
+        await assertAccountExportAllowedForRequest(context.actor);
         await requireIdentityConfirmation(deps.auth, context);
         return { token: await deps.auth.issueAccountExportToken(context.actor.userId) };
       }),
