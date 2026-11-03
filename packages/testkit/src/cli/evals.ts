@@ -8,6 +8,12 @@ import type { AgentRunRequest } from "@rakazo/adapter-kit";
 import { ModelConnectInputSchema } from "@rakazo/contracts";
 import { loadRootEnv } from "@rakazo/core/node/load-root-env";
 import type { StartedPostgreSqlContainer } from "@testcontainers/postgresql";
+import {
+  BRIEFING_EVAL_CASES,
+  BRIEFING_FIXTURE_VERSION,
+  BRIEFING_JUDGE_CALIBRATION,
+  BRIEFING_JUDGE_VERSION,
+} from "../evals/briefing.js";
 import type { EvalCase } from "../evals/cases.js";
 import { EVAL_CASES, HISTORY_EVAL_CASES, wakesRoutines } from "../evals/cases.js";
 import {
@@ -114,6 +120,11 @@ async function main() {
       fixtureVersion: INITIATIVE_FIXTURE_VERSION,
       judge: { version: INITIATIVE_JUDGE_VERSION, calibration: INITIATIVE_JUDGE_CALIBRATION },
     },
+    briefing: {
+      cases: BRIEFING_EVAL_CASES,
+      fixtureVersion: BRIEFING_FIXTURE_VERSION,
+      judge: { version: BRIEFING_JUDGE_VERSION, calibration: BRIEFING_JUDGE_CALIBRATION },
+    },
     memory: {
       cases: MEMORY_EVAL_CASES,
       fixtureVersion: MEMORY_FIXTURE_VERSION,
@@ -133,7 +144,7 @@ async function main() {
   };
   if (!Object.hasOwn(suites, values.suite!))
     throw new Error(
-      "Unknown suite; use product, history, group, silence, initiative, deliberation, memory, tool-choice, or approval",
+      "Unknown suite; use product, history, group, silence, initiative, briefing, deliberation, memory, tool-choice, or approval",
     );
   const suite = suites[values.suite!]!;
   const suiteJudge = suite.judge;

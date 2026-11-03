@@ -47,6 +47,19 @@ describe("role template catalog", () => {
     expect(roleTemplateInstructions(executive)).toContain("send or forward an email");
     expect(executive.routines.map((routine) => routine.name)).toContain("Morning briefing");
   });
+
+  // Structure checks only; whether a briefing is faithful is judged by the opt-in briefing eval.
+  it("ships a briefing that is saved as an artifact by the morning routine", () => {
+    expect(executive.version).toBeGreaterThanOrEqual(2);
+    const skill = executive.skills.find((item) => item.name === "executive-briefing");
+    expect(skill?.body).toContain("write_file");
+    expect(skill?.body).toContain("attach_file");
+    const routine = executive.routines.find((item) => item.name === "Morning briefing");
+    expect(routine?.prompt).toContain("executive-briefing");
+    expect(executive.starterTask).toContain("executive-briefing");
+    // The previous skill name is not reused, so owners who already have it keep it untouched.
+    expect(executive.skills.map((item) => item.name)).not.toContain("daily-briefing");
+  });
 });
 
 describe("RoleTemplateSchema", () => {

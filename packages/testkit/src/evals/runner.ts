@@ -7,7 +7,13 @@ import {
   messageBot,
 } from "@rakazo/adapters";
 import type { MessageBlock, ModelConnectInput, RunStatus } from "@rakazo/contracts";
-import { ACTIVE_RUN_STATUSES, isTerminal } from "@rakazo/core";
+import {
+  ACTIVE_RUN_STATUSES,
+  buildSkillMd,
+  findRoleTemplate,
+  isTerminal,
+  roleTemplateInstructions,
+} from "@rakazo/core";
 import type { createDb } from "@rakazo/db";
 import { createThreadEvents } from "@rakazo/db";
 import { discardBotIntroRun } from "../discard-bot-intro.js";
@@ -211,6 +217,25 @@ export async function runTrial(
       // Direct synthetic fixture state, so setup never depends on the behavior under test.
       if (scenario.botSetup)
         await prisma.bot.update({ where: { id: botId }, data: scenario.botSetup });
+      if (scenario.roleTemplate) {
+        const template = findRoleTemplate(scenario.roleTemplate);
+        if (!template) throw new EvalFailure("harness", "Unknown role template");
+        await prisma.bot.update({
+          where: { id: botId },
+          data: { instructions: roleTemplateInstructions(template) },
+        });
+        for (const skill of template.skills)
+          await prisma.agentSkill.create({
+            data: {
+              spaceId: persistedBot.spaceId,
+              userId: persistedBot.userId,
+              name: skill.name,
+              description: skill.description,
+              content: `${buildSkillMd(skill)}\n`,
+              source: "user",
+            },
+          });
+      }
       if (scenario.botMemory) {
         const documents = await rpc<Array<{ id: string; path: string }>>(
           app,
