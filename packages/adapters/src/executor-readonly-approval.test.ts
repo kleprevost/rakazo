@@ -11,8 +11,8 @@ import type { ActionApprovalRule } from "@rakazo/core";
 import { inboundRoutineBlock } from "@rakazo/core";
 import { approvalEffectKey, toolEffectIdempotencyKey } from "@rakazo/core/node/approval-effect-key";
 import type { PrismaClient } from "@rakazo/db";
-import { createPendingSteeringRun, sendUserMessage } from "@rakazo/db";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { createPendingSteeringRun, installSecurityEventStore, sendUserMessage } from "@rakazo/db";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DENIED_ACTION_ERROR, isApprovalPausedResult } from "./approval-effect.js";
 import { MAX_SHARED_MEMORY_CHARS } from "./builtin-tools.js";
 import type * as ComputerLifecycleModule from "./computer-lifecycle.js";
@@ -21,6 +21,7 @@ import { FakeWebProvider } from "./fake-web.js";
 import type * as FleetToolsModule from "./fleet-tools.js";
 import type { HostComputerRequest } from "./host-computer-protocol.js";
 import { catalogEntries, resolveCatalogCall } from "./lazy-tool-catalog.js";
+import { setActivePolicy } from "./policy-runtime.js";
 import type { TurnCheckpoint } from "./turn-checkpoint.js";
 import { serializeTurnCheckpoint } from "./turn-checkpoint.js";
 import type { UserDeviceGateway } from "./user-device-protocol.js";
@@ -3700,6 +3701,68 @@ describe("a click that completes a purchase on a website", () => {
     f.setCalls([payCall()]);
     await f.run();
     expect(page.acts).toEqual([]);
+    expect(f.pauseRunForInput).toHaveBeenCalledOnce();
+  });
+});
+
+describe("central policy", () => {
+  const events: Array<Record<string, unknown>> = [];
+  beforeEach(() => {
+    events.length = 0;
+    installSecurityEventStore({
+      securityEvent: {
+        create: async (args: { data: Record<string, unknown> }) => {
+          events.push(args.data);
+          return args.data;
+        },
+      },
+    } as never);
+  });
+  afterEach(() => {
+    setActivePolicy(undefined);
+    installSecurityEventStore(undefined);
+  });
+
+  it("refuses a denied tool without a card, in every mode, and audits it", async () => {
+    setActivePolicy({ version: 1, tools: { deny: ["demo_*"] } });
+    const f = fixture({ name: "demo_get_item", skipApprovals: true });
+    await f.run();
+    expect(f.execute).not.toHaveBeenCalled();
+    expect(f.pauseRunForInput).not.toHaveBeenCalled();
+    expect(JSON.stringify(f.results[0])).toContain("blocked by your organization");
+    expect(events).toEqual([
+      expect.objectContaining({
+        type: "policy.denied",
+        metadata: { rule: "tools.deny", subject: "demo_get_item", surface: "run" },
+      }),
+    ]);
+  });
+
+  it("shows a card for an alwaysAsk tool in Never ask, even when Always allow", async () => {
+    setActivePolicy({ version: 1, approvals: { alwaysAsk: ["demo_get_*"] } });
+    const f = fixture({
+      name: "demo_get_item",
+      skipApprovals: true,
+      rules: [{ effect: "always_allow", matchKind: "tool", matchValue: "demo_get_item" }],
+    });
+    await f.run();
+    expect(f.execute).not.toHaveBeenCalled();
+    expect(f.pauseRunForInput).toHaveBeenCalledOnce();
+  });
+
+  it("leaves other tools alone", async () => {
+    setActivePolicy({ version: 1, tools: { deny: ["other_*"] }, approvals: { alwaysAsk: ["x"] } });
+    const f = fixture({ name: "demo_get_item", skipApprovals: true });
+    await f.run();
+    expect(f.execute).toHaveBeenCalledOnce();
+    expect(f.pauseRunForInput).not.toHaveBeenCalled();
+  });
+
+  it("treats Never ask as Ask under an approval floor", async () => {
+    setActivePolicy({ version: 1, approvals: { minimumMode: "ask" } });
+    const f = fixture({ name: "create_space", builtin: true, skipApprovals: true });
+    f.setCalls([{ args: { name: "Support" }, executionId: "call-1" }]);
+    await f.run();
     expect(f.pauseRunForInput).toHaveBeenCalledOnce();
   });
 });

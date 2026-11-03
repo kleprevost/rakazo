@@ -2,7 +2,11 @@ import { ORPCError } from "@orpc/server";
 import { setActivePolicy } from "@rakazo/adapters";
 import { installSecurityEventStore } from "@rakazo/db";
 import { afterEach, describe, expect, it } from "vitest";
-import { assertConnectionAllowedForRequest, assertModelAllowedForRequest } from "./policy-guard.js";
+import {
+  assertApprovalModeForRequest,
+  assertConnectionAllowedForRequest,
+  assertModelAllowedForRequest,
+} from "./policy-guard.js";
 
 const actor = { userId: "user-1", spaceId: "space-1" } as never;
 
@@ -21,6 +25,14 @@ describe("settings-time policy guard", () => {
       }),
     ).resolves.toBeUndefined();
     await expect(assertConnectionAllowedForRequest(actor, "openai")).resolves.toBeUndefined();
+  });
+
+  it("refuses a looser approval mode than the floor with a structured reason", async () => {
+    setActivePolicy({ version: 1, approvals: { minimumMode: "ask" } });
+    await expect(assertApprovalModeForRequest(actor, "ask")).resolves.toBeUndefined();
+    const error = await assertApprovalModeForRequest(actor, "never").catch((e) => e);
+    expect(error.code).toBe("FORBIDDEN");
+    expect(error.data).toEqual({ reason: "policy", rule: "approvals.minimumMode" });
   });
 
   it("answers FORBIDDEN with a structured policy reason", async () => {
