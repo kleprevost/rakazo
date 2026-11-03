@@ -2,12 +2,14 @@ import { ORPCError } from "@orpc/server";
 import type { AdapterContext, ConnectorCatalogItem } from "@rakazo/adapter-kit";
 import { ConnectorAuthUnavailableError } from "@rakazo/adapter-kit";
 import {
+  activePolicy,
   pickReusableConnection,
   planLiveConnectionSync,
   prepareManagedConnectorForTransaction,
   sanitizeComposioError,
 } from "@rakazo/adapters";
 import type { Actor } from "@rakazo/contracts";
+import { filterConnectorCatalog } from "@rakazo/core";
 import type { Prisma, PrismaClient } from "@rakazo/db";
 import {
   IsolationError,
@@ -16,6 +18,7 @@ import {
   runProviderTransaction,
 } from "@rakazo/db";
 import { getLogger } from "@rakazo/logging";
+import { assertConnectorAllowedForRequest } from "../policy-integrations-guard.js";
 import { connectionCreatedEvent } from "../security-audit.js";
 import type { RouterContext } from "./context.js";
 
@@ -253,7 +256,7 @@ export function connectionsRoutes(ctx: RouterContext) {
                   );
                 });
               }
-              return items;
+              return filterConnectorCatalog(activePolicy(), items);
             } catch {
               return [];
             }
@@ -276,6 +279,7 @@ export function connectionsRoutes(ctx: RouterContext) {
         }));
       }),
       begin: authed.connections.begin.handler(async ({ context, input }) => {
+        await assertConnectorAllowedForRequest(context.actor, input.provider);
         const connector =
           deps.integrationSettings &&
           (input.connectorId === "composio" || input.connectorId === "pipedream")

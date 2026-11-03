@@ -53,7 +53,7 @@ data:
 ## Status
 Step 1 is implemented: the full v1 schema (`PolicySchema`, strict, in `packages/contracts/src/policy.ts`),
 the loader and process-wide accessor (`packages/adapters/src/policy-runtime.ts`), and the pure
-evaluator (`packages/core/src/policy.ts`). **`models`, `tools` and `approvals` are enforced**; every other section is
+evaluator (`packages/core/src/policy.ts`). **`models`, `tools`, `approvals` and `integrations` are enforced**; every other section is
 parsed and validated but has no effect yet.
 
 - `RAKAZO_POLICY_FILE` points at a YAML or JSON file (JSON is read by the YAML parser). It is read
@@ -67,6 +67,17 @@ parsed and validated but has no effect yet.
   or backup model, setting the main model and changing a bot's model are refused with `FORBIDDEN`
   and `{ reason: "policy", rule }`. Users see "Blocked by your organization". A saved choice that
   a later policy forbids is kept and fails at run time with that message.
+- Integrations: `integrations.allowConnectors` matches the app slug shown in the connector catalog and
+  on the saved connection (for example `gmail`; case-insensitive, `*` globs), not the managed
+  provider that serves it. Connecting is refused (`connections.begin`), the catalog is filtered, and
+  a connected app the policy no longer allows is dropped from the run's connections so its tools
+  are neither listed nor callable. `integrations.mcp.allowHosts` matches the hostname of every
+  remote MCP, OpenAPI and GraphQL tool source (exact, or `*.example.com` for subdomains only; ports
+  ignored; userinfo tricks resolve to the real host). It is checked on save and on every request
+  those sources make, including OAuth discovery, token and registration endpoints, so list an
+  OAuth server's authorization host too. Local-command (stdio) MCP servers are blocked whenever
+  `allowHosts` is set. Denials record the host only. Not covered: built-in services (web search,
+  voice) and the browser-side OAuth redirect.
 - Tools and approvals: ids are the tool names the approval Allow/Block lists use (a built-in
   tool's name, or an installed connector tool's name; every name a call goes by, including each
   batch action, is checked), globs case-insensitive. `tools.deny` is checked in the run gate

@@ -18,6 +18,10 @@ import { assertNameFreeWhereAvailable, userAddedAvailability } from "./availabil
 import { dismissMcpServerApprovals } from "./mcp-approval.js";
 import type { McpSecretMaterial } from "./mcp-material.js";
 import { legacyMcpArgs } from "./mcp-material.js";
+import {
+  assertStdioMcpAllowedForRequest,
+  assertToolSourceAllowedForRequest,
+} from "./policy-integrations-guard.js";
 import type { RouterDeps } from "./router.js";
 import { computerContext } from "./routes/shared.js";
 
@@ -117,13 +121,16 @@ export async function assertMcpStdioCommand(
   const refusal = mcpStdioRefusal(command, mcpStdioPolicy(deps));
   if (refusal) throw new ORPCError("BAD_REQUEST", { message: refusal });
   await assertMcpStdioAdmin(actor, deps);
+  await assertStdioMcpAllowedForRequest(actor);
 }
 
 export async function assertMcpRemoteEndpoint(
   endpoint: string | null | undefined,
   deps: Pick<RouterDeps, "remoteConnectors" | "env">,
+  actor?: Actor,
 ): Promise<void> {
   if (!endpoint) return;
+  await assertToolSourceAllowedForRequest(endpoint, actor);
   try {
     await assertSafeRemoteUrl(endpoint, deps.remoteConnectors?.resolveHostname, {
       allowPrivateEndpoint: mayUsePrivateEndpoint(deps),
@@ -289,11 +296,11 @@ export function createMcpServers(
     return painted;
   };
   const prepareMcpServer = async (actor: Actor, input: McpServerConfigInput) => {
-    await assertMcpRemoteEndpoint("endpoint" in input ? input.endpoint : null, deps);
+    await assertMcpRemoteEndpoint("endpoint" in input ? input.endpoint : null, deps, actor);
     if (input.transport === "stdio") {
       await assertMcpStdioCommand(input.command, actor, deps);
       assertMcpOAuthTemplates(input.env, input.files ?? {}, Boolean(input.oauthClient));
-      await assertMcpRemoteEndpoint(input.oauthClient?.authorizationServer, deps);
+      await assertMcpRemoteEndpoint(input.oauthClient?.authorizationServer, deps, actor);
     }
     const secretPayload = buildMcpCredentialBlob(input);
     return secretPayload

@@ -63,6 +63,7 @@ import {
   listPluginSubmissions,
   reviewPluginSubmission,
 } from "../plugin-submissions.js";
+import { policyForbidden } from "../policy-integrations-guard.js";
 import type { RouterContext } from "./context.js";
 import { computerContext, isUniqueViolation } from "./shared.js";
 
@@ -260,6 +261,8 @@ export function mcpRoutes(ctx: RouterContext) {
             config = prepared.config;
           }
         } catch (error) {
+          const denied = policyForbidden(error);
+          if (denied) throw denied;
           const message = sanitizeComposioError(error);
           throw new ORPCError("BAD_REQUEST", {
             message: credential ? message.split(credential).join("[redacted]") : message,
@@ -468,7 +471,7 @@ export function mcpRoutes(ctx: RouterContext) {
             }
             const nextEndpoint = "endpoint" in config ? config.endpoint : null;
             if (existing.endpoint !== nextEndpoint) {
-              await assertMcpRemoteEndpoint(nextEndpoint, deps);
+              await assertMcpRemoteEndpoint(nextEndpoint, deps, context.actor);
             }
             if (config.transport === "stdio") {
               await assertMcpStdioCommand(config.command, context.actor, deps);
