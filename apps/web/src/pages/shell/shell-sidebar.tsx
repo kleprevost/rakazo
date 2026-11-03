@@ -156,20 +156,17 @@ export function ShellSidebar({
             toggleActivityMode();
           }}
           searchOpen={searchOpen && !mini}
-          onSearch={
-            activityMode && !mini
-              ? undefined
-              : () => {
-                  if (searchOpen && !mini) {
-                    setQuery("");
-                    setSearchOpen(false);
-                    return;
-                  }
-                  if (mini) setCollapsedPref(false);
-                  setSearchOpen(true);
-                  focusSidebarSearch();
-                }
-          }
+          onSearch={() => {
+            if (searchOpen && !mini) {
+              if (activityMode) setActivityFilters({ ...activityFilters, query: "" });
+              else setQuery("");
+              setSearchOpen(false);
+              return;
+            }
+            if (mini) setCollapsedPref(false);
+            setSearchOpen(true);
+            focusSidebarSearch();
+          }}
           setBotsSidebarCollapsedPref={setCollapsedPref}
           bots={bots}
           setMobileSidebarOpen={setMobileOpen}
@@ -178,7 +175,12 @@ export function ShellSidebar({
           setNewSpaceOpen={setNewSpaceOpen}
           setCreateBotOpen={setCreateBotOpen}
         />
-        {mini || !(activityMode || searchOpen || query) ? null : (
+        {mini ||
+        !(
+          searchOpen ||
+          query ||
+          (activityMode && (activityFilterCount > 0 || activityFiltersExpanded))
+        ) ? null : (
           <InputGroup
             data-testid="sidebar-search"
             className="mx-2.5 mb-3 w-auto rounded-xl bg-card dark:bg-input border border-border text-muted-foreground focus-within:border-ring"
@@ -199,11 +201,8 @@ export function ShellSidebar({
                   event.keyCode === 229
                 )
                   return;
-                if (activityMode) {
-                  setActivityFilters({ ...activityFilters, query: "" });
-                  return;
-                }
-                setQuery("");
+                if (activityMode) setActivityFilters({ ...activityFilters, query: "" });
+                else setQuery("");
                 setSearchOpen(false);
               }}
               placeholder={activityMode ? t`Search runs` : t`Search`}
@@ -395,10 +394,6 @@ function ShellSidebarFooter({
         onSettings={() => {
           setMenuOpen(false);
           openSettings("general");
-        }}
-        onUsage={() => {
-          setMenuOpen(false);
-          openSettings("usage");
         }}
         onAdmin={
           isAdmin
