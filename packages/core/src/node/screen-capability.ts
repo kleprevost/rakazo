@@ -112,7 +112,7 @@ export function sealScreenCapability(
     view_only: policy === "control" ? "false" : "true",
     // noVNC can resolve paths relative to its document directory. An absolute
     // path prevents it from repeating the capability prefix.
-    path: target.pathname === "/embed.html" ? "websockify" : `${prefix}/websockify`,
+    path: target.pathname.endsWith("/embed.html") ? "websockify" : `${prefix}/websockify`,
   }).toString();
   return result.toString();
 }
@@ -266,11 +266,14 @@ export function screenPolicyPath(requestedPath: string, interactive: boolean) {
 function remoteTargetPath(target: URL, requestedPath: string) {
   const requested = new URL(requestedPath, "https://screen.invalid");
   const path = requested.pathname || target.pathname || "/";
-  if (path === "/websockify" && target.searchParams.has("path")) {
+  // A page served below a directory (a reverse proxy's route) opens its socket beside itself.
+  const pageSocket = `${target.pathname.slice(0, target.pathname.lastIndexOf("/") + 1)}websockify`;
+  const isSocket = path === "/websockify" || path === pageSocket;
+  if (isSocket && target.searchParams.has("path")) {
     const socket = new URL(target.searchParams.get("path")!, target);
     return `${socket.pathname}${socket.search}`;
   }
-  if (path === target.pathname || path === "/websockify") {
+  if (path === target.pathname || isSocket) {
     return `${path}${target.search}`;
   }
   return `${path}${requested.search}`;

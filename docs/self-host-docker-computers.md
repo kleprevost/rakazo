@@ -9,6 +9,17 @@ it is equivalent to control of the Docker host. Docker sandboxes require `SANDBO
 (API, worker, supervisor). `SCREEN_PROXY_SECRET` signs browser-screen capabilities (API and web
 proxy). Keep both distinct from `BETTER_AUTH_SECRET`.
 
+## Supervisor on another host
+
+By default the web process opens a computer's screen and terminal on its Docker network, so it
+must run beside the supervisor. When the app runs elsewhere, set `SANDBOX_SCREEN_VIA_SUPERVISOR=true`
+on the API and worker, with `SANDBOX_SUPERVISOR_URL` as a private IP address (the screen proxy
+refuses other plain-HTTP hosts). Screens and terminals then stream through the supervisor's own port
+(7091), so no other port on its host needs to be reachable. The supervisor serves
+`/computers/<id>/screen/...` and `/computers/<id>/terminal/...` only for a short-lived capability
+tied to that computer and purpose, never for the supervisor token. See
+[Container Apps and a Docker VM](./enterprise/aca-vm.md).
+
 ## Resource ceilings
 
 Each Docker computer runs Xvfb, a window manager and a full Chromium driven by an agent that

@@ -190,6 +190,8 @@ x-app-environment: &app-environment
   SANDBOX_PROVIDER: ${SANDBOX_PROVIDER:-docker}
   SANDBOX_SUPERVISOR_URL: http://supervisor:7091
   SANDBOX_SUPERVISOR_TOKEN: ${SANDBOX_SUPERVISOR_TOKEN:?Set SANDBOX_SUPERVISOR_TOKEN in .env}
+  # Same-host supervisor: screens reach the web container directly.
+  SANDBOX_SCREEN_VIA_SUPERVISOR: "false"
   SANDBOX_HOST_URL: ${SANDBOX_HOST_URL:-}
   SANDBOX_HOST_TOKEN: ${SANDBOX_HOST_TOKEN:-}
   SANDBOX_COMMAND_TIMEOUT_MS:

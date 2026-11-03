@@ -5,9 +5,9 @@ Apps (ACA), Postgres Flexible Server, and one private Linux VM running the Docke
 and the bot computers (`SANDBOX_PROVIDER=docker`). Entra and Foundry as in [entra-id.md](./entra-id.md)
 and [inference.md](./inference.md); Key Vault optional ([azure-key-vault.md](./azure-key-vault.md)).
 
-**Verdict: needs code changes.** Config alone cannot work, because the browser-facing screen and
-terminal streams are proxied by the web process, which only reaches a computer on its Docker bridge
-or loopback (section 2). Shared storage for bot homes also needs an NFS share (section 3).
+**Verdict: needed code changes, now in place for screens and terminals** (supervisor stream proxy,
+`SANDBOX_SCREEN_VIA_SUPERVISOR`, section 2). The web process alone only reaches a computer on its
+Docker bridge or loopback. Shared storage for bot homes also needs an NFS share (section 3).
 
 ```
  Browser --https/wss--> ACA ingress --> web (vite preview, /novnc proxy)
@@ -68,6 +68,43 @@ or loopback (section 2). Shared storage for bot homes also needs an NFS share (s
   | C. Second `web` on the VM | Run the VM as a Compose project (supervisor + screen-only `web`), route `/novnc/*` to it with Front Door/App Gateway; it needs `SCREEN_PROXY_SECRET` and API reachability | None in Rakazo, extra edge service | edge -> VM 5173 |
   | D. Generic reverse proxy on the VM | Cannot work: upstream is per-container and dynamic | n/a | n/a |
   Use A; B is the fallback if A takes too long; C avoids code but adds Front Door and a second web.
+
+**Option A is implemented** (the table above describes the design before it; the details below
+supersede it). Opt in with `SANDBOX_SCREEN_VIA_SUPERVISOR=true` on the API and worker (unset or
+`false` keeps today's behavior), and set `SANDBOX_SUPERVISOR_URL` to the VM's private IP, since the
+screen proxy accepts plain-HTTP targets only when they are IP addresses on a private range.
+
+- Routes on the supervisor port: `GET /computers/<id>/screen/<path>` and
+  `GET /computers/<id>/terminal/<path>`, plus the WebSocket upgrade on the same paths
+  (`infra/sandboxes/supervisor/src/screen-proxy.ts`). Existing `/computers/*` routes are unchanged and
+  still need the bearer token; only these two prefixes are answered by the proxy, and only with a
+  capability. Only GET (and HEAD for plain HTTP) is forwarded.
+- Capability: `rsc1.<base64url JSON [computerId, containerPort, "screen"|"terminal", expiresAtMs]>.<base64url HMAC-SHA256>`
+  (`packages/core/src/node/supervisor-proxy-capability.ts`). The key is `HMAC(SANDBOX_SUPERVISOR_TOKEN,
+  "rakazo supervisor proxy capability v1")`, so the raw token is never used as a key and never leaves the
+  trusted processes. Expiry is about 65 to 70 minutes (longer than a sealed screen capability, rounded
+  to 5 minutes so repeated mints are identical and the web process can reuse a seal). The adapter
+  returns it as `ScreenSession.headers.authorization`; the API seals it into the web capability, and the
+  web process sends it upstream. It is not in any URL, so it stays out of browser history and access logs.
+- What the supervisor enforces: constant-time signature check; not expired; the computer in the path
+  equals the computer in the capability; the purpose matches the route; the port is one of the
+  computer's screen ports (6080). The upstream address is never taken from the request: the supervisor
+  inspects the named container, requires it to be running and Rakazo-managed, and resolves its address
+  with the same rule it uses for screens (bridge IP in `isolated`/`internal` mode, published port
+  otherwise). Paths with `..`, encoded separators or `//` are refused, the capability and cookies
+  are not forwarded to the computer, and `Set-Cookie` is not returned. At most 512 proxied streams.
+- Web side: `remoteTargetPath` and the embed-page socket path in `screen-capability.ts` now treat a
+  page below a directory (`/computers/<id>/screen/embed.html`) as its socket's neighbour
+  (`.../websockify`); pages at the root behave as before.
+- WebSockets: the supervisor hands the upgrade to the computer's websockify as a raw TCP pipe, so
+  frames, backpressure and half-close pass through unchanged; either side closing (or a FIN) tears
+  down both within a second, and the stream ends when its capability expires. The web process
+  rechecks authorization each second and closes the pair on revoke, as before.
+- Idle timeouts: the computer's websockify runs with `--heartbeat=30`, so a ping frame crosses the
+  chain every 30 s in both directions, below ACA's roughly 240 s idle limit. Not verified on ACA itself.
+- Requirements: `SANDBOX_SCREEN_NETWORK=isolated` (compose default) or `internal` still has the
+  supervisor attach itself to the computer's network, which is what lets it reach the bridge address;
+  the supervisor must run as a container with its default hostname. No other VM port is used.
 
 ## 3. Shared storage
 
@@ -135,7 +172,7 @@ files (`lessons.md:7`), but ACA is outside that test.
 | `SANDBOX_SUPERVISOR_TOKEN` | x | x | | | x | secret |
 | `OIDC_CLIENT_SECRET` | x | | | | | secret |
 | `AZURE_OPENAI_API_KEY` (Foundry) | x | x | | | | secret |
-| `SANDBOX_PROVIDER=docker`, `SANDBOX_SUPERVISOR_URL=http://<vm-ip>:7091` | x | x | | | | no |
+| `SANDBOX_PROVIDER=docker`, `SANDBOX_SUPERVISOR_URL=http://<vm-ip>:7091`, `SANDBOX_SCREEN_VIA_SUPERVISOR=true` | x | x | | | | no |
 | `BETTER_AUTH_URL`, `WEB_ORIGIN`, `API_URL`, `RAKAZO_HOST`, `TRUSTED_PROXIES`, `API_HOST=0.0.0.0` | x | | | | | no |
 | `RAKAZO_HOST`, `API_PROXY_TARGET`, `NODE_ENV`, `RAYON_NUM_THREADS=4` | | | x | | | no |
 | `OIDC_ISSUER/CLIENT_ID/NAME/ACCESS_CLAIM/ALLOWED_VALUES/ADMIN_VALUES` | x | | | | | no |
@@ -172,7 +209,8 @@ SSH via Bastion or none.
 
 ## 6. Gaps and risks, ranked
 
-1. **Screen/terminal reachability (code).** Section 2 option A (or B). Blocks the core "watch the computer" flow.
+1. **Screen/terminal reachability (code, option A implemented).** Needs a live test on ACA: a screen held
+   open for 10 minutes, and the terminal. Blocks the core "watch the computer" flow until verified.
 2. **Shared `/data` over NFS (infra + unverified).** Needs a Premium Files NFS share on ACA and the VM; ownership
    (uid 1000, `chown`) and the bind mount through a NFS path are untested.
 3. **Worker drain and probes on ACA (config).** 600 s grace versus 45 min of job drain; no exec probe.
@@ -180,8 +218,9 @@ SSH via Bastion or none.
 4. **Egress on Azure (config).** Add the 168.63.129.16 drop; confirm DNS on the Docker version in use.
 5. **Ingress timeouts for SSE/ws (unverified).** Needs a live test.
 6. **Supervisor is plain HTTP with a static bearer token, and Docker socket access is host control.** Restrict by
-   NSG and subnet; consider mTLS or a private-link proxy later. The bearer token is also sealed into screen
-   capabilities under option A; that capability is AES-GCM encrypted, still treat as sensitive.
+   NSG and subnet; consider mTLS or a private-link proxy later. Under option A the bearer token is not
+   sealed into screen capabilities: only the scoped, expiring stream capability is. Anyone who can reach
+   the supervisor port can still try capabilities, so the NSG limit to the ACA subnet matters.
 7. **Single VM, single point of failure and capacity.** Caps: `SANDBOX_MAX_COMPUTERS_PER_USER`, `_PER_SPACE`.
 8. **Not verifiable offline:** ACA NFS mounts, ACA `terminationGracePeriodSeconds`, Envoy source IPs for
    `TRUSTED_PROXIES`, managed identity with `DefaultAzureCredential` in ACA, Docker/iptables on the chosen VM image.
@@ -214,7 +253,7 @@ zone); `identity.bicep` (without the AKS federation, or a variant). New:
 
 ## Decisions needed
 
-1. Screen path: A (supervisor proxy), B (publish on private IP), or C (Front Door + second web)?
+1. Screen path: decided, A (supervisor proxy, implemented). B and C remain fallbacks.
 2. Worker location: ACA (accept the 600 s drain limit) or on the VM next to the supervisor?
 3. `/data`: Premium NFS share (recommended), or move homes and artifacts to object storage and accept
    the cache requirement (still needs a share between VM and ACA for homes)?
