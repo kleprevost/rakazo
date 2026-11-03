@@ -1055,14 +1055,14 @@ msgstr "Bloquer"
 msgid "Blocked"
 msgstr ""
 
-#: src/lib/user-error.ts
-msgid "Blocked by your organization"
-msgstr ""
-
 #. js-lingui-explicit-id
 #: src/lib/run-error.ts
 msgid "Blocked by your organization"
 msgstr "Bloqué par votre organisation"
+
+#: src/lib/user-error.ts
+msgid "Blocked by your organization"
+msgstr ""
 
 #: src/components/SidebarFooter.tsx
 #: src/pages/Board.tsx

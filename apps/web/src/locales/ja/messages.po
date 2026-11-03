@@ -1055,14 +1055,14 @@ msgstr "ブロック"
 msgid "Blocked"
 msgstr "ブロック中"
 
-#: src/lib/user-error.ts
-msgid "Blocked by your organization"
-msgstr ""
-
 #. js-lingui-explicit-id
 #: src/lib/run-error.ts
 msgid "Blocked by your organization"
 msgstr "組織によってブロックされています"
+
+#: src/lib/user-error.ts
+msgid "Blocked by your organization"
+msgstr ""
 
 #: src/components/SidebarFooter.tsx
 #: src/pages/Board.tsx
