@@ -1,4 +1,5 @@
 import type { AdapterContext, SecretStore } from "@rakazo/adapter-kit";
+import { AZURE_KEY_VAULT_REF_PREFIX } from "./azure-key-vault-secret-store.js";
 import { INFISICAL_REF_PREFIX } from "./infisical-secret-store.js";
 import { deleteSecretBestEffort } from "./secret-store-factory.js";
 
@@ -38,7 +39,11 @@ export async function upgradeLegacySecrets(
   const counts = { migrated: 0, verified: 0, planned: 0, concurrent: 0, failed: 0 };
   for await (const row of repository.rows()) {
     if (context.signal.aborted) break;
-    if (row.ref.startsWith("v2:") || row.ref.startsWith(INFISICAL_REF_PREFIX)) {
+    if (
+      row.ref.startsWith("v2:") ||
+      row.ref.startsWith(INFISICAL_REF_PREFIX) ||
+      row.ref.startsWith(AZURE_KEY_VAULT_REF_PREFIX)
+    ) {
       counts.verified++;
       continue;
     }

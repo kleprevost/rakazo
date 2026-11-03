@@ -6,6 +6,8 @@ import type { KeyProvider } from "@rakazo/adapter-kit";
 import { LocalKeyProvider, withLocalMasterKeys } from "@rakazo/db";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { AwsKmsKeyProvider, awsKmsConfigFromEnv } from "./aws-kms-key-provider.js";
+import { fakeKeyVaultCrypto } from "./azure-key-vault-fake.js";
+import { AzureKeyVaultKeyProvider } from "./azure-key-vault-key-provider.js";
 import { contentKeyProviderFromEnv } from "./key-provider-factory.js";
 import { unwrapEnv, wrapEnvValue } from "./wrapped-env.js";
 
@@ -145,6 +147,13 @@ function conformance(name: string, create: () => KeyProvider) {
 conformance("local", local);
 conformance("AWS KMS", aws);
 conformance("AWS KMS with local master keys", () => withLocalMasterKeys(aws(), local()));
+
+const AZURE_KEY =
+  "https://rakazo-test.vault.azure.net/keys/rakazo/0123456789abcdef0123456789abcdef";
+const azureCrypto = fakeKeyVaultCrypto([AZURE_KEY]).crypto;
+const azure = () => new AzureKeyVaultKeyProvider({ keyId: AZURE_KEY }, azureCrypto);
+conformance("Azure Key Vault", azure);
+conformance("Azure Key Vault with local master keys", () => withLocalMasterKeys(azure(), local()));
 
 describe("AWS KMS key provider", () => {
   it("sends the space and version as encryption context", async () => {
