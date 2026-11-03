@@ -161,6 +161,11 @@ export const ROW_SECURITY_MODELS: ReadonlySet<string> = new Set([
   "SecurityEvent",
   "AuditEvent",
   "Page",
+  "Employee",
+  "EmployeeVersion",
+  "EmployeeGrant",
+  "UserDirectoryClaim",
+  "EmployeeEntitlement",
   "PageVersion",
 ]);
 

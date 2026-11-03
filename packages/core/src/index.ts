@@ -35,6 +35,7 @@ export * from "./cron.js";
 export * from "./display-name.js";
 export * from "./echo.js";
 export * from "./email-typo.js";
+export * from "./employee-access.js";
 export * from "./events.js";
 export * from "./farewell.js";
 export * from "./featured-connectors.js";

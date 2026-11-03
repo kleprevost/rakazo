@@ -414,19 +414,34 @@ credentials and autonomy are strictly additive after.
   check, so a bug in that module could over-grant. Hence the Postgres policy tests and
   the import-boundary test.
 
-## Open questions for the maintainer
+## Decisions
 
-1. Should the instance be a real `Bot` in the user's space (this design, maximum reuse and
-   isolation) or a lighter "binding" row with lazily created state? The former is simpler to ship;
-   the latter reduces row count at large scale.
-2. Which role may use `shared` credentials and approve shared-identity actions: Owner only, any
-   Manager, or a separate approver list?
-3. Is the proposer's identity shown to reviewers by default, and should Collaborators be allowed
-   to edit approved knowledge directly in small teams?
-4. Does an employee belong to one team (Owner group) or can Managers be directory groups? Should
-   claim grants be allowed to confer Manager?
-5. Messaging surfaces (Teams/Slack channels with many users): out of scope for v1, or served by the
-   service instance with a clear "shared" label?
-6. Upstream posture: send the employee layer upstream, or keep as fork-only modules?
-7. Should the admin be able to take over an ownerless employee (read definition only, never
-   instance content)? This design says yes.
+Recorded from the maintainer; the sections above are read in their light.
+
+1. **An instance is a full `Bot` row** (nullable `bots.employeeId`), not a lighter binding. Every
+   existing feature (threads, memory, computers, routines, Today, budgets) works on instances
+   unchanged.
+2. **Shared-identity credentials are authorized by the employee Owner only**, plus an optional
+   admin-configured approver list. Managers configure which credential an employee uses but cannot
+   attach a shared one. The access evaluator expresses this as `authorize_shared_credential`
+   (Owner, or a listed approver who still holds at least Collaborator) next to
+   `configure_credentials` (Manager and up). This replaces "or Manager if policy allows" in the
+   Credential model, and `allowedRoles` there still limits who may *use* a shared credential.
+3. **Shared multi-user channels (Teams or Slack channels) talk only to the employee's service
+   instance, using the shared identity.** Personal credentials and personal memory are never used
+   in group channels; a direct message still links to the requester's own instance. This replaces
+   "not supported" in the Messaging apps note and depends on the service instance (PR 10).
+
+Open items not decided here: whether proposer identity is shown to reviewers (default hidden),
+whether claims may confer Manager (the evaluator allows it only when an Owner created that grant;
+a claim never confers Owner, enforced in the evaluator and by a database check), upstream posture,
+and admin takeover of an ownerless employee (definition only, never instance content).
+
+## Status
+
+PR 1 (schema foundation) ships the tables above except knowledge, proposals, access requests and
+shared connections, `bots.employeeId` with a one-instance-per-user partial unique index, row-level
+security, the contracts in `packages/contracts/src/employees.ts` and the pure evaluator in
+`packages/core/src/employee-access.ts`. Nothing reads them yet and no flag is needed. Not added
+yet: `employeeVersionSeen`, `instanceKind` and `usage_records.employeeId`, which arrive with the
+PRs that use them.

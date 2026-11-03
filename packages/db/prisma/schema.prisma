@@ -23,6 +23,8 @@ model AiDataConsent {
 
 model User {
   aiDataConsents AiDataConsent[]
+  directoryClaim       UserDirectoryClaim?
+  employeeEntitlements EmployeeEntitlement[]
   pages          Page[]
   id                          String                       @id
   name                        String
@@ -763,6 +765,8 @@ model Bot {
   crossSpaceCommunication Boolean @default(true)
   dailyCheckIns Boolean @default(true)
   fleetManagement        Boolean @default(true)
+  employeeId        String?
+  employee          Employee?         @relation(fields: [employeeId], references: [id], onDelete: SetNull)
   routines          Routine[]
   scratchpadItems   ScratchpadItem[]
   taughtSkills      TaughtSkill[]
@@ -789,6 +793,8 @@ model Bot {
   @@index([sectionId])
   @@index([computerId])
   @@index([parentBotId])
+  @@index([employeeId])
+  // Partial unique index bots_employee_user_key (employeeId, userId) WHERE employeeId IS NOT NULL is created in SQL.
   @@map("bots")
   messagingInstallations MessagingInstallation[]
   messagingInstallSessions MessagingInstallSession[]
@@ -2382,4 +2388,101 @@ model CapabilityInstallSpace {
   @@id([installId, spaceId])
   @@index([spaceId, userId])
   @@map("capability_install_spaces")
+}
+
+/// A shared AI employee: one definition many people use. Lives in the deployment, not in
+/// anyone's space; each user's working state is a Bot with employeeId set.
+model Employee {
+  id                String            @id @default(cuid())
+  name              String
+  description       String            @default("")
+  /// "listed" | "unlisted"
+  listing           String            @default("unlisted")
+  /// "draft" | "published" | "retired"
+  status            String            @default("draft")
+  currentVersionId  String?
+  suspendedAt       DateTime?
+  suspendedByUserId String?
+  serviceUserId     String?
+  /// Plain id, no foreign key: the employee outlives its creator.
+  createdByUserId   String
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  versions          EmployeeVersion[]
+  grants            EmployeeGrant[]
+  entitlements      EmployeeEntitlement[]
+  bots              Bot[]
+
+  @@map("employees")
+}
+
+/// Published rows are immutable; an edit creates the next draft.
+model EmployeeVersion {
+  id               String   @id @default(cuid())
+  employeeId       String
+  employee         Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  number           Int
+  /// "draft" | "published"
+  state            String   @default("draft")
+  role             String   @default("")
+  instructions     String   @default("")
+  skills           Json     @default("[]")
+  capabilityPolicy Json     @default("{}")
+  modelPolicy      Json     @default("{}")
+  createdBy        String
+  publishedBy      String?
+  publishedAt      DateTime?
+  createdAt        DateTime @default(now())
+
+  @@unique([employeeId, number])
+  @@map("employee_versions")
+}
+
+/// Who may do what with an employee: a user, or everyone carrying a directory claim value.
+model EmployeeGrant {
+  id           String    @id @default(cuid())
+  employeeId   String
+  employee     Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  /// "user" | "claim"
+  subjectKind  String
+  /// A user id, or a directory claim value such as an app role or group id.
+  subjectValue String
+  /// "owner" | "manager" | "collaborator" | "viewer"
+  role         String
+  grantedBy    String
+  expiresAt    DateTime?
+  createdAt    DateTime  @default(now())
+
+  @@unique([employeeId, subjectKind, subjectValue])
+  @@index([subjectKind, subjectValue])
+  @@map("employee_grants")
+}
+
+/// The directory claim values (groups or app roles) a user carried at last sign-in or revalidation.
+model UserDirectoryClaim {
+  userId      String   @id
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  values      String[] @default([])
+  /// The directory returned a link instead of the full list; claim grants fail closed.
+  truncated   Boolean  @default(false)
+  refreshedAt DateTime @default(now())
+
+  @@map("user_directory_claims")
+}
+
+/// Grants resolved per user, recomputed whenever a grant or claim changes. Plain rows so
+/// row-level security can read them. The effective role is the highest across sources.
+model EmployeeEntitlement {
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role       String
+  /// "grant" | "claim"
+  source     String
+  createdAt  DateTime @default(now())
+
+  @@id([employeeId, userId, source])
+  @@index([userId])
+  @@map("employee_entitlements")
 }

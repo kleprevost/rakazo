@@ -19,6 +19,7 @@ export * from "./cloudflare-ai-gateway.js";
 export * from "./connector-errors.js";
 export * from "./desktop.js";
 export * from "./domain.js";
+export * from "./employees.js";
 export * from "./events.js";
 export * from "./history.js";
 export * from "./ids.js";
