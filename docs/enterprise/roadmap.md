@@ -35,6 +35,9 @@ Acceptance: enforced server-side before a run starts, offline tests, admin UI on
 - Teams as a messaging surface (new adapter on the existing messaging-surface abstraction).
 - Shared team bots and delegation: upstream features — verify under Entra + Kata, don't rebuild.
 
+## Alternative hosting: Container Apps + one Docker VM
+Discovery for a PoC with API/web/worker on ACA and the Docker supervisor on a private VM: [aca-vm.md](./aca-vm.md) (needs a screen-proxy code change before it works).
+
 ## Real Azure validation (as soon as a subscription exists)
 Deploy the Bicep, run a smoke test, confirm the items listed as unverified in each `docs/enterprise/*.md`
 (Kata handler name, Cilium enforcement of bot egress, Key Vault purge/RBAC, Entra claims, Foundry deployment names).
