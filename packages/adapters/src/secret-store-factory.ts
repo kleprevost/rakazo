@@ -8,6 +8,11 @@ import type {
   SecretStore,
 } from "@rakazo/adapter-kit";
 import { getLogger } from "@rakazo/logging";
+import {
+  AZURE_KEY_VAULT_REF_PREFIX,
+  AzureKeyVaultSecretStore,
+  azureKeyVaultUrl,
+} from "./azure-key-vault-secret-store.js";
 import type { InfisicalSecretStoreOptions } from "./infisical-secret-store.js";
 import { INFISICAL_REF_PREFIX, InfisicalSecretStore } from "./infisical-secret-store.js";
 import { SecretChanges } from "./secret-changes.js";
@@ -18,6 +23,7 @@ export function secretStoreOptionsFromEnv(
 ): InfisicalSecretStoreOptions | undefined {
   const provider = source.SECRET_STORE?.trim() || "encrypted";
   if (provider === "encrypted") return undefined;
+  if (provider === "azure-key-vault") return undefined;
   if (provider !== "infisical") throw new Error("Unsupported SECRET_STORE");
   const required = (name: string) => {
     const value = source[name]?.trim();
@@ -57,6 +63,11 @@ export function secretStoreOptionsFromEnv(
   };
 }
 
+/** A remote store plus the ref prefix that routes to it. */
+type RemoteSecretStore = SecretStore & { invalidate(ref: string): void };
+const remotePrefix = (store: RemoteSecretStore) =>
+  store instanceof AzureKeyVaultSecretStore ? AZURE_KEY_VAULT_REF_PREFIX : INFISICAL_REF_PREFIX;
+
 const heldNotifications = new AsyncLocalStorage<Array<() => Promise<void>>>();
 
 /** Sends change notifications from writes inside `work` once it settles. A write
@@ -80,7 +91,7 @@ export class ComposedSecretStore extends SecretChanges implements SecretStore {
   private readonly subscriptions: Array<() => void> = [];
   constructor(
     private readonly encrypted: SecretStore,
-    private readonly remote?: InfisicalSecretStore,
+    private readonly remote?: RemoteSecretStore,
     private readonly realtime?: RealtimeFanout,
   ) {
     super();
@@ -103,7 +114,7 @@ export class ComposedSecretStore extends SecretChanges implements SecretStore {
         try {
           const event = JSON.parse(payload);
           if (event.origin !== this.origin && typeof event.ref === "string") {
-            if (this.remote && event.ref.startsWith(INFISICAL_REF_PREFIX))
+            if (this.remote && event.ref.startsWith(remotePrefix(this.remote)))
               this.remote.invalidate(event.ref);
             else this.changed(event.ref);
           }
@@ -135,12 +146,12 @@ export class ComposedSecretStore extends SecretChanges implements SecretStore {
   }
   load(ref: string, context: SecretContext): Promise<string> {
     return (
-      ref.startsWith(INFISICAL_REF_PREFIX) && this.remote ? this.remote : this.encrypted
+      this.remote && ref.startsWith(remotePrefix(this.remote)) ? this.remote : this.encrypted
     ).load(ref, context);
   }
   async delete(ref: string, context: SecretContext): Promise<void> {
     try {
-      await (ref.startsWith(INFISICAL_REF_PREFIX) && this.remote
+      await (this.remote && ref.startsWith(remotePrefix(this.remote))
         ? this.remote
         : this.encrypted
       ).delete(ref, context);
@@ -174,14 +185,14 @@ export function createSecretStore(
   realtime?: RealtimeFanout,
 ): SecretStore {
   const options = secretStoreOptionsFromEnv(source);
+  const azure = source.SECRET_STORE?.trim() === "azure-key-vault";
   const encrypted = new EncryptedSecretStore(encryptionKey);
-  return options || realtime
-    ? new ComposedSecretStore(
-        encrypted,
-        options ? new InfisicalSecretStore(options) : undefined,
-        realtime,
-      )
-    : encrypted;
+  const remote = azure
+    ? new AzureKeyVaultSecretStore({ vaultUrl: azureKeyVaultUrl(source.AZURE_KEY_VAULT_URL) })
+    : options
+      ? new InfisicalSecretStore(options)
+      : undefined;
+  return remote || realtime ? new ComposedSecretStore(encrypted, remote, realtime) : encrypted;
 }
 
 export async function deleteSecretBestEffort(

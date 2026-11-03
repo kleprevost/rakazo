@@ -6,6 +6,10 @@ import {
   withLocalMasterKeys,
 } from "@rakazo/db";
 import { AwsKmsKeyProvider, awsKmsConfigFromEnv } from "./aws-kms-key-provider.js";
+import {
+  AzureKeyVaultKeyProvider,
+  azureKeyVaultConfigFromEnv,
+} from "./azure-key-vault-key-provider.js";
 import { isWrappedEnvValue, unwrapEnv } from "./wrapped-env.js";
 
 /** Settings that build the key provider, which must be readable before anything unwraps. */
@@ -15,12 +19,15 @@ export const KEY_PROVIDER_SETTINGS = [
   "AWS_KMS_ACCESS_KEY_ID",
   "AWS_KMS_SECRET_ACCESS_KEY",
   "AWS_KMS_PROFILE",
+  "AZURE_KEY_VAULT_KEY_ID",
 ];
 
 /** The external key manager alone, without the local master keys. */
 export function keyManagerFromEnv(env: NodeJS.ProcessEnv = process.env): KeyProvider | undefined {
   const provider = env.MASTER_KEY_PROVIDER?.trim() || "local";
   if (provider === "local") return undefined;
+  if (provider === "azure-key-vault")
+    return new AzureKeyVaultKeyProvider(azureKeyVaultConfigFromEnv(env));
   if (provider !== "aws-kms") throw new Error("Unsupported MASTER_KEY_PROVIDER");
   return new AwsKmsKeyProvider(awsKmsConfigFromEnv(env));
 }

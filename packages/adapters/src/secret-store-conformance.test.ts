@@ -1,6 +1,8 @@
 import type { AdapterContext, SecretStore } from "@rakazo/adapter-kit";
 import { createLogger, createTestSink, getLogger, installLogger } from "@rakazo/logging";
 import { describe, expect, it, vi } from "vitest";
+import { fakeKeyVaultSecrets } from "./azure-key-vault-fake.js";
+import { AzureKeyVaultSecretStore } from "./azure-key-vault-secret-store.js";
 import { InfisicalSecretStore, SecretStoreUnavailableError } from "./infisical-secret-store.js";
 import { InMemoryRealtimeFanout } from "./realtime.js";
 import {
@@ -66,6 +68,7 @@ function conformance(name: string, create: () => SecretStore) {
 }
 conformance("encrypted", () => new EncryptedSecretStore("test-key"));
 conformance("Infisical", () => new InfisicalSecretStore(infisicalFake().options));
+conformance("Azure Key Vault", () => new AzureKeyVaultSecretStore(fakeKeyVaultSecrets().options));
 
 describe("Infisical lifecycle and REST", () => {
   it("reads a just-written ref from another process and reads legacy/ephemeral refs locally", async () => {

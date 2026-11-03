@@ -10,6 +10,8 @@ export * from "./audit-forwarding.js";
 export * from "./auto-review.js";
 export * from "./auto-review-factory.js";
 export * from "./aws-kms-key-provider.js";
+export * from "./azure-key-vault-key-provider.js";
+export * from "./azure-key-vault-secret-store.js";
 export * from "./background-job-handlers.js";
 export * from "./billing-emulator.js";
 export * from "./boat-sandbox.js";

@@ -16,6 +16,7 @@ x-app-environment: &app-environment
   AWS_KMS_KEY_ARN:
   AWS_KMS_ACCESS_KEY_ID:
   AWS_KMS_SECRET_ACCESS_KEY:
+  AZURE_KEY_VAULT_KEY_ID:
   # on encrypts new content at rest; off stores it readable (docs/self-host-storage.md#content-encryption).
   CONTENT_ENCRYPTION: ${CONTENT_ENCRYPTION:-on}
   # Optional: keep computer homes and artifacts in S3-compatible storage (docs/self-host-storage.md#shared-storage-migration).
@@ -56,6 +57,7 @@ x-app-environment: &app-environment
   INFISICAL_PROJECT_ID: ${INFISICAL_PROJECT_ID:-}
   INFISICAL_ENVIRONMENT: ${INFISICAL_ENVIRONMENT:-}
   INFISICAL_FOLDER: ${INFISICAL_FOLDER:-}
+  AZURE_KEY_VAULT_URL: ${AZURE_KEY_VAULT_URL:-}
   # Logs, errors, traces and analytics
   LOG_LEVEL:
   SECURITY_EVENT_RETENTION_DAYS:
