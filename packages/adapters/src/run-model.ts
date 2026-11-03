@@ -48,6 +48,7 @@ import {
   serializeModelSecret,
   withModelCredentialLock,
 } from "./pi-oauth.js";
+import { assertModelAllowed, PolicyDeniedError } from "./policy-runtime.js";
 
 export function runtimeFallbackModel(runtime: AgentRuntime) {
   return runtime.describe().capabilities.scripted ? { provider: "scripted", id: "scripted" } : null;
@@ -56,6 +57,7 @@ export function runtimeFallbackModel(runtime: AgentRuntime) {
 export function isTerminalModelSetupError(error: unknown): boolean {
   return (
     error instanceof UnavailableModelForAuthError ||
+    error instanceof PolicyDeniedError ||
     error instanceof HostedModelCreditsRequiredError ||
     isRetiredModelCredentialError(error) ||
     (error instanceof Error &&
@@ -163,6 +165,11 @@ export async function resolveModelKey(...args: Parameters<typeof resolveModelKey
     args[7] = { ...args[7], requireStoredSecret: false };
   }
   const credential = args[3];
+  // The gate for every run path: settings can predate the policy, so check at the moment of use.
+  await assertModelAllowed(
+    { provider, modelId: args[5], ownConnection: credential !== null },
+    { userId, spaceId, surface: "run" },
+  );
   const material = await resolveModelKeyMaterial(...args);
   const deployment = resolveDeploymentModel();
   // Local and compatible endpoints can intentionally be keyless. Host auth is

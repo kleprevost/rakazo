@@ -406,6 +406,13 @@ describe("OIDC environment", () => {
       );
     expect(() => loadEnv({ ...base, OIDC_REVALIDATE_MINUTES: "60" })).toThrow(/requires OIDC/);
   });
+  it("trusts the SSO email only when OIDC_TRUST_EMAIL is true", () => {
+    expect(loadEnv({ ...base, ...oidc }).oidc?.trustEmail).toBe(false);
+    expect(loadEnv({ ...base, ...oidc, OIDC_TRUST_EMAIL: "true" }).oidc?.trustEmail).toBe(true);
+    expect(() => loadEnv({ ...base, ...oidc, OIDC_TRUST_EMAIL: "yes" })).toThrow(
+      "OIDC_TRUST_EMAIL must be true or false",
+    );
+  });
   it("defaults to SSO with no policy bypass", () => {
     expect(loadEnv({ ...base, ...oidc }).oidc).toMatchObject({
       name: "SSO",

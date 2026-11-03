@@ -6673,3 +6673,9 @@ msgstr "Your voice provider is out of credit."
 #: src/lib/user-error.ts
 msgid "Your voice provider key was rejected."
 msgstr "Your voice provider key was rejected."
+
+#. js-lingui-explicit-id
+#: src/lib/run-error.ts
+#: src/lib/user-error.ts
+msgid "Blocked by your organization"
+msgstr "Blocked by your organization"

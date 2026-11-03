@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: rakazo
+  labels:
+    pod-security.kubernetes.io/enforce: baseline
+---
+# Bot computers only. The API and worker create pods here with KUBERNETES_SANDBOX_NAMESPACE.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: rakazo-sandboxes
+  labels:
+    pod-security.kubernetes.io/enforce: baseline

@@ -27,6 +27,7 @@ x-app-environment: &app-environment
   AWS_KMS_ACCESS_KEY_ID:
   AWS_KMS_SECRET_ACCESS_KEY:
   AZURE_KEY_VAULT_KEY_ID:
+  RAKAZO_POLICY_FILE:
   # on encrypts new content at rest; off stores it readable (docs/self-host-storage.md#content-encryption).
   CONTENT_ENCRYPTION: ${CONTENT_ENCRYPTION:-on}
   # Optional: keep computer homes and artifacts in S3-compatible storage (docs/self-host-storage.md#shared-storage-migration).
@@ -457,6 +458,7 @@ services:
       OIDC_ALLOWED_VALUES: ${OIDC_ALLOWED_VALUES:-}
       OIDC_ADMIN_VALUES: ${OIDC_ADMIN_VALUES:-}
       OIDC_REVALIDATE_MINUTES: ${OIDC_REVALIDATE_MINUTES:-}
+      OIDC_TRUST_EMAIL: ${OIDC_TRUST_EMAIL:-}
       SIGNUPS_ENABLED:
       SIGNUP_ALLOWLIST:
       SCREEN_PROXY_SECRET: ${SCREEN_PROXY_SECRET:?Set SCREEN_PROXY_SECRET in .env}

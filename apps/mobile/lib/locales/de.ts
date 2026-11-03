@@ -109,6 +109,7 @@ export const DE_MESSAGES: Record<string, string> = {
   "Your OpenAI": "Dein OpenAI",
   "Your Anthropic": "Dein Anthropic",
   "Your model provider": "Dein Modellanbieter",
+  "Blocked by your organization": "Von deiner Organisation blockiert",
   "Connect a model in Settings before running bots.":
     "Verbinde ein Modell in den Einstellungen, bevor du Bots ausführst.",
   "Connect your own API key in Models or choose Rakazo credits in Billing.":
@@ -823,6 +824,7 @@ export const DE_MESSAGES: Record<string, string> = {
   "Request timed out": "Zeitüberschreitung der Anfrage",
   "Enter a password": "Gib ein Passwort ein",
   "Enter a valid email": "Gib eine gültige E-Mail-Adresse ein",
+  "Your account does not have access": "Dein Konto hat keinen Zugriff",
   "Something went wrong. Try again.": "Etwas ist schiefgelaufen. Versuche es erneut.",
   "Could not play that clip.": "Dieser Clip konnte nicht abgespielt werden.",
   "Move down": "Nach unten",

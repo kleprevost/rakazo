@@ -201,6 +201,7 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): AppEnv {
     "AUTH_PASSWORD_ENABLED",
     "AUTH_BREACHED_PASSWORD_CHECK_ENABLED",
     "OIDC_ALLOW_SIGNUP_BYPASS",
+    "OIDC_TRUST_EMAIL",
   ]) {
     const value = source[key];
     if (value && !["true", "false"].includes(value))
@@ -230,6 +231,7 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): AppEnv {
           allowedValues: list(source.OIDC_ALLOWED_VALUES),
           adminValues: list(source.OIDC_ADMIN_VALUES),
           revalidateMinutes: revalidate ? Number(revalidate) : undefined,
+          trustEmail: source.OIDC_TRUST_EMAIL === "true",
         }
       : undefined;
   const authSecret = resolveAuthSecret(source);

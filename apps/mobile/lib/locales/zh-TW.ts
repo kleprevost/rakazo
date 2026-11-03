@@ -88,6 +88,7 @@ export const ZH_TW_MESSAGES: Record<string, string> = {
   "Your OpenAI": "你的 OpenAI",
   "Your Anthropic": "你的 Anthropic",
   "Your model provider": "你的模型供應商",
+  "Blocked by your organization": "已被你的組織封鎖",
   "Connect a model in Settings before running bots.": "執行機器人前，請先在設定中連接模型。",
   "Connect your own API key in Models or choose Rakazo credits in Billing.":
     "請在「模型」中連接你自己的 API 金鑰，或在「帳務」中選擇 Rakazo 點數。",
@@ -388,6 +389,7 @@ export const ZH_TW_MESSAGES: Record<string, string> = {
   "Request timed out": "請求超時",
   "Enter a password": "請輸入密碼",
   "Enter a valid email": "請輸入有效的電子信箱地址",
+  "Your account does not have access": "你的帳號沒有存取權",
   "Something went wrong. Try again.": "出了點問題，請重試。",
   "Could not reach that server": "無法連線到該伺服器",
   "Could not reach this model server": "無法連線到此模型伺服器",

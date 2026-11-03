@@ -109,6 +109,7 @@ export const JA_MESSAGES: Record<string, string> = {
   "Your OpenAI": "お使いのOpenAI",
   "Your Anthropic": "お使いのAnthropic",
   "Your model provider": "お使いのモデルプロバイダー",
+  "Blocked by your organization": "組織によってブロックされています",
   "Connect a model in Settings before running bots.":
     "ボットを実行する前に、設定でモデルを接続してください。",
   "Connect your own API key in Models or choose Rakazo credits in Billing.":
@@ -804,6 +805,7 @@ export const JA_MESSAGES: Record<string, string> = {
   "Request timed out": "リクエストがタイムアウトしました",
   "Enter a password": "パスワードを入力してください",
   "Enter a valid email": "有効なメールアドレスを入力してください",
+  "Your account does not have access": "このアカウントにはアクセス権がありません",
   "Something went wrong. Try again.": "問題が発生しました。もう一度お試しください。",
   "Could not play that clip.": "そのクリップを再生できませんでした。",
   "Move down": "下へ移動",
