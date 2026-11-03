@@ -2,6 +2,7 @@ import type { RunErrorKind } from "@rakazo/contracts";
 import {
   COMPUTER_ALLOWANCE_USED_ERROR,
   COMPUTER_RATE_LIMIT_ERROR,
+  POLICY_DENIED_MESSAGE,
   providerQuotaResetAt,
 } from "@rakazo/contracts";
 import { stuckWorkStatusMessages } from "./stuck-work.js";
@@ -264,6 +265,7 @@ export function normalizeRunError(
     };
   }
   // Preserve only known recovery advice: provider diagnostics can also be plain text.
+  if (trimmed === POLICY_DENIED_MESSAGE) return { summary: translate(trimmed), details };
   if (APP_RUN_ERRORS.has(trimmed)) {
     return MODEL_OUTPUT_RUN_ERRORS.has(trimmed)
       ? { summary: details, details, kind: "output" }

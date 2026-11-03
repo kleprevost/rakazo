@@ -1,5 +1,6 @@
 import { implement, ORPCError } from "@orpc/server";
 import {
+  activePolicy,
   applyCodexLiveCatalog,
   applyProviderLiveCatalog,
   CHATGPT_OAUTH_PROVIDER,
@@ -36,12 +37,14 @@ import {
   modelSupportsRole,
   OPENAI_COMPATIBLE_PROVIDER_ID,
 } from "@rakazo/contracts";
+import { filterModelCatalog } from "@rakazo/core";
 import { createGroupRepos, createRepos, recordSecurityEvent, runAsTenant } from "@rakazo/db";
 import { createAgentImportServices } from "../agent-import-services.js";
 import { createAgentSkillsService } from "../agent-skills.js";
 import { createBotRemoval } from "../bot-removal.js";
 import { createMcpServers } from "../mcp-servers.js";
 import { createModelConnector, prepareAllowedThinkingLevels } from "../model-credentials.js";
+import { assertModelAllowedForRequest } from "../policy-guard.js";
 import type { RouterDeps } from "../router.js";
 import { createRoutineAnnouncer } from "../routines.js";
 import { procedureSecurityEvent } from "../security-audit.js";
@@ -135,7 +138,11 @@ export function createRouterContext(deps: RouterDeps) {
   // cannot execute it, so it stays out of the user-facing catalog otherwise.
   const chatCatalog = async (actor: Actor) => {
     const catalog = await catalogForSpace(actor);
-    return deps.env.agentRuntime === "scripted" ? [...catalog, scriptedCatalogEntry] : catalog;
+    // Central policy: the single source every picker reads, so clients never offer a blocked model.
+    return filterModelCatalog(
+      activePolicy(),
+      deps.env.agentRuntime === "scripted" ? [...catalog, scriptedCatalogEntry] : catalog,
+    );
   };
   const catalogForSpace = async (actor: Actor) => {
     const auth = await modelCredentialAuthKindsForSpace(
@@ -217,10 +224,10 @@ export function createRouterContext(deps: RouterDeps) {
     );
     return withServingConnections(
       actor,
-      [
+      filterModelCatalog(activePolicy(), [
         ...catalog,
         ...decisions.map((entry) => ({ ...entry, managed: managedProviders.has(entry.provider) })),
-      ].filter((entry) => modelSupportsRole(entry, role)),
+      ]).filter((entry) => modelSupportsRole(entry, role)),
     );
   };
   /**
@@ -287,6 +294,11 @@ export function createRouterContext(deps: RouterDeps) {
         choice.modelId,
         resolution,
       );
+      await assertModelAllowedForRequest(actor, {
+        provider: choice.provider,
+        modelId: choice.modelId,
+        ownConnection: Boolean(credential),
+      });
       if (!credential && (choice.credentialId || !(entry && "managed" in entry && entry.managed)))
         throw new ORPCError("BAD_REQUEST", { message: "Connect that model provider first" });
       // Another account of the provider listing the model does not make it run on this one;

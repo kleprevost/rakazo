@@ -55,6 +55,7 @@ import {
   isComposioEnabled,
   isMessagingSurfaceEnabled,
   isPipedreamEnabled,
+  loadPolicyFromEnv,
   McpConnector,
   McpOAuthBroker,
   mcpStdioOptionsFromEnv,
@@ -138,6 +139,8 @@ async function main() {
   prisma = withSecretPersistence(prisma, secrets);
   installSecurityEventStore(prisma);
   installAuditEventStore(prisma);
+  // An invalid policy file stops startup rather than running unrestricted.
+  await loadPolicyFromEnv(process.env);
   const unreadableMasterKeys = await verifyContentKeys(prisma);
   if (unreadableMasterKeys.length)
     logger.error("Stored space keys need master keys that are not configured", undefined, {

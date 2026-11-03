@@ -17,6 +17,7 @@ x-app-environment: &app-environment
   AWS_KMS_ACCESS_KEY_ID:
   AWS_KMS_SECRET_ACCESS_KEY:
   AZURE_KEY_VAULT_KEY_ID:
+  RAKAZO_POLICY_FILE:
   # on encrypts new content at rest; off stores it readable (docs/self-host-storage.md#content-encryption).
   CONTENT_ENCRYPTION: ${CONTENT_ENCRYPTION:-on}
   # Optional: keep computer homes and artifacts in S3-compatible storage (docs/self-host-storage.md#shared-storage-migration).

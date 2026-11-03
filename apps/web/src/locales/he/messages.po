@@ -6673,3 +6673,9 @@ msgstr "לספק הקול שלך נגמר הקרדיט."
 #: src/lib/user-error.ts
 msgid "Your voice provider key was rejected."
 msgstr "ספק הקול שלך דחה את המפתח."
+
+#. js-lingui-explicit-id
+#: src/lib/run-error.ts
+#: src/lib/user-error.ts
+msgid "Blocked by your organization"
+msgstr "נחסם על ידי הארגון שלך"

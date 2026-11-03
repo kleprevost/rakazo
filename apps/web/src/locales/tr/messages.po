@@ -6673,3 +6673,9 @@ msgstr "Ses sağlayıcınızın kredisi bitti."
 #: src/lib/user-error.ts
 msgid "Your voice provider key was rejected."
 msgstr "Ses sağlayıcınız anahtarı reddetti."
+
+#. js-lingui-explicit-id
+#: src/lib/run-error.ts
+#: src/lib/user-error.ts
+msgid "Blocked by your organization"
+msgstr "Kuruluşunuz tarafından engellendi"

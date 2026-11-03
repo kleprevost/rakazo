@@ -24,6 +24,8 @@ export const SECURITY_EVENT_TYPES = [
   "approval.decided",
   "approval.policy.changed",
   "egress.refused",
+  "policy.loaded",
+  "policy.denied",
   "rate_limit.hit",
 ] as const;
 

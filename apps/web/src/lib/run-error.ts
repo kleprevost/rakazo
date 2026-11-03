@@ -30,6 +30,12 @@ export const translateRunError: RunErrorTranslator = (message, values) => {
       return i18n._({ id: "Your Anthropic", message: "Your Anthropic", values });
     case "Your model provider":
       return i18n._({ id: "Your model provider", message: "Your model provider", values });
+    case "Blocked by your organization":
+      return i18n._({
+        id: "Blocked by your organization",
+        message: "Blocked by your organization",
+        values,
+      });
     case "Connect a model in Settings before running bots.":
       return i18n._({
         id: "Connect a model in Settings before running bots.",

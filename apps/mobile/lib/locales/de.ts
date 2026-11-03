@@ -109,6 +109,7 @@ export const DE_MESSAGES: Record<string, string> = {
   "Your OpenAI": "Dein OpenAI",
   "Your Anthropic": "Dein Anthropic",
   "Your model provider": "Dein Modellanbieter",
+  "Blocked by your organization": "Von deiner Organisation blockiert",
   "Connect a model in Settings before running bots.":
     "Verbinde ein Modell in den Einstellungen, bevor du Bots ausführst.",
   "Connect your own API key in Models or choose Rakazo credits in Billing.":

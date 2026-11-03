@@ -24,6 +24,7 @@ import { listPiCatalog, offeredCatalog, scriptedCatalogEntry } from "./pi-models
 import type { StoredModelSecret } from "./pi-oauth.js";
 import { parseModelSecret } from "./pi-oauth.js";
 import { OPENAI_COMPATIBLE_PROVIDER_ID } from "./pi-openai-compatible-provider.js";
+import { assertModelAllowed, PolicyDeniedError } from "./policy-runtime.js";
 
 export type ModelCredential = Awaited<ReturnType<typeof findModelCredential>>;
 
@@ -560,6 +561,15 @@ export async function validateBotModelChange(
     const credential = hosted
       ? null
       : await findConnectedModelCredential(deps.prisma, deps.secretStore, scope, provider, model);
+    try {
+      await assertModelAllowed(
+        { provider, modelId: model, ownConnection: credential !== null },
+        { ...scope, surface: "bot_model" },
+      );
+    } catch (error) {
+      if (error instanceof PolicyDeniedError) return { ok: false, error: error.message };
+      throw error;
+    }
     if (!credential) {
       if (hosted && isCatalogModelChoice(provider, model)) {
         const allowed = listPiCatalog().find(

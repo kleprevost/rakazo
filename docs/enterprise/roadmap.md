@@ -11,26 +11,30 @@ Not linked from the public docs site (`apps/www/src/docs.ts` lists slugs explici
   infra is delivered as IaC/manifests for later validation.
 - One PR per workstream against `kleprevost/rakazo`, branch `claude/ent-<ws>` off `main`; Sonnet agents in worktrees.
 
-## Milestone 1 — Azure-native foundation
-| WS | Scope | Existing base | Status |
-|---|---|---|---|
-| 1 Secrets | Azure Key Vault `SecretStore` + `KeyProvider` adapters, workload identity (DefaultAzureCredential) | `infisical-secret-store.ts`, `aws-kms-key-provider.ts`, conformance tests | PR #1 in review (secret migration CLI to/from Key Vault not supported yet) |
-| 2 Identity | Entra via existing OIDC: restrict to tenant (`tid`), optional group allow-list, admin role from group; docs | `packages/auth/src/oidc.ts` | PR #3 in review (claim allow-list + SSO admin; sessions outlive role removal until expiry) |
-| 3 Inference | Foundry + OpenCode Zen as deployment model / connections; verify via existing OpenAI-compatible + Pi providers before writing code | `pi-models.ts`, OpenAI-compatible connections | PR #2 in review (API key only; keyless Entra auth is a follow-up) |
-| 4 Compute + hosting | AKS reference deployment (Bicep + kustomize manifests, no Helm), Kata `runtimeClass` for bot pods, network policy, workload identity wiring | `kubernetes-sandbox.ts` (supports runtimeClass) | PR in review: `infra/azure/`, `azure-aks.md` (validated offline only: bicep lint/build, kubeconform; Kata value and Cilium policy unverified) |
+## Milestone 1 — Azure-native foundation (done offline; needs a real Azure run)
+| WS | Scope | Result |
+|---|---|---|
+| 1 Secrets | Key Vault `SecretStore` + `KeyProvider`, workload identity | Merged (#1) |
+| 2 Identity | Entra via OIDC: claim allow-list, SSO admin; trusted email option | Merged (#3, #6) |
+| 3 Inference | Foundry + OpenCode Zen as deployment model and connections | Merged (#2) |
+| 4 Compute + hosting | Bicep AKS, Kata pool + `rakazo-kata` RuntimeClass, network policy, kustomize manifests | Merged (#7) |
 
-Acceptance for each WS: unit/conformance tests pass offline, `pnpm lint` clean, doc page under
-`docs/enterprise/`, PR describes config and what was not verified against real Azure.
+## Next: M1 gaps (one small batch)
+- Revoke access promptly when a user is terminated or loses their role (in progress).
+- Deferred by decision: Foundry keyless auth (API keys are fine), secret migration CLI (no running deployment yet).
 
-## Milestone 2 — Governance (later)
-Central policy, approvals, budgets, audit export to Azure Monitor/Sentinel. Build on existing
-`approvals`, `audit-export`, budget code. Scope after M1.
+## Milestone 2 — Governance (next, run policy and budgets in parallel)
+Acceptance: enforced server-side before a run starts, offline tests, admin UI only where needed.
+- Central policy: see [central-policy.md](./central-policy.md). Foundation + models in progress.
+- Budgets: per user/bot/org spend limits enforced pre-run (extend existing budget code).
+- Audit to Azure Monitor / Sentinel: stream existing audit events to Log Analytics.
+- Admin roles (security admin, bot owner, viewer) mapped from Entra app roles via the OIDC claim mapping.
 
-## Milestone 3 — Collaboration & integrations (later)
-M365 via existing remote MCP support; team bots, delegation, memory are upstream features — verify, don't rebuild.
+## Milestone 3 — Collaboration & integrations
+- Microsoft 365 via existing remote MCP: verify end to end, document.
+- Teams as a messaging surface (new adapter on the existing messaging-surface abstraction).
+- Shared team bots and delegation: upstream features — verify under Entra + Kata, don't rebuild.
 
-## Follow-ups found during M1
-- Foundry keyless auth (workload identity) as a host-credentials provider.
-- Secret migration CLI to/from Key Vault.
-- SSO admin needs a verified email, but Entra omits `email_verified`: decide whether to trust it for a pinned single-tenant issuer.
-- Revoke live sessions when SSO access is removed (currently waits for session expiry).
+## Real Azure validation (as soon as a subscription exists)
+Deploy the Bicep, run a smoke test, confirm the items listed as unverified in each `docs/enterprise/*.md`
+(Kata handler name, Cilium enforcement of bot egress, Key Vault purge/RBAC, Entra claims, Foundry deployment names).
