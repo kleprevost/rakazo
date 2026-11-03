@@ -164,6 +164,7 @@ import {
 } from "./client-ip.js";
 import { cspReportRoutes } from "./csp-report.js";
 import { mountDiagramScript } from "./diagram-script.js";
+import { easyAuthMiddleware } from "./easy-auth.js";
 import { configuredEmailProvider } from "./email.js";
 import type { AppEnv } from "./env.js";
 import { loadEnv } from "./env.js";
@@ -545,6 +546,7 @@ async function buildApp(overrides: CreateAppOverrides): Promise<AppHandles> {
     passwordAuth: env.passwordAuth,
     breachedPasswordCheck: env.breachedPasswordCheck,
     oidc: env.oidc,
+    easyAuth: env.easyAuth,
     secret: env.authSecret,
     baseURL: env.authUrl,
     webOrigin: env.webOrigin,
@@ -867,6 +869,7 @@ async function buildApp(overrides: CreateAppOverrides): Promise<AppHandles> {
       exposeHeaders: [SERVER_BUILD_HEADER],
     }),
   );
+  app.use("*", easyAuthMiddleware(auth.easyAuth));
   // Session and account replies must never be stored by a client or an HTTP cache.
   for (const path of ["/api/auth/*", "/rpc/*"]) {
     app.use(path, async (c, next) => {
@@ -877,7 +880,11 @@ async function buildApp(overrides: CreateAppOverrides): Promise<AppHandles> {
   app.get("/api/auth/capabilities", (c) => {
     return c.json({
       sso: env.oidc
-        ? { name: env.oidc.name, availability: auth.ssoAvailability() ?? "checking" }
+        ? {
+            name: env.oidc.name,
+            availability: auth.ssoAvailability() ?? "checking",
+            ...(env.easyAuth ? { easyAuth: true } : {}),
+          }
         : null,
       passwordAuth: env.passwordAuth !== false,
       passwordReset: env.passwordAuth !== false && Boolean(email),

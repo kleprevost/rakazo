@@ -5,6 +5,8 @@ export const authCapabilitiesSchema = z.object({
     .object({
       name: z.string().min(1),
       availability: z.enum(["available", "unavailable", "checking"]),
+      /** Browsers sign in through the platform's built-in authentication instead of a redirect. */
+      easyAuth: z.boolean().optional(),
     })
     .nullable(),
   passwordAuth: z.boolean(),
