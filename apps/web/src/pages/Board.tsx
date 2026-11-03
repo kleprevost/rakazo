@@ -32,6 +32,7 @@ import { rpc } from "../lib/rpc";
 import { useTicketPriorityLabels } from "../lib/ticket-priority";
 import { useTicketStatusLabels } from "../lib/ticket-status";
 import { errorText } from "../lib/user-error";
+import { runPhase, useWorkPhaseLabels } from "../lib/work-phase";
 import { WindowChrome } from "./WindowChrome";
 
 export function BoardPage() {
@@ -199,6 +200,11 @@ function TicketDialog({
   });
   const commentsQuery = useQuery(commentsOptions);
   const comments = commentsQuery.data ?? [];
+  const phases = useWorkPhaseLabels();
+  const workQuery = useQuery(
+    queries.tickets.work.queryOptions({ input: ticket ? { ticketId: ticket.id } : skipToken }),
+  );
+  const work = workQuery.data;
   const [body, setBody] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -359,6 +365,30 @@ function TicketDialog({
             </Button>
           </div>
         </form>
+        {work && work.runs.length > 0 ? (
+          <div data-testid="ticket-work" className="space-y-2 border-t pt-3 text-sm">
+            <h3 className="font-medium">{phases[work.phase]}</h3>
+            <ul className="space-y-1 text-xs text-muted-foreground">
+              {work.runs.map((run) => (
+                <li key={run.id} className="flex justify-between gap-3">
+                  <span>{phases[runPhase(run.status)]}</span>
+                  <time dateTime={run.createdAt}>{formatRelativeTime(run.createdAt)}</time>
+                </li>
+              ))}
+            </ul>
+            {work.artifacts.length > 0 ? (
+              <ul className="space-y-1">
+                {work.artifacts.map((artifact) => (
+                  <li key={artifact.id}>
+                    <Link to={`/app/artifacts/${artifact.id}`} className="underline">
+                      {artifact.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </div>
+        ) : null}
         {ticket ? (
           <div data-testid="ticket-comments" className="space-y-3 border-t pt-3">
             {comments.map((row) => (

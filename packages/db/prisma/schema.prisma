@@ -951,8 +951,12 @@ model Task {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   runs      Run[]
+  /// The ticket this task works on; set when a ticket assignment wakes its bot.
+  ticketId  String?
+  ticket    Ticket?  @relation(fields: [ticketId], references: [id], onDelete: SetNull)
 
   @@index([spaceId, botId])
+  @@index([ticketId])
   @@map("tasks")
 }
 
@@ -2080,6 +2084,7 @@ model Ticket {
   updatedAt       DateTime  @updatedAt
   completedAt       DateTime?
   comments        TicketComment[]
+  tasks           Task[]
 
   @@unique([boardId, number])
   @@index([spaceId, status])

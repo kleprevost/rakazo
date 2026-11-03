@@ -161,3 +161,67 @@ export const BoardEventSchema = z.object({
   createdAt: z.string(),
 });
 export type BoardEvent = z.infer<typeof BoardEventSchema>;
+
+export const WORK_PHASES = [
+  "ready",
+  "running",
+  "waiting",
+  "review",
+  "done",
+  "failed",
+  "cancelled",
+] as const;
+export const WorkPhaseSchema = z.enum(WORK_PHASES);
+export type WorkPhase = z.infer<typeof WorkPhaseSchema>;
+
+const ACTIVE_RUN_STATUSES = new Set(["queued", "leased", "running"]);
+const WAITING_RUN_STATUSES = new Set(["waiting_input", "waiting_takeover"]);
+
+/**
+ * Where a ticket stands as a unit of work. The ticket's status is what people and
+ * the bot set; the latest linked run decides whether it is running, waiting or failed.
+ */
+export function workPhase(status: TicketStatus, latestRunStatus: string | null): WorkPhase {
+  if (status === "closed") return "cancelled";
+  if (status === "done") return "done";
+  if (latestRunStatus && ACTIVE_RUN_STATUSES.has(latestRunStatus)) return "running";
+  if (latestRunStatus && WAITING_RUN_STATUSES.has(latestRunStatus)) return "waiting";
+  if (status === "review") return "review";
+  if (latestRunStatus === "completed") return "review";
+  if (latestRunStatus === "failed") return "failed";
+  if (status === "blocked") return "waiting";
+  return status === "doing" ? "running" : "ready";
+}
+
+export const WorkRunSchema = z.object({
+  id: Id,
+  status: z.string(),
+  trigger: z.string(),
+  error: z.string().nullable(),
+  threadId: Id,
+  createdAt: z.string(),
+  completedAt: z.string().nullable(),
+});
+export type WorkRun = z.infer<typeof WorkRunSchema>;
+
+export const WorkArtifactSchema = z.object({
+  id: Id,
+  name: z.string(),
+  mimeType: z.string(),
+  version: z.number().int(),
+  runId: Id,
+  createdAt: z.string(),
+});
+export type WorkArtifact = z.infer<typeof WorkArtifactSchema>;
+
+export const TicketWorkSchema = z.object({
+  ticketId: Id,
+  phase: WorkPhaseSchema,
+  runs: z.array(WorkRunSchema),
+  artifacts: z.array(WorkArtifactSchema),
+});
+export type TicketWork = z.infer<typeof TicketWorkSchema>;
+
+/** A ticket with its phase: the read model other surfaces (dashboards, mobile) list. */
+export const WorkItemSchema = TicketSchema.extend({ phase: WorkPhaseSchema });
+export type WorkItem = z.infer<typeof WorkItemSchema>;

@@ -6745,6 +6745,10 @@ msgstr ""
 msgid "Wait a moment and test again."
 msgstr "잠시 기다린 뒤 다시 테스트하세요."
 
+#: src/lib/work-phase.ts
+msgid "Waiting"
+msgstr "대기 중"
+
 #: src/lib/roster-status.ts
 msgid "Waiting in line…"
 msgstr "줄에서 기다리는 중…"

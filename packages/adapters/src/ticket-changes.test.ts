@@ -23,6 +23,7 @@ function setup(ticketBoardEnabled: boolean, status = "todo") {
         number: 1,
         board: { ticketPrefix: "RAK" },
       })),
+      update: vi.fn(async () => ({})),
     },
     bot: {
       findFirst: vi.fn(async () => ({ id: "bot-1", userId: "user-1", thread: { id: "thread-1" } })),

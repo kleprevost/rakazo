@@ -77,6 +77,9 @@ var easyAuthEnv = enableEasyAuth ? [{ name: 'AUTH_EASY_AUTH', value: 'true' }] :
 // Screens and terminals go through the supervisor's proxy on port 7091 (docs/enterprise/aca-vm.md).
 var screenViaSupervisorEnv = [{ name: 'SANDBOX_SCREEN_VIA_SUPERVISOR', value: 'true' }]
 
+// Work items: tickets that bots pick up and track (docs/enterprise/features/work-items.md).
+var workItemsEnv = [{ name: 'TICKET_BOARD_ENABLED', value: 'true' }]
+
 var apiEnv = concat(
   [
     { name: 'NODE_ENV', value: 'production' }
@@ -116,6 +119,7 @@ var apiEnv = concat(
   ],
   empty(policyFile) ? [] : [{ name: 'RAKAZO_POLICY_FILE', value: policyFile }],
   screenViaSupervisorEnv,
+  workItemsEnv,
   easyAuthEnv
 )
 

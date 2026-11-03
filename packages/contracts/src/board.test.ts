@@ -8,6 +8,7 @@ import {
   TICKET_STATUSES,
   TicketSchema,
   UpdateTicketInput,
+  workPhase,
 } from "./board.js";
 
 describe("parseTicketRef", () => {
@@ -112,5 +113,22 @@ describe("ticket contracts", () => {
       "bot-2",
     );
     expect(() => UpdateTicketInput.parse({ id: "ticket-1", assigneeBotId: null })).toThrow();
+  });
+});
+
+describe("workPhase", () => {
+  it.each([
+    ["todo", null, "ready"],
+    ["doing", null, "running"],
+    ["todo", "running", "running"],
+    ["doing", "waiting_input", "waiting"],
+    ["blocked", null, "waiting"],
+    ["doing", "completed", "review"],
+    ["review", null, "review"],
+    ["blocked", "failed", "failed"],
+    ["done", "running", "done"],
+    ["closed", "completed", "cancelled"],
+  ] as const)("maps %s with latest run %s to %s", (status, run, phase) => {
+    expect(workPhase(status, run)).toBe(phase);
   });
 });

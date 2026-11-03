@@ -6746,6 +6746,10 @@ msgstr ""
 msgid "Wait a moment and test again."
 msgstr "請稍候並重新測試。"
 
+#: src/lib/work-phase.ts
+msgid "Waiting"
+msgstr "等待中"
+
 #: src/lib/roster-status.ts
 msgid "Waiting in line…"
 msgstr "排隊等候…"

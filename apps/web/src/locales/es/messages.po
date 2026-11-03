@@ -6745,6 +6745,10 @@ msgstr "Se agotó el tiempo de la solicitud de voz."
 msgid "Wait a moment and test again."
 msgstr "Espera un momento y vuelve a probar."
 
+#: src/lib/work-phase.ts
+msgid "Waiting"
+msgstr "En espera"
+
 #: src/lib/roster-status.ts
 msgid "Waiting in line…"
 msgstr "Esperando en la cola…"
