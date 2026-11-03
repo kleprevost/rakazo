@@ -174,8 +174,14 @@ function socketPeer(c: Context): string | undefined {
 /** The request Better Auth sees: its one IP header carries the resolved address and nothing else. */
 export function withClientIp(request: Request, ip: string | undefined): Request {
   if (!ip && !request.headers.has(CLIENT_IP_HEADER)) return request;
-  const headers = new Headers(request.headers);
-  headers.delete(CLIENT_IP_HEADER);
-  if (ip) headers.set(CLIENT_IP_HEADER, ip);
-  return new Request(request, { headers });
+  // Moves the body to the new request: callers must use the result, not the original.
+  return new Request(request, { headers: clientIpHeaders(request.headers, ip) });
+}
+
+/** A copy of `headers` carrying only the API's own client address. Leaves any body untouched. */
+export function clientIpHeaders(headers: Headers, ip: string | undefined): Headers {
+  const copy = new Headers(headers);
+  copy.delete(CLIENT_IP_HEADER);
+  if (ip) copy.set(CLIENT_IP_HEADER, ip);
+  return copy;
 }
