@@ -17,6 +17,14 @@ msgstr ""
 msgid " (unread)"
 msgstr " (읽지 않음)"
 
+#: src/pages/Today.tsx
+msgid "Coming up"
+msgstr "예정"
+
+#: src/pages/Today.tsx
+msgid "Nothing today"
+msgstr "오늘은 없음"
+
 #. placeholder {0}: pinned.length
 #: src/pages/model-settings/space-bots-model.tsx
 msgid "{0, plural, one {# bot has its own model:} other {# bots have their own model:}}"

@@ -17,6 +17,14 @@ msgstr ""
 msgid " (unread)"
 msgstr " (לא נקראה)"
 
+#: src/pages/Today.tsx
+msgid "Coming up"
+msgstr "בקרוב"
+
+#: src/pages/Today.tsx
+msgid "Nothing today"
+msgstr "אין כלום היום"
+
 #. placeholder {0}: pinned.length
 #: src/pages/model-settings/space-bots-model.tsx
 msgid "{0, plural, one {# bot has its own model:} other {# bots have their own model:}}"

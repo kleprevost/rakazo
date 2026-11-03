@@ -17,6 +17,14 @@ msgstr ""
 msgid " (unread)"
 msgstr " (non lu)"
 
+#: src/pages/Today.tsx
+msgid "Coming up"
+msgstr "À venir"
+
+#: src/pages/Today.tsx
+msgid "Nothing today"
+msgstr "Rien aujourd’hui"
+
 #. placeholder {0}: pinned.length
 #: src/pages/model-settings/space-bots-model.tsx
 msgid "{0, plural, one {# bot has its own model:} other {# bots have their own model:}}"
