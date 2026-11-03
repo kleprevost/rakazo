@@ -603,6 +603,10 @@ msgstr "Geçiş anahtarı ekle"
 msgid "Add provider"
 msgstr "Sağlayıcı ekle"
 
+#: src/components/ApprovalRulesSettings.tsx
+msgid "Add rule"
+msgstr ""
+
 #: src/pages/McpServersOverlay.tsx
 msgid "Add server"
 msgstr "Sunucu ekle"
@@ -1368,6 +1372,10 @@ msgstr ""
 msgid "Claude subscription"
 msgstr ""
 
+#: src/pages/shell/computer-panel.tsx
+msgid "Clean up"
+msgstr "Temizle"
+
 #: src/components/AskCard.tsx
 #: src/pages/shell/dialogs.tsx
 msgid "Clear"
@@ -1549,6 +1557,10 @@ msgstr "Bilgisayar başlatılamadı"
 #: src/components/ModelCredits.tsx
 msgid "Computer hours left"
 msgstr "Kalan bilgisayar saati"
+
+#: src/pages/shell/computer-panel.tsx
+msgid "Computer is {percent}% full"
+msgstr "Bilgisayar %{percent} dolu"
 
 #: src/pages/shell/computer-overlay.tsx
 msgid "Computer is asleep"
@@ -1759,7 +1771,6 @@ msgstr ""
 msgid "Copied"
 msgstr "Kopyalandı"
 
-#: src/components/InviteDialog.tsx
 #: src/components/VaultSettings.tsx
 #: src/pages/model-settings/connection-controls.tsx
 #: src/pages/Onboarding.tsx
@@ -1779,6 +1790,7 @@ msgstr "Kodu kopyala"
 msgid "Copy diagram source"
 msgstr "Diyagram kaynağını kopyala"
 
+#: src/components/InviteDialog.tsx
 #: src/components/pages/PublicPageShell.tsx
 #: src/components/pages/SharePopover.tsx
 msgid "Copy link"
@@ -2716,6 +2728,7 @@ msgstr "Bağlantı kesiliyor…"
 #: src/components/ComputerUpdateProgress.tsx
 #: src/components/PasskeyOffer.tsx
 #: src/components/teach/TeachComputerOverlay.tsx
+#: src/pages/shell/computer-panel.tsx
 #: src/pages/shell/message-cards.tsx
 msgid "Dismiss"
 msgstr "Kapat"
@@ -3179,10 +3192,6 @@ msgstr ""
 msgid "General"
 msgstr "Genel"
 
-#: src/components/InviteDialog.tsx
-msgid "Get a free month for each friend who starts a trial."
-msgstr "Deneme başlatan her arkadaşın için bir ay ücretsiz kazan."
-
 #: src/components/SidebarFooter.tsx
 msgid "Get the mobile app"
 msgstr "Mobil uygulamayı indir"
@@ -3194,6 +3203,10 @@ msgstr ""
 #: src/pages/RoutineEditor.tsx
 msgid "Git event"
 msgstr ""
+
+#: src/components/InviteDialog.tsx
+msgid "Give a friend {weeks} weeks free"
+msgstr "Bir arkadaşına {weeks} hafta ücretsiz hediye et"
 
 #: src/pages/NotFound.tsx
 msgid "Go home"
@@ -3485,7 +3498,10 @@ msgstr "Aralık birimi"
 msgid "Invalid code"
 msgstr "Geçersiz kod"
 
-#: src/components/InviteDialog.tsx
+#: src/pages/shell/chat-header.tsx
+msgid "Invite a friend"
+msgstr "Bir arkadaşını davet et"
+
 #: src/components/SidebarFooter.tsx
 msgid "Invite friends"
 msgstr "Arkadaşlarını davet et"
@@ -4093,6 +4109,10 @@ msgid "Needs an OAuth client ID"
 msgstr "OAuth istemci kimliği gerekli"
 
 #: src/pages/ActivityList.tsx
+msgid "Needs attention"
+msgstr "İlgi gerekiyor"
+
+#: src/pages/ActivityList.tsx
 msgid "Needs input"
 msgstr "Girdi bekliyor"
 
@@ -4344,10 +4364,6 @@ msgstr "Henüz hatırlanan bir şey yok"
 #: src/pages/shell/bot-panel.tsx
 msgid "Notifications"
 msgstr "Bildirimler"
-
-#: src/pages/ActivityList.tsx
-msgid "Now"
-msgstr "Şimdi"
 
 #: src/pages/McpOAuthCallback.tsx
 msgid "OAuth authorization was cancelled."
@@ -5130,6 +5146,10 @@ msgstr "Anahtarı değiştir"
 msgid "Replace value"
 msgstr ""
 
+#: src/components/AskCard.tsx
+msgid "Replaces the login saved for {replacedSite}"
+msgstr "{replacedSite} için kayıtlı girişin yerini alır"
+
 #: src/pages/ExternalConversationSettings.tsx
 msgid "Replies to"
 msgstr "Yanıt verdiği"
@@ -5350,6 +5370,7 @@ msgstr "{botName} ile aynı"
 msgid "Saturday"
 msgstr "Cumartesi"
 
+#: src/components/ApprovalRulesSettings.tsx
 #: src/components/AskCard.tsx
 #: src/components/ComputerProviderSettings.tsx
 #: src/components/PasskeySettings.tsx
@@ -6172,6 +6193,10 @@ msgstr "Bu dosyalar veya seçimler artık eşleşmiyor. Dosyaları yeniden seç.
 msgid "These saved settings can't be read. Remove it and add it again."
 msgstr ""
 
+#: src/components/InviteDialog.tsx
+msgid "They get {weeks} weeks free."
+msgstr "Arkadaşın {weeks} hafta ücretsiz kullanır."
+
 #: src/components/call/CallCard.tsx
 #: src/pages/ModelRoleSettings.tsx
 #: src/pages/RoutineEditor.tsx
@@ -6394,6 +6419,7 @@ msgstr "Araç bağımsız değişkenleri bir JSON nesnesi olmalıdır"
 msgid "Tool arguments must be JSON"
 msgstr "Araç bağımsız değişkenleri JSON olmalıdır"
 
+#: src/components/ApprovalRulesSettings.tsx
 #: src/pages/RoutineEditor.tsx
 msgid "Tool name"
 msgstr "Araç adı"
@@ -6501,6 +6527,10 @@ msgstr "Sesi aç"
 #: src/pages/BotContextMenu.tsx
 msgid "Unpin"
 msgstr "Sabitlemeyi kaldır"
+
+#: src/pages/ActivityList.tsx
+msgid "Unread"
+msgstr "Okunmamış"
 
 #. placeholder {0}: pending.file.name
 #: src/pages/shell/use-composer-actions.ts
@@ -6841,6 +6871,10 @@ msgstr ""
 msgid "Work"
 msgstr ""
 
+#: src/pages/ActivityList.tsx
+msgid "Working"
+msgstr "Çalışıyor"
+
 #: src/pages/shell/agent-import.tsx
 msgid "Working instructions"
 msgstr "Çalışma talimatları"
@@ -6894,6 +6928,10 @@ msgstr "Bu pencereyi kapatabilirsin."
 msgid "You declined"
 msgstr ""
 
+#: src/components/InviteDialog.tsx
+msgid "You get a free month when they start their trial with a new card."
+msgstr "Yeni bir kartla deneme sürümünü başlattıklarında sen bir ay ücretsiz kazanırsın."
+
 #: src/pages/shell/computer-overlay.tsx
 msgid "You have control"
 msgstr "Kontrol sende"
@@ -6910,6 +6948,10 @@ msgstr "Anthropic sağlayıcınız"
 #: src/components/ModelCredits.tsx
 msgid "Your card is charged {annualPrice} today, less the unused part of this month."
 msgstr "Bugün kartından {annualPrice} tahsil edilir, bu ayın kullanılmayan kısmı düşülür."
+
+#: src/pages/Shell.tsx
+msgid "Your computer's disk is nearly full. Free up space by removing build output and caches you no longer need."
+msgstr "Bilgisayarınızın diski neredeyse dolu. Artık ihtiyaç duymadığınız derleme çıktılarını ve önbellekleri silerek yer açın."
 
 #: src/components/AccountDataSettings.tsx
 msgid "Your data"
