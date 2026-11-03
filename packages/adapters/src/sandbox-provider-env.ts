@@ -46,6 +46,7 @@ export function sandboxProviderOptionsFromEnv(
   SandboxProviderOptions,
   | "hostComputerUrl"
   | "hostComputerToken"
+  | "screenViaSupervisor"
   | "e2bApiKey"
   | "novitaApiKey"
   | "sandboxTemplate"
@@ -86,6 +87,7 @@ export function sandboxProviderOptionsFromEnv(
   return {
     hostComputerUrl: source.SANDBOX_HOST_URL,
     hostComputerToken: source.SANDBOX_HOST_TOKEN,
+    screenViaSupervisor: source.SANDBOX_SCREEN_VIA_SUPERVISOR?.trim() === "true" ? true : undefined,
     e2bApiKey: source.E2B_API_KEY,
     novitaApiKey: optional(source.NOVITA_API_KEY),
     sandboxTemplate: optional(source.SANDBOX_TEMPLATE),

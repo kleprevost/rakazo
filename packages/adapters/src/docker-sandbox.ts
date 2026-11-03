@@ -24,6 +24,12 @@ import {
   requestDeadline,
   resolveSupervisorToken,
 } from "@rakazo/core";
+import { screenPorts } from "@rakazo/core/node/desktop-runtime";
+import type { SupervisorProxyPurpose } from "@rakazo/core/node/supervisor-proxy-capability";
+import {
+  mintSupervisorProxyCapability,
+  supervisorProxyAuthorization,
+} from "@rakazo/core/node/supervisor-proxy-capability";
 import { outgoingCorrelationHeaders } from "@rakazo/logging";
 import {
   boundedComputerActions,
@@ -105,6 +111,10 @@ export class DockerSandboxProvider implements SandboxProvider {
   constructor(
     private readonly supervisorUrl: string,
     supervisorToken?: string,
+    private readonly options: {
+      /** Stream screens and terminals through the supervisor, for an app on another host. */
+      screenViaSupervisor?: boolean;
+    } = {},
   ) {
     this.supervisorToken = supervisorToken ?? resolveSupervisorToken(process.env);
   }
@@ -127,6 +137,34 @@ export class DockerSandboxProvider implements SandboxProvider {
 
   private url(path: string) {
     return `${this.supervisorUrl.replace(/\/$/, "")}${path}`;
+  }
+
+  /**
+   * The supervisor's own stream route for a screen or terminal URL it returned, plus the
+   * capability that opens it. The URL's query (the socket token) is kept; the capability is
+   * returned as a header for the server-side proxy, so it never reaches a URL or a browser.
+   */
+  private viaSupervisor(
+    computer: ComputerRef,
+    streamUrl: string,
+    purpose: SupervisorProxyPurpose,
+    port: string,
+  ): { url: string; headers?: Record<string, string> } {
+    if (!this.options.screenViaSupervisor) return { url: streamUrl };
+    const upstream = new URL(streamUrl);
+    const url = new URL(
+      this.url(`/computers/${encodeURIComponent(computer.id)}/${purpose}${upstream.pathname}`),
+    );
+    url.search = upstream.search;
+    const capability = mintSupervisorProxyCapability(this.supervisorToken, {
+      computerId: computer.id,
+      port: Number(port),
+      purpose,
+    });
+    return {
+      url: url.toString(),
+      headers: { authorization: supervisorProxyAuthorization(capability) },
+    };
   }
 
   private headers(context: AdapterContext, botId?: string) {
@@ -298,8 +336,17 @@ export class DockerSandboxProvider implements SandboxProvider {
     if (request.interactive && !body.screenUrl) {
       throw new Error("control screen failed to start");
     }
+    const layout = screenPorts(0);
+    const stream = body.screenUrl
+      ? this.viaSupervisor(
+          computer,
+          body.screenUrl,
+          "screen",
+          request.interactive ? layout.controlPort : layout.viewPort,
+        )
+      : { url: this.url(`/computers/${computer.id}/screen`) };
     return {
-      url: body.screenUrl ?? this.url(`/computers/${computer.id}/screen`),
+      ...stream,
       mimeType: "text/html",
       close: async () => undefined,
     };
@@ -317,7 +364,7 @@ export class DockerSandboxProvider implements SandboxProvider {
       throw new Error(`sandbox terminal failed: ${res.status} ${detail}`.trim());
     }
     const body = await readSandboxJson<{ terminalUrl: string }>(res, context.signal);
-    return { url: body.terminalUrl };
+    return this.viaSupervisor(computer, body.terminalUrl, "terminal", screenPorts(0).controlPort);
   }
 
   async setScreenControl(

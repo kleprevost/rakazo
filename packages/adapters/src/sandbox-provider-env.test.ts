@@ -45,6 +45,16 @@ describe("resolveSandboxProvider", () => {
     });
   });
 
+  it("streams screens through the supervisor only when asked", () => {
+    expect(sandboxProviderOptionsFromEnv({}).screenViaSupervisor).toBeUndefined();
+    expect(
+      sandboxProviderOptionsFromEnv({ SANDBOX_SCREEN_VIA_SUPERVISOR: "false" }).screenViaSupervisor,
+    ).toBeUndefined();
+    expect(
+      sandboxProviderOptionsFromEnv({ SANDBOX_SCREEN_VIA_SUPERVISOR: "true" }).screenViaSupervisor,
+    ).toBe(true);
+  });
+
   it("requires both Railway credentials and an environment", () => {
     expect(resolveSandboxProvider({ SANDBOX_PROVIDER: "railway" })).toBe("none");
     expect(resolveSandboxProvider({ SANDBOX_PROVIDER: "railway", RAILWAY_API_TOKEN: "test" })).toBe(

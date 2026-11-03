@@ -19,6 +19,8 @@ export interface SandboxProviderOptions {
   hostComputerToken?: string;
   supervisorUrl?: string;
   supervisorToken?: string;
+  /** Docker computers: stream screens and terminals through the supervisor instead of the computer's address. */
+  screenViaSupervisor?: boolean;
   e2bApiKey?: string;
   novitaApiKey?: string;
   sandboxTemplate?: string;
@@ -168,6 +170,7 @@ export async function createSandboxProvider(
       return new DockerSandboxProvider(
         opts.supervisorUrl ?? "http://127.0.0.1:7091",
         opts.supervisorToken,
+        { screenViaSupervisor: opts.screenViaSupervisor },
       );
     case "desktop":
       assertHostCommandsAllowed();
