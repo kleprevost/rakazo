@@ -1,0 +1,79 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Edit this file (the only one with deployment-specific values), then:
+#   kubectl apply -k infra/azure/k8s
+resources:
+  - namespaces.yaml
+  - rbac.yaml
+  - storageclass.yaml
+  - app.yaml
+  - ingress.yaml
+  - networkpolicy.yaml
+
+# Pin a published vX.Y.Z tag or a digest for production (docs/self-host-upgrading.md).
+images:
+  - name: ghcr.io/elie222/rakazo/app
+    newTag: edge
+
+patches:
+  # Client id of the managed identity (appIdentityClientId output of the Bicep deployment).
+  - target:
+      kind: ServiceAccount
+      name: rakazo-(api|worker)
+    patch: |-
+      apiVersion: v1
+      kind: ServiceAccount
+      metadata:
+        name: ignored
+        annotations:
+          azure.workload.identity/client-id: 00000000-0000-0000-0000-000000000000
+
+configMapGenerator:
+  - name: rakazo-config
+    namespace: rakazo
+    literals:
+      - NODE_ENV=production
+      - DATA_DIR=/data
+      - API_HOST=0.0.0.0
+      - API_PORT=3100
+      - WAKEUP_DRIVER=graphile
+      - AGENT_RUNTIME=pi
+      - CONTENT_ENCRYPTION=on
+
+      # Public origin: one HTTPS host for the web app, /api and /rpc. Must match the Ingress host.
+      - RAKAZO_HOST=rakazo.example.com
+      - BETTER_AUTH_URL=https://rakazo.example.com
+      - WEB_ORIGIN=https://rakazo.example.com
+      - API_URL=https://rakazo.example.com
+      # Pod network CIDR of the cluster (infra/azure/modules/aks.bicep). The web proxy and ingress
+      # sit inside it; bot computers cannot reach the API (network policy).
+      - TRUSTED_PROXIES=192.168.0.0/16
+
+      # Key Vault (docs/enterprise/azure-key-vault.md). Values are Bicep outputs.
+      - SECRET_STORE=azure-key-vault
+      - AZURE_KEY_VAULT_URL=https://example-kv.vault.azure.net
+      - MASTER_KEY_PROVIDER=azure-key-vault
+      - AZURE_KEY_VAULT_KEY_ID=https://example-kv.vault.azure.net/keys/rakazo-master/0000000000000000000000000000000
+
+      # Entra ID (docs/enterprise/entra-id.md). The client secret is in rakazo-secrets.
+      - OIDC_ISSUER=https://login.microsoftonline.com/00000000-0000-0000-0000-000000000000/v2.0
+      - OIDC_CLIENT_ID=00000000-0000-0000-0000-000000000000
+      - OIDC_NAME=Microsoft
+      - OIDC_ACCESS_CLAIM=roles
+      - OIDC_ALLOWED_VALUES=Rakazo.User,Rakazo.Admin
+      - OIDC_ADMIN_VALUES=Rakazo.Admin
+
+      # Foundry (docs/enterprise/inference.md). The key is in rakazo-secrets.
+      - PI_DEFAULT_PROVIDER=azure
+      - PI_DEFAULT_MODEL=replace-with-model-id
+      - AZURE_OPENAI_RESOURCE_NAME=replace-with-resource
+
+      # Bot computers: one pod per computer in rakazo-sandboxes on the Kata node pool.
+      # The RuntimeClass is created by AKS for the node pool (kubectl get runtimeclass).
+      - SANDBOX_PROVIDER=kubernetes
+      - KUBERNETES_SANDBOX_NAMESPACE=rakazo-sandboxes
+      - KUBERNETES_SANDBOX_RUNTIME_CLASS_NAME=kata-vm-isolation
+      - KUBERNETES_SANDBOX_COMPUTER_IMAGE=ghcr.io/elie222/rakazo/computer:edge
+      - KUBERNETES_SANDBOX_CPU_LIMIT=2
+      - KUBERNETES_SANDBOX_MEMORY_LIMIT=4Gi

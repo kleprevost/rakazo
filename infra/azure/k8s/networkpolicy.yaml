@@ -1,0 +1,73 @@
+# Bot computers (pods labelled app.kubernetes.io/name=rakazo-computer in rakazo-sandboxes).
+# Everything is denied unless listed here, in both directions. The API, worker and web pods in
+# rakazo are not restricted by this file; add policies there if your cluster policy requires them.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny
+  namespace: rakazo-sandboxes
+spec:
+  podSelector: {}
+  policyTypes: [Ingress, Egress]
+---
+# Ingress: only the API, worker and web pods, and only on the computer's screen and
+# readiness ports (6080, and 6100 upward for the desktop gateway).
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-rakazo-to-computers
+  namespace: rakazo-sandboxes
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: rakazo-computer
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: rakazo
+          podSelector:
+            matchExpressions:
+              - key: app
+                operator: In
+                values: [rakazo-api, rakazo-worker, rakazo-web]
+      ports:
+        - { protocol: TCP, port: 6080 }
+        - { protocol: TCP, port: 6100, endPort: 6199 }
+---
+# Egress: cluster DNS, and the public internet minus every private, link-local and
+# shared-address range. That leaves out the instance metadata endpoint 169.254.169.254, node
+# and pod addresses, other namespaces, and the Kubernetes API server (a cluster-internal
+# address, also not reachable because bot pods get no service account token).
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-computer-egress
+  namespace: rakazo-sandboxes
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: rakazo-computer
+  policyTypes: [Egress]
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - { protocol: UDP, port: 53 }
+        - { protocol: TCP, port: 53 }
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except:
+              - 10.0.0.0/8
+              - 172.16.0.0/12
+              - 192.168.0.0/16
+              - 100.64.0.0/10
+              - 169.254.0.0/16
+              - 127.0.0.0/8

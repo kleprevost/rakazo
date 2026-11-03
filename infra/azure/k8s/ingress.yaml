@@ -1,0 +1,30 @@
+# Public entry: the web service serves the UI and proxies /api, /rpc and the screen routes to the
+# API, so one host and one backend is enough. Uses AKS's managed NGINX (web application routing,
+# enabled in infra/azure/modules/aks.bicep). Any other ingress controller works with a different
+# ingressClassName. TLS: create the rakazo-tls secret yourself (az keyvault + CSI driver, or
+# cert-manager) before applying.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: rakazo
+  namespace: rakazo
+  annotations:
+    # Screen and realtime streams are long-lived; long uploads need a larger body.
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-body-size: 64m
+spec:
+  ingressClassName: webapprouting.kubernetes.azure.com
+  tls:
+    - hosts: [rakazo.example.com]
+      secretName: rakazo-tls
+  rules:
+    - host: rakazo.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: rakazo-web
+                port: { number: 5173 }

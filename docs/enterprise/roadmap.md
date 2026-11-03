@@ -17,7 +17,7 @@ Not linked from the public docs site (`apps/www/src/docs.ts` lists slugs explici
 | 1 Secrets | Azure Key Vault `SecretStore` + `KeyProvider` adapters, workload identity (DefaultAzureCredential) | `infisical-secret-store.ts`, `aws-kms-key-provider.ts`, conformance tests | PR #1 in review (secret migration CLI to/from Key Vault not supported yet) |
 | 2 Identity | Entra via existing OIDC: restrict to tenant (`tid`), optional group allow-list, admin role from group; docs | `packages/auth/src/oidc.ts` | PR #3 in review (claim allow-list + SSO admin; sessions outlive role removal until expiry) |
 | 3 Inference | Foundry + OpenCode Zen as deployment model / connections; verify via existing OpenAI-compatible + Pi providers before writing code | `pi-models.ts`, OpenAI-compatible connections | PR #2 in review (API key only; keyless Entra auth is a follow-up) |
-| 4 Compute + hosting | AKS reference deployment (Helm or manifests), Kata `runtimeClass` for bot pods, network policy, workload identity wiring | `kubernetes-sandbox.ts` (supports runtimeClass) | todo |
+| 4 Compute + hosting | AKS reference deployment (Bicep + kustomize manifests, no Helm), Kata `runtimeClass` for bot pods, network policy, workload identity wiring | `kubernetes-sandbox.ts` (supports runtimeClass) | PR in review: `infra/azure/`, `azure-aks.md` (validated offline only: bicep lint/build, kubeconform; Kata value and Cilium policy unverified) |
 
 Acceptance for each WS: unit/conformance tests pass offline, `pnpm lint` clean, doc page under
 `docs/enterprise/`, PR describes config and what was not verified against real Azure.
