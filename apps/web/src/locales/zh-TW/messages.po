@@ -6605,6 +6605,10 @@ msgstr "你已拒絕"
 msgid "You have control"
 msgstr "你已接管"
 
+#: src/lib/user-error.ts
+msgid "Your account does not have access"
+msgstr ""
+
 #. js-lingui-explicit-id
 #: src/lib/run-error.ts
 msgid "Your Anthropic"

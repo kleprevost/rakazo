@@ -39,7 +39,12 @@ import type { EmailLocaleOf } from "./email.js";
 import { emailLocale, passwordResetEmail, signInCodeEmail, verificationEmail } from "./email.js";
 import { hasRecentIdentityConfirmation, identityConfirmation } from "./identity-confirmation.js";
 import type { OidcConfig } from "./oidc.js";
-import { isCurrentOidcAccount, oidcDiscovery } from "./oidc.js";
+import {
+  isCurrentOidcAccount,
+  isOidcAccessDenied,
+  isOidcAdminAccount,
+  oidcDiscovery,
+} from "./oidc.js";
 import { passkeyRelyingParty } from "./passkey.js";
 import type { TokenKey } from "./token-storage.js";
 import { encryptStoredOAuthTokens, openIdToken, sealIdToken } from "./token-storage.js";
@@ -287,6 +292,21 @@ export function createAuth(prisma: PrismaClient, env: AuthEnv) {
         const expectedUser = (await getOAuthState())?.serverContext?.reauthUserId;
         if (typeof expectedUser === "string" && user.id !== expectedUser)
           return { error: "REAUTHENTICATION_REQUIRED" };
+        if (await isOidcAccessDenied()) {
+          // A denied sign-in must not leave an older ID token granting administration.
+          if (user.id)
+            await ctx.context.adapter
+              .updateMany({
+                model: "account",
+                where: [
+                  { field: "userId", value: String(user.id) },
+                  { field: "providerId", value: "oidc" },
+                ],
+                update: { idToken: null },
+              })
+              .catch(() => undefined);
+          return { error: "SSO_ACCESS_DENIED" };
+        }
         const verified = user.emailVerified === true;
         const email = String(user.email ?? "").toLowerCase();
         if (isMessagingEmail(email)) return { error: "EMAIL_NOT_AVAILABLE" };
@@ -751,6 +771,18 @@ export function createAuth(prisma: PrismaClient, env: AuthEnv) {
     consumeAccountExportToken: async (token: string) =>
       consumeAccountExportToken((await auth.$context).internalAdapter, token),
     disposeOidcDiscovery: () => discovery?.dispose(),
+    /** Whether the user's current SSO identity carries an admin value, as of their last sign-in. */
+    isSsoAdmin: async (userId: string) => {
+      const oidc = env.oidc;
+      if (!oidc?.adminValues?.length) return false;
+      const accounts = await prisma.account.findMany({
+        where: { userId, providerId: "oidc" },
+        select: { providerId: true, accountId: true, idToken: true },
+      });
+      const key = await tokenKey();
+      for (const account of accounts) if (await isOidcAdminAccount(oidc, account, key)) return true;
+      return false;
+    },
   });
 }
 

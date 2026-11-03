@@ -69,6 +69,11 @@ function setup(options: Partial<AuthEnv> = {}, hasMembership = true) {
     userDevice: { updateMany: vi.fn(async () => ({})) },
     passkey: { deleteMany: vi.fn(async () => ({})) },
     account: {
+      findMany: vi.fn(async ({ where }: { where: { userId: string; providerId: string } }) =>
+        rows("account").filter(
+          (row) => row.userId === where.userId && row.providerId === where.providerId,
+        ),
+      ),
       deleteMany: vi.fn(async ({ where }: { where: { userId: string } }) => {
         const kept = rows("account").filter(
           (row) => row.userId !== where.userId || row.providerId === "credential",
@@ -646,6 +651,91 @@ describe("OIDC callbacks", () => {
     );
     expect(response.status).toBe(400);
     expect(response.headers.get("location")).toBeNull();
+  });
+  describe("claim access control", () => {
+    const access = { accessClaim: "roles", allowedValues: ["Rakazo.User", "Rakazo.Admin"] };
+    const configure = (extra: Record<string, unknown> = {}) =>
+      setup({
+        oidc: {
+          issuer,
+          clientId: "test-client",
+          clientSecret: "test-client-secret",
+          name: "SSO",
+          scopes: ["openid", "email", "profile"],
+          allowSignupBypass: false,
+          ...access,
+          ...extra,
+        },
+      });
+    const claims = (roles: unknown) => ({
+      sub: "subject-1",
+      email: "sso@example.test",
+      email_verified: true,
+      ...(roles === undefined ? {} : { roles }),
+    });
+    const userId = () => String(rows("user")[0]?.id);
+
+    it("admits a token carrying an allowed value", async () => {
+      configure();
+      expect((await signIn(claims(["Other", "Rakazo.User"]))).headers.get("location")).toBe(
+        `${origin}/app`,
+      );
+    });
+    it.each([
+      ["missing", undefined],
+      ["empty", []],
+      ["a string", "Rakazo.User"],
+      ["an object", { 0: "Rakazo.User" }],
+      ["non-string entries", [1, null, { value: "Rakazo.User" }]],
+      ["a different value", ["Rakazo.Other"]],
+    ])("denies a %s claim without creating a user", async (_name, roles) => {
+      configure();
+      const response = await signIn(claims(roles));
+      expect(response.headers.get("location")).toContain("error=SSO_ACCESS_DENIED");
+      expect(rows("user")).toHaveLength(0);
+      expect(rows("account")).toHaveLength(0);
+    });
+    it("leaves sign-in unchanged when no allow-list is set", async () => {
+      configure({ allowedValues: [] });
+      expect((await signIn(claims(undefined))).headers.get("location")).toBe(`${origin}/app`);
+    });
+    it("re-checks on every sign-in", async () => {
+      configure();
+      await signIn(claims(["Rakazo.User"]));
+      cookies = "";
+      const response = await signIn(claims(["Rakazo.Other"]));
+      expect(response.headers.get("location")).toContain("error=SSO_ACCESS_DENIED");
+    });
+    it("denies linking without an allowed value", async () => {
+      configure();
+      await request("/sign-up/email", {
+        email: "sso@example.test",
+        password: "correct-horse-battery",
+        name: "Existing",
+      });
+      const response = await request(await start(claims(["Rakazo.Other"]), true));
+      expect(response.headers.get("location")).toContain("error=SSO_ACCESS_DENIED");
+      expect(rows("account").filter((row) => row.providerId === "oidc")).toHaveLength(0);
+    });
+    it("grants admin from the claim and revokes it on the next sign-in or denial", async () => {
+      configure({ adminValues: ["Rakazo.Admin"] });
+      await signIn(claims(["Rakazo.Admin"]));
+      expect(await auth.isSsoAdmin(userId())).toBe(true);
+      cookies = "";
+      await signIn(claims(["Rakazo.User"]));
+      expect(await auth.isSsoAdmin(userId())).toBe(false);
+      cookies = "";
+      await signIn(claims(["Rakazo.Admin"]));
+      expect(await auth.isSsoAdmin(userId())).toBe(true);
+      cookies = "";
+      expect((await signIn(claims([]))).headers.get("location")).toContain("SSO_ACCESS_DENIED");
+      expect(await auth.isSsoAdmin(userId())).toBe(false);
+    });
+    it("never grants admin when no admin values are configured", async () => {
+      configure();
+      await signIn(claims(["Rakazo.Admin"]));
+      expect(await auth.isSsoAdmin(userId())).toBe(false);
+    });
   });
   it("enforces the allowlist before inserting a user", async () => {
     setup({ signupAllowlist: "allowed@example.test" });

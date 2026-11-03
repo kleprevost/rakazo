@@ -6604,6 +6604,10 @@ msgstr "Has rechazado la llamada"
 msgid "You have control"
 msgstr "Tienes el control"
 
+#: src/lib/user-error.ts
+msgid "Your account does not have access"
+msgstr ""
+
 #. js-lingui-explicit-id
 #: src/lib/run-error.ts
 msgid "Your Anthropic"

@@ -220,6 +220,9 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): AppEnv {
             .split(/[\s,]+/)
             .filter(Boolean),
           allowSignupBypass: source.OIDC_ALLOW_SIGNUP_BYPASS === "true",
+          accessClaim: optional(source.OIDC_ACCESS_CLAIM) ?? "groups",
+          allowedValues: list(source.OIDC_ALLOWED_VALUES),
+          adminValues: list(source.OIDC_ADMIN_VALUES),
         }
       : undefined;
   const authSecret = resolveAuthSecret(source);
