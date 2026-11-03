@@ -44,8 +44,10 @@ kubelogin convert-kubeconfig -l azurecli
 kubectl get runtimeclass
 ```
 
-`kubectl get runtimeclass` must list the Kata class AKS created for the `computers` pool. If its
-name is not `kata-vm-isolation`, set `KUBERNETES_SANDBOX_RUNTIME_CLASS_NAME` to the name shown.
+After applying the manifests, `kubectl get runtimeclass -o custom-columns=NAME:.metadata.name,HANDLER:.handler`
+must show the Kata class AKS installed for the `computers` pool. `rakazo-kata` (from
+`k8s/runtimeclass.yaml`) uses handler `kata`; if AKS's class shows a different handler, change it
+in that file.
 
 ## Post-deploy
 
@@ -72,9 +74,11 @@ The Kubernetes provider creates one pod per computer in `rakazo-sandboxes` with
 `runtimeClassName` from `KUBERNETES_SANDBOX_RUNTIME_CLASS_NAME`. The Kata runtime class makes the
 node start each pod inside its own lightweight VM with a separate guest kernel, so a bot that
 escapes its container still lands inside that VM, not on the node or beside another bot. The
-RuntimeClass is created and scheduled by AKS for the pool, so these manifests do not define one
-and the API and worker do not set node selectors. Rakazo's own pods are pinned to the system pool
-(`kubernetes.azure.com/mode: system`), so they never share a node with bots.
+provider cannot set node selectors or tolerations, so `rakazo-kata` carries them: the
+`computers` pool is labelled `rakazo.io/pool=computers` and tainted
+`rakazo.io/computers=true:NoSchedule`, and the class selects that label and tolerates that
+taint. A bot pod can therefore only run on a Kata node, and no other pod can. Rakazo's own pods
+are pinned to the system pool (`kubernetes.azure.com/mode: system`).
 
 Around the VM, the namespace is locked down:
 
@@ -113,7 +117,7 @@ Offline only; nothing was deployed and no Azure subscription was used.
   including `workloadRuntime` on the node pool. The type accepts any string for its value, so
   `KataVmIsolation` was not checked against a type.
 - `kustomize build infra/azure/k8s` and `kubeconform -strict` against Kubernetes 1.33 schemas:
-  all 20 resources valid.
+  all 21 resources valid.
 - Environment variable names were checked against the Kubernetes computer provider docs and the
   Compose file.
 
@@ -121,9 +125,10 @@ Offline only; nothing was deployed and no Azure subscription was used.
 
 - Deployment, quotas, and VM size availability. The `computers` pool VM size must support nested
   virtualization in your region.
-- The `KataVmIsolation` value, the RuntimeClass name and its node selector, and Kata with Azure CNI
+- The `KataVmIsolation` value, the Kata handler name `kata` in `rakazo-kata` (from memory of AKS's
+  own class), that the taint and label apply to the pool as written, and Kata with Azure CNI
   overlay and Cilium. Older docs and API versions used `KataMshvVmIsolation` and
-  `kata-mshv-vm-isolation`.
+  AKS's class `kata-mshv-vm-isolation`.
 - That Cilium enforces the `ipBlock` exceptions as intended for pod and node addresses. Test from a
   computer pod: `curl 169.254.169.254` and a pod IP must fail, a public site must work.
 - Entra-specific settings, Azure Files uid mapping for the `node` user, TLS to PostgreSQL with

@@ -1,0 +1,18 @@
+# Kata microVM runtime for bot computers. The Kubernetes computer provider cannot set node
+# selectors or tolerations, so this class carries them: pods using it run only on the tainted,
+# labelled `computers` node pool (infra/azure/modules/aks.bicep), inside a Kata VM.
+# The handler is the one AKS Pod Sandboxing installs on that pool. Confirm it with
+#   kubectl get runtimeclass -o custom-columns=NAME:.metadata.name,HANDLER:.handler
+apiVersion: node.k8s.io/v1
+kind: RuntimeClass
+metadata:
+  name: rakazo-kata
+handler: kata
+scheduling:
+  nodeSelector:
+    rakazo.io/pool: computers
+  tolerations:
+    - key: rakazo.io/computers
+      operator: Equal
+      value: "true"
+      effect: NoSchedule

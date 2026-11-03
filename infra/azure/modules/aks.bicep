@@ -69,8 +69,8 @@ resource aks 'Microsoft.ContainerService/managedClusters@2025-05-01' = {
 }
 
 // Bot computers. workloadRuntime KataVmIsolation (AKS Pod Sandboxing) needs Azure Linux and a VM
-// size with nested virtualization. AKS then provides the RuntimeClass used by
-// KUBERNETES_SANDBOX_RUNTIME_CLASS_NAME. Rakazo's own pods stay on the system pool.
+// size with nested virtualization. infra/azure/k8s/runtimeclass.yaml binds the Kata handler to
+// this pool's label and taint. Rakazo's own pods stay on the system pool.
 resource computerPool 'Microsoft.ContainerService/managedClusters/agentPools@2025-05-01' = {
   parent: aks
   name: 'computers'
@@ -80,6 +80,10 @@ resource computerPool 'Microsoft.ContainerService/managedClusters/agentPools@202
     osSKU: 'AzureLinux'
     vmSize: computerNodeVmSize
     workloadRuntime: 'KataVmIsolation'
+    // Only pods that tolerate the taint (the rakazo-kata RuntimeClass adds it) run here, and that
+    // class selects this label, so bots never land on the system pool and app pods never land here.
+    nodeLabels: { 'rakazo.io/pool': 'computers' }
+    nodeTaints: ['rakazo.io/computers=true:NoSchedule']
     enableAutoScaling: true
     minCount: computerNodeMinCount
     maxCount: computerNodeMaxCount

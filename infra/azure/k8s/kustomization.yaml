@@ -5,6 +5,7 @@ kind: Kustomization
 #   kubectl apply -k infra/azure/k8s
 resources:
   - namespaces.yaml
+  - runtimeclass.yaml
   - rbac.yaml
   - storageclass.yaml
   - app.yaml
@@ -70,10 +71,10 @@ configMapGenerator:
       - AZURE_OPENAI_RESOURCE_NAME=replace-with-resource
 
       # Bot computers: one pod per computer in rakazo-sandboxes on the Kata node pool.
-      # The RuntimeClass is created by AKS for the node pool (kubectl get runtimeclass).
+      # rakazo-kata (runtimeclass.yaml) pins computers to the Kata node pool.
       - SANDBOX_PROVIDER=kubernetes
       - KUBERNETES_SANDBOX_NAMESPACE=rakazo-sandboxes
-      - KUBERNETES_SANDBOX_RUNTIME_CLASS_NAME=kata-vm-isolation
+      - KUBERNETES_SANDBOX_RUNTIME_CLASS_NAME=rakazo-kata
       - KUBERNETES_SANDBOX_COMPUTER_IMAGE=ghcr.io/elie222/rakazo/computer:edge
       - KUBERNETES_SANDBOX_CPU_LIMIT=2
       - KUBERNETES_SANDBOX_MEMORY_LIMIT=4Gi
