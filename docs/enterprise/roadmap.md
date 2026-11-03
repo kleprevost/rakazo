@@ -41,3 +41,31 @@ PoC on Azure Container Apps (web, API) with the Docker supervisor, bot computers
 ## Real Azure validation (as soon as a subscription exists)
 Deploy the Bicep, run a smoke test, confirm the items listed as unverified in each `docs/enterprise/*.md`
 (Kata handler name, Cilium enforcement of bot egress, Key Vault purge/RBAC, Entra claims, Foundry deployment names).
+
+## Wave 3 backlog
+Epics only; each needs its own design before building. Shared employees is designed in
+[features/shared-employees.md](./features/shared-employees.md).
+- Shared AI employees: one definition, per-user instances with private chat, memory and credentials, approved shared knowledge, roles from Entra claims and grants.
+- Capability broker + quarantine: central grant/withdraw of tool capabilities per employee; extends merged suspend (#38).
+- Computer fleet manager: pools, sizing, idle policy and cost view for per-user and service computers.
+- Teach by demonstration + skill lifecycle: Observed -> Drafted -> Tested -> Approved -> Published; publishing never grants permissions.
+- Team skill/template library: approved skills and employee templates browsable and reusable across the deployment.
+- Memory review & knowledge governance: review queues, retention, provenance and retirement for shared knowledge.
+- Agent evaluation & release management: draft -> evaluate -> approve -> canary -> publish -> rollback.
+- Inference firewall (pre-model) + pre-action gate: inspect and block data before model calls and before side effects.
+- Network egress policy: enforce `computers.egress` per provider (today not enforced).
+- Group-scoped policy: central policy overrides keyed by directory group.
+- Fine-grained admin roles: Platform, Security, Fleet, Bot Manager, Auditor.
+- Credential governance: inventory, rotation, expiry and revocation of user and shared credentials.
+- Action recording & audit replay: durable record of tool actions for review.
+- Identity lifecycle: Entra group reconciliation, SCIM deprovisioning.
+- Admin API: scripted access to metadata and governance operations.
+- Proactive standing responsibilities: employees with owned recurring duties.
+- Quiet autonomous reporting: summaries only when something needs a person.
+- Execution replay: re-run a past run deterministically for debugging and evaluation.
+
+### Licensing guidance
+Adapt MIT/Apache-2.0 code with attribution (keep notices, record the source in the PR). Treat
+noncommercial or restricted-license projects (for example OpenBot under PolyForm Noncommercial,
+n8n under the Sustainable Use License, Dify under its modified Apache license) as design
+references only: read for ideas, do not copy code or structure.
