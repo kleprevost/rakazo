@@ -63,6 +63,7 @@ import {
 } from "./computer-spec.js";
 import { EgressNotEnforced, verifyRestrictedEgress } from "./egress-probe.js";
 import { assertComputerHomeWritable } from "./home-ownership.js";
+import { attachSupervisorProxy } from "./screen-proxy.js";
 import type { ScreenAssignment } from "./supervisor-logic.js";
 import {
   assertRequestIdentity,
@@ -1255,6 +1256,14 @@ function startSupervisor() {
   const server = serve({ fetch: app.fetch, hostname, port }, () => {
     logger.info("supervisor listening", { "http.host": hostname, "http.port": port });
   });
+  attachSupervisorProxy(server as http.Server, {
+    token: supervisorToken,
+    allowedPorts: new Set(
+      [screenPorts(0).viewPort, screenPorts(0).controlPort].map((value) => Number(value)),
+    ),
+    resolveUpstream: ({ computerId, port }) => resolveProxyUpstream(computerId, port),
+    log: (message, details) => logger.warn(message, details),
+  });
   let stopping = false;
   const shutdown = async () => {
     if (stopping) return;
@@ -1707,6 +1716,36 @@ async function publishedScreenUrl(
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
   throw new Error("computer screen port was not published");
+}
+
+/**
+ * Where the stream proxy reaches a computer's screen port. The address comes from Docker's view
+ * of a running, Rakazo-managed computer, never from the request.
+ */
+async function resolveProxyUpstream(computerId: string, port: number) {
+  const container = docker.getContainer(computerId);
+  const info = await container.inspect().catch((error) => {
+    if ((error as { statusCode?: number })?.statusCode === 404) return undefined;
+    throw error;
+  });
+  const labels = info?.Config.Labels ?? {};
+  if (
+    !info?.State.Running ||
+    !labels["rakazo.botId"] ||
+    (labels["rakazo.managed"] !== "true" && info.Config.Image !== COMPUTER_IMAGE)
+  ) {
+    return null;
+  }
+  await rejoinComputerNetwork(info);
+  const target = resolveScreenPublishTarget({
+    screenNetwork: screenNetworkMode,
+    networkMode: info.HostConfig.NetworkMode,
+    networks: info.NetworkSettings?.Networks,
+    hostPort: info.NetworkSettings?.Ports?.[`${port}/tcp`]?.[0]?.HostPort,
+    containerPort: String(port),
+    screenHost: SCREEN_HOST,
+  });
+  return target ? { host: target.host, port: Number(target.port) } : null;
 }
 
 // Control and observe address the computer on its own network. A recreated

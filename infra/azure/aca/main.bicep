@@ -207,7 +207,8 @@ module apps 'modules/aca-apps.bicep' = {
     oidcAccessClaim: oidcAccessClaim
     oidcAllowedValues: oidcAllowedValues
     oidcAdminValues: oidcAdminValues
-    oidcRevalidateMinutes: oidcRevalidateMinutes
+    // Easy Auth sessions have no refresh token, so the API refuses both settings together.
+    oidcRevalidateMinutes: enableEasyAuth ? '' : oidcRevalidateMinutes
     oidcTrustEmail: oidcTrustEmail
     piDefaultModel: piDefaultModel
     azureOpenAiResourceName: azureOpenAiResourceName

@@ -159,7 +159,7 @@ to run without one.
 
 `enableEasyAuth=true` configures the web app's Entra provider (token store on, unauthenticated
 requests allowed, same app registration and client secret as OIDC) and sets `AUTH_EASY_AUTH=true` on
-web and api. The variable name is a placeholder for the sibling change; confirm it before use. The
+web and api (see [easy-auth.md](./easy-auth.md); it cannot be combined with `OIDC_REVALIDATE_MINUTES`). The
 Easy Auth redirect URI must be registered as above.
 
 ## Smoke test
@@ -201,9 +201,6 @@ Easy Auth redirect URI must be registered as above.
 Nothing was deployed. `bicep lint` and `bicep build` pass, the cloud-init YAML and the Compose file
 parse; that is all.
 
-- Placeholders awaiting sibling changes: `SANDBOX_SCREEN_VIA_SUPERVISOR=true` (api, VM supervisor,
-  VM worker: which processes read it) and `AUTH_EASY_AUTH=true` (web and api). Both names, and
-  whether the supervisor screen path also needs `SANDBOX_SCREEN_NETWORK=isolated`.
 - ACA NFS mount support with a workload-profile environment, the `NfsAzureFile` volume type on API
   `2025-01-01`, uid 1000 ownership and `NoRootSquash` through the mount, and the `api` image user
   (`node`, uid 1000) writing to `/data`.

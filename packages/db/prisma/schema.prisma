@@ -1590,6 +1590,8 @@ model UsageRecord {
   createdAt          DateTime @default(now())
 
   @@index([spaceId, userId, createdAt])
+  // The covering index `usage_records_period_spend_idx` ("createdAt") INCLUDE (userId, botId,
+  // costUsd) serves the budget check and is managed in its SQL migration.
   @@map("usage_records")
 }
 

@@ -72,10 +72,9 @@ var registrySecrets = empty(ghcrToken) ? [] : [
   { name: 'ghcr-token', value: ghcrToken }
 ]
 
-// PLACEHOLDER: name of the sibling PR's Easy Auth switch (assumed AUTH_EASY_AUTH). Verify.
+// Easy Auth sign-in mode (docs/enterprise/easy-auth.md).
 var easyAuthEnv = enableEasyAuth ? [{ name: 'AUTH_EASY_AUTH', value: 'true' }] : []
-// PLACEHOLDER: name of the sibling PR's supervisor screen proxy switch (assumed
-// SANDBOX_SCREEN_VIA_SUPERVISOR). Verify; the supervisor on the VM sets it too.
+// Screens and terminals go through the supervisor's proxy on port 7091 (docs/enterprise/aca-vm.md).
 var screenViaSupervisorEnv = [{ name: 'SANDBOX_SCREEN_VIA_SUPERVISOR', value: 'true' }]
 
 var apiEnv = concat(

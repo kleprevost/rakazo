@@ -49,6 +49,7 @@ interface Scenario {
   resumeAfterScheduleEdit?: boolean;
   lateLookupFails?: boolean;
   setupFailsOnce?: boolean;
+  spend?: { organization: number; user: number; bot: number };
 }
 
 async function failRun(scenario: Scenario) {
@@ -93,6 +94,7 @@ async function failRun(scenario: Scenario) {
     throw scenario.error;
   });
   const prisma = {
+    $queryRaw: vi.fn(async () => [scenario.spend ?? { organization: 0, user: 0, bot: 0 }]),
     user: { findUnique: vi.fn(async () => null) },
     run: {
       findUnique: vi.fn(async () => run),
@@ -1085,6 +1087,31 @@ describe("reporting a failed run", () => {
       expect(JSON.stringify(fields)).not.toMatch(/fake-deployment-key|:\/\//);
     },
   );
+});
+
+describe("a run past a policy spend budget", () => {
+  afterEach(() => {
+    setActivePolicy(undefined);
+    installSecurityEventStore(undefined);
+  });
+
+  it("fails before the model with the budget message and records the rule", async () => {
+    const create = vi.fn();
+    installSecurityEventStore({ securityEvent: { create } } as never);
+    setActivePolicy({ version: 1, budgets: { perBotUsd: 50 } });
+    const { runtimeRun } = await failRun({
+      error: new Error("Monthly budget reached"),
+      trigger: "chat",
+      spend: { organization: 60, user: 60, bot: 50 },
+    });
+    expect(runtimeRun).not.toHaveBeenCalled();
+    expect(create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        type: "policy.denied",
+        metadata: { rule: "budgets.bot", subject: "monthly-budget", surface: "run" },
+      }),
+    });
+  });
 });
 
 describe("a routine or webhook the policy switched off", () => {

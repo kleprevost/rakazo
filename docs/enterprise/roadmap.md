@@ -26,7 +26,7 @@ Not linked from the public docs site (`apps/www/src/docs.ts` lists slugs explici
 ## Milestone 2 — Governance (next, run policy and budgets in parallel)
 Acceptance: enforced server-side before a run starts, offline tests, admin UI only where needed.
 - Central policy: done (#8, #12, #13, #14); see [central-policy.md](./central-policy.md). Gaps: bot computer egress, routine-watch tools, already-running computers on a newly disallowed provider, admin read-only view.
-- Budgets: per user/bot/org spend limits enforced pre-run (extend existing budget code).
+- Budgets: per user/bot/org monthly USD limits enforced pre-run from persisted usage cost; see [central-policy.md](./central-policy.md#budgets). Gaps: `warnAtPercent` warning, admin spend view, mid-run cut-off.
 - Audit to Azure Monitor / Sentinel: stream existing audit events to Log Analytics.
 - Admin roles (security admin, bot owner, viewer) mapped from Entra app roles via the OIDC claim mapping.
 
@@ -36,7 +36,7 @@ Acceptance: enforced server-side before a run starts, offline tests, admin UI on
 - Shared team bots and delegation: upstream features — verify under Entra + Kata, don't rebuild.
 
 ## Alternative hosting: Container Apps + one Docker VM
-Discovery for a PoC with API/web on ACA and the Docker supervisor, bot computers and worker on a private VM: [aca-vm.md](./aca-vm.md) (needs a screen-proxy code change before it works). Bicep and deploy guide, not yet run on Azure: [aca-vm-deploy.md](./aca-vm-deploy.md), `infra/azure/aca/`.
+PoC on Azure Container Apps (web, API) with the Docker supervisor, bot computers and worker on a private VM: design [aca-vm.md](./aca-vm.md) (supervisor screen proxy implemented), Bicep and deploy guide [aca-vm-deploy.md](./aca-vm-deploy.md), `infra/azure/aca/`. Not yet run on Azure.
 
 ## Real Azure validation (as soon as a subscription exists)
 Deploy the Bicep, run a smoke test, confirm the items listed as unverified in each `docs/enterprise/*.md`

@@ -59,6 +59,11 @@
       "development": "./src/node/screen-capability.ts",
       "default": "./src/node/screen-capability.ts"
     },
+    "./node/supervisor-proxy-capability": {
+      "types": "./src/node/supervisor-proxy-capability.ts",
+      "development": "./src/node/supervisor-proxy-capability.ts",
+      "default": "./src/node/supervisor-proxy-capability.ts"
+    },
     "./egress": {
       "types": "./src/egress.ts",
       "development": "./src/egress.ts",

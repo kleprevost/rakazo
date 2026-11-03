@@ -188,6 +188,23 @@ it("selects a non-redirecting SSO request on desktop", async () => {
   );
 });
 
+it("sends the SSO button to built-in authentication when the server runs behind it", async () => {
+  const assign = vi.fn();
+  vi.stubGlobal("location", { assign, pathname: "/sign-in", search: "" });
+  vi.mocked(fetchAuthCapabilities).mockResolvedValue({
+    ...capabilities,
+    sso: { name: "Example", availability: "available", easyAuth: true },
+  });
+  await render();
+  const button = Array.from(host.querySelectorAll("button")).find((button) =>
+    button.textContent?.includes("Continue with"),
+  )!;
+  await act(async () => button.click());
+  expect(assign).toHaveBeenCalledWith("/.auth/login/aad?post_login_redirect_uri=%2Fapp");
+  expect(authClient.signIn.social).not.toHaveBeenCalled();
+  vi.unstubAllGlobals();
+});
+
 it("keeps SSO available for retry while an authorization request is pending", async () => {
   vi.mocked(fetchAuthCapabilities).mockResolvedValue(capabilities);
   vi.mocked(authClient.signIn.social).mockReturnValue(new Promise(() => undefined));

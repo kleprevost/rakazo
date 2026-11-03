@@ -7,7 +7,11 @@ import {
   SandboxUnresponsiveError,
 } from "@rakazo/adapter-kit";
 import type { MessageBlock, ModelRoleChoice, RunStatus } from "@rakazo/contracts";
-import { disabledBuiltinToolSet, POLICY_DENIED_MESSAGE } from "@rakazo/contracts";
+import {
+  BUDGET_REACHED_MESSAGE,
+  disabledBuiltinToolSet,
+  POLICY_DENIED_MESSAGE,
+} from "@rakazo/contracts";
 import {
   assertTransition,
   botMessageAllowsSilence,
@@ -122,6 +126,7 @@ import { modelAcceptsImageInput } from "./model-vision.js";
 import { usesNativeShell } from "./native-shell.js";
 import { paymentWalletConnected } from "./payment-wallets.js";
 import { isRetiredModelCredentialError } from "./pi-oauth.js";
+import { assertBudgetAvailable } from "./policy-budgets.js";
 import {
   assertHostComputerAllowed,
   assertRunTriggerAllowed,
@@ -902,6 +907,19 @@ export function createRunExecutor(executorDeps: ExecutorDeps) {
           )
         ) {
           await failRunBeforeModel(POLICY_DENIED_MESSAGE, run.trigger === "routine");
+          return;
+        }
+        // A spend budget the policy sets stops the run here, before any model call.
+        if (
+          await policyDenied(() =>
+            assertBudgetAvailable(deps.prisma, {
+              userId: run.userId,
+              spaceId: run.spaceId,
+              botId: run.botId,
+            }),
+          )
+        ) {
+          await failRunBeforeModel(BUDGET_REACHED_MESSAGE, run.trigger === "routine");
           return;
         }
         if (pinError) {

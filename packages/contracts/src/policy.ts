@@ -52,8 +52,21 @@ export const PolicySchema = z.strictObject({
     .optional(),
   messaging: z.strictObject({ allowSurfaces: ids.optional() }).optional(),
   data: z.strictObject({ allowAccountExport: z.boolean().optional() }).optional(),
+  /** Spend limits in USD for the current calendar month (UTC). Absent = no limit. */
+  budgets: z
+    .strictObject({
+      period: z.literal("month").optional(),
+      organizationUsd: z.number().positive().finite().optional(),
+      perUserUsd: z.number().positive().finite().optional(),
+      perBotUsd: z.number().positive().finite().optional(),
+      warnAtPercent: z.number().gt(0).lt(100).optional(),
+    })
+    .optional(),
 });
 export type Policy = z.infer<typeof PolicySchema>;
 
 /** The one short message shown wherever a policy rule refuses an action. */
 export const POLICY_DENIED_MESSAGE = "Blocked by your organization";
+
+/** The one short message a run shows when a spend budget stops it. */
+export const BUDGET_REACHED_MESSAGE = "Monthly budget reached";

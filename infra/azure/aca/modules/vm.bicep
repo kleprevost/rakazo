@@ -60,7 +60,7 @@ var envLines = [
   'AZURE_OPENAI_RESOURCE_NAME=${azureOpenAiResourceName}'
   'AZURE_OPENAI_API_KEY=${azureOpenAiApiKey}'
   'AZURE_OPENAI_DEPLOYMENT_NAME_MAP=${azureOpenAiDeploymentNameMap}'
-  // PLACEHOLDER: supervisor screen proxy switch from the sibling PR. Verify the name.
+  // Screens and terminals go through the supervisor's proxy (read by the worker's sandbox options).
   'SANDBOX_SCREEN_VIA_SUPERVISOR=true'
   ''
 ]

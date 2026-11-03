@@ -39,7 +39,7 @@ services:
       SANDBOX_COMMAND_TIMEOUT_MS: ${SANDBOX_COMMAND_TIMEOUT_MS:-300000}
       SANDBOX_SUPERVISOR_TOKEN: ${SANDBOX_SUPERVISOR_TOKEN:?Set SANDBOX_SUPERVISOR_TOKEN}
       SANDBOX_SCREEN_NETWORK: isolated
-      # PLACEHOLDER: switch for the supervisor screen/terminal proxy (sibling PR). Verify the name.
+      # The supervisor's screen/terminal proxy is always on; this switch is read by the api and worker.
       SANDBOX_SCREEN_VIA_SUPERVISOR: ${SANDBOX_SCREEN_VIA_SUPERVISOR:-true}
       # restricted refuses to start computers unless restrict-computer-egress.sh is in place.
       SANDBOX_COMPUTER_EGRESS: restricted
@@ -100,7 +100,7 @@ services:
       SANDBOX_PROVIDER: docker
       SANDBOX_SUPERVISOR_URL: http://supervisor:7091
       SANDBOX_SUPERVISOR_TOKEN: ${SANDBOX_SUPERVISOR_TOKEN:?Set SANDBOX_SUPERVISOR_TOKEN}
-      # PLACEHOLDER: same switch as on the supervisor and the api. Verify the name.
+      # Hand out supervisor-proxied screen and terminal URLs.
       SANDBOX_SCREEN_VIA_SUPERVISOR: ${SANDBOX_SCREEN_VIA_SUPERVISOR:-true}
       PI_DEFAULT_PROVIDER: ${PI_DEFAULT_PROVIDER:-azure}
       PI_DEFAULT_MODEL: ${PI_DEFAULT_MODEL:?Set PI_DEFAULT_MODEL}

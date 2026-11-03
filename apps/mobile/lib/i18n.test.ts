@@ -169,6 +169,7 @@ describe("mobile i18n", () => {
       "Your OpenAI",
       "Your Anthropic",
       "Your model provider",
+      "Monthly budget reached",
       "The model provider returned an error.",
       "Connect a model in Settings before running bots.",
       "Connect your own API key in Models or choose Rakazo credits in Billing.",

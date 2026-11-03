@@ -150,6 +150,10 @@ is the button label, defaulting to “SSO”. Secrets remain on the API; Compose
 OIDC credentials. The capabilities endpoint exposes only the label, discovery availability,
 and enabled authentication methods.
 
+Behind Azure App Service or Container Apps built-in authentication, `AUTH_EASY_AUTH=true` lets
+browsers sign in through the platform with the same OIDC settings and accounts; see
+[enterprise/easy-auth.md](enterprise/easy-auth.md).
+
 ### Claim-based access
 
 Optionally restrict SSO by an ID token claim. The API reads these; the worker does not.

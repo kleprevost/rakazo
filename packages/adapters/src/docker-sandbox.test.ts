@@ -1,5 +1,6 @@
 import type { ProcessEvent } from "@rakazo/adapter-kit";
 import { SandboxRequestRejectedError } from "@rakazo/adapter-kit";
+import { verifySupervisorProxyCapability } from "@rakazo/core/node/supervisor-proxy-capability";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   DockerSandboxProvider,
@@ -835,5 +836,70 @@ describe("Docker sandbox stopped containers", () => {
     await expect(
       provider.connectScreen(computer, { view: "stream", interactive: false }, context),
     ).resolves.toMatchObject({ url: null });
+  });
+});
+
+describe("Docker sandbox streams through the supervisor", () => {
+  const computer = {
+    id: "abc123",
+    botId: "bot",
+    kind: "docker" as const,
+    providerRef: "abc123",
+  };
+  const token = "supervisor-token-at-least-32-characters";
+  const bridge = "http://172.20.0.5:6080/embed.html?path=websockify%3Ftoken%3Dsocket-token";
+
+  afterEach(() => vi.unstubAllGlobals());
+
+  function supervisorReturning(body: Record<string, string>) {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => Response.json(body)),
+    );
+  }
+
+  it("keeps the computer's own address by default", async () => {
+    supervisorReturning({ screenUrl: bridge, terminalUrl: bridge });
+    const provider = new DockerSandboxProvider("http://10.1.0.4:7091", token);
+    const screen = await provider.connectScreen(computer, { view: "stream" }, context);
+    expect(screen).toMatchObject({ url: bridge });
+    expect(screen.headers).toBeUndefined();
+    const terminal = await provider.connectTerminal(computer, { controlToken: "lease" }, context);
+    expect(terminal).toEqual({ url: bridge });
+  });
+
+  it("points a screen at the supervisor route and carries a scoped capability in a header", async () => {
+    supervisorReturning({ screenUrl: bridge });
+    const provider = new DockerSandboxProvider("http://10.1.0.4:7091/", token, {
+      screenViaSupervisor: true,
+    });
+    const screen = await provider.connectScreen(computer, { view: "stream" }, context);
+    expect(screen.url).toBe(
+      "http://10.1.0.4:7091/computers/abc123/screen/embed.html?path=websockify%3Ftoken%3Dsocket-token",
+    );
+    const capability = screen.headers?.authorization?.replace(/^Bearer /, "");
+    expect(screen.url).not.toContain(capability);
+    expect(screen.url).not.toContain(token);
+    expect(JSON.stringify(screen.headers)).not.toContain(token);
+    expect(verifySupervisorProxyCapability(token, capability)).toMatchObject({
+      computerId: "abc123",
+      port: 6080,
+      purpose: "screen",
+    });
+  });
+
+  it("does the same for a terminal, with its own purpose", async () => {
+    supervisorReturning({ terminalUrl: bridge });
+    const provider = new DockerSandboxProvider("http://10.1.0.4:7091", token, {
+      screenViaSupervisor: true,
+    });
+    const terminal = await provider.connectTerminal(computer, { controlToken: "lease" }, context);
+    expect(terminal.url).toContain("/computers/abc123/terminal/embed.html?");
+    expect(
+      verifySupervisorProxyCapability(
+        token,
+        (terminal as { headers?: Record<string, string> }).headers?.authorization?.slice(7),
+      ),
+    ).toMatchObject({ computerId: "abc123", purpose: "terminal" });
   });
 });
