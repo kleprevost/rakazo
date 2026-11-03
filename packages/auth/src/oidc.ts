@@ -29,6 +29,18 @@ export interface OidcConfig {
   allowedValues?: string[];
   /** Tokens carrying one of these values in the claim are deployment admins. */
   adminValues?: string[];
+  /** Count the email as verified when the token omits `email_verified` (e.g. Microsoft Entra ID). */
+  trustEmail?: boolean;
+}
+
+/**
+ * `email_verified: true` always counts. With `trustEmail`, a missing claim counts too, but an
+ * explicit `email_verified: false` never does, and neither does Entra's `xms_edov` unless true.
+ */
+export function isOidcEmailVerified(config: OidcConfig, claims: Record<string, unknown>) {
+  if (claims.email_verified === true) return true;
+  if (!config.trustEmail || claims.email_verified !== undefined) return false;
+  return claims.xms_edov === undefined || claims.xms_edov === true || claims.xms_edov === "true";
 }
 
 /** Values of an array claim. Missing, non-array or non-string entries yield nothing (fail closed). */
@@ -68,7 +80,7 @@ export function oidcDiscovery(config: OidcConfig) {
           return oidcAccountSubject(config.issuer, profile.sub);
         },
         requireIdTokenVerification: true,
-        mapProfileToUser: (profile) => ({ emailVerified: profile.email_verified === true }),
+        mapProfileToUser: (profile) => ({ emailVerified: isOidcEmailVerified(config, profile) }),
       },
     ],
   });
