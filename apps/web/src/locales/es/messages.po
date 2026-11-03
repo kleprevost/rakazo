@@ -1649,6 +1649,7 @@ msgstr "Las computadoras están apagadas. Configura SANDBOX_PROVIDER=docker con 
 msgid "Configure a plugin catalog on the server to connect apps."
 msgstr "Configura un catálogo de plugins en el servidor para conectar apps."
 
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/admin/AdminUsersPage.tsx
 msgid "Confirm"
 msgstr ""
@@ -2389,6 +2390,7 @@ msgstr "No se pudo probar el servidor MCP"
 msgid "Could not transcribe that recording."
 msgstr "No se pudo transcribir esa grabación."
 
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/ScratchpadSection.tsx
 msgid "Could not update"
 msgstr "No se pudo actualizar"
@@ -5437,6 +5439,7 @@ msgstr "Restaurado"
 msgid "Restoring your workspace"
 msgstr "Restaurando tu espacio de trabajo"
 
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/Calendar.tsx
 msgid "Resume"
 msgstr "Reanudar"
@@ -6259,6 +6262,20 @@ msgstr "Admite imágenes"
 #: src/pages/Onboarding.tsx
 msgid "Supports thinking"
 msgstr "Admite razonamiento"
+
+#: src/pages/admin/AdminBotsPage.tsx
+msgid "Suspend"
+msgstr "Suspender"
+
+#: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/shell/chat-header.tsx
+msgid "Suspended"
+msgstr "Suspendido"
+
+#. js-lingui-explicit-id
+#: src/lib/run-error.ts
+msgid "Suspended by your organization"
+msgstr "Suspendido por tu organización"
 
 #: src/components/ModelCredits.tsx
 #: src/pages/model-settings/space-bots-model.tsx

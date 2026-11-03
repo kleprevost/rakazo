@@ -15,12 +15,19 @@ const api = vi.hoisted(() => ({
   policy: vi.fn(),
   audit: vi.fn(),
   endSessions: vi.fn(),
+  suspend: vi.fn(),
+  resume: vi.fn(),
   toastError: vi.fn(),
   toastSuccess: vi.fn(),
 }));
 
 vi.mock("../../lib/rpc", () => ({
-  rpc: { admin: { users: { endSessions: api.endSessions } } },
+  rpc: {
+    admin: {
+      users: { endSessions: api.endSessions },
+      bots: { suspend: api.suspend, resume: api.resume },
+    },
+  },
 }));
 vi.mock("../../lib/query", () => {
   const plain = (name: string, call: (input?: unknown) => unknown) => ({
@@ -277,6 +284,7 @@ it("shows the AI employees page: empty, loading, and populated", async () => {
         lastActiveAt: "2026-02-05T00:00:00.000Z",
         monthlySpendUsd: 4.25,
         archived: true,
+        suspendedAt: null,
       },
     ],
     nextCursor: null,
@@ -292,6 +300,45 @@ it("shows the AI employees page: empty, loading, and populated", async () => {
     "$4.25",
   ])
     expect(row).toContain(part);
+});
+
+it("suspends an AI employee after a confirming click and resumes it in one click", async () => {
+  const bot = {
+    id: "b1",
+    name: "Reporter",
+    ownerName: "Mia",
+    ownerEmail: "mia@example.test",
+    spaceName: "Team space",
+    model: null,
+    lastActiveAt: null,
+    monthlySpendUsd: 0,
+    archived: false,
+    suspendedAt: null as string | null,
+  };
+  api.bots.mockImplementation(async () => ({ bots: [{ ...bot }], nextCursor: null }));
+  api.suspend.mockImplementation(async () => {
+    bot.suspendedAt = "2026-02-05T00:00:00.000Z";
+    return { cancelledRuns: 0 };
+  });
+  api.resume.mockImplementation(async () => {
+    bot.suspendedAt = null;
+    return { ok: true };
+  });
+  const { host } = await show(<AdminBotsPage />);
+  const button = () => host.querySelector<HTMLButtonElement>("tbody tr button");
+  expect(button()?.textContent).toBe("Suspend");
+  await act(async () => button()?.click());
+  expect(api.suspend).not.toHaveBeenCalled();
+  expect(button()?.textContent).toBe("Confirm");
+  await act(async () => button()?.click());
+  await settle();
+  expect(api.suspend).toHaveBeenCalledWith({ botId: "b1" });
+  expect(host.querySelector("tbody tr")?.textContent).toContain("Suspended");
+  expect(button()?.textContent).toBe("Resume");
+  await act(async () => button()?.click());
+  await settle();
+  expect(api.resume).toHaveBeenCalledWith({ botId: "b1" });
+  expect(button()?.textContent).toBe("Suspend");
 });
 
 it("shows the policy page: error, not loaded, and populated", async () => {

@@ -132,6 +132,19 @@ export async function wakeRoutine(deps: ExecutorDeps, routineId: string, schedul
     });
     return;
   }
+  if (bot?.suspendedAt) {
+    // Suspended: skip this occurrence and keep the schedule, so resuming never fires a burst.
+    // The next wake is the next future occurrence; a one-shot that falls due now is dropped.
+    const next = isOneShotRoutineCrons(routine.crons)
+      ? null
+      : nextRoutineRunDateAcross(routine.crons, scheduledAt, new Date(), routine.timezone);
+    const moved = await deps.prisma.routine.updateMany({
+      where: { id: routine.id, active: true, nextRunAt: scheduledAt },
+      data: { nextRunAt: next, ...(next ? {} : { active: false }) },
+    });
+    if (moved.count === 1 && next) await deps.jobs.enqueue(routineWakeupJob(routine.id, next));
+    return;
+  }
   if (!bot?.thread) return;
   const targetThread = routine.threadId
     ? await deps.prisma.thread.findFirst({

@@ -1649,6 +1649,7 @@ msgstr "המחשבים כבויים. יש להגדיר SANDBOX_PROVIDER=docker �
 msgid "Configure a plugin catalog on the server to connect apps."
 msgstr "כדי לחבר אפליקציות, יש להגדיר קטלוג תוספים בשרת."
 
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/admin/AdminUsersPage.tsx
 msgid "Confirm"
 msgstr ""
@@ -2389,6 +2390,7 @@ msgstr "לא ניתן לבדוק את שרת ה-MCP"
 msgid "Could not transcribe that recording."
 msgstr ""
 
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/ScratchpadSection.tsx
 msgid "Could not update"
 msgstr "לא ניתן לעדכן"
@@ -5437,6 +5439,9 @@ msgstr "שוחזר"
 msgid "Restoring your workspace"
 msgstr "משחזר את סביבת העבודה"
 
+#: src/pages/admin/AdminBotsPage.tsx
+msgid "Resume"
+msgstr "חידוש"
 #: src/pages/Calendar.tsx
 msgid "Resume"
 msgstr "המשך"
@@ -6259,6 +6264,20 @@ msgstr "תומך בתמונות"
 #: src/pages/Onboarding.tsx
 msgid "Supports thinking"
 msgstr "תומך בחשיבה"
+
+#: src/pages/admin/AdminBotsPage.tsx
+msgid "Suspend"
+msgstr "השהיה"
+
+#: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/shell/chat-header.tsx
+msgid "Suspended"
+msgstr "מושהה"
+
+#. js-lingui-explicit-id
+#: src/lib/run-error.ts
+msgid "Suspended by your organization"
+msgstr "הושהה על ידי הארגון שלך"
 
 #: src/components/ModelCredits.tsx
 #: src/pages/model-settings/space-bots-model.tsx

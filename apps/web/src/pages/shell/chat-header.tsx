@@ -74,6 +74,14 @@ export function ChatHeader({
               ? (activeGroup?.name ?? activeSnapshot?.groupName ?? t`Group`)
               : (active?.name ?? t`Select a bot`)}
           </span>
+          {!inGroup && active?.suspendedAt ? (
+            <span
+              data-testid="bot-suspended"
+              className="block truncate text-xs text-muted-foreground"
+            >
+              {t`Suspended`}
+            </span>
+          ) : null}
         </span>
       </Button>
       <div className="flex items-center justify-self-end gap-2">

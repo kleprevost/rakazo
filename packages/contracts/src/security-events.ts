@@ -22,6 +22,8 @@ export const SECURITY_EVENT_TYPES = [
   "device.tied",
   "device.revoked",
   "deployment.settings.changed",
+  "bot.suspended",
+  "bot.resumed",
   "approval.decided",
   "approval.policy.changed",
   "egress.refused",

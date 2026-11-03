@@ -21,6 +21,7 @@ import {
   touchGroupUpdatedAt,
 } from "@rakazo/db";
 import { getLogger } from "@rakazo/logging";
+import { assertBotNotSuspended } from "../bot-suspension.js";
 import type { RouterDeps } from "../router.js";
 import { createRoutineTestRun, routineTestRunNonce, routineTestTarget } from "../routines.js";
 import { withSerializableRetry } from "../serializable-retry.js";
@@ -112,6 +113,7 @@ export async function sendThread(
   }
   if (target.kind === "bot") {
     await assertTeachingSendAllowed(deps.prisma, actor.spaceId, target.botId);
+    if (!isStopMessage(input)) await assertBotNotSuspended(deps.prisma, target.botId);
   }
   const confirmingImages = input.imageHandling === "confirm" && Boolean(input.artifactIds?.length);
   // Reuse the funding modelSetup resolved; a send never asks billing twice.
@@ -396,6 +398,7 @@ export function threadsRoutes(ctx: RouterContext) {
         const target = await resolveThreadTarget(deps.prisma, context.actor, input);
         if (target.kind === "bot") {
           await assertTeachingSendAllowed(deps.prisma, context.actor.spaceId, target.botId);
+          await assertBotNotSuspended(deps.prisma, target.botId);
           const sent = await deps.events.sendUserMessage({
             spaceId: context.actor.spaceId,
             threadId: target.threadId,

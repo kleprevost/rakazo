@@ -65,13 +65,15 @@ afterEach(() => {
   writeText.mockClear();
 });
 
-function renderHeader({ inGroup = false } = {}) {
+function renderHeader({ inGroup = false, suspendedAt = null as string | null } = {}) {
   act(() =>
     root.render(
       <ChatHeader
         inGroup={inGroup}
         active={
-          inGroup ? undefined : ({ id: "bot-1", name: "Helper", color: BOT_COLORS[0] } as Bot)
+          inGroup
+            ? undefined
+            : ({ id: "bot-1", name: "Helper", color: BOT_COLORS[0], suspendedAt } as Bot)
         }
         activeGroup={undefined}
         activeSnapshot={null}
@@ -122,4 +124,11 @@ it("opens the invite with both rewards and copies the link", async () => {
   await act(async () => copy.click());
   expect(writeText).toHaveBeenCalledWith("https://example.test/sign-up?ref=abc");
   expect(dialog.textContent).toContain("Copied");
+});
+
+it("marks a suspended AI employee in the header and shows nothing otherwise", () => {
+  renderHeader();
+  expect(container.querySelector('[data-testid="bot-suspended"]')).toBeNull();
+  renderHeader({ suspendedAt: "2026-02-05T00:00:00.000Z" });
+  expect(container.querySelector('[data-testid="bot-suspended"]')?.textContent).toBe("Suspended");
 });

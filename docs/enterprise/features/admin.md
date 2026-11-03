@@ -16,7 +16,7 @@ Admins reach it from the account menu ("Admin"); everyone else never sees the en
 - `security_events` table (`listSecurityEvents`), written by `recordSecurityEvent`, with no reader
   for the web: the old `security.events` procedure is closed for app accounts.
 - Policy runtime (`activePolicy()`), budgets (`budgetPeriodStart`), `UsageRecord.costUsd`.
-- No bot disabled/paused flag exists (`archivedAt` is the user's archive, not an admin action).
+- No bot disabled/paused flag existed (`archivedAt` is the user's archive, not an admin action); `suspendedAt` now is one.
 
 ## Pages (`/admin`)
 | Page | Path | Shows |
@@ -64,8 +64,7 @@ list fields explicitly; a test pins the user fields. The policy file holds rules
 credentials; the schema is strict).
 
 ## Deferred
-- Suspend and resume a bot: no existing flag. Needs a nullable `Bot.suspendedAt`, a run-gate
-  check, and a migration, so it is its own PR.
+- Suspend and resume a bot: done, see [suspend.md](./suspend.md).
 - Editing: config editing in the UI, policy editing, role changes. Policy stays policy-as-code.
 - Per-user disable (revoke plus block sign-in), user search and role filters.
 - Admin roles (security admin, viewer) from the OIDC claim; today admin is all or nothing.

@@ -9,6 +9,9 @@ import { SecurityEventMetadataSchema, SecurityEventTypeSchema } from "./security
  * content. See docs/enterprise/features/admin.md.
  */
 const Id = z.string().min(1).max(128);
+
+/** What a run, a send or a delegated request says when the AI employee is suspended. */
+export const BOT_SUSPENDED_MESSAGE = "Suspended by your organization";
 const pageLimit = (max: number, fallback: number) =>
   z.number().int().min(1).max(max).default(fallback);
 
@@ -64,6 +67,8 @@ export const AdminBotSchema = z.object({
   lastActiveAt: z.string().nullable(),
   monthlySpendUsd: z.number(),
   archived: z.boolean(),
+  /** When an admin suspended it; null when it is active. */
+  suspendedAt: z.string().nullable(),
 });
 export type AdminBot = z.infer<typeof AdminBotSchema>;
 
@@ -140,6 +145,11 @@ export const adminContract = {
   },
   bots: {
     list: oc.input(AdminPageInputSchema).output(AdminBotPageSchema),
+    /** Stops its runs and refuses new ones from every source until resumed. Idempotent. */
+    suspend: oc
+      .input(z.object({ botId: Id, reason: z.string().trim().max(200).optional() }))
+      .output(z.object({ cancelledRuns: z.number().int() })),
+    resume: oc.input(z.object({ botId: Id })).output(z.object({ ok: z.literal(true) })),
   },
   policy: oc.output(AdminPolicyViewSchema),
   audit: oc.input(AdminAuditInputSchema).output(AdminAuditPageSchema),

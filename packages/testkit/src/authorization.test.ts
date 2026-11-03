@@ -479,6 +479,8 @@ describeWithDatabase("API authorization and resource isolation", () => {
       ["admin/users/list"],
       ["admin/users/endSessions", { userId: "missing-user" }],
       ["admin/bots/list"],
+      ["admin/bots/suspend", { botId: "missing-bot" }],
+      ["admin/bots/resume", { botId: "missing-bot" }],
       ["admin/policy"],
       ["admin/audit"],
       ["roleTemplates/list"],
