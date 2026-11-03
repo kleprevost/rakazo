@@ -817,6 +817,7 @@ export const NL_MESSAGES: Record<string, string> = {
   "Request timed out": "Time-out bij verzoek",
   "Enter a password": "Voer een wachtwoord in",
   "Enter a valid email": "Voer een geldig e-mailadres in",
+  "Your account does not have access": "Je account heeft geen toegang",
   "Something went wrong. Try again.": "Er is iets misgegaan. Probeer het opnieuw.",
   "Could not play that clip.": "Dat fragment kon niet worden afgespeeld.",
   "Move down": "Omlaag",

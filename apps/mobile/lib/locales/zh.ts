@@ -406,6 +406,7 @@ export const ZH_MESSAGES: Record<string, string> = {
   "Request timed out": "请求超时",
   "Enter a password": "请输入密码",
   "Enter a valid email": "请输入有效的邮箱地址",
+  "Your account does not have access": "你的账号没有访问权限",
   "Something went wrong. Try again.": "出了点问题，请重试。",
   "Could not reach that server": "无法连接到该服务器",
   "Could not reach this model server": "无法连接到此模型服务器",

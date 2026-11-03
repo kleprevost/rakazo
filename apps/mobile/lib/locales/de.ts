@@ -824,6 +824,7 @@ export const DE_MESSAGES: Record<string, string> = {
   "Request timed out": "Zeitüberschreitung der Anfrage",
   "Enter a password": "Gib ein Passwort ein",
   "Enter a valid email": "Gib eine gültige E-Mail-Adresse ein",
+  "Your account does not have access": "Dein Konto hat keinen Zugriff",
   "Something went wrong. Try again.": "Etwas ist schiefgelaufen. Versuche es erneut.",
   "Could not play that clip.": "Dieser Clip konnte nicht abgespielt werden.",
   "Move down": "Nach unten",

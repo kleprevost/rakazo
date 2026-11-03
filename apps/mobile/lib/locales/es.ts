@@ -774,6 +774,7 @@ export const ES_MESSAGES: Record<string, string> = {
   "Request timed out": "Se agotó el tiempo de espera de la solicitud",
   "Enter a password": "Introduce una contraseña",
   "Enter a valid email": "Introduce un correo electrónico válido",
+  "Your account does not have access": "Tu cuenta no tiene acceso",
   "Something went wrong. Try again.": "Algo salió mal. Inténtalo de nuevo.",
   "Could not play that clip.": "No se pudo reproducir ese clip.",
   "Move down": "Bajar",

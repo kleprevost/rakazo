@@ -15,7 +15,7 @@ Not linked from the public docs site (`apps/www/src/docs.ts` lists slugs explici
 | WS | Scope | Result |
 |---|---|---|
 | 1 Secrets | Key Vault `SecretStore` + `KeyProvider`, workload identity | Merged (#1) |
-| 2 Identity | Entra via OIDC: claim allow-list, SSO admin; trusted email option | Merged (#3), #6 |
+| 2 Identity | Entra via OIDC: claim allow-list, SSO admin; trusted email option | Merged (#3, #6) |
 | 3 Inference | Foundry + OpenCode Zen as deployment model and connections | Merged (#2) |
 | 4 Compute + hosting | Bicep AKS, Kata pool + `rakazo-kata` RuntimeClass, network policy, kustomize manifests | #7 |
 

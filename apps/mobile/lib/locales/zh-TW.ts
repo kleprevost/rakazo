@@ -389,6 +389,7 @@ export const ZH_TW_MESSAGES: Record<string, string> = {
   "Request timed out": "請求超時",
   "Enter a password": "請輸入密碼",
   "Enter a valid email": "請輸入有效的電子信箱地址",
+  "Your account does not have access": "你的帳號沒有存取權",
   "Something went wrong. Try again.": "出了點問題，請重試。",
   "Could not reach that server": "無法連線到該伺服器",
   "Could not reach this model server": "無法連線到此模型伺服器",
