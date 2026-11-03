@@ -101,6 +101,7 @@ export function ShellDialogs({
   openSpaceSettings,
   closeMobileSidebar,
   createBot,
+  hire,
   clearOpenThread,
   deleteRoutineDialogProps,
   paletteActions,
@@ -119,6 +120,7 @@ export function ShellDialogs({
   openSpaceSettings: (spaceId: string) => void;
   closeMobileSidebar: () => void;
   createBot: (input: CreateBotDialogInput) => Promise<void>;
+  hire: ComponentProps<typeof CreateBotDialog>["hire"];
   clearOpenThread: () => void;
   deleteRoutineDialogProps: ComponentProps<typeof DeleteItemDialog> | null;
   paletteActions: CommandPaletteAction[];
@@ -328,7 +330,11 @@ export function ShellDialogs({
       />
 
       {createBotOpen ? (
-        <CreateBotDialog onCancel={() => setCreateBotOpen(false)} onCreate={createBot} />
+        <CreateBotDialog
+          onCancel={() => setCreateBotOpen(false)}
+          onCreate={createBot}
+          hire={hire}
+        />
       ) : null}
 
       {newSpaceOpen ? (

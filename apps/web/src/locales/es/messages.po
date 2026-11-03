@@ -915,6 +915,10 @@ msgstr "Artefactos"
 msgid "Ask"
 msgstr "Preguntar"
 
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "Asks before"
+msgstr ""
+
 #: src/pages/shell/computer-panel.tsx
 msgid "Asleep"
 msgstr "En reposo"
@@ -1010,6 +1014,7 @@ msgstr "Estudio de avatares"
 #: src/pages/RoutineEditor.tsx
 #: src/pages/SettingsOverlay.tsx
 #: src/pages/shell/agent-import.tsx
+#: src/pages/shell/hire-role-dialog.tsx
 msgid "Back"
 msgstr "Atrás"
 
@@ -1054,6 +1059,16 @@ msgstr "Bloquear"
 #: src/lib/ticket-status.ts
 msgid "Blocked"
 msgstr "Bloqueado"
+
+#. js-lingui-explicit-id
+#: src/lib/run-error.ts
+msgid "Blocked by your organization"
+msgstr "Bloqueado por tu organización"
+
+#: src/lib/user-error.ts
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "Blocked by your organization"
+msgstr "Bloqueado por tu organización"
 
 #: src/components/SidebarFooter.tsx
 #: src/pages/Board.tsx
@@ -1136,6 +1151,10 @@ msgstr "Explorar servidores MCP"
 #: src/pages/shell/agent-import.tsx
 msgid "Built-in"
 msgstr "Integrado"
+
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "Calendar"
+msgstr ""
 
 #: src/pages/shell/chat-header.tsx
 msgid "Call"
@@ -1253,6 +1272,7 @@ msgid "Chart failed to render: {error}"
 msgstr "No se pudo renderizar el gráfico: {error}"
 
 #: src/pages/AccountSettingsOverlay.tsx
+#: src/pages/shell/hire-role-dialog.tsx
 msgid "Chat"
 msgstr ""
 
@@ -2007,6 +2027,10 @@ msgstr "No se pudieron activar las herramientas"
 msgid "Could not grant access"
 msgstr ""
 
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "Could not hire"
+msgstr ""
+
 #: src/pages/PluginsOverlay.tsx
 msgid "Could not install connector"
 msgstr "No se pudo instalar el conector"
@@ -2062,6 +2086,10 @@ msgstr "No se pudieron cargar los servidores MCP"
 #: src/pages/model-settings/use-model-settings.ts
 msgid "Could not load model settings"
 msgstr "No se pudo cargar la configuración de modelos"
+
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "Could not load roles"
+msgstr ""
 
 #: src/pages/RoutineRunHistory.tsx
 msgid "Could not load run history"
@@ -2454,6 +2482,10 @@ msgstr "Cantidad de créditos"
 msgid "Credits ($)"
 msgstr ""
 
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "CRM"
+msgstr ""
+
 #: src/lib/cron.ts
 msgid "Cron"
 msgstr "Cron"
@@ -2765,6 +2797,10 @@ msgstr "Documentación"
 msgid "Document changed. Reopen to edit the latest version."
 msgstr "El documento ha cambiado. Vuelve a abrirlo para editar la última versión."
 
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "Documents"
+msgstr ""
+
 #: src/pages/Auth.tsx
 msgid "Don’t have an account?"
 msgstr "¿No tienes una cuenta?"
@@ -2845,6 +2881,7 @@ msgstr "Editar perfil"
 
 #: src/pages/AdminAccessPage.tsx
 #: src/pages/Auth.tsx
+#: src/pages/shell/hire-role-dialog.tsx
 msgid "Email"
 msgstr "Correo"
 
@@ -3307,6 +3344,14 @@ msgstr "Alto"
 msgid "High"
 msgstr "Alto"
 
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "Hire"
+msgstr ""
+
+#: src/pages/shell/create-bot-dialog.tsx
+msgid "Hire for a role"
+msgstr ""
+
 #: src/components/composer/HoldToTalk.tsx
 msgid "Hold to talk"
 msgstr "Mantén pulsado para hablar"
@@ -3453,6 +3498,7 @@ msgstr "Historial de instrucciones"
 #: src/components/AskCard.tsx
 #: src/components/InstructionSettings.tsx
 #: src/pages/shell/agent-import.tsx
+#: src/pages/shell/hire-role-dialog.tsx
 msgid "Instructions"
 msgstr "Instrucciones"
 
@@ -5309,6 +5355,7 @@ msgstr "Rutina"
 
 #: src/pages/shell/agent-import.tsx
 #: src/pages/shell/bot-panel.tsx
+#: src/pages/shell/hire-role-dialog.tsx
 msgid "Routines"
 msgstr "Rutinas"
 
@@ -5779,6 +5826,7 @@ msgstr "Habilidad {position}"
 #: src/components/SidebarFooter.tsx
 #: src/pages/Shell.tsx
 #: src/pages/shell/agent-import.tsx
+#: src/pages/shell/hire-role-dialog.tsx
 msgid "Skills"
 msgstr "Habilidades"
 
@@ -6365,6 +6413,10 @@ msgstr "Esta semana"
 msgid "Thursday"
 msgstr "jueves"
 
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "Tickets"
+msgstr ""
+
 #: src/pages/RoutineSchedule.tsx
 msgid "Time of day"
 msgstr "Hora del día"
@@ -6886,6 +6938,10 @@ msgstr "Instrucciones de trabajo"
 msgid "Working…"
 msgstr "Trabajando…"
 
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "Works with"
+msgstr ""
+
 #: src/components/ModelCredits.tsx
 msgid "Works with your ChatGPT or Claude plan."
 msgstr "Funciona con tu plan de ChatGPT o Claude."
@@ -7011,9 +7067,3 @@ msgstr "Tu proveedor de voz se quedó sin crédito."
 #: src/lib/user-error.ts
 msgid "Your voice provider key was rejected."
 msgstr "Tu proveedor de voz rechazó la clave."
-
-#. js-lingui-explicit-id
-#: src/lib/run-error.ts
-#: src/lib/user-error.ts
-msgid "Blocked by your organization"
-msgstr "Bloqueado por tu organización"

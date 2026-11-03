@@ -915,6 +915,10 @@ msgstr "Artefacten"
 msgid "Ask"
 msgstr "Vragen"
 
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "Asks before"
+msgstr ""
+
 #: src/pages/shell/computer-panel.tsx
 msgid "Asleep"
 msgstr "Slaapt"
@@ -1010,6 +1014,7 @@ msgstr "Avatarstudio"
 #: src/pages/RoutineEditor.tsx
 #: src/pages/SettingsOverlay.tsx
 #: src/pages/shell/agent-import.tsx
+#: src/pages/shell/hire-role-dialog.tsx
 msgid "Back"
 msgstr "Terug"
 
@@ -1054,6 +1059,16 @@ msgstr "Blokkeren"
 #: src/lib/ticket-status.ts
 msgid "Blocked"
 msgstr "Geblokkeerd"
+
+#. js-lingui-explicit-id
+#: src/lib/run-error.ts
+msgid "Blocked by your organization"
+msgstr "Geblokkeerd door je organisatie"
+
+#: src/lib/user-error.ts
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "Blocked by your organization"
+msgstr "Geblokkeerd door je organisatie"
 
 #: src/components/SidebarFooter.tsx
 #: src/pages/Board.tsx
@@ -1136,6 +1151,10 @@ msgstr "MCP-servers doorzoeken"
 #: src/pages/shell/agent-import.tsx
 msgid "Built-in"
 msgstr "Ingebouwd"
+
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "Calendar"
+msgstr ""
 
 #: src/pages/shell/chat-header.tsx
 msgid "Call"
@@ -1253,6 +1272,7 @@ msgid "Chart failed to render: {error}"
 msgstr "Grafiek kon niet worden weergegeven: {error}"
 
 #: src/pages/AccountSettingsOverlay.tsx
+#: src/pages/shell/hire-role-dialog.tsx
 msgid "Chat"
 msgstr ""
 
@@ -2007,6 +2027,10 @@ msgstr ""
 msgid "Could not grant access"
 msgstr ""
 
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "Could not hire"
+msgstr ""
+
 #: src/pages/PluginsOverlay.tsx
 msgid "Could not install connector"
 msgstr "Connector installeren mislukt"
@@ -2062,6 +2086,10 @@ msgstr "MCP-servers laden mislukt"
 #: src/pages/model-settings/use-model-settings.ts
 msgid "Could not load model settings"
 msgstr "Modelinstellingen laden mislukt"
+
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "Could not load roles"
+msgstr ""
 
 #: src/pages/RoutineRunHistory.tsx
 msgid "Could not load run history"
@@ -2454,6 +2482,10 @@ msgstr ""
 msgid "Credits ($)"
 msgstr ""
 
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "CRM"
+msgstr ""
+
 #: src/lib/cron.ts
 msgid "Cron"
 msgstr "Cron"
@@ -2765,6 +2797,10 @@ msgstr "Documentatie"
 msgid "Document changed. Reopen to edit the latest version."
 msgstr "Het document is gewijzigd. Open het opnieuw om de nieuwste versie te bewerken."
 
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "Documents"
+msgstr ""
+
 #: src/pages/Auth.tsx
 msgid "Don’t have an account?"
 msgstr "Heb je geen account?"
@@ -2845,6 +2881,7 @@ msgstr "Profiel bewerken"
 
 #: src/pages/AdminAccessPage.tsx
 #: src/pages/Auth.tsx
+#: src/pages/shell/hire-role-dialog.tsx
 msgid "Email"
 msgstr "E-mail"
 
@@ -3307,6 +3344,14 @@ msgstr "Hoog"
 msgid "High"
 msgstr "Hoog"
 
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "Hire"
+msgstr ""
+
+#: src/pages/shell/create-bot-dialog.tsx
+msgid "Hire for a role"
+msgstr ""
+
 #: src/components/composer/HoldToTalk.tsx
 msgid "Hold to talk"
 msgstr "Houd ingedrukt om te praten"
@@ -3453,6 +3498,7 @@ msgstr "Instructiegeschiedenis"
 #: src/components/AskCard.tsx
 #: src/components/InstructionSettings.tsx
 #: src/pages/shell/agent-import.tsx
+#: src/pages/shell/hire-role-dialog.tsx
 msgid "Instructions"
 msgstr "Instructies"
 
@@ -5309,6 +5355,7 @@ msgstr "Routine"
 
 #: src/pages/shell/agent-import.tsx
 #: src/pages/shell/bot-panel.tsx
+#: src/pages/shell/hire-role-dialog.tsx
 msgid "Routines"
 msgstr "Routines"
 
@@ -5779,6 +5826,7 @@ msgstr "Skill {position}"
 #: src/components/SidebarFooter.tsx
 #: src/pages/Shell.tsx
 #: src/pages/shell/agent-import.tsx
+#: src/pages/shell/hire-role-dialog.tsx
 msgid "Skills"
 msgstr "Skills"
 
@@ -6365,6 +6413,10 @@ msgstr "Deze week"
 msgid "Thursday"
 msgstr "donderdag"
 
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "Tickets"
+msgstr ""
+
 #: src/pages/RoutineSchedule.tsx
 msgid "Time of day"
 msgstr "Tijdstip van de dag"
@@ -6886,6 +6938,10 @@ msgstr "Werkinstructies"
 msgid "Working…"
 msgstr "Bezig…"
 
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "Works with"
+msgstr ""
+
 #: src/components/ModelCredits.tsx
 msgid "Works with your ChatGPT or Claude plan."
 msgstr "Werkt met je ChatGPT- of Claude-abonnement."
@@ -7011,9 +7067,3 @@ msgstr "Je spraakaanbieder heeft geen tegoed meer."
 #: src/lib/user-error.ts
 msgid "Your voice provider key was rejected."
 msgstr "Je spraakaanbieder heeft de sleutel geweigerd."
-
-#. js-lingui-explicit-id
-#: src/lib/run-error.ts
-#: src/lib/user-error.ts
-msgid "Blocked by your organization"
-msgstr "Geblokkeerd door je organisatie"

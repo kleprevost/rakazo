@@ -23,6 +23,8 @@ import {
 import { useRef, useState } from "react";
 import { errorText } from "../../lib/user-error";
 import { BotLookPicker } from "./avatar-studio-popover";
+import type { HireRoleDialogProps } from "./hire-role-dialog";
+import { HireRoleDialog } from "./hire-role-dialog";
 
 /** One preview identity per organic look, so the dialog can show a body before the bot has an id. */
 const ORGANIC_IDENTITIES = ORGANIC_AVATAR_LOOKS.map(organicAvatarSampleIdentity);
@@ -45,9 +47,12 @@ export interface CreateBotDialogInput {
 export function CreateBotDialog({
   onCancel,
   onCreate,
+  hire,
 }: {
   onCancel: () => void;
   onCreate: (input: CreateBotDialogInput) => Promise<void>;
+  /** Offers hiring from a role template; absent where the API has none. */
+  hire?: Pick<HireRoleDialogProps, "load" | "onHire">;
 }) {
   const { t } = useLingui();
   const nameRef = useRef<HTMLInputElement>(null);
@@ -66,6 +71,7 @@ export function CreateBotDialog({
   const [avatarSet, setAvatarSet] = useState<BotAvatarSet>(DEFAULT_NEW_BOT_AVATAR_SET);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [hiring, setHiring] = useState(false);
   const trimmed = name.trim();
 
   async function create() {
@@ -85,6 +91,10 @@ export function CreateBotDialog({
       setError(errorText(err, t`Could not create bot`));
       setSubmitting(false);
     }
+  }
+
+  if (hiring && hire) {
+    return <HireRoleDialog {...hire} onBack={() => setHiring(false)} />;
   }
 
   return (
@@ -148,6 +158,11 @@ export function CreateBotDialog({
               setLook((current) => ({ value, identity: identity ?? current.identity }));
             }}
           />
+          {hire ? (
+            <Button type="button" variant="ghost" onClick={() => setHiring(true)}>
+              <Trans>Hire for a role</Trans>
+            </Button>
+          ) : null}
           <DialogFooter>
             <Button type="button" variant="outline" disabled={submitting} onClick={onCancel}>
               <Trans>Cancel</Trans>

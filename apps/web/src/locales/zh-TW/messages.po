@@ -916,6 +916,10 @@ msgstr "成品"
 msgid "Ask"
 msgstr "詢問"
 
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "Asks before"
+msgstr ""
+
 #: src/pages/shell/computer-panel.tsx
 msgid "Asleep"
 msgstr "休眠中"
@@ -1011,6 +1015,7 @@ msgstr "頭像工作室"
 #: src/pages/RoutineEditor.tsx
 #: src/pages/SettingsOverlay.tsx
 #: src/pages/shell/agent-import.tsx
+#: src/pages/shell/hire-role-dialog.tsx
 msgid "Back"
 msgstr "返回"
 
@@ -1055,6 +1060,16 @@ msgstr "封鎖"
 #: src/lib/ticket-status.ts
 msgid "Blocked"
 msgstr "受阻"
+
+#. js-lingui-explicit-id
+#: src/lib/run-error.ts
+msgid "Blocked by your organization"
+msgstr "已被你的組織封鎖"
+
+#: src/lib/user-error.ts
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "Blocked by your organization"
+msgstr "已被你的組織封鎖"
 
 #: src/components/SidebarFooter.tsx
 #: src/pages/Board.tsx
@@ -1137,6 +1152,10 @@ msgstr "瀏覽 MCP 伺服器"
 #: src/pages/shell/agent-import.tsx
 msgid "Built-in"
 msgstr "內建"
+
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "Calendar"
+msgstr ""
 
 #: src/pages/shell/chat-header.tsx
 msgid "Call"
@@ -1254,6 +1273,7 @@ msgid "Chart failed to render: {error}"
 msgstr "圖表渲染失敗：{error}"
 
 #: src/pages/AccountSettingsOverlay.tsx
+#: src/pages/shell/hire-role-dialog.tsx
 msgid "Chat"
 msgstr ""
 
@@ -2008,6 +2028,10 @@ msgstr ""
 msgid "Could not grant access"
 msgstr ""
 
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "Could not hire"
+msgstr ""
+
 #: src/pages/PluginsOverlay.tsx
 msgid "Could not install connector"
 msgstr "無法安裝連接器"
@@ -2063,6 +2087,10 @@ msgstr "無法載入 MCP 伺服器"
 #: src/pages/model-settings/use-model-settings.ts
 msgid "Could not load model settings"
 msgstr "無法載入模型設定"
+
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "Could not load roles"
+msgstr ""
 
 #: src/pages/RoutineRunHistory.tsx
 msgid "Could not load run history"
@@ -2455,6 +2483,10 @@ msgstr "額度金額"
 msgid "Credits ($)"
 msgstr ""
 
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "CRM"
+msgstr ""
+
 #: src/lib/cron.ts
 msgid "Cron"
 msgstr "Cron"
@@ -2766,6 +2798,10 @@ msgstr "說明文件"
 msgid "Document changed. Reopen to edit the latest version."
 msgstr "文件已變更，請重新開啟以編輯最新版本。"
 
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "Documents"
+msgstr ""
+
 #: src/pages/Auth.tsx
 msgid "Don’t have an account?"
 msgstr "還沒有帳號？"
@@ -2846,6 +2882,7 @@ msgstr "編輯資料"
 
 #: src/pages/AdminAccessPage.tsx
 #: src/pages/Auth.tsx
+#: src/pages/shell/hire-role-dialog.tsx
 msgid "Email"
 msgstr "電子信箱"
 
@@ -3308,6 +3345,14 @@ msgstr "高"
 msgid "High"
 msgstr "高"
 
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "Hire"
+msgstr ""
+
+#: src/pages/shell/create-bot-dialog.tsx
+msgid "Hire for a role"
+msgstr ""
+
 #: src/components/composer/HoldToTalk.tsx
 msgid "Hold to talk"
 msgstr "按住說話"
@@ -3454,6 +3499,7 @@ msgstr "指令歷史"
 #: src/components/AskCard.tsx
 #: src/components/InstructionSettings.tsx
 #: src/pages/shell/agent-import.tsx
+#: src/pages/shell/hire-role-dialog.tsx
 msgid "Instructions"
 msgstr "指令"
 
@@ -5310,6 +5356,7 @@ msgstr "例行任務"
 
 #: src/pages/shell/agent-import.tsx
 #: src/pages/shell/bot-panel.tsx
+#: src/pages/shell/hire-role-dialog.tsx
 msgid "Routines"
 msgstr "例行任務"
 
@@ -5780,6 +5827,7 @@ msgstr "技能 {position}"
 #: src/components/SidebarFooter.tsx
 #: src/pages/Shell.tsx
 #: src/pages/shell/agent-import.tsx
+#: src/pages/shell/hire-role-dialog.tsx
 msgid "Skills"
 msgstr "技能"
 
@@ -6366,6 +6414,10 @@ msgstr "本週"
 msgid "Thursday"
 msgstr "週四"
 
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "Tickets"
+msgstr ""
+
 #: src/pages/RoutineSchedule.tsx
 msgid "Time of day"
 msgstr "時間"
@@ -6887,6 +6939,10 @@ msgstr "工作指示"
 msgid "Working…"
 msgstr "處理中…"
 
+#: src/pages/shell/hire-role-dialog.tsx
+msgid "Works with"
+msgstr ""
+
 #: src/components/ModelCredits.tsx
 msgid "Works with your ChatGPT or Claude plan."
 msgstr "可使用你的 ChatGPT 或 Claude 方案。"
@@ -7012,9 +7068,3 @@ msgstr "你的語音供應商額度已用完。"
 #: src/lib/user-error.ts
 msgid "Your voice provider key was rejected."
 msgstr "你的語音供應商拒絕了該金鑰。"
-
-#. js-lingui-explicit-id
-#: src/lib/run-error.ts
-#: src/lib/user-error.ts
-msgid "Blocked by your organization"
-msgstr "已被你的組織封鎖"
