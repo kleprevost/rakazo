@@ -1,7 +1,15 @@
 import { useLingui } from "@lingui/react/macro";
 import type { Bot } from "@rakazo/contracts";
 import { Button, Popover, PopoverContent, PopoverTrigger } from "@rakazo/ui-web";
-import { Bell, LayoutDashboard, PanelLeftClose, PanelLeftOpen, Plus, Search } from "lucide-react";
+import {
+  Bell,
+  CalendarDays,
+  LayoutDashboard,
+  PanelLeftClose,
+  PanelLeftOpen,
+  Plus,
+  Search,
+} from "lucide-react";
 import { IconTooltip } from "../../components/IconTooltip";
 import { desktopBridge } from "../../lib/desktop";
 import { TODAY_PATH } from "../../lib/landing";
@@ -77,6 +85,21 @@ export function SidebarHeader({
             className="app-no-drag flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground/70 hover:text-foreground/75"
           >
             <LayoutDashboard size={15} strokeWidth={1.8} aria-hidden="true" />
+          </Button>
+        </IconTooltip>
+        <IconTooltip label={t`Calendar`}>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            aria-label={t`Calendar`}
+            data-testid="sidebar-calendar"
+            onClick={() => {
+              setMobileSidebarOpen(false);
+              navigate("/app/calendar");
+            }}
+            className="app-no-drag flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground/70 hover:text-foreground/75"
+          >
+            <CalendarDays size={15} strokeWidth={1.8} aria-hidden="true" />
           </Button>
         </IconTooltip>
         <IconTooltip label={t`Activity`}>

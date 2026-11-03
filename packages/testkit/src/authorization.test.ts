@@ -484,6 +484,7 @@ describeWithDatabase("API authorization and resource isolation", () => {
       ["roleTemplates/list"],
       ["roleTemplates/hire"],
       ["today/summary"],
+      ["calendar/range"],
       ["boards/list"],
       ["boards/get"],
       ["boards/rename"],

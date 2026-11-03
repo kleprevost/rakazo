@@ -58,6 +58,10 @@ it("puts Today in the primary navigation and closes the mobile sidebar when it o
     await act(async () => today?.click());
     expect(navigate).toHaveBeenCalledExactlyOnceWith("/app/today");
     expect(setMobileSidebarOpen).toHaveBeenCalledWith(false);
+    const calendar = container.querySelector<HTMLButtonElement>('[aria-label="Calendar"]');
+    expect(calendar).not.toBeNull();
+    await act(async () => calendar?.click());
+    expect(navigate).toHaveBeenLastCalledWith("/app/calendar");
   } finally {
     await act(async () => root.unmount());
     vi.unstubAllGlobals();

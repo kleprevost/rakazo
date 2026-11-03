@@ -478,6 +478,10 @@ msgstr "账户名称"
 msgid "Account menu for {name}"
 msgstr "{name} 的账户菜单"
 
+#: src/pages/Calendar.tsx
+msgid "Actions"
+msgstr "操作"
+
 #. placeholder {0}: bot.name
 #. placeholder {0}: group.spaceName
 #. placeholder {0}: page.title
@@ -1032,6 +1036,7 @@ msgstr "头像工作室"
 #: src/pages/admin/AdminShell.tsx
 #: src/pages/Auth.tsx
 #: src/pages/Board.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/McpServersOverlay.tsx
 #: src/pages/NavLinkPage.tsx
 #: src/pages/PluginsOverlay.tsx
@@ -1177,7 +1182,9 @@ msgstr "浏览 MCP 服务器"
 msgid "Built-in"
 msgstr "内置"
 
+#: src/pages/Calendar.tsx
 #: src/pages/shell/hire-role-dialog.tsx
+#: src/pages/shell/sidebar-header.tsx
 msgid "Calendar"
 msgstr ""
 
@@ -1916,6 +1923,7 @@ msgid "Could not clear conversation"
 msgstr "无法清空对话"
 
 #: src/components/ComputerUpdateProgress.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/Today.tsx
 msgid "Could not complete action"
 msgstr "无法完成操作"
@@ -2582,6 +2590,10 @@ msgstr "数据"
 msgid "day"
 msgstr "天"
 
+#: src/pages/Calendar.tsx
+msgid "Day"
+msgstr "日"
+
 #: src/pages/shell/message-cards.tsx
 msgid "Day-to-day work"
 msgstr "日常工作"
@@ -2860,6 +2872,7 @@ msgstr "还没有账户？"
 #: src/lib/ticket-status.ts
 #: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/shell/avatar-studio-popover.tsx
 #: src/pages/shell/import-setup-card.tsx
 #: src/pages/shell/message-view.tsx
@@ -2919,6 +2932,7 @@ msgstr ""
 
 #: src/components/AskCard.tsx
 #: src/pages/AccountSettingsOverlay.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/McpServersOverlay.tsx
 msgid "Edit"
 msgstr "编辑"
@@ -3019,6 +3033,10 @@ msgstr "环境变量：{names}"
 #: src/pages/shell/sidebar-roster.tsx
 msgid "Error"
 msgstr "出错"
+
+#: src/pages/Calendar.tsx
+msgid "Event-triggered"
+msgstr "事件触发"
 
 #: src/lib/cron.ts
 #: src/pages/ExternalConversationSettings.tsx
@@ -3139,6 +3157,7 @@ msgstr "失败"
 #: src/components/SubagentCard.tsx
 #: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
+#: src/pages/Calendar.tsx
 msgid "Failed"
 msgstr "失败"
 
@@ -4317,6 +4336,10 @@ msgstr "新建工作区"
 msgid "New ticket"
 msgstr "新建工单"
 
+#: src/pages/Calendar.tsx
+msgid "Next"
+msgstr "下一个"
+
 #: src/components/markdown-copy.tsx
 msgid "Next page"
 msgstr "下一页"
@@ -4490,6 +4513,10 @@ msgstr "无法正常工作"
 #: src/pages/KnowledgeSection.tsx
 msgid "Nothing remembered yet"
 msgstr "暂无记忆"
+
+#: src/pages/Calendar.tsx
+msgid "Nothing scheduled"
+msgstr "没有计划"
 
 #: src/pages/admin/AdminPolicyPage.tsx
 #: src/pages/admin/AdminQuery.tsx
@@ -4827,6 +4854,10 @@ msgstr "粘贴你的 API 密钥"
 msgid "Paste your API key, then test again."
 msgstr "请粘贴你的 API 密钥，然后重新测试。"
 
+#: src/pages/Calendar.tsx
+msgid "Pause"
+msgstr "暂停"
+
 #: src/pages/RoutineEditor.tsx
 #: src/pages/shell/import-status.ts
 msgid "Paused"
@@ -4941,6 +4972,10 @@ msgstr "预览 {0}"
 #: src/pages/Artifacts.tsx
 msgid "Preview isn't available for this file type — download it to view it."
 msgstr "这种文件无法预览，请下载后查看。"
+
+#: src/pages/Calendar.tsx
+msgid "Previous"
+msgstr "上一个"
 
 #: src/components/markdown-copy.tsx
 msgid "Previous page"
@@ -5403,6 +5438,10 @@ msgstr "已恢复"
 msgid "Restoring your workspace"
 msgstr "正在恢复工作区"
 
+#: src/pages/Calendar.tsx
+msgid "Resume"
+msgstr "恢复"
+
 #: src/components/AccountAccess.tsx
 #: src/components/integrations/plugin-marketplace.tsx
 #: src/components/integrations/skills-dialog.tsx
@@ -5495,6 +5534,10 @@ msgstr "运行时间"
 msgid "Run history"
 msgstr "运行记录"
 
+#: src/pages/Calendar.tsx
+msgid "Run now"
+msgstr "立即运行"
+
 #: src/pages/shell/use-routine-editor.ts
 msgid "Run time must be in the future."
 msgstr "运行时间必须是将来的时间。"
@@ -5506,6 +5549,7 @@ msgstr "运行中"
 #: src/components/SubagentCard.tsx
 #: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/RoutineEditor.tsx
 #: src/pages/Today.tsx
 msgid "Running"
@@ -5968,6 +6012,7 @@ msgstr "跳过"
 msgid "Skip or deploy key"
 msgstr "跳过或使用部署密钥"
 
+#: src/pages/Calendar.tsx
 #: src/pages/shell/message-view.tsx
 msgid "Skipped"
 msgstr ""
@@ -6583,9 +6628,10 @@ msgstr "待办"
 msgid "To:"
 msgstr "至:"
 
-#: src/components/SidebarFooter.tsx
 #: src/pages/Artifacts.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/shell/chat-context.tsx
+#: src/pages/shell/sidebar-header.tsx
 #: src/pages/Today.tsx
 msgid "Today"
 msgstr "今天"
@@ -6663,6 +6709,7 @@ msgstr "受信任的网站"
 #: src/components/pages/PageNotice.tsx
 #: src/components/pages/PagesList.tsx
 #: src/pages/ActivityList.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/Onboarding.tsx
 #: src/pages/SharedPage.tsx
 #: src/pages/SpaceSearch.tsx
@@ -6992,6 +7039,10 @@ msgstr "周三"
 
 #: src/lib/billing.ts
 msgid "week"
+msgstr "周"
+
+#: src/pages/Calendar.tsx
+msgid "Week"
 msgstr "周"
 
 #: src/lib/cron.ts

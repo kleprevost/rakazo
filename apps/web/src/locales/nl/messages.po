@@ -478,6 +478,10 @@ msgstr "Accountlabel"
 msgid "Account menu for {name}"
 msgstr "Accountmenu voor {name}"
 
+#: src/pages/Calendar.tsx
+msgid "Actions"
+msgstr "Acties"
+
 #. placeholder {0}: bot.name
 #. placeholder {0}: group.spaceName
 #. placeholder {0}: page.title
@@ -1032,6 +1036,7 @@ msgstr "Avatarstudio"
 #: src/pages/admin/AdminShell.tsx
 #: src/pages/Auth.tsx
 #: src/pages/Board.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/McpServersOverlay.tsx
 #: src/pages/NavLinkPage.tsx
 #: src/pages/PluginsOverlay.tsx
@@ -1177,7 +1182,9 @@ msgstr "MCP-servers doorzoeken"
 msgid "Built-in"
 msgstr "Ingebouwd"
 
+#: src/pages/Calendar.tsx
 #: src/pages/shell/hire-role-dialog.tsx
+#: src/pages/shell/sidebar-header.tsx
 msgid "Calendar"
 msgstr ""
 
@@ -1916,6 +1923,7 @@ msgid "Could not clear conversation"
 msgstr "Gesprek wissen mislukt"
 
 #: src/components/ComputerUpdateProgress.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/Today.tsx
 msgid "Could not complete action"
 msgstr "Actie voltooien mislukt"
@@ -2582,6 +2590,10 @@ msgstr ""
 msgid "day"
 msgstr "dag"
 
+#: src/pages/Calendar.tsx
+msgid "Day"
+msgstr "Dag"
+
 #: src/pages/shell/message-cards.tsx
 msgid "Day-to-day work"
 msgstr "Dagelijkse taken"
@@ -2860,6 +2872,7 @@ msgstr "Heb je geen account?"
 #: src/lib/ticket-status.ts
 #: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/shell/avatar-studio-popover.tsx
 #: src/pages/shell/import-setup-card.tsx
 #: src/pages/shell/message-view.tsx
@@ -2919,6 +2932,7 @@ msgstr ""
 
 #: src/components/AskCard.tsx
 #: src/pages/AccountSettingsOverlay.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/McpServersOverlay.tsx
 msgid "Edit"
 msgstr "Bewerken"
@@ -3019,6 +3033,10 @@ msgstr "Omgevingsvariabelen: {names}"
 #: src/pages/shell/sidebar-roster.tsx
 msgid "Error"
 msgstr "Fout"
+
+#: src/pages/Calendar.tsx
+msgid "Event-triggered"
+msgstr "Door gebeurtenis gestart"
 
 #: src/lib/cron.ts
 #: src/pages/ExternalConversationSettings.tsx
@@ -3139,6 +3157,7 @@ msgstr "mislukt"
 #: src/components/SubagentCard.tsx
 #: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
+#: src/pages/Calendar.tsx
 msgid "Failed"
 msgstr "Mislukt"
 
@@ -4317,6 +4336,10 @@ msgstr "Nieuwe space"
 msgid "New ticket"
 msgstr "Nieuw ticket"
 
+#: src/pages/Calendar.tsx
+msgid "Next"
+msgstr "Volgende"
+
 #: src/components/markdown-copy.tsx
 msgid "Next page"
 msgstr "Volgende pagina"
@@ -4490,6 +4513,10 @@ msgstr "Werkt niet"
 #: src/pages/KnowledgeSection.tsx
 msgid "Nothing remembered yet"
 msgstr "Nog niets onthouden"
+
+#: src/pages/Calendar.tsx
+msgid "Nothing scheduled"
+msgstr "Niets gepland"
 
 #: src/pages/admin/AdminPolicyPage.tsx
 #: src/pages/admin/AdminQuery.tsx
@@ -4827,6 +4854,10 @@ msgstr "Plak je API-sleutel"
 msgid "Paste your API key, then test again."
 msgstr "Plak je API-sleutel en test daarna opnieuw."
 
+#: src/pages/Calendar.tsx
+msgid "Pause"
+msgstr "Onderbreken"
+
 #: src/pages/RoutineEditor.tsx
 #: src/pages/shell/import-status.ts
 msgid "Paused"
@@ -4941,6 +4972,10 @@ msgstr "{0} bekijken"
 #: src/pages/Artifacts.tsx
 msgid "Preview isn't available for this file type — download it to view it."
 msgstr "Een voorbeeld is niet beschikbaar voor dit bestandstype — download het om het te bekijken."
+
+#: src/pages/Calendar.tsx
+msgid "Previous"
+msgstr "Vorige"
 
 #: src/components/markdown-copy.tsx
 msgid "Previous page"
@@ -5403,6 +5438,10 @@ msgstr "Hersteld"
 msgid "Restoring your workspace"
 msgstr "Je werkruimte herstellen"
 
+#: src/pages/Calendar.tsx
+msgid "Resume"
+msgstr "Hervatten"
+
 #: src/components/AccountAccess.tsx
 #: src/components/integrations/plugin-marketplace.tsx
 #: src/components/integrations/skills-dialog.tsx
@@ -5495,6 +5534,10 @@ msgstr "Uitvoeren om"
 msgid "Run history"
 msgstr "Rungeschiedenis"
 
+#: src/pages/Calendar.tsx
+msgid "Run now"
+msgstr "Nu uitvoeren"
+
 #: src/pages/shell/use-routine-editor.ts
 msgid "Run time must be in the future."
 msgstr "Het uitvoertijdstip moet in de toekomst liggen."
@@ -5506,6 +5549,7 @@ msgstr "draait"
 #: src/components/SubagentCard.tsx
 #: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/RoutineEditor.tsx
 #: src/pages/Today.tsx
 msgid "Running"
@@ -5968,6 +6012,7 @@ msgstr "Overslaan"
 msgid "Skip or deploy key"
 msgstr "Overslaan of deploysleutel"
 
+#: src/pages/Calendar.tsx
 #: src/pages/shell/message-view.tsx
 msgid "Skipped"
 msgstr ""
@@ -6583,9 +6628,10 @@ msgstr "Te doen"
 msgid "To:"
 msgstr "Aan:"
 
-#: src/components/SidebarFooter.tsx
 #: src/pages/Artifacts.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/shell/chat-context.tsx
+#: src/pages/shell/sidebar-header.tsx
 #: src/pages/Today.tsx
 msgid "Today"
 msgstr "Vandaag"
@@ -6663,6 +6709,7 @@ msgstr "Vertrouwde sites"
 #: src/components/pages/PageNotice.tsx
 #: src/components/pages/PagesList.tsx
 #: src/pages/ActivityList.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/Onboarding.tsx
 #: src/pages/SharedPage.tsx
 #: src/pages/SpaceSearch.tsx
@@ -6993,6 +7040,10 @@ msgstr "woensdag"
 #: src/lib/billing.ts
 msgid "week"
 msgstr "week"
+
+#: src/pages/Calendar.tsx
+msgid "Week"
+msgstr "Week"
 
 #: src/lib/cron.ts
 #: src/pages/RoutineEditor.tsx
