@@ -43,13 +43,16 @@ OIDC_NAME=Microsoft
 OIDC_ACCESS_CLAIM=roles
 OIDC_ALLOWED_VALUES=Rakazo.User,Rakazo.Admin
 OIDC_ADMIN_VALUES=Rakazo.Admin
+OIDC_TRUST_EMAIL=true
 ```
 
-Verified-email handling is unchanged. Entra's ID token normally has no `email_verified` claim,
-so an SSO account may stay unverified, and admin (from `RAKAZO_ADMIN_EMAILS` or
-`OIDC_ADMIN_VALUES`) still requires a verified email. Verify the address through email delivery
-before expecting an SSO admin to take effect. The `email` claim is optional in Entra and needs
-the `email` scope and a mailbox on the user.
+Entra's ID token normally has no `email_verified` claim, so without `OIDC_TRUST_EMAIL=true` SSO
+accounts stay unverified and admin (from `RAKAZO_ADMIN_EMAILS` or `OIDC_ADMIN_VALUES`) never
+applies. With it, the email counts as verified. Also add `xms_edov` as an optional ID token claim
+(**Token configuration**, **Add optional claim**, ID): when present and not `true`, Rakazo does
+not trust the email. Use a single-tenant app and tenant-specific issuer (never `common` or
+`organizations`); see [self-host-accounts.md](../self-host-accounts.md#claim-based-access). The
+`email` claim is optional in Entra and needs the `email` scope and a mailbox on the user.
 
 ## Behavior
 

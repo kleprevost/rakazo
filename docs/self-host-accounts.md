@@ -169,6 +169,14 @@ the value is gone, or immediately after a denied one; `RAKAZO_ADMIN_EMAILS` admi
 affected, and an admin still needs a verified email. For Microsoft Entra ID see
 [enterprise/entra-id.md](enterprise/entra-id.md).
 
+`OIDC_TRUST_EMAIL=true` counts the SSO email as verified when the ID token omits
+`email_verified`, as Microsoft Entra ID does. It never applies when `email_verified` is `false`,
+or when an `xms_edov` claim is present and not `true`. It is only safe when the issuer is a
+single tenant you control, because anyone who can set an email on that tenant can claim it. The
+exact-issuer check still pins the tenant and sign-in never links accounts by email. Verification
+is re-evaluated at each sign-in, like `email_verified`: a later `false` claim (or, without the
+setting, a missing one) marks the user unverified again.
+
 Register this redirect URI at the provider (using your public `BETTER_AUTH_URL` origin):
 
 ```text

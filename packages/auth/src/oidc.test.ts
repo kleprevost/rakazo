@@ -4,7 +4,7 @@ import { memoryAdapter } from "better-auth/adapters/memory";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Auth, AuthEnv } from "./index.js";
 import { createAuth } from "./index.js";
-import { isCurrentOidcAccount, oidcAccountSubject } from "./oidc.js";
+import { isCurrentOidcAccount, isOidcEmailVerified, oidcAccountSubject } from "./oidc.js";
 import { encryptStoredOAuthTokens, openIdToken, sealIdToken } from "./token-storage.js";
 
 const state = vi.hoisted(() => ({ db: {} as Record<string, Record<string, unknown>[]> }));
@@ -294,6 +294,35 @@ describe("OIDC callbacks", () => {
       expect(rows("account")).toHaveLength(1);
     },
   );
+  it.each([
+    ["missing claim", {}, true],
+    ["email_verified=false", { email_verified: false }, false],
+    ["xms_edov=false", { xms_edov: false }, false],
+    ["xms_edov=true", { xms_edov: true }, true],
+  ])("OIDC_TRUST_EMAIL with %s", async (_name, extra, expected) => {
+    setup({
+      oidc: {
+        issuer,
+        clientId: "test-client",
+        clientSecret: "test-client-secret",
+        name: "SSO",
+        scopes: ["openid", "email", "profile"],
+        allowSignupBypass: false,
+        trustEmail: true,
+      },
+    });
+    await signIn({ sub: "subject-1", email: "sso@example.test", ...extra });
+    expect(rows("user")[0]?.emailVerified).toBe(expected);
+  });
+  it("evaluates the trust rules without the setting unchanged", () => {
+    const base = { issuer, clientId: "c", clientSecret: "s", name: "SSO" };
+    const config = { ...base, scopes: [], allowSignupBypass: false };
+    expect(isOidcEmailVerified(config, {})).toBe(false);
+    expect(isOidcEmailVerified(config, { xms_edov: true })).toBe(false);
+    expect(isOidcEmailVerified(config, { email_verified: true })).toBe(true);
+    expect(isOidcEmailVerified({ ...config, trustEmail: true }, {})).toBe(true);
+    expect(isOidcEmailVerified({ ...config, trustEmail: true }, { xms_edov: "false" })).toBe(false);
+  });
   it.each([false, undefined])(
     "downgrades a previously verified OIDC email when the claim becomes %s",
     async (verified) => {
