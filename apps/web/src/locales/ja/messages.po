@@ -642,6 +642,19 @@ msgstr "追加済み"
 msgid "Adding…"
 msgstr "追加中…"
 
+#: src/components/SidebarFooter.tsx
+#: src/pages/admin/AdminShell.tsx
+msgid "Admin"
+msgstr ""
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Admin (email list)"
+msgstr ""
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Admin (SSO)"
+msgstr ""
+
 #: src/pages/McpServersOverlay.tsx
 #: src/pages/model-settings/compatible-model-fields.tsx
 #: src/pages/ModelSettingsOverlay.tsx
@@ -660,6 +673,12 @@ msgstr "詳細設定..."
 msgid "Agent from another app"
 msgstr ""
 
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminShell.tsx
+msgid "AI employees"
+msgstr ""
+
+#: src/pages/admin/AdminAuditPage.tsx
 #: src/pages/PluginsOverlay.tsx
 msgid "All"
 msgstr ""
@@ -898,6 +917,7 @@ msgstr "アーカイブ"
 msgid "archived"
 msgstr "アーカイブ済み"
 
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/shell/archived-chats.tsx
 msgid "Archived"
 msgstr "アーカイブ済み"
@@ -936,6 +956,10 @@ msgstr "ファイルを添付"
 #: src/pages/shell/chat-shared.ts
 msgid "Attachment"
 msgstr "添付ファイル"
+
+#: src/pages/admin/AdminShell.tsx
+msgid "Audit log"
+msgstr ""
 
 #: src/pages/PluginsOverlay.tsx
 msgid "Authentication"
@@ -1000,8 +1024,7 @@ msgstr "Avatar Studio"
 
 #: src/components/integrations/plugin-marketplace.tsx
 #: src/components/integrations/skills-dialog.tsx
-#: src/pages/AdminAccessPage.tsx
-#: src/pages/AdminPluginsPage.tsx
+#: src/pages/admin/AdminShell.tsx
 #: src/pages/Auth.tsx
 #: src/pages/Board.tsx
 #: src/pages/McpServersOverlay.tsx
@@ -1054,6 +1077,15 @@ msgstr "ブロック"
 #: src/lib/ticket-status.ts
 msgid "Blocked"
 msgstr "ブロック中"
+
+#. js-lingui-explicit-id
+#: src/lib/run-error.ts
+msgid "Blocked by your organization"
+msgstr "組織によってブロックされています"
+
+#: src/lib/user-error.ts
+msgid "Blocked by your organization"
+msgstr ""
 
 #: src/components/SidebarFooter.tsx
 #: src/pages/Board.tsx
@@ -1577,6 +1609,7 @@ msgstr "コンピューターは停止しています"
 
 #: src/components/ComputerDeviceSettings.tsx
 #: src/pages/AccountSettingsOverlay.tsx
+#: src/pages/admin/AdminOverviewPage.tsx
 msgid "Computers"
 msgstr "コンピューター"
 
@@ -1591,6 +1624,10 @@ msgstr "コンピューターは無効です。SANDBOX_PROVIDER=docker と SANDB
 #: src/pages/PluginsOverlay.tsx
 msgid "Configure a plugin catalog on the server to connect apps."
 msgstr "アプリを接続するには、サーバーでプラグインカタログを設定してください。"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Confirm"
+msgstr ""
 
 #: src/pages/KnowledgeSection.tsx
 msgid "Confirm delete"
@@ -2003,6 +2040,10 @@ msgstr "{name}をダウンロードできませんでした。もう一度お試
 msgid "Could not enable tools"
 msgstr ""
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Could not end sessions"
+msgstr ""
+
 #: src/pages/AdminAccessPage.tsx
 msgid "Could not grant access"
 msgstr ""
@@ -2366,6 +2407,10 @@ msgstr "ページを読み込めませんでした。"
 msgid "Couldn't load submissions"
 msgstr ""
 
+#: src/pages/admin/AdminQuery.tsx
+msgid "Couldn't load this page"
+msgstr ""
+
 #: src/pages/SharedPage.tsx
 msgid "Couldn't load this page. Try again."
 msgstr "このページを読み込めませんでした。もう一度お試しください。"
@@ -2541,6 +2586,10 @@ msgstr "Hermesの初期設定"
 msgid "Default from OpenClaw"
 msgstr "OpenClawの初期設定"
 
+#: src/pages/admin/AdminOverviewPage.tsx
+msgid "Default model"
+msgstr ""
+
 #: src/pages/MemorySettingsOverlay.tsx
 msgid "Default scope"
 msgstr "デフォルトの範囲"
@@ -2656,6 +2705,7 @@ msgstr ""
 msgid "Desktop update"
 msgstr "デスクトップの更新"
 
+#: src/pages/admin/AdminAuditPage.tsx
 #: src/pages/RoutineRunHistory.tsx
 #: src/pages/shell/composer-error.tsx
 msgid "Details"
@@ -2825,6 +2875,10 @@ msgstr "複製"
 msgid "Each name can be used once."
 msgstr "各名前は一度だけ使用できます。"
 
+#: src/pages/admin/AdminOverviewPage.tsx
+msgid "Easy Auth"
+msgstr ""
+
 #: src/components/AskCard.tsx
 #: src/pages/AccountSettingsOverlay.tsx
 #: src/pages/McpServersOverlay.tsx
@@ -2843,6 +2897,8 @@ msgstr "名前を編集"
 msgid "Edit Profile"
 msgstr "プロフィールを編集"
 
+#: src/pages/admin/AdminAuditPage.tsx
+#: src/pages/admin/AdminUsersPage.tsx
 #: src/pages/AdminAccessPage.tsx
 #: src/pages/Auth.tsx
 msgid "Email"
@@ -2864,6 +2920,10 @@ msgstr "メールアドレスの確認が必要です"
 #: src/pages/shell/bot-panel.tsx
 msgid "Enable {0}"
 msgstr "{0}を有効にする"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "End sessions"
+msgstr ""
 
 #: src/components/ComputerProviderSettings.tsx
 msgid "End user ID"
@@ -3140,7 +3200,7 @@ msgstr "パスワードをお忘れですか？"
 msgid "Free"
 msgstr "無料"
 
-#: src/pages/AdminAccessPage.tsx
+#: src/pages/admin/AdminShell.tsx
 msgid "Free access"
 msgstr ""
 
@@ -3157,6 +3217,7 @@ msgid "Friday"
 msgstr "金曜日"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/admin/AdminAuditPage.tsx
 msgid "From"
 msgstr "開始日"
 
@@ -3567,6 +3628,10 @@ msgstr "ラベル"
 msgid "Language"
 msgstr "言語"
 
+#: src/pages/admin/AdminBotsPage.tsx
+msgid "Last active"
+msgstr ""
+
 #. placeholder {0}: new Date(state.checkedAt).toLocaleString()
 #: src/pages/RoutineEditor.tsx
 msgid "Last check {0}: changed"
@@ -3576,6 +3641,10 @@ msgstr "前回の確認 {0}: 変更あり"
 #: src/pages/RoutineEditor.tsx
 msgid "Last check {0}: no changes"
 msgstr "前回の確認 {0}: 変更なし"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Last sign-in"
+msgstr ""
 
 #: src/components/DesktopUpdates.tsx
 msgid "Later"
@@ -3631,6 +3700,7 @@ msgstr "聞いています…"
 msgid "Load earlier messages"
 msgstr "以前のメッセージを読み込む"
 
+#: src/pages/admin/AdminQuery.tsx
 #: src/pages/Artifacts.tsx
 msgid "Load more"
 msgstr "さらに読み込む"
@@ -3675,6 +3745,7 @@ msgstr "音声プロバイダーを読み込み中…"
 #: src/components/integrations/plugin-marketplace.tsx
 #: src/components/integrations/skills-dialog.tsx
 #: src/components/PageLoading.tsx
+#: src/pages/admin/AdminQuery.tsx
 #: src/pages/AdminAccessPage.tsx
 #: src/pages/Artifacts.tsx
 #: src/pages/IntegrationSetup.tsx
@@ -3823,6 +3894,7 @@ msgid "Medium"
 msgstr "中"
 
 #: src/lib/identity-display.ts
+#: src/pages/admin/AdminUsersPage.tsx
 msgid "Member"
 msgstr "メンバー"
 
@@ -3954,6 +4026,7 @@ msgid "Mode"
 msgstr "モード"
 
 #: src/pages/AccountSettingsOverlay.tsx
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/model-settings/compatible-model-fields.tsx
 #: src/pages/Onboarding.tsx
 #: src/pages/RoutineEditor.tsx
@@ -4069,6 +4142,7 @@ msgstr ""
 #: src/components/teach/SkillDraftCard.tsx
 #: src/components/VaultSettings.tsx
 #: src/pages/AccountSettingsOverlay.tsx
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/Auth.tsx
 #: src/pages/GroupPanel.tsx
 #: src/pages/McpServersOverlay.tsx
@@ -4339,6 +4413,11 @@ msgstr "Rakazoのカタログにありません"
 msgid "Not in the plugin catalog"
 msgstr "プラグインカタログにありません"
 
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminPolicyPage.tsx
+msgid "Not loaded"
+msgstr ""
+
 #: src/components/GitHubStarPrompt.tsx
 #: src/pages/shell/message-cards.tsx
 msgid "Not now"
@@ -4360,6 +4439,11 @@ msgstr "動作していません"
 #: src/pages/KnowledgeSection.tsx
 msgid "Nothing remembered yet"
 msgstr "記憶はまだありません"
+
+#: src/pages/admin/AdminPolicyPage.tsx
+#: src/pages/admin/AdminQuery.tsx
+msgid "Nothing to show."
+msgstr ""
 
 #: src/pages/shell/bot-panel.tsx
 msgid "Notifications"
@@ -4532,6 +4616,7 @@ msgid "Or paste an API key"
 msgstr "またはAPIキーを貼り付け"
 
 #: src/components/ComputerProviderSettings.tsx
+#: src/pages/admin/AdminPolicyPage.tsx
 msgid "Organization"
 msgstr ""
 
@@ -4556,8 +4641,13 @@ msgstr "その他のモデル…"
 msgid "Output"
 msgstr "出力"
 
+#: src/pages/admin/AdminShell.tsx
+msgid "Overview"
+msgstr ""
+
 #: src/components/pages/SharePopover.tsx
 #: src/lib/identity-display.ts
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/Board.tsx
 msgid "Owner"
 msgstr "オーナー"
@@ -4630,6 +4720,7 @@ msgstr "パスキー"
 #: src/components/ConfirmIdentityDialog.tsx
 #: src/components/VaultSettings.tsx
 #: src/pages/AccountSettingsOverlay.tsx
+#: src/pages/admin/AdminOverviewPage.tsx
 #: src/pages/Auth.tsx
 msgid "Password"
 msgstr "パスワード"
@@ -4756,12 +4847,18 @@ msgstr "プラグイン"
 msgid "Plugin GitHub URL"
 msgstr ""
 
-#: src/pages/AdminPluginsPage.tsx
+#: src/pages/admin/AdminShell.tsx
 msgid "Plugin submissions"
 msgstr ""
 
 #: src/components/integrations/skills-dialog.tsx
 msgid "Plugins"
+msgstr ""
+
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminPolicyPage.tsx
+#: src/pages/admin/AdminShell.tsx
+msgid "Policy"
 msgstr ""
 
 #: src/pages/RoutineEditor.tsx
@@ -4897,6 +4994,10 @@ msgstr ""
 #: src/pages/ActivityList.tsx
 msgid "Recent"
 msgstr "最近"
+
+#: src/pages/admin/AdminPolicyPage.tsx
+msgid "Recent denials"
+msgstr ""
 
 #: src/pages/PluginsOverlay.tsx
 msgid "Recommended"
@@ -5251,6 +5352,7 @@ msgstr "ワークスペースを復元中"
 #: src/components/integrations/plugin-marketplace.tsx
 #: src/components/integrations/skills-dialog.tsx
 #: src/components/PasskeySettings.tsx
+#: src/pages/admin/AdminQuery.tsx
 #: src/pages/AdminAccessPage.tsx
 #: src/pages/Auth.tsx
 #: src/pages/ModelRoleSettings.tsx
@@ -5290,6 +5392,10 @@ msgstr "取り消す"
 
 #: src/pages/AdminAccessPage.tsx
 msgid "Revoked"
+msgstr ""
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Role"
 msgstr ""
 
 #: src/components/ComputerProviderSettings.tsx
@@ -5605,6 +5711,10 @@ msgstr "サーバー名"
 msgid "Server URL"
 msgstr "サーバーURL"
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Sessions ended"
+msgstr ""
+
 #: src/components/call/CallCard.tsx
 #: src/components/SidebarFooter.tsx
 #: src/pages/MessagingSettingsPanel.tsx
@@ -5757,6 +5867,10 @@ msgstr "サブスクリプションでログインするか、代わりにAPIキ
 msgid "Sign up"
 msgstr "新規登録"
 
+#: src/pages/admin/AdminOverviewPage.tsx
+msgid "Sign-in"
+msgstr ""
+
 #: src/components/integrations/plugin-marketplace.tsx
 msgid "Sign-in cancelled. Try again."
 msgstr ""
@@ -5854,6 +5968,7 @@ msgid "Sorted by {column}, descending"
 msgstr "{column} で並べ替え済み、降順"
 
 #: src/lib/identity-display.ts
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/SettingsOverlay.tsx
 msgid "Space"
 msgstr "スペース"
@@ -5883,6 +5998,8 @@ msgid "Speech model"
 msgstr "音声モデル"
 
 #: src/components/AccountAccess.tsx
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminUsersPage.tsx
 msgid "SSO"
 msgstr ""
 
@@ -6293,6 +6410,8 @@ msgstr "このモデルは画像を読み取れません。画像に対応した
 msgid "This model's context window is too small. Choose another model."
 msgstr "このモデルのコンテキストウィンドウは小さすぎます。別のモデルを選択してください。"
 
+#: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/admin/AdminPolicyPage.tsx
 #: src/pages/Artifacts.tsx
 msgid "This month"
 msgstr "今月"
@@ -6382,6 +6501,7 @@ msgid "Title"
 msgstr "タイトル"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/admin/AdminAuditPage.tsx
 msgid "To"
 msgstr "終了日"
 
@@ -6491,6 +6611,7 @@ msgid "Tuesday"
 msgstr "火曜日"
 
 #: src/components/VaultSettings.tsx
+#: src/pages/admin/AdminAuditPage.tsx
 msgid "Type"
 msgstr "種類"
 
@@ -6670,6 +6791,10 @@ msgstr "スペースのデフォルトを使用"
 msgid "Use up to 512 letters, digits, _ or -."
 msgstr "英数字、_、-のみで512文字以内で入力してください。"
 
+#: src/pages/admin/AdminAuditPage.tsx
+msgid "User"
+msgstr ""
+
 #: src/pages/memory-providers/HonchoSettingsForm.tsx
 msgid "User peer"
 msgstr "ユーザーピア"
@@ -6678,6 +6803,11 @@ msgstr "ユーザーピア"
 #: src/components/VaultSettings.tsx
 msgid "Username"
 msgstr "ユーザー名"
+
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminShell.tsx
+msgid "Users"
+msgstr ""
 
 #: src/pages/shell/import-status.ts
 msgid "Uses files that are not imported"
@@ -6721,6 +6851,13 @@ msgstr "確認中…"
 #: src/pages/Artifacts.tsx
 msgid "Version"
 msgstr "バージョン"
+
+#. placeholder {0}: data.policy.version
+#. placeholder {0}: view.version
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminPolicyPage.tsx
+msgid "Version {0}"
+msgstr ""
 
 #: src/pages/PluginsOverlay.tsx
 msgid "View all"
@@ -6834,6 +6971,10 @@ msgstr "返す内容"
 #: src/pages/RoutineEditor.tsx
 msgid "What to watch"
 msgstr "監視する対象"
+
+#: src/pages/admin/AdminAuditPage.tsx
+msgid "When"
+msgstr ""
 
 #: src/pages/RoutineEditor.tsx
 msgid "When a webhook fires"
@@ -7011,9 +7152,3 @@ msgstr "音声プロバイダーのクレジットが不足しています。"
 #: src/lib/user-error.ts
 msgid "Your voice provider key was rejected."
 msgstr "音声プロバイダーのキーが拒否されました。"
-
-#. js-lingui-explicit-id
-#: src/lib/run-error.ts
-#: src/lib/user-error.ts
-msgid "Blocked by your organization"
-msgstr "組織によってブロックされています"

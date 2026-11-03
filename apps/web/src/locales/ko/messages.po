@@ -642,6 +642,19 @@ msgstr ""
 msgid "Adding…"
 msgstr "추가 중…"
 
+#: src/components/SidebarFooter.tsx
+#: src/pages/admin/AdminShell.tsx
+msgid "Admin"
+msgstr ""
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Admin (email list)"
+msgstr ""
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Admin (SSO)"
+msgstr ""
+
 #: src/pages/McpServersOverlay.tsx
 #: src/pages/model-settings/compatible-model-fields.tsx
 #: src/pages/ModelSettingsOverlay.tsx
@@ -660,6 +673,12 @@ msgstr "고급..."
 msgid "Agent from another app"
 msgstr ""
 
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminShell.tsx
+msgid "AI employees"
+msgstr ""
+
+#: src/pages/admin/AdminAuditPage.tsx
 #: src/pages/PluginsOverlay.tsx
 msgid "All"
 msgstr ""
@@ -898,6 +917,7 @@ msgstr "보관"
 msgid "archived"
 msgstr "보관됨"
 
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/shell/archived-chats.tsx
 msgid "Archived"
 msgstr "보관됨"
@@ -936,6 +956,10 @@ msgstr "파일 첨부"
 #: src/pages/shell/chat-shared.ts
 msgid "Attachment"
 msgstr "첨부 파일"
+
+#: src/pages/admin/AdminShell.tsx
+msgid "Audit log"
+msgstr ""
 
 #: src/pages/PluginsOverlay.tsx
 msgid "Authentication"
@@ -1000,8 +1024,7 @@ msgstr "아바타 스튜디오"
 
 #: src/components/integrations/plugin-marketplace.tsx
 #: src/components/integrations/skills-dialog.tsx
-#: src/pages/AdminAccessPage.tsx
-#: src/pages/AdminPluginsPage.tsx
+#: src/pages/admin/AdminShell.tsx
 #: src/pages/Auth.tsx
 #: src/pages/Board.tsx
 #: src/pages/McpServersOverlay.tsx
@@ -1053,6 +1076,15 @@ msgstr "차단"
 
 #: src/lib/ticket-status.ts
 msgid "Blocked"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/lib/run-error.ts
+msgid "Blocked by your organization"
+msgstr "조직에서 차단했습니다"
+
+#: src/lib/user-error.ts
+msgid "Blocked by your organization"
 msgstr ""
 
 #: src/components/SidebarFooter.tsx
@@ -1577,6 +1609,7 @@ msgstr "컴퓨터가 중지됨"
 
 #: src/components/ComputerDeviceSettings.tsx
 #: src/pages/AccountSettingsOverlay.tsx
+#: src/pages/admin/AdminOverviewPage.tsx
 msgid "Computers"
 msgstr "컴퓨터"
 
@@ -1590,6 +1623,10 @@ msgstr "컴퓨터가 꺼져 있습니다. SANDBOX_PROVIDER=docker와 SANDBOX_SUP
 
 #: src/pages/PluginsOverlay.tsx
 msgid "Configure a plugin catalog on the server to connect apps."
+msgstr ""
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Confirm"
 msgstr ""
 
 #: src/pages/KnowledgeSection.tsx
@@ -2003,6 +2040,10 @@ msgstr "{name}을 다운로드하지 못했습니다. 다시 시도해 주세요
 msgid "Could not enable tools"
 msgstr ""
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Could not end sessions"
+msgstr ""
+
 #: src/pages/AdminAccessPage.tsx
 msgid "Could not grant access"
 msgstr ""
@@ -2366,6 +2407,10 @@ msgstr "페이지를 불러오지 못했습니다."
 msgid "Couldn't load submissions"
 msgstr ""
 
+#: src/pages/admin/AdminQuery.tsx
+msgid "Couldn't load this page"
+msgstr ""
+
 #: src/pages/SharedPage.tsx
 msgid "Couldn't load this page. Try again."
 msgstr "이 페이지를 불러올 수 없습니다. 다시 시도하세요."
@@ -2541,6 +2586,10 @@ msgstr "Hermes 기본값"
 msgid "Default from OpenClaw"
 msgstr "OpenClaw 기본값"
 
+#: src/pages/admin/AdminOverviewPage.tsx
+msgid "Default model"
+msgstr ""
+
 #: src/pages/MemorySettingsOverlay.tsx
 msgid "Default scope"
 msgstr "기본 기억 범위"
@@ -2656,6 +2705,7 @@ msgstr ""
 msgid "Desktop update"
 msgstr ""
 
+#: src/pages/admin/AdminAuditPage.tsx
 #: src/pages/RoutineRunHistory.tsx
 #: src/pages/shell/composer-error.tsx
 msgid "Details"
@@ -2825,6 +2875,10 @@ msgstr "복제"
 msgid "Each name can be used once."
 msgstr "각 이름은 한 번만 사용할 수 있습니다."
 
+#: src/pages/admin/AdminOverviewPage.tsx
+msgid "Easy Auth"
+msgstr ""
+
 #: src/components/AskCard.tsx
 #: src/pages/AccountSettingsOverlay.tsx
 #: src/pages/McpServersOverlay.tsx
@@ -2843,6 +2897,8 @@ msgstr "이름 편집"
 msgid "Edit Profile"
 msgstr "Bot 정보 수정"
 
+#: src/pages/admin/AdminAuditPage.tsx
+#: src/pages/admin/AdminUsersPage.tsx
 #: src/pages/AdminAccessPage.tsx
 #: src/pages/Auth.tsx
 msgid "Email"
@@ -2864,6 +2920,10 @@ msgstr "이메일 인증이 필요합니다"
 #: src/pages/shell/bot-panel.tsx
 msgid "Enable {0}"
 msgstr "{0} 활성화"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "End sessions"
+msgstr ""
 
 #: src/components/ComputerProviderSettings.tsx
 msgid "End user ID"
@@ -3140,7 +3200,7 @@ msgstr "비밀번호를 잊으셨나요?"
 msgid "Free"
 msgstr "무료"
 
-#: src/pages/AdminAccessPage.tsx
+#: src/pages/admin/AdminShell.tsx
 msgid "Free access"
 msgstr ""
 
@@ -3157,6 +3217,7 @@ msgid "Friday"
 msgstr "금요일"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/admin/AdminAuditPage.tsx
 msgid "From"
 msgstr ""
 
@@ -3567,6 +3628,10 @@ msgstr "레이블"
 msgid "Language"
 msgstr "언어"
 
+#: src/pages/admin/AdminBotsPage.tsx
+msgid "Last active"
+msgstr ""
+
 #. placeholder {0}: new Date(state.checkedAt).toLocaleString()
 #: src/pages/RoutineEditor.tsx
 msgid "Last check {0}: changed"
@@ -3576,6 +3641,10 @@ msgstr "마지막 확인 {0}: 변경됨"
 #: src/pages/RoutineEditor.tsx
 msgid "Last check {0}: no changes"
 msgstr "마지막 확인 {0}: 변경 없음"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Last sign-in"
+msgstr ""
 
 #: src/components/DesktopUpdates.tsx
 msgid "Later"
@@ -3631,6 +3700,7 @@ msgstr ""
 msgid "Load earlier messages"
 msgstr "이전 메시지 불러오기"
 
+#: src/pages/admin/AdminQuery.tsx
 #: src/pages/Artifacts.tsx
 msgid "Load more"
 msgstr ""
@@ -3675,6 +3745,7 @@ msgstr "음성 서비스를 불러오는 중…"
 #: src/components/integrations/plugin-marketplace.tsx
 #: src/components/integrations/skills-dialog.tsx
 #: src/components/PageLoading.tsx
+#: src/pages/admin/AdminQuery.tsx
 #: src/pages/AdminAccessPage.tsx
 #: src/pages/Artifacts.tsx
 #: src/pages/IntegrationSetup.tsx
@@ -3823,6 +3894,7 @@ msgid "Medium"
 msgstr "보통"
 
 #: src/lib/identity-display.ts
+#: src/pages/admin/AdminUsersPage.tsx
 msgid "Member"
 msgstr "멤버"
 
@@ -3954,6 +4026,7 @@ msgid "Mode"
 msgstr "모드"
 
 #: src/pages/AccountSettingsOverlay.tsx
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/model-settings/compatible-model-fields.tsx
 #: src/pages/Onboarding.tsx
 #: src/pages/RoutineEditor.tsx
@@ -4069,6 +4142,7 @@ msgstr ""
 #: src/components/teach/SkillDraftCard.tsx
 #: src/components/VaultSettings.tsx
 #: src/pages/AccountSettingsOverlay.tsx
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/Auth.tsx
 #: src/pages/GroupPanel.tsx
 #: src/pages/McpServersOverlay.tsx
@@ -4339,6 +4413,11 @@ msgstr "Rakazo 카탈로그에 없음"
 msgid "Not in the plugin catalog"
 msgstr "플러그인 카탈로그에 없음"
 
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminPolicyPage.tsx
+msgid "Not loaded"
+msgstr ""
+
 #: src/components/GitHubStarPrompt.tsx
 #: src/pages/shell/message-cards.tsx
 msgid "Not now"
@@ -4360,6 +4439,11 @@ msgstr "작동하지 않음"
 #: src/pages/KnowledgeSection.tsx
 msgid "Nothing remembered yet"
 msgstr "아직 기억한 내용이 없습니다"
+
+#: src/pages/admin/AdminPolicyPage.tsx
+#: src/pages/admin/AdminQuery.tsx
+msgid "Nothing to show."
+msgstr ""
 
 #: src/pages/shell/bot-panel.tsx
 msgid "Notifications"
@@ -4532,6 +4616,7 @@ msgid "Or paste an API key"
 msgstr "또는 API 키 붙여넣기"
 
 #: src/components/ComputerProviderSettings.tsx
+#: src/pages/admin/AdminPolicyPage.tsx
 msgid "Organization"
 msgstr ""
 
@@ -4556,8 +4641,13 @@ msgstr "다른 모델 직접 입력…"
 msgid "Output"
 msgstr "출력"
 
+#: src/pages/admin/AdminShell.tsx
+msgid "Overview"
+msgstr ""
+
 #: src/components/pages/SharePopover.tsx
 #: src/lib/identity-display.ts
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/Board.tsx
 msgid "Owner"
 msgstr "소유자"
@@ -4630,6 +4720,7 @@ msgstr "패스키"
 #: src/components/ConfirmIdentityDialog.tsx
 #: src/components/VaultSettings.tsx
 #: src/pages/AccountSettingsOverlay.tsx
+#: src/pages/admin/AdminOverviewPage.tsx
 #: src/pages/Auth.tsx
 msgid "Password"
 msgstr "비밀번호"
@@ -4756,12 +4847,18 @@ msgstr "플러그인"
 msgid "Plugin GitHub URL"
 msgstr ""
 
-#: src/pages/AdminPluginsPage.tsx
+#: src/pages/admin/AdminShell.tsx
 msgid "Plugin submissions"
 msgstr ""
 
 #: src/components/integrations/skills-dialog.tsx
 msgid "Plugins"
+msgstr ""
+
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminPolicyPage.tsx
+#: src/pages/admin/AdminShell.tsx
+msgid "Policy"
 msgstr ""
 
 #: src/pages/RoutineEditor.tsx
@@ -4897,6 +4994,10 @@ msgstr ""
 #: src/pages/ActivityList.tsx
 msgid "Recent"
 msgstr "최근"
+
+#: src/pages/admin/AdminPolicyPage.tsx
+msgid "Recent denials"
+msgstr ""
 
 #: src/pages/PluginsOverlay.tsx
 msgid "Recommended"
@@ -5251,6 +5352,7 @@ msgstr ""
 #: src/components/integrations/plugin-marketplace.tsx
 #: src/components/integrations/skills-dialog.tsx
 #: src/components/PasskeySettings.tsx
+#: src/pages/admin/AdminQuery.tsx
 #: src/pages/AdminAccessPage.tsx
 #: src/pages/Auth.tsx
 #: src/pages/ModelRoleSettings.tsx
@@ -5290,6 +5392,10 @@ msgstr "연결 해제"
 
 #: src/pages/AdminAccessPage.tsx
 msgid "Revoked"
+msgstr ""
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Role"
 msgstr ""
 
 #: src/components/ComputerProviderSettings.tsx
@@ -5605,6 +5711,10 @@ msgstr "서버 이름"
 msgid "Server URL"
 msgstr "서버 URL"
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Sessions ended"
+msgstr ""
+
 #: src/components/call/CallCard.tsx
 #: src/components/SidebarFooter.tsx
 #: src/pages/MessagingSettingsPanel.tsx
@@ -5757,6 +5867,10 @@ msgstr "구독으로 로그인하거나 대신 API 키를 테스트하세요."
 msgid "Sign up"
 msgstr "가입하기"
 
+#: src/pages/admin/AdminOverviewPage.tsx
+msgid "Sign-in"
+msgstr ""
+
 #: src/components/integrations/plugin-marketplace.tsx
 msgid "Sign-in cancelled. Try again."
 msgstr ""
@@ -5854,6 +5968,7 @@ msgid "Sorted by {column}, descending"
 msgstr "{column} 기준 정렬됨, 내림차순"
 
 #: src/lib/identity-display.ts
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/SettingsOverlay.tsx
 msgid "Space"
 msgstr "스페이스"
@@ -5883,6 +5998,8 @@ msgid "Speech model"
 msgstr "음성 모델"
 
 #: src/components/AccountAccess.tsx
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminUsersPage.tsx
 msgid "SSO"
 msgstr ""
 
@@ -6293,6 +6410,8 @@ msgstr "이 모델은 이미지를 읽을 수 없습니다. 이미지를 지원�
 msgid "This model's context window is too small. Choose another model."
 msgstr "이 모델의 컨텍스트 창이 너무 작습니다. 다른 모델을 선택하세요."
 
+#: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/admin/AdminPolicyPage.tsx
 #: src/pages/Artifacts.tsx
 msgid "This month"
 msgstr ""
@@ -6382,6 +6501,7 @@ msgid "Title"
 msgstr "역할"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/admin/AdminAuditPage.tsx
 msgid "To"
 msgstr ""
 
@@ -6491,6 +6611,7 @@ msgid "Tuesday"
 msgstr "화요일"
 
 #: src/components/VaultSettings.tsx
+#: src/pages/admin/AdminAuditPage.tsx
 msgid "Type"
 msgstr ""
 
@@ -6670,6 +6791,10 @@ msgstr ""
 msgid "Use up to 512 letters, digits, _ or -."
 msgstr ""
 
+#: src/pages/admin/AdminAuditPage.tsx
+msgid "User"
+msgstr ""
+
 #: src/pages/memory-providers/HonchoSettingsForm.tsx
 msgid "User peer"
 msgstr ""
@@ -6677,6 +6802,11 @@ msgstr ""
 #: src/components/AskCard.tsx
 #: src/components/VaultSettings.tsx
 msgid "Username"
+msgstr ""
+
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminShell.tsx
+msgid "Users"
 msgstr ""
 
 #: src/pages/shell/import-status.ts
@@ -6720,6 +6850,13 @@ msgstr "확인 중…"
 
 #: src/pages/Artifacts.tsx
 msgid "Version"
+msgstr ""
+
+#. placeholder {0}: data.policy.version
+#. placeholder {0}: view.version
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminPolicyPage.tsx
+msgid "Version {0}"
 msgstr ""
 
 #: src/pages/PluginsOverlay.tsx
@@ -6834,6 +6971,10 @@ msgstr "완료 후 전달할 결과"
 #: src/pages/RoutineEditor.tsx
 msgid "What to watch"
 msgstr "감시 대상"
+
+#: src/pages/admin/AdminAuditPage.tsx
+msgid "When"
+msgstr ""
 
 #: src/pages/RoutineEditor.tsx
 msgid "When a webhook fires"
@@ -7011,9 +7152,3 @@ msgstr "음성 서비스 크레딧이 모두 소진되었습니다."
 #: src/lib/user-error.ts
 msgid "Your voice provider key was rejected."
 msgstr "음성 서비스에서 키를 거부했습니다."
-
-#. js-lingui-explicit-id
-#: src/lib/run-error.ts
-#: src/lib/user-error.ts
-msgid "Blocked by your organization"
-msgstr "조직에서 차단했습니다"

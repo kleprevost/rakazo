@@ -642,6 +642,19 @@ msgstr "Ajouté"
 msgid "Adding…"
 msgstr "Ajout en cours…"
 
+#: src/components/SidebarFooter.tsx
+#: src/pages/admin/AdminShell.tsx
+msgid "Admin"
+msgstr ""
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Admin (email list)"
+msgstr ""
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Admin (SSO)"
+msgstr ""
+
 #: src/pages/McpServersOverlay.tsx
 #: src/pages/model-settings/compatible-model-fields.tsx
 #: src/pages/ModelSettingsOverlay.tsx
@@ -660,6 +673,12 @@ msgstr "Avancé..."
 msgid "Agent from another app"
 msgstr ""
 
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminShell.tsx
+msgid "AI employees"
+msgstr ""
+
+#: src/pages/admin/AdminAuditPage.tsx
 #: src/pages/PluginsOverlay.tsx
 msgid "All"
 msgstr ""
@@ -898,6 +917,7 @@ msgstr "Archiver"
 msgid "archived"
 msgstr "archivé"
 
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/shell/archived-chats.tsx
 msgid "Archived"
 msgstr "Archivé"
@@ -936,6 +956,10 @@ msgstr "Joindre un fichier"
 #: src/pages/shell/chat-shared.ts
 msgid "Attachment"
 msgstr "Pièce jointe"
+
+#: src/pages/admin/AdminShell.tsx
+msgid "Audit log"
+msgstr ""
 
 #: src/pages/PluginsOverlay.tsx
 msgid "Authentication"
@@ -1000,8 +1024,7 @@ msgstr "Studio d'avatars"
 
 #: src/components/integrations/plugin-marketplace.tsx
 #: src/components/integrations/skills-dialog.tsx
-#: src/pages/AdminAccessPage.tsx
-#: src/pages/AdminPluginsPage.tsx
+#: src/pages/admin/AdminShell.tsx
 #: src/pages/Auth.tsx
 #: src/pages/Board.tsx
 #: src/pages/McpServersOverlay.tsx
@@ -1053,6 +1076,15 @@ msgstr "Bloquer"
 
 #: src/lib/ticket-status.ts
 msgid "Blocked"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/lib/run-error.ts
+msgid "Blocked by your organization"
+msgstr "Bloqué par votre organisation"
+
+#: src/lib/user-error.ts
+msgid "Blocked by your organization"
 msgstr ""
 
 #: src/components/SidebarFooter.tsx
@@ -1577,6 +1609,7 @@ msgstr "L'ordinateur est arrêté"
 
 #: src/components/ComputerDeviceSettings.tsx
 #: src/pages/AccountSettingsOverlay.tsx
+#: src/pages/admin/AdminOverviewPage.tsx
 msgid "Computers"
 msgstr "Ordinateurs"
 
@@ -1591,6 +1624,10 @@ msgstr "Les ordinateurs sont désactivés. Définissez SANDBOX_PROVIDER=docker a
 #: src/pages/PluginsOverlay.tsx
 msgid "Configure a plugin catalog on the server to connect apps."
 msgstr "Configurez un catalogue de plugins sur le serveur pour connecter des applications."
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Confirm"
+msgstr ""
 
 #: src/pages/KnowledgeSection.tsx
 msgid "Confirm delete"
@@ -2003,6 +2040,10 @@ msgstr "Impossible de télécharger {name}. Réessayez."
 msgid "Could not enable tools"
 msgstr ""
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Could not end sessions"
+msgstr ""
+
 #: src/pages/AdminAccessPage.tsx
 msgid "Could not grant access"
 msgstr ""
@@ -2366,6 +2407,10 @@ msgstr "Impossible de charger les pages."
 msgid "Couldn't load submissions"
 msgstr ""
 
+#: src/pages/admin/AdminQuery.tsx
+msgid "Couldn't load this page"
+msgstr ""
+
 #: src/pages/SharedPage.tsx
 msgid "Couldn't load this page. Try again."
 msgstr "Impossible de charger cette page. Réessayez."
@@ -2541,6 +2586,10 @@ msgstr "Par défaut de Hermes"
 msgid "Default from OpenClaw"
 msgstr "Par défaut d’OpenClaw"
 
+#: src/pages/admin/AdminOverviewPage.tsx
+msgid "Default model"
+msgstr ""
+
 #: src/pages/MemorySettingsOverlay.tsx
 msgid "Default scope"
 msgstr "Portée par défaut"
@@ -2656,6 +2705,7 @@ msgstr ""
 msgid "Desktop update"
 msgstr "Mise à jour du bureau"
 
+#: src/pages/admin/AdminAuditPage.tsx
 #: src/pages/RoutineRunHistory.tsx
 #: src/pages/shell/composer-error.tsx
 msgid "Details"
@@ -2825,6 +2875,10 @@ msgstr "Dupliquer"
 msgid "Each name can be used once."
 msgstr "Chaque nom ne peut être utilisé qu’une fois."
 
+#: src/pages/admin/AdminOverviewPage.tsx
+msgid "Easy Auth"
+msgstr ""
+
 #: src/components/AskCard.tsx
 #: src/pages/AccountSettingsOverlay.tsx
 #: src/pages/McpServersOverlay.tsx
@@ -2843,6 +2897,8 @@ msgstr "Modifier le nom"
 msgid "Edit Profile"
 msgstr "Modifier le profil"
 
+#: src/pages/admin/AdminAuditPage.tsx
+#: src/pages/admin/AdminUsersPage.tsx
 #: src/pages/AdminAccessPage.tsx
 #: src/pages/Auth.tsx
 msgid "Email"
@@ -2864,6 +2920,10 @@ msgstr "Vérification de l’e-mail requise"
 #: src/pages/shell/bot-panel.tsx
 msgid "Enable {0}"
 msgstr "Activer {0}"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "End sessions"
+msgstr ""
 
 #: src/components/ComputerProviderSettings.tsx
 msgid "End user ID"
@@ -3140,7 +3200,7 @@ msgstr "Mot de passe oublié ?"
 msgid "Free"
 msgstr "Gratuit"
 
-#: src/pages/AdminAccessPage.tsx
+#: src/pages/admin/AdminShell.tsx
 msgid "Free access"
 msgstr ""
 
@@ -3157,6 +3217,7 @@ msgid "Friday"
 msgstr "vendredi"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/admin/AdminAuditPage.tsx
 msgid "From"
 msgstr ""
 
@@ -3567,6 +3628,10 @@ msgstr "Libellé"
 msgid "Language"
 msgstr "Langue"
 
+#: src/pages/admin/AdminBotsPage.tsx
+msgid "Last active"
+msgstr ""
+
 #. placeholder {0}: new Date(state.checkedAt).toLocaleString()
 #: src/pages/RoutineEditor.tsx
 msgid "Last check {0}: changed"
@@ -3576,6 +3641,10 @@ msgstr "Dernière vérification {0} : modifications"
 #: src/pages/RoutineEditor.tsx
 msgid "Last check {0}: no changes"
 msgstr "Dernière vérification {0} : aucun changement"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Last sign-in"
+msgstr ""
 
 #: src/components/DesktopUpdates.tsx
 msgid "Later"
@@ -3631,6 +3700,7 @@ msgstr "À l’écoute…"
 msgid "Load earlier messages"
 msgstr "Charger les messages précédents"
 
+#: src/pages/admin/AdminQuery.tsx
 #: src/pages/Artifacts.tsx
 msgid "Load more"
 msgstr "Charger plus"
@@ -3675,6 +3745,7 @@ msgstr "Chargement des fournisseurs vocaux…"
 #: src/components/integrations/plugin-marketplace.tsx
 #: src/components/integrations/skills-dialog.tsx
 #: src/components/PageLoading.tsx
+#: src/pages/admin/AdminQuery.tsx
 #: src/pages/AdminAccessPage.tsx
 #: src/pages/Artifacts.tsx
 #: src/pages/IntegrationSetup.tsx
@@ -3823,6 +3894,7 @@ msgid "Medium"
 msgstr "Moyen"
 
 #: src/lib/identity-display.ts
+#: src/pages/admin/AdminUsersPage.tsx
 msgid "Member"
 msgstr "Membre"
 
@@ -3954,6 +4026,7 @@ msgid "Mode"
 msgstr "Mode"
 
 #: src/pages/AccountSettingsOverlay.tsx
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/model-settings/compatible-model-fields.tsx
 #: src/pages/Onboarding.tsx
 #: src/pages/RoutineEditor.tsx
@@ -4069,6 +4142,7 @@ msgstr ""
 #: src/components/teach/SkillDraftCard.tsx
 #: src/components/VaultSettings.tsx
 #: src/pages/AccountSettingsOverlay.tsx
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/Auth.tsx
 #: src/pages/GroupPanel.tsx
 #: src/pages/McpServersOverlay.tsx
@@ -4339,6 +4413,11 @@ msgstr "Absent du catalogue de Rakazo"
 msgid "Not in the plugin catalog"
 msgstr "Pas dans le catalogue de plugins"
 
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminPolicyPage.tsx
+msgid "Not loaded"
+msgstr ""
+
 #: src/components/GitHubStarPrompt.tsx
 #: src/pages/shell/message-cards.tsx
 msgid "Not now"
@@ -4360,6 +4439,11 @@ msgstr "Ne fonctionne pas"
 #: src/pages/KnowledgeSection.tsx
 msgid "Nothing remembered yet"
 msgstr "Rien n'est mémorisé pour le moment"
+
+#: src/pages/admin/AdminPolicyPage.tsx
+#: src/pages/admin/AdminQuery.tsx
+msgid "Nothing to show."
+msgstr ""
 
 #: src/pages/shell/bot-panel.tsx
 msgid "Notifications"
@@ -4532,6 +4616,7 @@ msgid "Or paste an API key"
 msgstr "Ou collez une clé API"
 
 #: src/components/ComputerProviderSettings.tsx
+#: src/pages/admin/AdminPolicyPage.tsx
 msgid "Organization"
 msgstr ""
 
@@ -4556,8 +4641,13 @@ msgstr "Autre modèle…"
 msgid "Output"
 msgstr "Sortie"
 
+#: src/pages/admin/AdminShell.tsx
+msgid "Overview"
+msgstr ""
+
 #: src/components/pages/SharePopover.tsx
 #: src/lib/identity-display.ts
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/Board.tsx
 msgid "Owner"
 msgstr "Propriétaire"
@@ -4630,6 +4720,7 @@ msgstr "Clés d’accès"
 #: src/components/ConfirmIdentityDialog.tsx
 #: src/components/VaultSettings.tsx
 #: src/pages/AccountSettingsOverlay.tsx
+#: src/pages/admin/AdminOverviewPage.tsx
 #: src/pages/Auth.tsx
 msgid "Password"
 msgstr "Mot de passe"
@@ -4756,12 +4847,18 @@ msgstr "Plugin"
 msgid "Plugin GitHub URL"
 msgstr ""
 
-#: src/pages/AdminPluginsPage.tsx
+#: src/pages/admin/AdminShell.tsx
 msgid "Plugin submissions"
 msgstr ""
 
 #: src/components/integrations/skills-dialog.tsx
 msgid "Plugins"
+msgstr ""
+
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminPolicyPage.tsx
+#: src/pages/admin/AdminShell.tsx
+msgid "Policy"
 msgstr ""
 
 #: src/pages/RoutineEditor.tsx
@@ -4897,6 +4994,10 @@ msgstr ""
 #: src/pages/ActivityList.tsx
 msgid "Recent"
 msgstr "Récent"
+
+#: src/pages/admin/AdminPolicyPage.tsx
+msgid "Recent denials"
+msgstr ""
 
 #: src/pages/PluginsOverlay.tsx
 msgid "Recommended"
@@ -5251,6 +5352,7 @@ msgstr "Restauration de votre espace de travail"
 #: src/components/integrations/plugin-marketplace.tsx
 #: src/components/integrations/skills-dialog.tsx
 #: src/components/PasskeySettings.tsx
+#: src/pages/admin/AdminQuery.tsx
 #: src/pages/AdminAccessPage.tsx
 #: src/pages/Auth.tsx
 #: src/pages/ModelRoleSettings.tsx
@@ -5290,6 +5392,10 @@ msgstr "Révoquer"
 
 #: src/pages/AdminAccessPage.tsx
 msgid "Revoked"
+msgstr ""
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Role"
 msgstr ""
 
 #: src/components/ComputerProviderSettings.tsx
@@ -5605,6 +5711,10 @@ msgstr "Nom du serveur"
 msgid "Server URL"
 msgstr "URL du serveur"
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Sessions ended"
+msgstr ""
+
 #: src/components/call/CallCard.tsx
 #: src/components/SidebarFooter.tsx
 #: src/pages/MessagingSettingsPanel.tsx
@@ -5757,6 +5867,10 @@ msgstr "Connectez-vous avec l'abonnement, ou testez la clé API à la place."
 msgid "Sign up"
 msgstr "S'inscrire"
 
+#: src/pages/admin/AdminOverviewPage.tsx
+msgid "Sign-in"
+msgstr ""
+
 #: src/components/integrations/plugin-marketplace.tsx
 msgid "Sign-in cancelled. Try again."
 msgstr ""
@@ -5854,6 +5968,7 @@ msgid "Sorted by {column}, descending"
 msgstr "Trié par {column}, décroissant"
 
 #: src/lib/identity-display.ts
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/SettingsOverlay.tsx
 msgid "Space"
 msgstr "Espace"
@@ -5883,6 +5998,8 @@ msgid "Speech model"
 msgstr "Modèle de parole"
 
 #: src/components/AccountAccess.tsx
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminUsersPage.tsx
 msgid "SSO"
 msgstr ""
 
@@ -6293,6 +6410,8 @@ msgstr "Ce modèle ne peut pas lire les images. Choisissez un modèle qui les pr
 msgid "This model's context window is too small. Choose another model."
 msgstr "La fenêtre de contexte de ce modèle est trop petite. Choisissez un autre modèle."
 
+#: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/admin/AdminPolicyPage.tsx
 #: src/pages/Artifacts.tsx
 msgid "This month"
 msgstr "Ce mois-ci"
@@ -6382,6 +6501,7 @@ msgid "Title"
 msgstr "Titre"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/admin/AdminAuditPage.tsx
 msgid "To"
 msgstr ""
 
@@ -6491,6 +6611,7 @@ msgid "Tuesday"
 msgstr "mardi"
 
 #: src/components/VaultSettings.tsx
+#: src/pages/admin/AdminAuditPage.tsx
 msgid "Type"
 msgstr ""
 
@@ -6670,6 +6791,10 @@ msgstr ""
 msgid "Use up to 512 letters, digits, _ or -."
 msgstr ""
 
+#: src/pages/admin/AdminAuditPage.tsx
+msgid "User"
+msgstr ""
+
 #: src/pages/memory-providers/HonchoSettingsForm.tsx
 msgid "User peer"
 msgstr ""
@@ -6677,6 +6802,11 @@ msgstr ""
 #: src/components/AskCard.tsx
 #: src/components/VaultSettings.tsx
 msgid "Username"
+msgstr ""
+
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminShell.tsx
+msgid "Users"
 msgstr ""
 
 #: src/pages/shell/import-status.ts
@@ -6721,6 +6851,13 @@ msgstr "Vérification en cours…"
 #: src/pages/Artifacts.tsx
 msgid "Version"
 msgstr "Version"
+
+#. placeholder {0}: data.policy.version
+#. placeholder {0}: view.version
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminPolicyPage.tsx
+msgid "Version {0}"
+msgstr ""
 
 #: src/pages/PluginsOverlay.tsx
 msgid "View all"
@@ -6834,6 +6971,10 @@ msgstr "Que retourner"
 #: src/pages/RoutineEditor.tsx
 msgid "What to watch"
 msgstr "Élément à surveiller"
+
+#: src/pages/admin/AdminAuditPage.tsx
+msgid "When"
+msgstr ""
 
 #: src/pages/RoutineEditor.tsx
 msgid "When a webhook fires"
@@ -7011,9 +7152,3 @@ msgstr "Votre fournisseur vocal n'a plus de crédit."
 #: src/lib/user-error.ts
 msgid "Your voice provider key was rejected."
 msgstr "Votre fournisseur vocal a refusé la clé."
-
-#. js-lingui-explicit-id
-#: src/lib/run-error.ts
-#: src/lib/user-error.ts
-msgid "Blocked by your organization"
-msgstr "Bloqué par votre organisation"

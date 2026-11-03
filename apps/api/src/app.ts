@@ -333,7 +333,7 @@ async function buildApp(overrides: CreateAppOverrides): Promise<AppHandles> {
   installSecurityEventStore(prisma);
   installAuditEventStore(prisma);
   // An invalid policy file stops startup rather than running unrestricted.
-  await loadPolicyFromEnv(process.env);
+  const loadedPolicy = await loadPolicyFromEnv(process.env);
   const unreadableMasterKeys = await verifyContentKeys(prisma);
   if (unreadableMasterKeys.length)
     logger.error("Stored space keys need master keys that are not configured", undefined, {
@@ -846,6 +846,12 @@ async function buildApp(overrides: CreateAppOverrides): Promise<AppHandles> {
       navLinks: env.navLinks,
       adminEmails: env.adminEmails,
       ssoAdminEnabled: Boolean(env.oidc?.adminValues?.length),
+      authModes: {
+        password: env.passwordAuth !== false,
+        sso: Boolean(env.oidc),
+        easyAuth: Boolean(env.easyAuth),
+      },
+      policyHash: loadedPolicy?.hash,
       maxUploadSizeBytes: env.maxUploadSizeBytes,
       maxAttachmentsPerMessage: env.maxAttachmentsPerMessage,
       agentRuntime: env.agentRuntime,

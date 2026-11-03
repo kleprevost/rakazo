@@ -181,7 +181,16 @@ export function createRetentionPruner(
 
 export async function listSecurityEvents(
   db: SecurityEventDb,
-  input: { type?: SecurityEventType; ip?: string; userId?: string; cursor?: string; limit: number },
+  input: {
+    type?: SecurityEventType;
+    ip?: string;
+    userId?: string;
+    /** Inclusive start and exclusive end of the time window. */
+    from?: Date;
+    to?: Date;
+    cursor?: string;
+    limit: number;
+  },
 ): Promise<SecurityEvent[]> {
   const after = input.cursor
     ? await db.securityEvent.findUnique({
@@ -197,6 +206,14 @@ export async function listSecurityEvents(
       type: input.type ?? { in: [...SECURITY_EVENT_TYPES] },
       ...(input.ip ? { ip: input.ip } : {}),
       ...(input.userId ? { userId: input.userId } : {}),
+      ...(input.from || input.to
+        ? {
+            createdAt: {
+              ...(input.from ? { gte: input.from } : {}),
+              ...(input.to ? { lt: input.to } : {}),
+            },
+          }
+        : {}),
       // Same order as the sort, so events sharing a timestamp are neither skipped nor repeated.
       ...(after
         ? {

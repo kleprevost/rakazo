@@ -642,6 +642,19 @@ msgstr ""
 msgid "Adding…"
 msgstr "जोड़ा जा रहा है…"
 
+#: src/components/SidebarFooter.tsx
+#: src/pages/admin/AdminShell.tsx
+msgid "Admin"
+msgstr ""
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Admin (email list)"
+msgstr ""
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Admin (SSO)"
+msgstr ""
+
 #: src/pages/McpServersOverlay.tsx
 #: src/pages/model-settings/compatible-model-fields.tsx
 #: src/pages/ModelSettingsOverlay.tsx
@@ -660,6 +673,12 @@ msgstr ""
 msgid "Agent from another app"
 msgstr ""
 
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminShell.tsx
+msgid "AI employees"
+msgstr ""
+
+#: src/pages/admin/AdminAuditPage.tsx
 #: src/pages/PluginsOverlay.tsx
 msgid "All"
 msgstr ""
@@ -898,6 +917,7 @@ msgstr "आर्काइव करें"
 msgid "archived"
 msgstr "आर्काइव किया गया"
 
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/shell/archived-chats.tsx
 msgid "Archived"
 msgstr "आर्काइव किया गया"
@@ -936,6 +956,10 @@ msgstr "फ़ाइल संलग्न करें"
 #: src/pages/shell/chat-shared.ts
 msgid "Attachment"
 msgstr "अटैचमेंट"
+
+#: src/pages/admin/AdminShell.tsx
+msgid "Audit log"
+msgstr ""
 
 #: src/pages/PluginsOverlay.tsx
 msgid "Authentication"
@@ -1000,8 +1024,7 @@ msgstr "अवतार स्टूडियो"
 
 #: src/components/integrations/plugin-marketplace.tsx
 #: src/components/integrations/skills-dialog.tsx
-#: src/pages/AdminAccessPage.tsx
-#: src/pages/AdminPluginsPage.tsx
+#: src/pages/admin/AdminShell.tsx
 #: src/pages/Auth.tsx
 #: src/pages/Board.tsx
 #: src/pages/McpServersOverlay.tsx
@@ -1053,6 +1076,15 @@ msgstr "ब्लॉक करें"
 
 #: src/lib/ticket-status.ts
 msgid "Blocked"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/lib/run-error.ts
+msgid "Blocked by your organization"
+msgstr "आपके संगठन द्वारा अवरुद्ध"
+
+#: src/lib/user-error.ts
+msgid "Blocked by your organization"
 msgstr ""
 
 #: src/components/SidebarFooter.tsx
@@ -1577,6 +1609,7 @@ msgstr "कंप्यूटर रुका हुआ है"
 
 #: src/components/ComputerDeviceSettings.tsx
 #: src/pages/AccountSettingsOverlay.tsx
+#: src/pages/admin/AdminOverviewPage.tsx
 msgid "Computers"
 msgstr "कंप्यूटर"
 
@@ -1590,6 +1623,10 @@ msgstr "कंप्यूटर बंद हैं। SANDBOX_PROVIDER=docker 
 
 #: src/pages/PluginsOverlay.tsx
 msgid "Configure a plugin catalog on the server to connect apps."
+msgstr ""
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Confirm"
 msgstr ""
 
 #: src/pages/KnowledgeSection.tsx
@@ -2003,6 +2040,10 @@ msgstr "{name} डाउनलोड नहीं हो सका। पुन�
 msgid "Could not enable tools"
 msgstr ""
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Could not end sessions"
+msgstr ""
+
 #: src/pages/AdminAccessPage.tsx
 msgid "Could not grant access"
 msgstr ""
@@ -2366,6 +2407,10 @@ msgstr "पेज लोड नहीं हो सके।"
 msgid "Couldn't load submissions"
 msgstr ""
 
+#: src/pages/admin/AdminQuery.tsx
+msgid "Couldn't load this page"
+msgstr ""
+
 #: src/pages/SharedPage.tsx
 msgid "Couldn't load this page. Try again."
 msgstr "यह पेज लोड नहीं हो सका। फिर से कोशिश करें।"
@@ -2541,6 +2586,10 @@ msgstr "Hermes का डिफ़ॉल्ट"
 msgid "Default from OpenClaw"
 msgstr "OpenClaw का डिफ़ॉल्ट"
 
+#: src/pages/admin/AdminOverviewPage.tsx
+msgid "Default model"
+msgstr ""
+
 #: src/pages/MemorySettingsOverlay.tsx
 msgid "Default scope"
 msgstr "डिफ़ॉल्ट स्कोप"
@@ -2656,6 +2705,7 @@ msgstr ""
 msgid "Desktop update"
 msgstr ""
 
+#: src/pages/admin/AdminAuditPage.tsx
 #: src/pages/RoutineRunHistory.tsx
 #: src/pages/shell/composer-error.tsx
 msgid "Details"
@@ -2825,6 +2875,10 @@ msgstr "डुप्लिकेट"
 msgid "Each name can be used once."
 msgstr "हर नाम का उपयोग केवल एक बार किया जा सकता है।"
 
+#: src/pages/admin/AdminOverviewPage.tsx
+msgid "Easy Auth"
+msgstr ""
+
 #: src/components/AskCard.tsx
 #: src/pages/AccountSettingsOverlay.tsx
 #: src/pages/McpServersOverlay.tsx
@@ -2843,6 +2897,8 @@ msgstr "नाम संपादित करें"
 msgid "Edit Profile"
 msgstr "प्रोफ़ाइल संपादित करें"
 
+#: src/pages/admin/AdminAuditPage.tsx
+#: src/pages/admin/AdminUsersPage.tsx
 #: src/pages/AdminAccessPage.tsx
 #: src/pages/Auth.tsx
 msgid "Email"
@@ -2864,6 +2920,10 @@ msgstr "ईमेल सत्यापन आवश्यक है"
 #: src/pages/shell/bot-panel.tsx
 msgid "Enable {0}"
 msgstr "{0} सक्षम करें"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "End sessions"
+msgstr ""
 
 #: src/components/ComputerProviderSettings.tsx
 msgid "End user ID"
@@ -3140,7 +3200,7 @@ msgstr "पासवर्ड भूल गए?"
 msgid "Free"
 msgstr ""
 
-#: src/pages/AdminAccessPage.tsx
+#: src/pages/admin/AdminShell.tsx
 msgid "Free access"
 msgstr ""
 
@@ -3157,6 +3217,7 @@ msgid "Friday"
 msgstr "शुक्रवार"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/admin/AdminAuditPage.tsx
 msgid "From"
 msgstr ""
 
@@ -3567,6 +3628,10 @@ msgstr "लेबल"
 msgid "Language"
 msgstr "भाषा"
 
+#: src/pages/admin/AdminBotsPage.tsx
+msgid "Last active"
+msgstr ""
+
 #. placeholder {0}: new Date(state.checkedAt).toLocaleString()
 #: src/pages/RoutineEditor.tsx
 msgid "Last check {0}: changed"
@@ -3576,6 +3641,10 @@ msgstr "पिछली जाँच {0}: बदलाव हुए"
 #: src/pages/RoutineEditor.tsx
 msgid "Last check {0}: no changes"
 msgstr "पिछली जाँच {0}: कोई बदलाव नहीं"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Last sign-in"
+msgstr ""
 
 #: src/components/DesktopUpdates.tsx
 msgid "Later"
@@ -3631,6 +3700,7 @@ msgstr "सुन रहा है…"
 msgid "Load earlier messages"
 msgstr "पुराने संदेश लोड करें"
 
+#: src/pages/admin/AdminQuery.tsx
 #: src/pages/Artifacts.tsx
 msgid "Load more"
 msgstr ""
@@ -3675,6 +3745,7 @@ msgstr "आवाज़ प्रोवाइडर्स लोड हो र�
 #: src/components/integrations/plugin-marketplace.tsx
 #: src/components/integrations/skills-dialog.tsx
 #: src/components/PageLoading.tsx
+#: src/pages/admin/AdminQuery.tsx
 #: src/pages/AdminAccessPage.tsx
 #: src/pages/Artifacts.tsx
 #: src/pages/IntegrationSetup.tsx
@@ -3823,6 +3894,7 @@ msgid "Medium"
 msgstr "मध्यम"
 
 #: src/lib/identity-display.ts
+#: src/pages/admin/AdminUsersPage.tsx
 msgid "Member"
 msgstr "सदस्य"
 
@@ -3954,6 +4026,7 @@ msgid "Mode"
 msgstr "मोड"
 
 #: src/pages/AccountSettingsOverlay.tsx
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/model-settings/compatible-model-fields.tsx
 #: src/pages/Onboarding.tsx
 #: src/pages/RoutineEditor.tsx
@@ -4069,6 +4142,7 @@ msgstr ""
 #: src/components/teach/SkillDraftCard.tsx
 #: src/components/VaultSettings.tsx
 #: src/pages/AccountSettingsOverlay.tsx
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/Auth.tsx
 #: src/pages/GroupPanel.tsx
 #: src/pages/McpServersOverlay.tsx
@@ -4339,6 +4413,11 @@ msgstr "Rakazo के कैटलॉग में नहीं"
 msgid "Not in the plugin catalog"
 msgstr ""
 
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminPolicyPage.tsx
+msgid "Not loaded"
+msgstr ""
+
 #: src/components/GitHubStarPrompt.tsx
 #: src/pages/shell/message-cards.tsx
 msgid "Not now"
@@ -4360,6 +4439,11 @@ msgstr "काम नहीं कर रहा"
 #: src/pages/KnowledgeSection.tsx
 msgid "Nothing remembered yet"
 msgstr "अभी तक कुछ याद नहीं किया गया"
+
+#: src/pages/admin/AdminPolicyPage.tsx
+#: src/pages/admin/AdminQuery.tsx
+msgid "Nothing to show."
+msgstr ""
 
 #: src/pages/shell/bot-panel.tsx
 msgid "Notifications"
@@ -4532,6 +4616,7 @@ msgid "Or paste an API key"
 msgstr "या एक API कुंजी पेस्ट करें"
 
 #: src/components/ComputerProviderSettings.tsx
+#: src/pages/admin/AdminPolicyPage.tsx
 msgid "Organization"
 msgstr ""
 
@@ -4556,8 +4641,13 @@ msgstr "अन्य मॉडल…"
 msgid "Output"
 msgstr "आउटपुट"
 
+#: src/pages/admin/AdminShell.tsx
+msgid "Overview"
+msgstr ""
+
 #: src/components/pages/SharePopover.tsx
 #: src/lib/identity-display.ts
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/Board.tsx
 msgid "Owner"
 msgstr "मालिक"
@@ -4630,6 +4720,7 @@ msgstr "पासकी"
 #: src/components/ConfirmIdentityDialog.tsx
 #: src/components/VaultSettings.tsx
 #: src/pages/AccountSettingsOverlay.tsx
+#: src/pages/admin/AdminOverviewPage.tsx
 #: src/pages/Auth.tsx
 msgid "Password"
 msgstr "पासवर्ड"
@@ -4756,12 +4847,18 @@ msgstr "प्लगइन"
 msgid "Plugin GitHub URL"
 msgstr ""
 
-#: src/pages/AdminPluginsPage.tsx
+#: src/pages/admin/AdminShell.tsx
 msgid "Plugin submissions"
 msgstr ""
 
 #: src/components/integrations/skills-dialog.tsx
 msgid "Plugins"
+msgstr ""
+
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminPolicyPage.tsx
+#: src/pages/admin/AdminShell.tsx
+msgid "Policy"
 msgstr ""
 
 #: src/pages/RoutineEditor.tsx
@@ -4897,6 +4994,10 @@ msgstr ""
 #: src/pages/ActivityList.tsx
 msgid "Recent"
 msgstr "हाल के"
+
+#: src/pages/admin/AdminPolicyPage.tsx
+msgid "Recent denials"
+msgstr ""
 
 #: src/pages/PluginsOverlay.tsx
 msgid "Recommended"
@@ -5251,6 +5352,7 @@ msgstr ""
 #: src/components/integrations/plugin-marketplace.tsx
 #: src/components/integrations/skills-dialog.tsx
 #: src/components/PasskeySettings.tsx
+#: src/pages/admin/AdminQuery.tsx
 #: src/pages/AdminAccessPage.tsx
 #: src/pages/Auth.tsx
 #: src/pages/ModelRoleSettings.tsx
@@ -5290,6 +5392,10 @@ msgstr ""
 
 #: src/pages/AdminAccessPage.tsx
 msgid "Revoked"
+msgstr ""
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Role"
 msgstr ""
 
 #: src/components/ComputerProviderSettings.tsx
@@ -5605,6 +5711,10 @@ msgstr "सर्वर का नाम"
 msgid "Server URL"
 msgstr "सर्वर URL"
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Sessions ended"
+msgstr ""
+
 #: src/components/call/CallCard.tsx
 #: src/components/SidebarFooter.tsx
 #: src/pages/MessagingSettingsPanel.tsx
@@ -5757,6 +5867,10 @@ msgstr "सब्सक्रिप्शन से साइन इन कर�
 msgid "Sign up"
 msgstr "साइन अप करें"
 
+#: src/pages/admin/AdminOverviewPage.tsx
+msgid "Sign-in"
+msgstr ""
+
 #: src/components/integrations/plugin-marketplace.tsx
 msgid "Sign-in cancelled. Try again."
 msgstr ""
@@ -5854,6 +5968,7 @@ msgid "Sorted by {column}, descending"
 msgstr "{column} के अनुसार क्रमबद्ध, अवरोही"
 
 #: src/lib/identity-display.ts
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/SettingsOverlay.tsx
 msgid "Space"
 msgstr "कार्यस्थान"
@@ -5883,6 +5998,8 @@ msgid "Speech model"
 msgstr "वाक् मॉडल"
 
 #: src/components/AccountAccess.tsx
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminUsersPage.tsx
 msgid "SSO"
 msgstr ""
 
@@ -6293,6 +6410,8 @@ msgstr "यह मॉडल चित्र नहीं पढ़ सकता�
 msgid "This model's context window is too small. Choose another model."
 msgstr "इस मॉडल की कॉन्टेक्स्ट विंडो बहुत छोटी है। कोई दूसरा मॉडल चुनें।"
 
+#: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/admin/AdminPolicyPage.tsx
 #: src/pages/Artifacts.tsx
 msgid "This month"
 msgstr ""
@@ -6382,6 +6501,7 @@ msgid "Title"
 msgstr "शीर्षक"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/admin/AdminAuditPage.tsx
 msgid "To"
 msgstr ""
 
@@ -6491,6 +6611,7 @@ msgid "Tuesday"
 msgstr "मंगलवार"
 
 #: src/components/VaultSettings.tsx
+#: src/pages/admin/AdminAuditPage.tsx
 msgid "Type"
 msgstr ""
 
@@ -6670,6 +6791,10 @@ msgstr ""
 msgid "Use up to 512 letters, digits, _ or -."
 msgstr ""
 
+#: src/pages/admin/AdminAuditPage.tsx
+msgid "User"
+msgstr ""
+
 #: src/pages/memory-providers/HonchoSettingsForm.tsx
 msgid "User peer"
 msgstr ""
@@ -6677,6 +6802,11 @@ msgstr ""
 #: src/components/AskCard.tsx
 #: src/components/VaultSettings.tsx
 msgid "Username"
+msgstr ""
+
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminShell.tsx
+msgid "Users"
 msgstr ""
 
 #: src/pages/shell/import-status.ts
@@ -6720,6 +6850,13 @@ msgstr "पुष्टि की जा रही है…"
 
 #: src/pages/Artifacts.tsx
 msgid "Version"
+msgstr ""
+
+#. placeholder {0}: data.policy.version
+#. placeholder {0}: view.version
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminPolicyPage.tsx
+msgid "Version {0}"
 msgstr ""
 
 #: src/pages/PluginsOverlay.tsx
@@ -6834,6 +6971,10 @@ msgstr "क्या लौटाना है"
 #: src/pages/RoutineEditor.tsx
 msgid "What to watch"
 msgstr "किसकी निगरानी करें"
+
+#: src/pages/admin/AdminAuditPage.tsx
+msgid "When"
+msgstr ""
 
 #: src/pages/RoutineEditor.tsx
 msgid "When a webhook fires"
@@ -7011,9 +7152,3 @@ msgstr "आपके आवाज़ प्रोवाइडर का क्�
 #: src/lib/user-error.ts
 msgid "Your voice provider key was rejected."
 msgstr "आपके आवाज़ प्रोवाइडर ने कुंजी अस्वीकार कर दी।"
-
-#. js-lingui-explicit-id
-#: src/lib/run-error.ts
-#: src/lib/user-error.ts
-msgid "Blocked by your organization"
-msgstr "आपके संगठन द्वारा अवरुद्ध"

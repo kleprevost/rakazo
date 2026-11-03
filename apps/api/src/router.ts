@@ -35,6 +35,7 @@ import type { NavLink } from "@rakazo/contracts";
 import type { BoardEvents, PrismaClient, ThreadEvents } from "@rakazo/db";
 import type { BillingService } from "./billing.js";
 import { accountRoutes } from "./routes/account.js";
+import { adminRoutes } from "./routes/admin.js";
 import { availabilityRoutes } from "./routes/availability.js";
 import { boardsRoutes } from "./routes/boards.js";
 import { botsRoutes } from "./routes/bots.js";
@@ -123,6 +124,10 @@ export interface RouterDeps {
     adminEmails?: string[];
     /** OIDC_ADMIN_VALUES is set, so SSO identities can grant admin. */
     ssoAdminEnabled?: boolean;
+    /** Sign-in methods this deployment accepts, for the admin overview. */
+    authModes?: { password: boolean; sso: boolean; easyAuth: boolean };
+    /** SHA-256 of the loaded policy file, for the admin overview. */
+    policyHash?: string;
     phoneCallsEnabled?: boolean;
     phoneCallRingSeconds?: number;
     maxUploadSizeBytes?: number;
@@ -153,6 +158,7 @@ export function createRouter(deps: RouterDeps) {
 
   return os.router({
     ...accountRoutes(ctx),
+    ...adminRoutes(ctx),
     ...spacesRoutes(ctx),
     ...modelsRoutes(ctx),
     ...botsRoutes(ctx),

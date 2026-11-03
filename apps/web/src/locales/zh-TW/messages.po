@@ -643,6 +643,19 @@ msgstr "已新增"
 msgid "Adding…"
 msgstr "正在新增…"
 
+#: src/components/SidebarFooter.tsx
+#: src/pages/admin/AdminShell.tsx
+msgid "Admin"
+msgstr ""
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Admin (email list)"
+msgstr ""
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Admin (SSO)"
+msgstr ""
+
 #: src/pages/McpServersOverlay.tsx
 #: src/pages/model-settings/compatible-model-fields.tsx
 #: src/pages/ModelSettingsOverlay.tsx
@@ -661,6 +674,12 @@ msgstr "進階..."
 msgid "Agent from another app"
 msgstr ""
 
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminShell.tsx
+msgid "AI employees"
+msgstr ""
+
+#: src/pages/admin/AdminAuditPage.tsx
 #: src/pages/PluginsOverlay.tsx
 msgid "All"
 msgstr ""
@@ -899,6 +918,7 @@ msgstr "封存"
 msgid "archived"
 msgstr "已封存"
 
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/shell/archived-chats.tsx
 msgid "Archived"
 msgstr "已封存"
@@ -937,6 +957,10 @@ msgstr "附加檔案"
 #: src/pages/shell/chat-shared.ts
 msgid "Attachment"
 msgstr "附件"
+
+#: src/pages/admin/AdminShell.tsx
+msgid "Audit log"
+msgstr ""
 
 #: src/pages/PluginsOverlay.tsx
 msgid "Authentication"
@@ -1001,8 +1025,7 @@ msgstr "頭像工作室"
 
 #: src/components/integrations/plugin-marketplace.tsx
 #: src/components/integrations/skills-dialog.tsx
-#: src/pages/AdminAccessPage.tsx
-#: src/pages/AdminPluginsPage.tsx
+#: src/pages/admin/AdminShell.tsx
 #: src/pages/Auth.tsx
 #: src/pages/Board.tsx
 #: src/pages/McpServersOverlay.tsx
@@ -1055,6 +1078,15 @@ msgstr "封鎖"
 #: src/lib/ticket-status.ts
 msgid "Blocked"
 msgstr "受阻"
+
+#. js-lingui-explicit-id
+#: src/lib/run-error.ts
+msgid "Blocked by your organization"
+msgstr "已被你的組織封鎖"
+
+#: src/lib/user-error.ts
+msgid "Blocked by your organization"
+msgstr ""
 
 #: src/components/SidebarFooter.tsx
 #: src/pages/Board.tsx
@@ -1578,6 +1610,7 @@ msgstr "電腦已停止"
 
 #: src/components/ComputerDeviceSettings.tsx
 #: src/pages/AccountSettingsOverlay.tsx
+#: src/pages/admin/AdminOverviewPage.tsx
 msgid "Computers"
 msgstr "電腦"
 
@@ -1592,6 +1625,10 @@ msgstr "電腦未開啟。請設定 SANDBOX_PROVIDER=docker 並提供 SANDBOX_SU
 #: src/pages/PluginsOverlay.tsx
 msgid "Configure a plugin catalog on the server to connect apps."
 msgstr "請在伺服器上設定外掛程式目錄，以連接應用程式。"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Confirm"
+msgstr ""
 
 #: src/pages/KnowledgeSection.tsx
 msgid "Confirm delete"
@@ -2004,6 +2041,10 @@ msgstr "無法下載 {name}。請重試。"
 msgid "Could not enable tools"
 msgstr ""
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Could not end sessions"
+msgstr ""
+
 #: src/pages/AdminAccessPage.tsx
 msgid "Could not grant access"
 msgstr ""
@@ -2367,6 +2408,10 @@ msgstr "無法載入頁面。"
 msgid "Couldn't load submissions"
 msgstr ""
 
+#: src/pages/admin/AdminQuery.tsx
+msgid "Couldn't load this page"
+msgstr ""
+
 #: src/pages/SharedPage.tsx
 msgid "Couldn't load this page. Try again."
 msgstr "無法載入此頁面。請再試一次。"
@@ -2542,6 +2587,10 @@ msgstr "Hermes 預設內容"
 msgid "Default from OpenClaw"
 msgstr "OpenClaw 預設內容"
 
+#: src/pages/admin/AdminOverviewPage.tsx
+msgid "Default model"
+msgstr ""
+
 #: src/pages/MemorySettingsOverlay.tsx
 msgid "Default scope"
 msgstr "預設範圍"
@@ -2657,6 +2706,7 @@ msgstr ""
 msgid "Desktop update"
 msgstr "桌面版更新"
 
+#: src/pages/admin/AdminAuditPage.tsx
 #: src/pages/RoutineRunHistory.tsx
 #: src/pages/shell/composer-error.tsx
 msgid "Details"
@@ -2826,6 +2876,10 @@ msgstr "複製"
 msgid "Each name can be used once."
 msgstr "每個名稱只能使用一次。"
 
+#: src/pages/admin/AdminOverviewPage.tsx
+msgid "Easy Auth"
+msgstr ""
+
 #: src/components/AskCard.tsx
 #: src/pages/AccountSettingsOverlay.tsx
 #: src/pages/McpServersOverlay.tsx
@@ -2844,6 +2898,8 @@ msgstr "編輯名稱"
 msgid "Edit Profile"
 msgstr "編輯資料"
 
+#: src/pages/admin/AdminAuditPage.tsx
+#: src/pages/admin/AdminUsersPage.tsx
 #: src/pages/AdminAccessPage.tsx
 #: src/pages/Auth.tsx
 msgid "Email"
@@ -2865,6 +2921,10 @@ msgstr "需要驗證電子信箱"
 #: src/pages/shell/bot-panel.tsx
 msgid "Enable {0}"
 msgstr "啟用 {0}"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "End sessions"
+msgstr ""
 
 #: src/components/ComputerProviderSettings.tsx
 msgid "End user ID"
@@ -3141,7 +3201,7 @@ msgstr "忘記密碼？"
 msgid "Free"
 msgstr "免費"
 
-#: src/pages/AdminAccessPage.tsx
+#: src/pages/admin/AdminShell.tsx
 msgid "Free access"
 msgstr ""
 
@@ -3158,6 +3218,7 @@ msgid "Friday"
 msgstr "週五"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/admin/AdminAuditPage.tsx
 msgid "From"
 msgstr "從"
 
@@ -3568,6 +3629,10 @@ msgstr "標籤"
 msgid "Language"
 msgstr "語言"
 
+#: src/pages/admin/AdminBotsPage.tsx
+msgid "Last active"
+msgstr ""
+
 #. placeholder {0}: new Date(state.checkedAt).toLocaleString()
 #: src/pages/RoutineEditor.tsx
 msgid "Last check {0}: changed"
@@ -3577,6 +3642,10 @@ msgstr "上次檢查 {0}：有變化"
 #: src/pages/RoutineEditor.tsx
 msgid "Last check {0}: no changes"
 msgstr "上次檢查 {0}：無變化"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Last sign-in"
+msgstr ""
 
 #: src/components/DesktopUpdates.tsx
 msgid "Later"
@@ -3632,6 +3701,7 @@ msgstr "聆聽中…"
 msgid "Load earlier messages"
 msgstr "載入更早的訊息"
 
+#: src/pages/admin/AdminQuery.tsx
 #: src/pages/Artifacts.tsx
 msgid "Load more"
 msgstr "載入更多"
@@ -3676,6 +3746,7 @@ msgstr "正在載入語音供應商…"
 #: src/components/integrations/plugin-marketplace.tsx
 #: src/components/integrations/skills-dialog.tsx
 #: src/components/PageLoading.tsx
+#: src/pages/admin/AdminQuery.tsx
 #: src/pages/AdminAccessPage.tsx
 #: src/pages/Artifacts.tsx
 #: src/pages/IntegrationSetup.tsx
@@ -3824,6 +3895,7 @@ msgid "Medium"
 msgstr "中"
 
 #: src/lib/identity-display.ts
+#: src/pages/admin/AdminUsersPage.tsx
 msgid "Member"
 msgstr "成員"
 
@@ -3955,6 +4027,7 @@ msgid "Mode"
 msgstr "模式"
 
 #: src/pages/AccountSettingsOverlay.tsx
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/model-settings/compatible-model-fields.tsx
 #: src/pages/Onboarding.tsx
 #: src/pages/RoutineEditor.tsx
@@ -4070,6 +4143,7 @@ msgstr ""
 #: src/components/teach/SkillDraftCard.tsx
 #: src/components/VaultSettings.tsx
 #: src/pages/AccountSettingsOverlay.tsx
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/Auth.tsx
 #: src/pages/GroupPanel.tsx
 #: src/pages/McpServersOverlay.tsx
@@ -4340,6 +4414,11 @@ msgstr "不在 Rakazo 目錄中"
 msgid "Not in the plugin catalog"
 msgstr "不在外掛程式目錄中"
 
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminPolicyPage.tsx
+msgid "Not loaded"
+msgstr ""
+
 #: src/components/GitHubStarPrompt.tsx
 #: src/pages/shell/message-cards.tsx
 msgid "Not now"
@@ -4361,6 +4440,11 @@ msgstr "無法正常工作"
 #: src/pages/KnowledgeSection.tsx
 msgid "Nothing remembered yet"
 msgstr "尚無記憶"
+
+#: src/pages/admin/AdminPolicyPage.tsx
+#: src/pages/admin/AdminQuery.tsx
+msgid "Nothing to show."
+msgstr ""
 
 #: src/pages/shell/bot-panel.tsx
 msgid "Notifications"
@@ -4533,6 +4617,7 @@ msgid "Or paste an API key"
 msgstr "或貼上 API 金鑰"
 
 #: src/components/ComputerProviderSettings.tsx
+#: src/pages/admin/AdminPolicyPage.tsx
 msgid "Organization"
 msgstr ""
 
@@ -4557,8 +4642,13 @@ msgstr "其他模型…"
 msgid "Output"
 msgstr "輸出"
 
+#: src/pages/admin/AdminShell.tsx
+msgid "Overview"
+msgstr ""
+
 #: src/components/pages/SharePopover.tsx
 #: src/lib/identity-display.ts
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/Board.tsx
 msgid "Owner"
 msgstr "擁有者"
@@ -4631,6 +4721,7 @@ msgstr "通行金鑰"
 #: src/components/ConfirmIdentityDialog.tsx
 #: src/components/VaultSettings.tsx
 #: src/pages/AccountSettingsOverlay.tsx
+#: src/pages/admin/AdminOverviewPage.tsx
 #: src/pages/Auth.tsx
 msgid "Password"
 msgstr "密碼"
@@ -4757,12 +4848,18 @@ msgstr "外掛程式"
 msgid "Plugin GitHub URL"
 msgstr ""
 
-#: src/pages/AdminPluginsPage.tsx
+#: src/pages/admin/AdminShell.tsx
 msgid "Plugin submissions"
 msgstr ""
 
 #: src/components/integrations/skills-dialog.tsx
 msgid "Plugins"
+msgstr ""
+
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminPolicyPage.tsx
+#: src/pages/admin/AdminShell.tsx
+msgid "Policy"
 msgstr ""
 
 #: src/pages/RoutineEditor.tsx
@@ -4898,6 +4995,10 @@ msgstr ""
 #: src/pages/ActivityList.tsx
 msgid "Recent"
 msgstr "最近"
+
+#: src/pages/admin/AdminPolicyPage.tsx
+msgid "Recent denials"
+msgstr ""
 
 #: src/pages/PluginsOverlay.tsx
 msgid "Recommended"
@@ -5252,6 +5353,7 @@ msgstr "正在還原工作空間"
 #: src/components/integrations/plugin-marketplace.tsx
 #: src/components/integrations/skills-dialog.tsx
 #: src/components/PasskeySettings.tsx
+#: src/pages/admin/AdminQuery.tsx
 #: src/pages/AdminAccessPage.tsx
 #: src/pages/Auth.tsx
 #: src/pages/ModelRoleSettings.tsx
@@ -5291,6 +5393,10 @@ msgstr "撤銷授權"
 
 #: src/pages/AdminAccessPage.tsx
 msgid "Revoked"
+msgstr ""
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Role"
 msgstr ""
 
 #: src/components/ComputerProviderSettings.tsx
@@ -5606,6 +5712,10 @@ msgstr "伺服器名稱"
 msgid "Server URL"
 msgstr "伺服器 URL"
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Sessions ended"
+msgstr ""
+
 #: src/components/call/CallCard.tsx
 #: src/components/SidebarFooter.tsx
 #: src/pages/MessagingSettingsPanel.tsx
@@ -5758,6 +5868,10 @@ msgstr "請使用訂閱登入，或改為測試 API 金鑰。"
 msgid "Sign up"
 msgstr "註冊"
 
+#: src/pages/admin/AdminOverviewPage.tsx
+msgid "Sign-in"
+msgstr ""
+
 #: src/components/integrations/plugin-marketplace.tsx
 msgid "Sign-in cancelled. Try again."
 msgstr ""
@@ -5855,6 +5969,7 @@ msgid "Sorted by {column}, descending"
 msgstr "已依 {column} 遞減排序"
 
 #: src/lib/identity-display.ts
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/SettingsOverlay.tsx
 msgid "Space"
 msgstr "空間"
@@ -5884,6 +5999,8 @@ msgid "Speech model"
 msgstr "語音模型"
 
 #: src/components/AccountAccess.tsx
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminUsersPage.tsx
 msgid "SSO"
 msgstr ""
 
@@ -6294,6 +6411,8 @@ msgstr "此模型無法讀取圖片。請選擇支援圖片的模型。"
 msgid "This model's context window is too small. Choose another model."
 msgstr "此模型的上下文視窗太小。請選擇其他模型。"
 
+#: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/admin/AdminPolicyPage.tsx
 #: src/pages/Artifacts.tsx
 msgid "This month"
 msgstr "本月"
@@ -6383,6 +6502,7 @@ msgid "Title"
 msgstr "標題"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/admin/AdminAuditPage.tsx
 msgid "To"
 msgstr "到"
 
@@ -6492,6 +6612,7 @@ msgid "Tuesday"
 msgstr "週二"
 
 #: src/components/VaultSettings.tsx
+#: src/pages/admin/AdminAuditPage.tsx
 msgid "Type"
 msgstr "類型"
 
@@ -6671,6 +6792,10 @@ msgstr "使用空間預設模型"
 msgid "Use up to 512 letters, digits, _ or -."
 msgstr "最多可使用 512 個英文字母、數字、_ 或 -。"
 
+#: src/pages/admin/AdminAuditPage.tsx
+msgid "User"
+msgstr ""
+
 #: src/pages/memory-providers/HonchoSettingsForm.tsx
 msgid "User peer"
 msgstr "使用者對端"
@@ -6679,6 +6804,11 @@ msgstr "使用者對端"
 #: src/components/VaultSettings.tsx
 msgid "Username"
 msgstr "使用者名稱"
+
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminShell.tsx
+msgid "Users"
+msgstr ""
 
 #: src/pages/shell/import-status.ts
 msgid "Uses files that are not imported"
@@ -6722,6 +6852,13 @@ msgstr "正在驗證…"
 #: src/pages/Artifacts.tsx
 msgid "Version"
 msgstr "版本"
+
+#. placeholder {0}: data.policy.version
+#. placeholder {0}: view.version
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminPolicyPage.tsx
+msgid "Version {0}"
+msgstr ""
 
 #: src/pages/PluginsOverlay.tsx
 msgid "View all"
@@ -6835,6 +6972,10 @@ msgstr "回傳內容"
 #: src/pages/RoutineEditor.tsx
 msgid "What to watch"
 msgstr "監視內容"
+
+#: src/pages/admin/AdminAuditPage.tsx
+msgid "When"
+msgstr ""
 
 #: src/pages/RoutineEditor.tsx
 msgid "When a webhook fires"
@@ -7012,9 +7153,3 @@ msgstr "你的語音供應商額度已用完。"
 #: src/lib/user-error.ts
 msgid "Your voice provider key was rejected."
 msgstr "你的語音供應商拒絕了該金鑰。"
-
-#. js-lingui-explicit-id
-#: src/lib/run-error.ts
-#: src/lib/user-error.ts
-msgid "Blocked by your organization"
-msgstr "已被你的組織封鎖"

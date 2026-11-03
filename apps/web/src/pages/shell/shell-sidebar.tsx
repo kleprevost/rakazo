@@ -9,6 +9,7 @@ import {
   InputGroupInput,
   Sidebar,
 } from "@rakazo/ui-web";
+import { useQuery } from "@tanstack/react-query";
 import { Search, SlidersHorizontal } from "lucide-react";
 import type { ReactNode } from "react";
 import { useState } from "react";
@@ -18,6 +19,7 @@ import { SidebarFooter } from "../../components/SidebarFooter";
 import { useBilling } from "../../components/SubscriptionGate";
 import { formatBillingDate } from "../../lib/billing";
 import type { BotsSidebarDensity } from "../../lib/bots-sidebar-density-pref";
+import { useSpaceQueries } from "../../lib/query";
 import type { Panel } from "../../lib/right-panel-state";
 import { useSignOut } from "../../lib/sign-out";
 import { ActivityList } from "../ActivityList";
@@ -317,6 +319,7 @@ function ShellSidebarFooter({
   openSkills: () => void;
 }) {
   const { t, i18n } = useLingui();
+  const isAdmin = useQuery(useSpaceQueries().me.queryOptions()).data?.isAdmin === true;
   const { status: billing, showPlans } = useBilling();
   const freeUntil =
     billing?.funding === "byok" &&
@@ -397,6 +400,15 @@ function ShellSidebarFooter({
           setMenuOpen(false);
           openSettings("usage");
         }}
+        onAdmin={
+          isAdmin
+            ? () => {
+                setMenuOpen(false);
+                closeMobileSidebar();
+                navigate("/admin");
+              }
+            : undefined
+        }
         onInvite={
           referral
             ? () => {

@@ -245,3 +245,39 @@ it("keeps at most three marks with the same tile and a missing-logo fallback", a
   expect(new Set(tiles.map((tile) => tile.className)).size).toBe(1);
   expect(tiles[1]!.textContent).toBe("N");
 });
+
+it("offers Admin only to admins", async () => {
+  const props = {
+    name: "Demo User",
+    initials: "DU",
+    open: true,
+    onOpenChange: () => {},
+    onIntegrations: () => {},
+    onSkills: () => {},
+    onArtifacts: () => {},
+    onSettings: () => {},
+    onUsage: () => {},
+    onLogOut: () => {},
+    signingOut: false,
+    logOutError: null,
+  };
+  const onAdmin = vi.fn();
+  await act(async () =>
+    root.render(
+      <DesktopUpdatesProvider>
+        <SidebarFooter {...props} />
+      </DesktopUpdatesProvider>,
+    ),
+  );
+  expect(document.body.textContent).not.toContain("Admin");
+  await act(async () =>
+    root.render(
+      <DesktopUpdatesProvider>
+        <SidebarFooter {...props} onAdmin={onAdmin} />
+      </DesktopUpdatesProvider>,
+    ),
+  );
+  const item = [...document.querySelectorAll("button")].find((b) => b.textContent === "Admin");
+  await act(async () => item?.click());
+  expect(onAdmin).toHaveBeenCalledOnce();
+});
