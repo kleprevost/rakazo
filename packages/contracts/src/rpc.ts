@@ -31,6 +31,7 @@ import {
   RenameBoardInput,
   TicketCommentSchema,
   TicketSchema,
+  TicketWorkSchema,
   UpdateTicketInput,
 } from "./board.js";
 import {
@@ -899,6 +900,7 @@ export const appContract = {
     move: oc.input(MoveTicketInput).output(TicketSchema),
     comment: oc.input(CommentTicketInput).output(TicketCommentSchema),
     comments: oc.input(z.object({ ticketId: Id })).output(z.array(TicketCommentSchema)),
+    work: oc.input(z.object({ ticketId: Id })).output(TicketWorkSchema),
   },
   skills: {
     list: oc.input(botId).output(z.array(TaughtSkillSchema)),

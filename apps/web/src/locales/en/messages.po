@@ -6745,6 +6745,10 @@ msgstr "Voice request timed out."
 msgid "Wait a moment and test again."
 msgstr "Wait a moment and test again."
 
+#: src/lib/work-phase.ts
+msgid "Waiting"
+msgstr "Waiting"
+
 #: src/lib/roster-status.ts
 msgid "Waiting in line…"
 msgstr "Waiting in line…"

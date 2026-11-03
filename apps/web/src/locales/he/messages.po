@@ -6745,6 +6745,10 @@ msgstr ""
 msgid "Wait a moment and test again."
 msgstr "יש להמתין רגע ולבדוק שוב."
 
+#: src/lib/work-phase.ts
+msgid "Waiting"
+msgstr "ממתין"
+
 #: src/lib/roster-status.ts
 msgid "Waiting in line…"
 msgstr "ממתין בתור…"

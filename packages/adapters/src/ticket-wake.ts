@@ -31,8 +31,12 @@ export async function wakeTicketAssignee(
         userId: bot.userId,
         prompt: `Work on ticket ${ticket.board.ticketPrefix}-${ticket.number}. Read it with ticket_get. Keep progress in ticket comments and update its status with ticket_update. Use ask or approval cards when user input is needed.`,
         status: "queued",
+        ticketId: ticket.id,
       },
     });
+    if (status.data === "todo") {
+      await tx.ticket.update({ where: { id: ticket.id }, data: { status: "doing" } });
+    }
     return tx.run.create({
       data: {
         spaceId: input.spaceId,
