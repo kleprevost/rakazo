@@ -36,6 +36,12 @@ export const translateRunError: RunErrorTranslator = (message, values) => {
         message: "Blocked by your organization",
         values,
       });
+    case "Monthly budget reached":
+      return i18n._({
+        id: "Monthly budget reached",
+        message: "Monthly budget reached",
+        values,
+      });
     case "Connect a model in Settings before running bots.":
       return i18n._({
         id: "Connect a model in Settings before running bots.",

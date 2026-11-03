@@ -104,6 +104,7 @@ export const NL_MESSAGES: Record<string, string> = {
   "Your Anthropic": "Jouw Anthropic",
   "Your model provider": "Jouw modelaanbieder",
   "Blocked by your organization": "Geblokkeerd door je organisatie",
+  "Monthly budget reached": "Maandbudget bereikt",
   "Connect a model in Settings before running bots.":
     "Verbind een model in Instellingen voordat je bots uitvoert.",
   "Connect your own API key in Models or choose Rakazo credits in Billing.":

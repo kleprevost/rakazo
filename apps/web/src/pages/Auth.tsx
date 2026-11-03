@@ -13,6 +13,7 @@ import { PasskeySignIn } from "../components/PasskeySignIn";
 import { authClient } from "../lib/auth";
 import type { AuthCapabilities } from "../lib/auth-capabilities";
 import { fetchAuthCapabilities } from "../lib/auth-capabilities";
+import { easyAuthLoginUrl } from "../lib/easy-auth";
 import { clearSpaceSelection } from "../lib/rpc";
 import { runSsoFlow } from "../lib/sso-flow";
 import { authErrorText, credentialIssueText } from "../lib/user-error";
@@ -203,6 +204,14 @@ export function AuthPage({ mode }: { mode: AuthMode }) {
 
   async function signInWithSso() {
     setError(null);
+    if (reset?.sso?.easyAuth) {
+      window.location.assign(
+        easyAuthLoginUrl(
+          searchParams.get("next") === "/integrations/setup" ? "/integrations/setup" : "/app",
+        ),
+      );
+      return;
+    }
     try {
       const result = await runSsoFlow(
         (disableRedirect, callbackURL) =>

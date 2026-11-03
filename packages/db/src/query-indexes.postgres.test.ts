@@ -18,6 +18,12 @@ const hotQueries = [
     sql: `SELECT id FROM runs WHERE "taskId" = $1`,
   },
   {
+    name: "this month's spend for budgets",
+    index: "usage_records_period_spend_idx",
+    sql: `SELECT sum("costUsd"), sum("costUsd") FILTER (WHERE "userId" = $1)
+      FROM usage_records WHERE "createdAt" >= now()`,
+  },
+  {
     name: "a bot's run lease fence",
     index: "runs_botId_idx",
     sql: `SELECT max("leaseFence") FROM runs WHERE "botId" = $1`,

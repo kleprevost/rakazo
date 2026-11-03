@@ -110,6 +110,7 @@ export const JA_MESSAGES: Record<string, string> = {
   "Your Anthropic": "お使いのAnthropic",
   "Your model provider": "お使いのモデルプロバイダー",
   "Blocked by your organization": "組織によってブロックされています",
+  "Monthly budget reached": "月間予算に達しました",
   "Connect a model in Settings before running bots.":
     "ボットを実行する前に、設定でモデルを接続してください。",
   "Connect your own API key in Models or choose Rakazo credits in Billing.":

@@ -41,6 +41,8 @@ export interface AppEnv {
   /** Opt-in Have I Been Pwned check for new passwords. Default off: it calls an outside service. */
   breachedPasswordCheck?: boolean;
   oidc?: OidcConfig;
+  /** Sign in from the identity App Service / Container Apps built-in authentication forwards. */
+  easyAuth?: boolean;
   nodeEnv: string;
   desktopStackToken?: string;
   databaseUrl: string;
@@ -202,6 +204,7 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): AppEnv {
     "AUTH_BREACHED_PASSWORD_CHECK_ENABLED",
     "OIDC_ALLOW_SIGNUP_BYPASS",
     "OIDC_TRUST_EMAIL",
+    "AUTH_EASY_AUTH",
   ]) {
     const value = source[key];
     if (value && !["true", "false"].includes(value))
@@ -216,6 +219,10 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): AppEnv {
     throw new Error("OIDC_REVALIDATE_MINUTES must be a whole number of minutes");
   if (revalidate && Number(revalidate) < 5)
     throw new Error("OIDC_REVALIDATE_MINUTES must be at least 5");
+  const easyAuth = source.AUTH_EASY_AUTH === "true";
+  if (easyAuth && !issuer) throw new Error("AUTH_EASY_AUTH requires OIDC configuration");
+  if (easyAuth && revalidate)
+    throw new Error("AUTH_EASY_AUTH cannot be combined with OIDC_REVALIDATE_MINUTES");
   const oidc =
     issuer && clientId && clientSecret
       ? {
@@ -243,6 +250,7 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): AppEnv {
     passwordAuth,
     breachedPasswordCheck: source.AUTH_BREACHED_PASSWORD_CHECK_ENABLED === "true",
     oidc,
+    easyAuth,
     nodeEnv: source.NODE_ENV ?? "",
     databaseUrl: required(source, "DATABASE_URL"),
     realtimeDatabaseUrl: source.REALTIME_DATABASE_URL ?? required(source, "DATABASE_URL"),

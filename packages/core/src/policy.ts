@@ -100,3 +100,32 @@ export function filterModelCatalog<
       }).allowed,
   );
 }
+
+export type BudgetScope = "organization" | "user" | "bot";
+export type BudgetSpend = { organization: number; user: number; bot: number };
+
+/** Start of the budget period containing `now`: the first instant of the UTC calendar month. */
+export function budgetPeriodStart(now: Date): Date {
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
+}
+
+const BUDGET_LIMITS = {
+  organization: "organizationUsd",
+  user: "perUserUsd",
+  bot: "perBotUsd",
+} as const;
+
+/** The configured limit for a scope, or undefined when the policy sets none. */
+export function budgetLimit(policy: Policy | undefined, scope: BudgetScope): number | undefined {
+  return policy?.budgets?.[BUDGET_LIMITS[scope]];
+}
+
+/** Whether a run may start given period spend. A limit is reached once spend equals it. */
+export function evaluateBudgets(policy: Policy | undefined, spend: BudgetSpend): PolicyDecision {
+  for (const scope of ["organization", "user", "bot"] as const) {
+    const limit = budgetLimit(policy, scope);
+    if (limit !== undefined && spend[scope] >= limit)
+      return { allowed: false, rule: `budgets.${scope}` };
+  }
+  return ALLOWED;
+}

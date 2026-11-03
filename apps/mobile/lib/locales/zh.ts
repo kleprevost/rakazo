@@ -99,6 +99,7 @@ export const ZH_MESSAGES: Record<string, string> = {
   "Your Anthropic": "你的 Anthropic",
   "Your model provider": "你的模型提供商",
   "Blocked by your organization": "已被你的组织阻止",
+  "Monthly budget reached": "已达到月度预算",
   "Connect a model in Settings before running bots.": "运行机器人前，请先在设置中连接模型。",
   "Connect your own API key in Models or choose Rakazo credits in Billing.":
     "请在“模型”中连接你自己的 API 密钥，或在“账单”中选择 Rakazo 额度。",
