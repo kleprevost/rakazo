@@ -51,6 +51,10 @@ import {
   throwIfAborted,
 } from "../model-credentials.js";
 import { assertCompatibleDefaultChange } from "../model-pins.js";
+import {
+  assertConnectionAllowedForRequest,
+  assertModelAllowedForRequest,
+} from "../policy-guard.js";
 import { withSerializableRetry } from "../serializable-retry.js";
 import type { RouterContext } from "./context.js";
 
@@ -194,6 +198,7 @@ export function modelsRoutes(ctx: RouterContext) {
         return { ok: true as const };
       }),
       connect: authed.models.connect.handler(async ({ context, input }) => {
+        await assertConnectionAllowedForRequest(context.actor, input.provider);
         const record = await firstModelConnectAnalytics(deps, context.actor, "api_key");
         record(input.provider, { name: "model_connect_started" });
         try {
@@ -288,6 +293,7 @@ export function modelsRoutes(ctx: RouterContext) {
         }
       }),
       beginOAuth: authed.models.beginOAuth.handler(async ({ context, input }) => {
+        await assertConnectionAllowedForRequest(context.actor, input.provider);
         // An older app's sign-in renews the provider's newest connection, bound now so a
         // disconnect of that connection retires it and it never lands on another one.
         const target = await modelConnectionTarget(
@@ -393,6 +399,11 @@ export function modelsRoutes(ctx: RouterContext) {
       setDefault: authed.models.setDefault.handler(async ({ context, input }) => {
         const modelId = usableModelId(input.modelId);
         if (!modelId) throw new ORPCError("BAD_REQUEST", { message: "Choose a model" });
+        await assertModelAllowedForRequest(context.actor, {
+          provider: input.provider,
+          modelId,
+          ownConnection: false,
+        });
         // An omitted level keeps the one this model already has in the main list: on the
         // chosen connection first, then on another, as writeModelRole does.
         const savedChoices = async (

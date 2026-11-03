@@ -6673,3 +6673,9 @@ msgstr "У вашего голосового провайдера закончи
 #: src/lib/user-error.ts
 msgid "Your voice provider key was rejected."
 msgstr "Ваш голосовой провайдер отклонил ключ."
+
+#. js-lingui-explicit-id
+#: src/lib/run-error.ts
+#: src/lib/user-error.ts
+msgid "Blocked by your organization"
+msgstr "Заблокировано вашей организацией"

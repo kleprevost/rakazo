@@ -3,6 +3,7 @@ import {
   CONNECTOR_AUTH_UNAVAILABLE,
   isVoiceAccountErrorCode,
   MCP_OAUTH_CLIENT_REQUIRED,
+  POLICY_DENIED_MESSAGE,
 } from "@rakazo/contracts";
 import type { CredentialField } from "@rakazo/core";
 import {
@@ -22,6 +23,8 @@ export function errorText(error: unknown, fallback = t`Something went wrong. Try
       : error && typeof error === "object" && "message" in error
         ? error.message
         : undefined;
+  if (typeof message === "string" && message.trim() === POLICY_DENIED_MESSAGE)
+    return t`Blocked by your organization`;
   if (typeof message === "string" && message.trim() === MODEL_IMAGE_INPUT_ERROR)
     return t`This model cannot read images. Choose a model that supports images.`;
   if (typeof message === "string" && message.trim() === MODEL_IMAGE_INPUT_UNKNOWN)

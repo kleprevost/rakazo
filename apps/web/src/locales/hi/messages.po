@@ -6673,3 +6673,9 @@ msgstr "आपके आवाज़ प्रोवाइडर का क्�
 #: src/lib/user-error.ts
 msgid "Your voice provider key was rejected."
 msgstr "आपके आवाज़ प्रोवाइडर ने कुंजी अस्वीकार कर दी।"
+
+#. js-lingui-explicit-id
+#: src/lib/run-error.ts
+#: src/lib/user-error.ts
+msgid "Blocked by your organization"
+msgstr "आपके संगठन द्वारा अवरुद्ध"

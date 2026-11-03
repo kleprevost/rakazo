@@ -50,6 +50,35 @@ data:
   allowAccountExport: true
 ```
 
+## Status
+Step 1 is implemented: the full v1 schema (`PolicySchema`, strict, in `packages/contracts/src/policy.ts`),
+the loader and process-wide accessor (`packages/adapters/src/policy-runtime.ts`), and the pure
+evaluator (`packages/core/src/policy.ts`). **Only `models` is enforced**; every other section is
+parsed and validated but has no effect yet.
+
+- `RAKAZO_POLICY_FILE` points at a YAML or JSON file (JSON is read by the YAML parser). It is read
+  once at API and worker startup. An unreadable or invalid file stops the process with the failing
+  field named; no variable means no policy. Mount the file into both containers and pass the
+  variable to both.
+- Audit: `policy.loaded` (version, SHA-256 of the file) at startup; `policy.denied` (rule,
+  `provider/model` subject, surface) per refusal. Never message content or secrets.
+- Model enforcement: the run gate is `resolveModelKey` (every run, backup and role path); the
+  catalog every picker reads (`chatCatalog`) is filtered; saving a connection, choosing a role
+  or backup model, setting the main model and changing a bot's model are refused with `FORBIDDEN`
+  and `{ reason: "policy", rule }`. Users see "Blocked by your organization". A saved choice that
+  a later policy forbids is kept and fails at run time with that message.
+- Not yet: a capabilities flag for clients; routines, agent import and other paths that pin a model
+  without going through the bot-model check are caught at run time only.
+
+Example:
+```yaml
+version: 1
+models:
+  allowProviders: [azure]
+  allowModels: ["azure/gpt-*"]
+  allowUserConnections: false
+```
+
 ## Delivery
 1. **Foundation + models** (first PR): contract, file loader, evaluator, audit events, a capabilities
    flag so clients can hide disallowed choices, and enforcement for `models`.
