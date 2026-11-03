@@ -12,7 +12,7 @@ import {
 } from "@rakazo/core";
 import type { PrismaClient, SecurityEventType } from "@rakazo/db";
 import { bootstrapUserSpace, personalOrganizationIds, recordSecurityEvent } from "@rakazo/db";
-import type { BetterAuthOptions, BetterAuthPlugin } from "better-auth";
+import type { AuthContext, BetterAuthOptions, BetterAuthPlugin } from "better-auth";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import {
@@ -45,6 +45,7 @@ import {
   isOidcAdminAccount,
   oidcDiscovery,
 } from "./oidc.js";
+import { createOidcRevalidator } from "./oidc-revalidate.js";
 import { passkeyRelyingParty } from "./passkey.js";
 import type { TokenKey } from "./token-storage.js";
 import { encryptStoredOAuthTokens, openIdToken, sealIdToken } from "./token-storage.js";
@@ -214,7 +215,11 @@ export function createAuth(prisma: PrismaClient, env: AuthEnv) {
       ? null
       : passkeyRelyingParty(env.webOrigin, env.androidAppCertFingerprints);
   // Better Auth's own token key, so every stored token shares one cipher and key.
-  let authContext: Promise<{ secretConfig: TokenKey }> | undefined;
+  let revalidator: ReturnType<typeof createOidcRevalidator> | undefined;
+  let onDeferredSink: ((errorName: string) => void) | undefined;
+  let authContext:
+    | Promise<{ secretConfig: TokenKey; internalAdapter: AuthContext["internalAdapter"] }>
+    | undefined;
   const tokenKey = async () => (await authContext!).secretConfig;
   const auth = betterAuth({
     appName: "Rakazo",
@@ -771,6 +776,29 @@ export function createAuth(prisma: PrismaClient, env: AuthEnv) {
     consumeAccountExportToken: async (token: string) =>
       consumeAccountExportToken((await auth.$context).internalAdapter, token),
     disposeOidcDiscovery: () => discovery?.dispose(),
+    /**
+     * One pass of SSO revalidation (OIDC_REVALIDATE_MINUTES). Safe to run from several instances.
+     * Undefined when SSO or revalidation is not configured.
+     */
+    revalidateSso: env.oidc?.revalidateMinutes
+      ? async (onDeferred?: (errorName: string) => void) => {
+          const { internalAdapter, secretConfig } = await authContext!;
+          revalidator ??= createOidcRevalidator({
+            config: env.oidc!,
+            key: secretConfig,
+            prisma,
+            onDeferred: (name) => onDeferredSink?.(name),
+            revokeSessions: async (userId) => {
+              const sessions = await internalAdapter.listSessions(userId);
+              if (sessions.length)
+                await internalAdapter.deleteSessions(sessions.map((session) => session.token));
+              return sessions.length;
+            },
+          });
+          onDeferredSink = onDeferred;
+          return revalidator.run();
+        }
+      : undefined,
     /** Whether the user's current SSO identity carries an admin value, as of their last sign-in. */
     isSsoAdmin: async (userId: string) => {
       const oidc = env.oidc;

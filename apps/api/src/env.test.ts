@@ -395,6 +395,17 @@ describe("OIDC environment", () => {
       adminValues: ["Rakazo.Admin"],
     });
   });
+  it("keeps SSO revalidation off unless a valid interval is set", () => {
+    expect(loadEnv({ ...base, ...oidc }).oidc?.revalidateMinutes).toBeUndefined();
+    expect(loadEnv({ ...base, ...oidc, OIDC_REVALIDATE_MINUTES: "60" }).oidc).toMatchObject({
+      revalidateMinutes: 60,
+    });
+    for (const value of ["0", "4", "1.5", "soon"])
+      expect(() => loadEnv({ ...base, ...oidc, OIDC_REVALIDATE_MINUTES: value })).toThrow(
+        /OIDC_REVALIDATE_MINUTES/,
+      );
+    expect(() => loadEnv({ ...base, OIDC_REVALIDATE_MINUTES: "60" })).toThrow(/requires OIDC/);
+  });
   it("defaults to SSO with no policy bypass", () => {
     expect(loadEnv({ ...base, ...oidc }).oidc).toMatchObject({
       name: "SSO",

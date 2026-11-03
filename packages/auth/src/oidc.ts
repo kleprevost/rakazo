@@ -29,6 +29,11 @@ export interface OidcConfig {
   allowedValues?: string[];
   /** Tokens carrying one of these values in the claim are deployment admins. */
   adminValues?: string[];
+  /**
+   * Re-checks signed-in SSO users against the provider this often, in minutes. Unset is off.
+   * It needs a refresh token, so `offline_access` is requested at sign-in.
+   */
+  revalidateMinutes?: number;
 }
 
 /** Values of an array claim. Missing, non-array or non-string entries yield nothing (fail closed). */
@@ -60,7 +65,15 @@ export function oidcDiscovery(config: OidcConfig) {
         discoveryUrl: `${config.issuer.replace(/\/$/, "")}/.well-known/openid-configuration`,
         clientId: config.clientId,
         clientSecret: config.clientSecret,
-        scopes: [...new Set(["openid", "email", "profile", ...config.scopes])],
+        scopes: [
+          ...new Set([
+            "openid",
+            "email",
+            "profile",
+            ...(config.revalidateMinutes ? ["offline_access"] : []),
+            ...config.scopes,
+          ]),
+        ],
         pkce: true,
         accountSubject: ({ profile }) => {
           if (typeof profile.sub !== "string" || !profile.sub.trim()) return "";
