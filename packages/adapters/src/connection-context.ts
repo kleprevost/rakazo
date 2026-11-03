@@ -3,6 +3,7 @@ import type { PrismaClient } from "@rakazo/db";
 import type { PluginConnectionRow } from "./composio-connector.js";
 import { planLiveConnectionSync } from "./composio-connector.js";
 import type { ExecutorDeps } from "./executor-deps.js";
+import { connectorAllowed } from "./policy-integrations.js";
 
 export function selectRunConnections<
   T extends { connectorId: string; provider: string; status: string },
@@ -39,6 +40,9 @@ export function connectedContext(
     providerRef: string | null;
   }>,
 ): Pick<AdapterContext, "connectedConnections" | "connectedProviders"> {
+  // Policy gate for every run and unattended check: an app the organization no longer allows
+  // is not connected as far as tool discovery and execution can tell.
+  rows = rows.filter((row) => connectorAllowed(row.provider));
   return {
     connectedConnections: rows.map((row) => ({
       id: row.id,

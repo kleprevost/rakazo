@@ -17,6 +17,7 @@ import {
   isPackageRunnerCommand,
 } from "./mcp-package-installer.js";
 import { limitMcpResponseBody } from "./mcp-response-limit.js";
+import { assertToolSourceHostAllowed } from "./policy-integrations.js";
 
 import type { RemoteTransportDependencies, SafeRemoteFetch } from "./remote-mcp.js";
 import { createSafeRemoteFetch, listMcpTools } from "./remote-mcp.js";
@@ -201,6 +202,8 @@ export function secureFetch(
       if (url.origin !== resourceUrl.origin && configuredCredentialValues.has(value)) continue;
       headers.set(name, value);
     }
+    // Every request, including OAuth discovery and token endpoints, must pass the host policy.
+    await assertToolSourceHostAllowed(url.href);
     const localHttp = url.protocol === "http:" && isLocalhostOrLoopbackIp(url.hostname);
     if (localHttp && urlPolicy.allowLocalHttpCredentials !== true) {
       for (const name of [...headers.keys()]) {

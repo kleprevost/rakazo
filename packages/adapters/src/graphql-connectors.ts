@@ -143,7 +143,11 @@ export async function prepareGraphqlInstall(input: {
   requireCredential(auth, input.credential);
   const headers = PublicHeadersSchema.parse(input.config.headers);
   assertNoSensitiveQuery(input.source);
-  const remote = { ...input.remote, allowPrivateEndpoint: input.allowPrivateEndpoint };
+  const remote = {
+    ...input.remote,
+    allowPrivateEndpoint: input.allowPrivateEndpoint,
+    toolSource: true,
+  };
   await assertSafeRemoteUrl(input.source, remote.resolveHostname, remote);
 
   const endpoint = new URL(input.source);
