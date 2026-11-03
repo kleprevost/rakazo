@@ -2,7 +2,12 @@ import type { JobPublisher, MessagingSurface, SecretStore } from "@rakazo/adapte
 import type { PrismaClient } from "@rakazo/db";
 import { InstalledMessagingSurface } from "./installed-messaging-surface.js";
 import { MessagingInstallations } from "./messaging-installations.js";
+import { PolicyMessagingSurface } from "./policy-capabilities.js";
 import { SlackInstallProvider } from "./slack-install-provider.js";
+
+function policyBound(surface: MessagingSurface | undefined) {
+  return surface && new PolicyMessagingSurface(surface);
+}
 
 export function installedMessaging(
   prisma: PrismaClient,
@@ -32,7 +37,7 @@ export function installedMessaging(
     !config.slackSigningSecret ||
     !config.apiUrl
   )
-    return { messaging: fallback, installations: undefined };
+    return { messaging: policyBound(fallback), installations: undefined };
   const provider = new SlackInstallProvider({
     clientId: config.slackClientId,
     clientSecret: config.slackClientSecret,
@@ -41,7 +46,7 @@ export function installedMessaging(
   });
   const installations = new MessagingInstallations(prisma, secrets, provider, cleanupJobs);
   return {
-    messaging: new InstalledMessagingSurface(installations, provider, fallback),
+    messaging: policyBound(new InstalledMessagingSurface(installations, provider, fallback)),
     installations,
   };
 }

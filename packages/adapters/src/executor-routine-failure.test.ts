@@ -6,11 +6,12 @@ import {
   TransientModelError,
 } from "@rakazo/adapter-kit";
 import type * as DbModule from "@rakazo/db";
-import { countUnreadInboxChats } from "@rakazo/db";
+import { countUnreadInboxChats, installSecurityEventStore } from "@rakazo/db";
 import { createLogger, createTestSink, installLogger } from "@rakazo/logging";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type * as ComputerLifecycleModule from "./computer-lifecycle.js";
 import { createRunExecutor } from "./executor.js";
+import { setActivePolicy } from "./policy-runtime.js";
 
 vi.mock("./computer-lifecycle.js", async (importOriginal) => ({
   ...(await importOriginal<typeof ComputerLifecycleModule>()),
@@ -1084,4 +1085,31 @@ describe("reporting a failed run", () => {
       expect(JSON.stringify(fields)).not.toMatch(/fake-deployment-key|:\/\//);
     },
   );
+});
+
+describe("a routine or webhook the policy switched off", () => {
+  afterEach(() => {
+    setActivePolicy(undefined);
+    installSecurityEventStore(undefined);
+  });
+
+  it.each([
+    ["routine", { allowRoutines: false }],
+    ["webhook", { allowWebhooks: false }],
+  ])("fails a %s run before the model with the one message", async (trigger, bots) => {
+    const create = vi.fn();
+    installSecurityEventStore({ securityEvent: { create } } as never);
+    setActivePolicy({ version: 1, bots });
+    const { runtimeRun } = await failRun({
+      error: new Error("Blocked by your organization"),
+      trigger,
+    });
+    expect(runtimeRun).not.toHaveBeenCalled();
+    expect(create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        type: "policy.denied",
+        metadata: { rule: `bots.${Object.keys(bots)[0]}`, subject: trigger, surface: "run" },
+      }),
+    });
+  });
 });

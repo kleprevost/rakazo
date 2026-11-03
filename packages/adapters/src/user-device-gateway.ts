@@ -15,6 +15,7 @@ import {
   hostComputerDeadlineMs,
   hostComputerRequest,
 } from "./host-computer-protocol.js";
+import { assertHostComputerAllowed, policyDenied } from "./policy-capabilities.js";
 import type {
   UserDevice,
   UserDeviceGateway,
@@ -252,8 +253,14 @@ export class UserDeviceHub {
     const path = new URL(request.url ?? "/", "http://device").pathname;
     if (path !== USER_DEVICE_CONNECT_PATH || this.closed) return reject(404, "Not Found");
     void this.lookup(request.headers.authorization)
-      .then(({ device, reason }) => {
+      .then(async ({ device, reason }) => {
         if (!device) return reject(401, "Unauthorized", reason);
+        if (
+          await policyDenied(() =>
+            assertHostComputerAllowed({ userId: device.userId, surface: "desktop" }),
+          )
+        )
+          return reject(403, "Forbidden");
         socket.off("error", onError);
         this.wss.handleUpgrade(request, socket, head, (ws) => {
           void this.attach(device, ws).catch((error) => {

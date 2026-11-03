@@ -1,4 +1,5 @@
 import { timingSafeEqual } from "node:crypto";
+import { assertHostComputerAllowed, PolicyDeniedError } from "@rakazo/adapters";
 import { LOCAL_COMPUTER_HOST_PATH, LOCAL_SETTINGS_TOKEN_HEADER } from "@rakazo/contracts";
 import type { PrismaClient } from "@rakazo/db";
 import { runAsSystem } from "@rakazo/db";
@@ -46,6 +47,15 @@ export function mountLocalComputerHost(
       return c.json({ error: "Invalid computer host" }, 400);
     }
     const selected = computerHost;
+    if (selected === "this-mac") {
+      try {
+        await assertHostComputerAllowed({ surface: "desktop" });
+      } catch (error) {
+        if (error instanceof PolicyDeniedError)
+          return c.json({ error: error.message, reason: "policy", rule: error.rule }, 403);
+        throw error;
+      }
+    }
     await runAsSystem("locally authorized computer host choice", () =>
       deps.prisma.deploymentSettings.upsert({
         where: { id: "default" },

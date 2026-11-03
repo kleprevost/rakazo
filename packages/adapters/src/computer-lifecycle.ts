@@ -46,6 +46,7 @@ import {
 } from "./computer-workspace.js";
 import { resolveAgentHomePath } from "./home.js";
 import { ObjectAgentHomeStore } from "./home-object-store.js";
+import { assertComputerKindAllowed } from "./policy-capabilities.js";
 import { sandboxAllowanceUsedUp } from "./sandbox-allowance.js";
 import {
   isSandboxDamagedError,
@@ -251,6 +252,7 @@ export async function provisionComputer(
 
   // A computer that bills starts only while its organization has allowance left this period.
   const startKind = (await deps.sandbox.provisionKind?.(existing.homeKey)) ?? existing.kind;
+  await assertComputerKindAllowed(startKind, { ...context, surface: "computer" });
   if (await sandboxAllowanceUsedUp(deps, { spaceId: existing.spaceId, kind: startKind }))
     throw new SandboxAllowanceUsedError();
 

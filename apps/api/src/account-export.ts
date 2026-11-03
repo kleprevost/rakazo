@@ -1,5 +1,9 @@
 import type { AdapterContext, AgentHomeStore, ArtifactStore } from "@rakazo/adapter-kit";
-import { resolveBotWorkspacePath } from "@rakazo/adapters";
+import {
+  assertAccountExportAllowed,
+  policyDenied,
+  resolveBotWorkspacePath,
+} from "@rakazo/adapters";
 import type { Auth } from "@rakazo/auth";
 import type {
   AccountExportExecutables,
@@ -12,6 +16,7 @@ import {
   ACCOUNT_EXPORT_MAX_HOME_FILE_BYTES,
   ACCOUNT_EXPORT_VERSION,
   accountExportPaths,
+  POLICY_DENIED_MESSAGE,
 } from "@rakazo/contracts";
 import type { AccountExportSource, PrismaClient } from "@rakazo/db";
 import {
@@ -215,6 +220,9 @@ export function mountAccountExportRoute(
   app.get("/api/account/export", async (c) => {
     const userId = await deps.auth.consumeAccountExportToken(c.req.query("token") ?? "");
     if (!userId) return c.text("Export link expired", 410, { "cache-control": "no-store" });
+    // A token issued before the policy changed still must not download.
+    if (await policyDenied(() => assertAccountExportAllowed({ userId, surface: "export" })))
+      return c.text(POLICY_DENIED_MESSAGE, 403, { "cache-control": "no-store" });
     const now = new Date();
     const source = await readAccountExport(deps.prisma, userId);
     const body = zipStream(accountArchiveFiles(source, deps, { signal: c.req.raw.signal, now }));

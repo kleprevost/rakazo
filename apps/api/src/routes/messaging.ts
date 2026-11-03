@@ -1,6 +1,7 @@
 import { ORPCError } from "@orpc/server";
 import { messagingDeliverJob } from "@rakazo/adapter-kit";
-import { displayName } from "@rakazo/core";
+import { activePolicy } from "@rakazo/adapters";
+import { displayName, evaluateMessagingSurface } from "@rakazo/core";
 import type { PrismaClient } from "@rakazo/db";
 import {
   crossSpaceCommunicationAllowed,
@@ -9,6 +10,7 @@ import {
   runAsSystem,
 } from "@rakazo/db";
 import { getLogger } from "@rakazo/logging";
+import { assertMessagingSurfaceAllowedForRequest } from "../policy-capabilities-guard.js";
 import type { RouterContext } from "./context.js";
 import { isUniqueViolation } from "./shared.js";
 
@@ -28,6 +30,10 @@ export function messagingRoutes(ctx: RouterContext) {
         }),
         start: authed.messaging.installations.start.handler(async ({ context, input }) => {
           if (!deps.messagingInstallations) throw new ORPCError("BAD_REQUEST");
+          await assertMessagingSurfaceAllowedForRequest(
+            context.actor,
+            deps.messagingInstallations.provider.provider,
+          );
           return { url: await deps.messagingInstallations.start(context.actor, input.botId) };
         }),
         complete: authed.messaging.installations.complete.handler(async ({ context, input }) => {
@@ -54,7 +60,9 @@ export function messagingRoutes(ctx: RouterContext) {
         );
         return {
           enabled: deps.messaging?.enabled ?? false,
-          providers: deps.messaging?.providers ?? [],
+          providers: (deps.messaging?.providers ?? []).filter(
+            (provider) => evaluateMessagingSurface(activePolicy(), provider).allowed,
+          ),
           addresses: deps.messaging?.addresses ?? {},
           openSignup: deps.messaging?.openSignup ?? false,
           identities: await Promise.all(

@@ -10,6 +10,7 @@ import {
 import { IsolationError, Prisma } from "@rakazo/db";
 import { getLogger } from "@rakazo/logging";
 import { assertRoutineModel } from "../model-pins.js";
+import { assertBotCapabilityAllowedForRequest } from "../policy-capabilities-guard.js";
 import { listRoutineRuns } from "../routine-runs.js";
 import {
   assertRoutineSchedule,
@@ -59,6 +60,9 @@ export function routinesRoutes(ctx: RouterContext) {
         return listRoutinesDto(deps, context.actor, input.botId);
       }),
       create: authed.routines.create.handler(async ({ context, input }) => {
+        await assertBotCapabilityAllowedForRequest(context.actor, "routines");
+        if (input.webhookEnabled)
+          await assertBotCapabilityAllowedForRequest(context.actor, "webhooks");
         assertRoutineSchedule(input);
         const bot = await repos.getBot(context.actor, input.botId);
         if (input.watch) {
@@ -98,6 +102,11 @@ export function routinesRoutes(ctx: RouterContext) {
         const crons = input.crons ?? existing.crons;
         const timezone = input.timezone ?? existing.timezone;
         const webhookEnabled = input.webhookEnabled ?? existing.webhookEnabled;
+        // Turning a routine off or leaving it as it is stays open; only enabling one is refused.
+        if (input.active === true && !existing.active)
+          await assertBotCapabilityAllowedForRequest(context.actor, "routines");
+        if (input.webhookEnabled === true && !existing.webhookEnabled)
+          await assertBotCapabilityAllowedForRequest(context.actor, "webhooks");
         const githubEnabled = input.githubEnabled ?? existing.githubEnabled;
         const messageProvider =
           input.messageProvider === undefined ? existing.messageProvider : input.messageProvider;
