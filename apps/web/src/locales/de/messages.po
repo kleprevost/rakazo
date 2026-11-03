@@ -1643,6 +1643,7 @@ msgstr "Computer sind aus. Setze SANDBOX_PROVIDER=docker mit SANDBOX_SUPERVISOR_
 msgid "Configure a plugin catalog on the server to connect apps."
 msgstr ""
 
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/admin/AdminUsersPage.tsx
 msgid "Confirm"
 msgstr ""
@@ -2382,6 +2383,7 @@ msgstr "MCP-Server konnte nicht getestet werden"
 msgid "Could not transcribe that recording."
 msgstr ""
 
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/ScratchpadSection.tsx
 msgid "Could not update"
 msgstr "Aktualisierung fehlgeschlagen"
@@ -5403,6 +5405,10 @@ msgstr "Wiederhergestellt"
 msgid "Restoring your workspace"
 msgstr ""
 
+#: src/pages/admin/AdminBotsPage.tsx
+msgid "Resume"
+msgstr "Fortsetzen"
+
 #: src/components/AccountAccess.tsx
 #: src/components/integrations/plugin-marketplace.tsx
 #: src/components/integrations/skills-dialog.tsx
@@ -6215,6 +6221,20 @@ msgstr "Unterstützt Bilder"
 #: src/pages/Onboarding.tsx
 msgid "Supports thinking"
 msgstr "Unterstützt Denkmodus"
+
+#: src/pages/admin/AdminBotsPage.tsx
+msgid "Suspend"
+msgstr "Pausieren"
+
+#: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/shell/chat-header.tsx
+msgid "Suspended"
+msgstr "Pausiert"
+
+#. js-lingui-explicit-id
+#: src/lib/run-error.ts
+msgid "Suspended by your organization"
+msgstr "Von deiner Organisation pausiert"
 
 #: src/components/ModelCredits.tsx
 #: src/pages/model-settings/space-bots-model.tsx

@@ -1643,6 +1643,7 @@ msgstr "कंप्यूटर बंद हैं। SANDBOX_PROVIDER=docker 
 msgid "Configure a plugin catalog on the server to connect apps."
 msgstr ""
 
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/admin/AdminUsersPage.tsx
 msgid "Confirm"
 msgstr ""
@@ -2382,6 +2383,7 @@ msgstr "MCP सर्वर का परीक्षण नहीं हो स
 msgid "Could not transcribe that recording."
 msgstr ""
 
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/ScratchpadSection.tsx
 msgid "Could not update"
 msgstr "अपडेट नहीं हो सका"
@@ -5403,6 +5405,10 @@ msgstr "बहाल किया गया"
 msgid "Restoring your workspace"
 msgstr ""
 
+#: src/pages/admin/AdminBotsPage.tsx
+msgid "Resume"
+msgstr "फिर शुरू करें"
+
 #: src/components/AccountAccess.tsx
 #: src/components/integrations/plugin-marketplace.tsx
 #: src/components/integrations/skills-dialog.tsx
@@ -6215,6 +6221,20 @@ msgstr "छवियों का समर्थन"
 #: src/pages/Onboarding.tsx
 msgid "Supports thinking"
 msgstr "सोचने की क्षमता का समर्थन करता है"
+
+#: src/pages/admin/AdminBotsPage.tsx
+msgid "Suspend"
+msgstr "निलंबित करें"
+
+#: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/shell/chat-header.tsx
+msgid "Suspended"
+msgstr "निलंबित"
+
+#. js-lingui-explicit-id
+#: src/lib/run-error.ts
+msgid "Suspended by your organization"
+msgstr "आपके संगठन ने निलंबित किया"
 
 #: src/components/ModelCredits.tsx
 #: src/pages/model-settings/space-bots-model.tsx

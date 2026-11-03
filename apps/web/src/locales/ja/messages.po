@@ -1643,6 +1643,7 @@ msgstr "コンピューターは無効です。SANDBOX_PROVIDER=docker と SANDB
 msgid "Configure a plugin catalog on the server to connect apps."
 msgstr "アプリを接続するには、サーバーでプラグインカタログを設定してください。"
 
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/admin/AdminUsersPage.tsx
 msgid "Confirm"
 msgstr ""
@@ -2382,6 +2383,7 @@ msgstr "MCPサーバーをテストできませんでした"
 msgid "Could not transcribe that recording."
 msgstr ""
 
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/ScratchpadSection.tsx
 msgid "Could not update"
 msgstr "更新できませんでした"
@@ -5403,6 +5405,10 @@ msgstr "復元しました"
 msgid "Restoring your workspace"
 msgstr "ワークスペースを復元中"
 
+#: src/pages/admin/AdminBotsPage.tsx
+msgid "Resume"
+msgstr "再開"
+
 #: src/components/AccountAccess.tsx
 #: src/components/integrations/plugin-marketplace.tsx
 #: src/components/integrations/skills-dialog.tsx
@@ -6215,6 +6221,20 @@ msgstr "画像に対応"
 #: src/pages/Onboarding.tsx
 msgid "Supports thinking"
 msgstr "思考に対応"
+
+#: src/pages/admin/AdminBotsPage.tsx
+msgid "Suspend"
+msgstr "停止"
+
+#: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/shell/chat-header.tsx
+msgid "Suspended"
+msgstr "停止中"
+
+#. js-lingui-explicit-id
+#: src/lib/run-error.ts
+msgid "Suspended by your organization"
+msgstr "組織によって停止されています"
 
 #: src/components/ModelCredits.tsx
 #: src/pages/model-settings/space-bots-model.tsx

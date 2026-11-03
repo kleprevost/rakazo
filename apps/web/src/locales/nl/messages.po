@@ -1643,6 +1643,7 @@ msgstr "Computers staan uit. Stel SANDBOX_PROVIDER=docker in met SANDBOX_SUPERVI
 msgid "Configure a plugin catalog on the server to connect apps."
 msgstr "Configureer een plugincatalogus op de server om apps te koppelen."
 
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/admin/AdminUsersPage.tsx
 msgid "Confirm"
 msgstr ""
@@ -2382,6 +2383,7 @@ msgstr "MCP-server testen mislukt"
 msgid "Could not transcribe that recording."
 msgstr ""
 
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/ScratchpadSection.tsx
 msgid "Could not update"
 msgstr "Bijwerken mislukt"
@@ -5403,6 +5405,10 @@ msgstr "Hersteld"
 msgid "Restoring your workspace"
 msgstr "Je werkruimte herstellen"
 
+#: src/pages/admin/AdminBotsPage.tsx
+msgid "Resume"
+msgstr "Hervatten"
+
 #: src/components/AccountAccess.tsx
 #: src/components/integrations/plugin-marketplace.tsx
 #: src/components/integrations/skills-dialog.tsx
@@ -6215,6 +6221,20 @@ msgstr "Ondersteunt afbeeldingen"
 #: src/pages/Onboarding.tsx
 msgid "Supports thinking"
 msgstr "Ondersteunt denken"
+
+#: src/pages/admin/AdminBotsPage.tsx
+msgid "Suspend"
+msgstr "Opschorten"
+
+#: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/shell/chat-header.tsx
+msgid "Suspended"
+msgstr "Opgeschort"
+
+#. js-lingui-explicit-id
+#: src/lib/run-error.ts
+msgid "Suspended by your organization"
+msgstr "Opgeschort door je organisatie"
 
 #: src/components/ModelCredits.tsx
 #: src/pages/model-settings/space-bots-model.tsx

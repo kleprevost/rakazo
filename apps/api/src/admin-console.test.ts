@@ -71,6 +71,7 @@ const bots = [
     modelProvider: "azure",
     modelId: "gpt-x",
     archivedAt: null,
+    suspendedAt: new Date("2026-02-06T00:00:00Z"),
     space: { name: "Team space" },
   },
   {
@@ -80,6 +81,7 @@ const bots = [
     modelProvider: null,
     modelId: null,
     archivedAt: new Date(),
+    suspendedAt: null,
     space: { name: "Team space" },
   },
 ];
@@ -190,6 +192,8 @@ describe("admin console authorization", () => {
       () => member.users.list({ limit: 10 }),
       () => member.users.endSessions({ userId: "admin" }),
       () => member.bots.list({ limit: 10 }),
+      () => member.bots.suspend({ botId: "bot-1" }),
+      () => member.bots.resume({ botId: "bot-1" }),
       () => member.policy(),
       () => member.audit({ limit: 10 }),
     ];
@@ -300,6 +304,7 @@ describe("admin console data", () => {
         lastActiveAt: "2026-02-05T00:00:00.000Z",
         monthlySpendUsd: 4.25,
         archived: false,
+        suspendedAt: "2026-02-06T00:00:00.000Z",
       },
       {
         id: "bot-2",
@@ -311,6 +316,7 @@ describe("admin console data", () => {
         lastActiveAt: null,
         monthlySpendUsd: 0,
         archived: true,
+        suspendedAt: null,
       },
     ]);
   });

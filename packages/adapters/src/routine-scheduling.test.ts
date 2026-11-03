@@ -24,7 +24,7 @@ describe("routine scheduling", () => {
   });
 });
 
-function pendingTimerFixture(reuse = true) {
+function pendingTimerFixture(reuse = true, suspended = false) {
   const scheduledAt = new Date(Date.now() - 1_000);
   const routine = {
     id: "routine-1",
@@ -64,8 +64,17 @@ function pendingTimerFixture(reuse = true) {
     },
   };
   const prisma = {
-    routine: { findUnique: vi.fn(async () => routine) },
-    bot: { findUnique: vi.fn(async () => ({ id: "bot-1", thread: { id: "thread-1" } })) },
+    routine: {
+      findUnique: vi.fn(async () => routine),
+      updateMany: vi.fn(async () => ({ count: 1 })),
+    },
+    bot: {
+      findUnique: vi.fn(async () => ({
+        id: "bot-1",
+        thread: { id: "thread-1" },
+        suspendedAt: suspended ? new Date() : null,
+      })),
+    },
     agentSkill: { findMany: vi.fn(async () => []) },
     $transaction: vi.fn(async (callback: (client: unknown) => Promise<unknown>) => callback(tx)),
   };
@@ -76,7 +85,7 @@ function pendingTimerFixture(reuse = true) {
     jobs: { enqueue, cancel: vi.fn(), close: vi.fn() },
     events: { append },
   } as unknown as Parameters<typeof createRunExecutor>[0]);
-  return { executor, tx, enqueue, append, scheduledAt };
+  return { executor, tx, prisma, enqueue, append, scheduledAt };
 }
 
 describe("recurring routine catch-up", () => {
@@ -124,6 +133,22 @@ describe("recurring routine catch-up", () => {
     expect(tx.run.create).not.toHaveBeenCalled();
     expect(tx.task.create).not.toHaveBeenCalled();
     expect(append).not.toHaveBeenCalled();
+    expect(enqueue).toHaveBeenCalledOnce();
+    expect(enqueue).toHaveBeenCalledWith(expect.objectContaining({ name: "routine.wakeup" }));
+  });
+});
+
+describe("a suspended AI employee's routine", () => {
+  it("skips the due occurrence and keeps the schedule, so resuming fires no burst", async () => {
+    const { executor, tx, prisma, enqueue, append, scheduledAt } = pendingTimerFixture(false, true);
+    await executor.wakeRoutine("routine-1", scheduledAt.toISOString());
+    expect(prisma.$transaction).not.toHaveBeenCalled();
+    expect(tx.run.create).not.toHaveBeenCalled();
+    expect(append).not.toHaveBeenCalled();
+    expect(prisma.routine.updateMany).toHaveBeenCalledWith({
+      where: { id: "routine-1", active: true, nextRunAt: scheduledAt },
+      data: { nextRunAt: expect.any(Date) },
+    });
     expect(enqueue).toHaveBeenCalledOnce();
     expect(enqueue).toHaveBeenCalledWith(expect.objectContaining({ name: "routine.wakeup" }));
   });

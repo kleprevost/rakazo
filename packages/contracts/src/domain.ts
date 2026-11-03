@@ -111,6 +111,8 @@ export const BotSchema = z.object({
   pinned: z.boolean(),
   sectionId: Id.nullable(),
   archivedAt: z.string().nullable(),
+  /** Set while an admin has suspended the bot; it takes no runs. */
+  suspendedAt: z.string().nullable().optional(),
   unread: z.boolean(),
   parentBotId: Id.nullable(),
   memoryScope: MemoryScopeSchema.nullable(),

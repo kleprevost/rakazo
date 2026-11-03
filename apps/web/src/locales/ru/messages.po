@@ -1643,6 +1643,7 @@ msgstr "Компьютеры выключены. Установите SANDBOX_PR
 msgid "Configure a plugin catalog on the server to connect apps."
 msgstr ""
 
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/admin/AdminUsersPage.tsx
 msgid "Confirm"
 msgstr ""
@@ -2382,6 +2383,7 @@ msgstr "Не удалось проверить MCP-сервер"
 msgid "Could not transcribe that recording."
 msgstr ""
 
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/ScratchpadSection.tsx
 msgid "Could not update"
 msgstr "Не удалось обновить"
@@ -5403,6 +5405,10 @@ msgstr "Восстановлено"
 msgid "Restoring your workspace"
 msgstr "Восстановление вашего рабочего пространства"
 
+#: src/pages/admin/AdminBotsPage.tsx
+msgid "Resume"
+msgstr "Возобновить"
+
 #: src/components/AccountAccess.tsx
 #: src/components/integrations/plugin-marketplace.tsx
 #: src/components/integrations/skills-dialog.tsx
@@ -6215,6 +6221,20 @@ msgstr ""
 #: src/pages/Onboarding.tsx
 msgid "Supports thinking"
 msgstr "Поддерживает рассуждения"
+
+#: src/pages/admin/AdminBotsPage.tsx
+msgid "Suspend"
+msgstr "Приостановить"
+
+#: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/shell/chat-header.tsx
+msgid "Suspended"
+msgstr "Приостановлен"
+
+#. js-lingui-explicit-id
+#: src/lib/run-error.ts
+msgid "Suspended by your organization"
+msgstr "Приостановлено вашей организацией"
 
 #: src/components/ModelCredits.tsx
 #: src/pages/model-settings/space-bots-model.tsx

@@ -736,6 +736,8 @@ model Bot {
   sectionId         String?
   section           BotSection?       @relation(fields: [sectionId], references: [id], onDelete: SetNull)
   archivedAt        DateTime?
+  suspendedAt       DateTime?
+  suspendedByUserId String?
   parentBotId       String?
   spawnKey          String?
   memoryScope       String?
