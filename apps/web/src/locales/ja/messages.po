@@ -710,7 +710,6 @@ msgid "All time"
 msgstr "全期間"
 
 #: src/components/ApprovalRulesSettings.tsx
-#: src/pages/Today.tsx
 msgid "Allow"
 msgstr "許可"
 
@@ -2719,7 +2718,6 @@ msgid "Denied"
 msgstr "拒否済み"
 
 #: src/components/AskCard.tsx
-#: src/pages/Today.tsx
 msgid "Deny"
 msgstr "拒否"
 
@@ -4604,6 +4602,7 @@ msgstr "自分のみ"
 #: src/pages/shell/computer-panel.tsx
 #: src/pages/shell/import-setup-card.tsx
 #: src/pages/shell/message-view.tsx
+#: src/pages/Today.tsx
 msgid "Open"
 msgstr "開く"
 

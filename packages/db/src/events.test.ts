@@ -2662,6 +2662,54 @@ describe("answerRunInput", () => {
     expect(tx.run.updateMany).not.toHaveBeenCalled();
   });
 
+  it("answers an approval only against its own still-pending effect", async () => {
+    const approvalBlock = {
+      kind: "ask",
+      approvalEffectId: "effect-1",
+      text: "Review before sending",
+      actions: [
+        { id: "allow", label: "Allow once" },
+        { id: "deny", label: "Deny" },
+      ],
+    };
+    const build = (block: Record<string, unknown>) => {
+      const tx = {
+        $queryRaw: vi.fn().mockResolvedValue([{ id: "thread-1" }]),
+        message: { findFirst: vi.fn().mockResolvedValue({ id: "message-1", blocks: [block] }) },
+        run: {
+          findFirst: vi.fn().mockResolvedValue({ botId: "bot-1" }),
+          updateMany: vi.fn(),
+        },
+        // The effect was already decided or expired, so no pending one matches.
+        externalEffect: { findFirst: vi.fn().mockResolvedValue(null) },
+      };
+      const prisma = {
+        $transaction: vi.fn(async (callback: (client: typeof tx) => unknown) => callback(tx)),
+      } as unknown as PrismaClient;
+      return { tx, prisma };
+    };
+    const answer = {
+      spaceId: "workspace-1",
+      threadId: "thread-1",
+      runId: "run-1",
+      messageId: "message-1",
+      answeredByUserId: "user-1",
+      answer: "allow",
+    };
+
+    const stale = build({ ...approvalBlock, status: "pending" });
+    await expect(answerRunInput(stale.prisma, answer)).resolves.toBe(false);
+    expect(stale.tx.externalEffect.findFirst).toHaveBeenCalledWith({
+      where: { id: "effect-1", spaceId: "workspace-1", runId: "run-1", status: "intended" },
+    });
+    expect(stale.tx.run.updateMany).not.toHaveBeenCalled();
+
+    const answered = build({ ...approvalBlock, status: "answered", answer: "deny" });
+    await expect(answerRunInput(answered.prisma, answer)).resolves.toBe(false);
+    expect(answered.tx.externalEffect.findFirst).not.toHaveBeenCalled();
+    expect(answered.tx.run.updateMany).not.toHaveBeenCalled();
+  });
+
   it("does not queue a run for an action that the approval card did not offer", async () => {
     const tx = {
       $queryRaw: vi.fn().mockResolvedValue([{ id: "thread-1" }]),

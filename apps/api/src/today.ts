@@ -31,8 +31,6 @@ const WORK_LIMIT = 20;
 const ASK_TEXT_MAX = 300;
 /** Chat replies are not "work done"; these runs started without a person typing. */
 const AUTONOMOUS_TRIGGERS = ["routine", "webhook", "spawn", "bot_message", "cloud_agent"];
-/** Quick actions are limited to the plain yes/no of an approval card. */
-const QUICK_ACTION_IDS = ["allow", "deny"];
 
 const HOUR_MS = 3_600_000;
 const DAY_MS = 24 * HOUR_MS;
@@ -292,23 +290,14 @@ export async function todaySummary(
       at: row.updatedAt.toISOString(),
       messageId: ask.messageId,
     };
-    const actions = (ask.block.actions ?? []).filter((action) =>
-      QUICK_ACTION_IDS.includes(action.id),
-    );
-    if (
-      ask.block.approvalEffectId &&
-      ask.block.input !== "secret" &&
-      QUICK_ACTION_IDS.every((id) => actions.some((action) => action.id === id))
-    ) {
-      attention.push({
-        ...base,
-        kind: "approval",
-        text: clip(ask.block.text),
-        actions: actions.map(({ id, label }) => ({ id, label })),
-      });
-    } else {
-      attention.push({ ...base, kind: "question", text: clip(ask.block.text) });
-    }
+    // No existing rule marks an approval as low-risk: every card names an effect or destination
+    // the user must see whole. So Today never answers one. The clipped text is a preview and the
+    // decision is made on the full card in the chat.
+    attention.push({
+      ...base,
+      kind: ask.block.approvalEffectId && ask.block.input !== "secret" ? "approval" : "question",
+      text: clip(ask.block.text),
+    });
   }
   const failed = failedRaw
     .filter((row) => !superseded.has(row.routineId ?? row.threadId))

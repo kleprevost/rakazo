@@ -120,7 +120,7 @@ describe("today summary", () => {
     );
   });
 
-  it("splits active runs into working and waiting and surfaces an approval with quick actions", async () => {
+  it("splits active runs into working and waiting and surfaces an approval without quick actions", async () => {
     const { prisma, messages, byStatus } = fixture();
     byStatus({
       active: [
@@ -148,13 +148,26 @@ describe("today summary", () => {
         groupId: "group-1",
         messageId: "message-1",
         text: "Send the email to Dana?",
-        // "Always allow" is a standing change, so it stays in the chat card.
-        actions: [
-          { id: "allow", label: "Allow once" },
-          { id: "deny", label: "Deny" },
-        ],
       }),
     ]);
+    // The clipped text is a preview; Today carries nothing to decide with.
+    expect(summary.attention[0]).not.toHaveProperty("actions");
+  });
+
+  it("clips a long approval to a preview and keeps it an approval", async () => {
+    const { prisma, messages, byStatus } = fixture();
+    byStatus({ active: [runRow("approve", { status: "waiting_input" })] });
+    messages.mockResolvedValue([
+      {
+        id: "message-1",
+        runId: "approve",
+        threadId: "thread-approve",
+        blocks: [{ ...approvalBlock, text: `Send to ${"x".repeat(400)}` }],
+      },
+    ]);
+    const summary = await todaySummary(prisma, actor, now);
+    expect(summary.attention[0]).toMatchObject({ kind: "approval", messageId: "message-1" });
+    expect((summary.attention[0] as { text: string }).text).toHaveLength(300);
   });
 
   it("treats secret requests, plain questions and answered asks conservatively", async () => {

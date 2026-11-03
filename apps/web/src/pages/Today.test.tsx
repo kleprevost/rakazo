@@ -54,10 +54,6 @@ const populated: TodaySummary = {
       at,
       messageId: "m1",
       text: "Send the email to Dana?",
-      actions: [
-        { id: "allow", label: "Allow once" },
-        { id: "deny", label: "Deny" },
-      ],
     },
     {
       ...bot,
@@ -211,19 +207,15 @@ it("lists every section with links to the work behind each row", async () => {
   expect(container.textContent).toContain("504: request timed out");
 });
 
-it("answers an approval through the existing thread procedure and refreshes", async () => {
+it("never offers a decision for an approval, only a way into its chat", async () => {
   rpc.today.summary.mockResolvedValue(populated);
-  rpc.threads.answer.mockResolvedValue({ ok: true });
   const container = await mount();
-  await vi.waitFor(() => expect(button(container, "Deny")).toBeDefined());
-  await act(async () => button(container, "Deny")?.click());
-  expect(rpc.threads.answer).toHaveBeenCalledWith({
-    botId: "bot-1",
-    runId: "run-ask",
-    messageId: "m1",
-    answer: "deny",
-  });
-  await vi.waitFor(() => expect(rpc.today.summary).toHaveBeenCalledTimes(2));
+  await vi.waitFor(() => expect(container.textContent).toContain("Send the email to Dana?"));
+  expect(button(container, "Allow")).toBeUndefined();
+  expect(button(container, "Deny")).toBeUndefined();
+  const open = [...container.querySelectorAll("a")].find((a) => a.textContent === "Open");
+  expect(open?.getAttribute("href")).toBe("/app/bot-1");
+  expect(rpc.threads.answer).not.toHaveBeenCalled();
 });
 
 it("retries a failed routine with a stable nonce and reports a refusal", async () => {
