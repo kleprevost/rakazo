@@ -59,22 +59,28 @@ export class PolicyDeniedError extends Error {
   constructor(
     readonly rule: string,
     readonly subject: string,
+    message: string = POLICY_DENIED_MESSAGE,
   ) {
-    super(POLICY_DENIED_MESSAGE);
+    super(message);
     this.name = "PolicyDeniedError";
   }
 }
 
 type Audience = { userId?: string; spaceId?: string; surface: string };
 
-async function deny(rule: string, subject: string, audience: Audience): Promise<never> {
+export async function deny(
+  rule: string,
+  subject: string,
+  audience: Audience,
+  message?: string,
+): Promise<never> {
   await recordSecurityEvent({
     type: "policy.denied",
     userId: audience.userId,
     spaceId: audience.spaceId,
     metadata: { rule, subject, surface: audience.surface },
   });
-  throw new PolicyDeniedError(rule, subject);
+  throw new PolicyDeniedError(rule, subject, message);
 }
 
 /** Refuse a model the policy forbids; records one `policy.denied` event. No-op without policy. */

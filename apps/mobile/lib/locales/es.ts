@@ -110,6 +110,7 @@ export const ES_MESSAGES: Record<string, string> = {
   "Your Anthropic": "Tu Anthropic",
   "Your model provider": "Tu proveedor de modelos",
   "Blocked by your organization": "Bloqueado por tu organización",
+  "Monthly budget reached": "Presupuesto mensual alcanzado",
   "Connect a model in Settings before running bots.":
     "Conecta un modelo en Configuración antes de ejecutar bots.",
   "Connect your own API key in Models or choose Rakazo credits in Billing.":

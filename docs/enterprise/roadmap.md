@@ -26,7 +26,7 @@ Not linked from the public docs site (`apps/www/src/docs.ts` lists slugs explici
 ## Milestone 2 — Governance (next, run policy and budgets in parallel)
 Acceptance: enforced server-side before a run starts, offline tests, admin UI only where needed.
 - Central policy: done (#8, #12, #13, #14); see [central-policy.md](./central-policy.md). Gaps: bot computer egress, routine-watch tools, already-running computers on a newly disallowed provider, admin read-only view.
-- Budgets: per user/bot/org spend limits enforced pre-run (extend existing budget code).
+- Budgets: per user/bot/org monthly USD limits enforced pre-run from persisted usage cost; see [central-policy.md](./central-policy.md#budgets). Gaps: `warnAtPercent` warning, admin spend view, mid-run cut-off.
 - Audit to Azure Monitor / Sentinel: stream existing audit events to Log Analytics.
 - Admin roles (security admin, bot owner, viewer) mapped from Entra app roles via the OIDC claim mapping.
 
