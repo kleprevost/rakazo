@@ -1,0 +1,55 @@
+# API and worker share one managed identity (federated to both service accounts) and may manage
+# computer pods only in the dedicated namespace. Rules match docs/self-host-sandbox-providers.md.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: rakazo-api
+  namespace: rakazo
+  annotations:
+    azure.workload.identity/client-id: 00000000-0000-0000-0000-000000000000 # appIdentityClientId output
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: rakazo-worker
+  namespace: rakazo
+  annotations:
+    azure.workload.identity/client-id: 00000000-0000-0000-0000-000000000000 # appIdentityClientId output
+---
+# The web proxy needs no Azure identity and no Kubernetes API access.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: rakazo-web
+  namespace: rakazo
+automountServiceAccountToken: false
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: rakazo-computers
+  namespace: rakazo-sandboxes
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["create", "get", "delete"]
+  - apiGroups: [""]
+    resources: ["pods/exec"]
+    verbs: ["create", "get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: rakazo-computers
+  namespace: rakazo-sandboxes
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: rakazo-computers
+subjects:
+  - kind: ServiceAccount
+    name: rakazo-api
+    namespace: rakazo
+  - kind: ServiceAccount
+    name: rakazo-worker
+    namespace: rakazo

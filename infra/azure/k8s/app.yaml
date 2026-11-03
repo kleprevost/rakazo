@@ -1,0 +1,243 @@
+# API, worker and web from the published app image (same commands as
+# infra/compose/docker-compose.images.yml). Settings come from the generated ConfigMap
+# rakazo-config (see kustomization.yaml) and the Secret rakazo-secrets (see secrets.example.yaml).
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rakazo-data
+  namespace: rakazo
+spec:
+  # Shared DATA_DIR for API and worker. Azure Files; see storageclass.yaml. Keep bot homes in
+  # object storage instead (docs/self-host-storage.md) to shrink what lives here.
+  accessModes: [ReadWriteMany]
+  storageClassName: rakazo-files
+  resources:
+    requests:
+      storage: 100Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rakazo-api
+  namespace: rakazo
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: rakazo-api }
+  template:
+    metadata:
+      labels:
+        app: rakazo-api
+        azure.workload.identity/use: "true"
+    spec:
+      serviceAccountName: rakazo-api
+      nodeSelector:
+        kubernetes.azure.com/mode: system
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        seccompProfile: { type: RuntimeDefault }
+      containers:
+        - name: api
+          image: ghcr.io/elie222/rakazo/app
+          workingDir: /app/apps/api
+          command: ["node", "--enable-source-maps", "dist/index.js"]
+          envFrom:
+            - configMapRef: { name: rakazo-config }
+            - secretRef: { name: rakazo-secrets }
+          ports:
+            - { name: http, containerPort: 3100 }
+          readinessProbe:
+            httpGet: { path: /health, port: http }
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: { path: /health, port: http }
+            periodSeconds: 20
+            failureThreshold: 6
+          startupProbe:
+            httpGet: { path: /health, port: http }
+            periodSeconds: 5
+            failureThreshold: 60
+          resources:
+            requests: { cpu: 250m, memory: 768Mi }
+            limits: { memory: 1536Mi }
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities: { drop: ["ALL"] }
+          volumeMounts:
+            - { name: data, mountPath: /data }
+      volumes:
+        - name: data
+          persistentVolumeClaim: { claimName: rakazo-data }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rakazo-api
+  namespace: rakazo
+spec:
+  selector: { app: rakazo-api }
+  ports:
+    - { name: http, port: 3100, targetPort: http }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rakazo-worker
+  namespace: rakazo
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: rakazo-worker }
+  template:
+    metadata:
+      labels:
+        app: rakazo-worker
+        azure.workload.identity/use: "true"
+    spec:
+      serviceAccountName: rakazo-worker
+      nodeSelector:
+        kubernetes.azure.com/mode: system
+      # Lets running jobs finish on a rollout (50m, as in the Compose files).
+      terminationGracePeriodSeconds: 3000
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        seccompProfile: { type: RuntimeDefault }
+      containers:
+        - name: worker
+          image: ghcr.io/elie222/rakazo/app
+          workingDir: /app/apps/worker
+          command: ["node", "--enable-source-maps", "dist/index.js"]
+          envFrom:
+            - configMapRef: { name: rakazo-config }
+            - secretRef: { name: rakazo-secrets }
+          livenessProbe:
+            exec:
+              command: ["node", "dist/health-check.js"]
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+            initialDelaySeconds: 120
+          resources:
+            requests: { cpu: 250m, memory: 1Gi }
+            limits: { memory: 2Gi }
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities: { drop: ["ALL"] }
+          volumeMounts:
+            - { name: data, mountPath: /data }
+      volumes:
+        - name: data
+          persistentVolumeClaim: { claimName: rakazo-data }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rakazo-web
+  namespace: rakazo
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: rakazo-web }
+  template:
+    metadata:
+      labels:
+        app: rakazo-web
+    spec:
+      serviceAccountName: rakazo-web
+      automountServiceAccountToken: false
+      nodeSelector:
+        kubernetes.azure.com/mode: system
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        seccompProfile: { type: RuntimeDefault }
+      containers:
+        - name: web
+          image: ghcr.io/elie222/rakazo/app
+          workingDir: /app/apps/web
+          command: ["node_modules/.bin/vite", "preview", "--host", "0.0.0.0", "--port", "5173"]
+          env:
+            - { name: NODE_ENV, value: production }
+            - { name: RAYON_NUM_THREADS, value: "4" }
+            - { name: API_PROXY_TARGET, value: "http://rakazo-api:3100" }
+            - name: RAKAZO_HOST
+              valueFrom:
+                configMapKeyRef: { name: rakazo-config, key: RAKAZO_HOST }
+            - name: SCREEN_PROXY_SECRET
+              valueFrom:
+                secretKeyRef: { name: rakazo-secrets, key: SCREEN_PROXY_SECRET }
+          ports:
+            - { name: http, containerPort: 5173 }
+          readinessProbe:
+            httpGet: { path: /, port: http }
+            periodSeconds: 10
+          resources:
+            requests: { cpu: 100m, memory: 256Mi }
+            limits: { memory: 512Mi }
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities: { drop: ["ALL"] }
+          volumeMounts:
+            - { name: web-assets, mountPath: /app/apps/web/asset-archive }
+      volumes:
+        # Per-pod scratch for the recent-asset archive; losing it only affects tabs on an old build.
+        - name: web-assets
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rakazo-web
+  namespace: rakazo
+spec:
+  selector: { app: rakazo-web }
+  ports:
+    - { name: http, port: 5173, targetPort: http }
+---
+# Applies migrations as the database owner and creates the rakazo_app login named in DATABASE_URL,
+# like the compose "migrate" service. Only this Job gets DATABASE_MIGRATION_URL.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: rakazo-migrate
+  namespace: rakazo
+spec:
+  backoffLimit: 3
+  ttlSecondsAfterFinished: 3600
+  template:
+    metadata:
+      labels:
+        app: rakazo-migrate
+    spec:
+      restartPolicy: Never
+      automountServiceAccountToken: false
+      nodeSelector:
+        kubernetes.azure.com/mode: system
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        seccompProfile: { type: RuntimeDefault }
+      containers:
+        - name: migrate
+          image: ghcr.io/elie222/rakazo/app
+          workingDir: /app/apps/api
+          command: ["pnpm", "db:deploy"]
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef: { name: rakazo-secrets, key: DATABASE_URL }
+            - name: DATABASE_MIGRATION_URL
+              valueFrom:
+                secretKeyRef: { name: rakazo-secrets, key: DATABASE_MIGRATION_URL }
+          resources:
+            requests: { cpu: 100m, memory: 512Mi }
+            limits: { memory: 1536Mi }
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities: { drop: ["ALL"] }
