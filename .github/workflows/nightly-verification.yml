@@ -15,6 +15,8 @@ concurrency:
 jobs:
   visual-web:
     name: Daily web screenshots
+    # Upstream-only: publishes the report to upstream's site.
+    if: github.repository == 'elie222/rakazo'
     uses: ./.github/workflows/playwright.yml
     with:
       publish_report: true

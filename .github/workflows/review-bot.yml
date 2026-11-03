@@ -17,6 +17,7 @@ permissions: {}
 jobs:
   handoff:
     if: >-
+      github.repository == 'elie222/rakazo' &&
       github.event.issue.pull_request &&
       github.event.issue.state == 'open' &&
       ((startsWith(github.event.comment.user.login, 'qodo-') &&

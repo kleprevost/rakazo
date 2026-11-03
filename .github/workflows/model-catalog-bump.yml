@@ -20,6 +20,8 @@ concurrency:
 jobs:
   update:
     name: Update pi packages and verify
+    # Fork syncs pick this up from upstream's own bump PRs.
+    if: github.repository == 'elie222/rakazo'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:

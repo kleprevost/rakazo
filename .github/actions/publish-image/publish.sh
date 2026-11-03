@@ -14,9 +14,9 @@ for file in "${files[@]}"; do
   sources+=("${IMAGE:?}@sha256:${digest}")
 done
 
-# Verify both platforms before making any tag discoverable.
+# Verify every required platform before making any tag discoverable (forks publish amd64 only).
 manifest="$(docker buildx imagetools create --dry-run "${sources[@]}")"
-for arch in amd64 arm64; do
+for arch in ${ARCHITECTURES:-amd64 arm64}; do
   jq -e --arg arch "$arch" \
     'any(.manifests[]; .platform.os == "linux" and .platform.architecture == $arch)' \
     <<< "$manifest" >/dev/null || { echo "Image is missing linux/$arch." >&2; exit 1; }

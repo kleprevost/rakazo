@@ -14,7 +14,8 @@ concurrency:
 
 jobs:
   update:
-    if: github.ref == 'refs/heads/main'
+    # Upstream-only: needs upstream's coding-agent credentials.
+    if: github.repository == 'elie222/rakazo' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 55
     permissions:

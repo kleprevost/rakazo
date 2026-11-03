@@ -25,6 +25,8 @@ concurrency:
 jobs:
   screenshot:
     name: macOS setup screenshot
+    # Upstream-only: needs paid macOS runners.
+    if: github.repository == 'elie222/rakazo'
     runs-on: macos-26
     timeout-minutes: 20
     steps:

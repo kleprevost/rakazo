@@ -17,6 +17,8 @@ concurrency:
 jobs:
   validate:
     name: Validate stable release
+    # Upstream-only: needs upstream's signing and notarization secrets.
+    if: github.repository == 'elie222/rakazo'
     runs-on: ubuntu-24.04
     outputs:
       tag: ${{ steps.release.outputs.tag }}

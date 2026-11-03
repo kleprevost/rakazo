@@ -109,7 +109,7 @@ jobs:
     # Each architecture builds natively on its own runner and pushes by digest only.
     # No QEMU: GitHub hosts native arm64 runners, and emulated arm64 took hours for the
     # desktop-sized computer image. See docs/self-host-upgrading.md (Published images and tags).
-    runs-on: ${{ matrix.runner }}
+    runs-on: ${{ matrix.arch == 'arm64' && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
     timeout-minutes: 90
     permissions:
       contents: read
@@ -118,7 +118,8 @@ jobs:
       fail-fast: false
       matrix:
         name: [app, updater, computer]
-        arch: [amd64, arm64]
+        # Forks deploy to amd64 hosts only, so they skip the slower arm64 builds.
+        arch: ${{ fromJSON(github.repository == 'elie222/rakazo' && '["amd64","arm64"]' || '["amd64"]') }}
         include:
           # Only the updater image contains the Docker CLI; the application image stays unprivileged.
           # The supervisor is not a separate published image: it runs from `app` on the internal network.
@@ -131,10 +132,6 @@ jobs:
           - name: computer
             dockerfile: infra/sandboxes/computer/Dockerfile
             context: infra/sandboxes/computer
-          - arch: amd64
-            runner: ubuntu-latest
-          - arch: arm64
-            runner: ubuntu-24.04-arm
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
@@ -331,3 +328,4 @@ jobs:
         with:
           image: ghcr.io/${{ github.repository }}/${{ matrix.name }}
           digests-directory: /tmp/digests
+          architectures: ${{ github.repository == 'elie222/rakazo' && 'amd64 arm64' || 'amd64' }}

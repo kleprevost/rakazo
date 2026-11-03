@@ -7,6 +7,9 @@ inputs:
   digests-directory:
     description: Directory containing one multi-platform digest or two architecture digests.
     required: true
+  architectures:
+    description: Space-separated platforms every published image must contain.
+    default: amd64 arm64
 runs:
   using: composite
   steps:
@@ -27,6 +30,7 @@ runs:
       env:
         ACTION_PATH: ${{ github.action_path }}
         IMAGE: ${{ inputs.image }}
+        ARCHITECTURES: ${{ inputs.architectures }}
         DIGESTS_DIRECTORY: ${{ inputs.digests-directory }}
         TAGS: ${{ steps.meta.outputs.tags }}
       run: bash "$ACTION_PATH/publish.sh"
