@@ -17,6 +17,46 @@ msgstr ""
 msgid " (unread)"
 msgstr " (ungelesen)"
 
+#: src/pages/Calendar.tsx
+msgid "Actions"
+msgstr "Aktionen"
+
+#: src/pages/Calendar.tsx
+msgid "Day"
+msgstr "Tag"
+
+#: src/pages/Calendar.tsx
+msgid "Event-triggered"
+msgstr "Ereignisgesteuert"
+
+#: src/pages/Calendar.tsx
+msgid "Next"
+msgstr "Weiter"
+
+#: src/pages/Calendar.tsx
+msgid "Nothing scheduled"
+msgstr "Nichts geplant"
+
+#: src/pages/Calendar.tsx
+msgid "Pause"
+msgstr "Pausieren"
+
+#: src/pages/Calendar.tsx
+msgid "Previous"
+msgstr "Zurück"
+
+#: src/pages/Calendar.tsx
+msgid "Resume"
+msgstr "Fortsetzen"
+
+#: src/pages/Calendar.tsx
+msgid "Run now"
+msgstr "Jetzt ausführen"
+
+#: src/pages/Calendar.tsx
+msgid "Week"
+msgstr "Woche"
+
 #. placeholder {0}: pinned.length
 #: src/pages/model-settings/space-bots-model.tsx
 msgid "{0, plural, one {# bot has its own model:} other {# bots have their own model:}}"

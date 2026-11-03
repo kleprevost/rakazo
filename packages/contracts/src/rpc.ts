@@ -45,6 +45,7 @@ import {
   VaultRevealed,
   VaultRevealInput,
 } from "./bot-secrets.js";
+import { CalendarRangeInputSchema, CalendarRangeSchema } from "./calendar.js";
 import {
   AccessGrantInputSchema,
   AccessGrantSchema,
@@ -1389,6 +1390,10 @@ export const appContract = {
   },
   runs: {
     list: oc.input(z.object({ filter: z.enum(["active", "recent"]) })).output(RunsListOutputSchema),
+  },
+  /** The signed-in user's routines over a day to a month: projected runs and past outcomes. */
+  calendar: {
+    range: oc.input(CalendarRangeInputSchema).output(CalendarRangeSchema),
   },
   /** The signed-in user's bots at a glance: what needs them, what is running, what finished. */
   today: {

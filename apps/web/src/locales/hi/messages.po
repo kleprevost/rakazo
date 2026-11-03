@@ -17,6 +17,46 @@ msgstr ""
 msgid " (unread)"
 msgstr " (अपठित)"
 
+#: src/pages/Calendar.tsx
+msgid "Actions"
+msgstr "कार्रवाइयाँ"
+
+#: src/pages/Calendar.tsx
+msgid "Day"
+msgstr "दिन"
+
+#: src/pages/Calendar.tsx
+msgid "Event-triggered"
+msgstr "इवेंट से शुरू"
+
+#: src/pages/Calendar.tsx
+msgid "Next"
+msgstr "अगला"
+
+#: src/pages/Calendar.tsx
+msgid "Nothing scheduled"
+msgstr "कुछ शेड्यूल नहीं है"
+
+#: src/pages/Calendar.tsx
+msgid "Pause"
+msgstr "रोकें"
+
+#: src/pages/Calendar.tsx
+msgid "Previous"
+msgstr "पिछला"
+
+#: src/pages/Calendar.tsx
+msgid "Resume"
+msgstr "फिर शुरू करें"
+
+#: src/pages/Calendar.tsx
+msgid "Run now"
+msgstr "अभी चलाएँ"
+
+#: src/pages/Calendar.tsx
+msgid "Week"
+msgstr "सप्ताह"
+
 #. placeholder {0}: pinned.length
 #: src/pages/model-settings/space-bots-model.tsx
 msgid "{0, plural, one {# bot has its own model:} other {# bots have their own model:}}"

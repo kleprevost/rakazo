@@ -11,6 +11,7 @@ import {
 } from "@rakazo/ui-web";
 import {
   BookOpen,
+  CalendarDays,
   Download,
   FolderOpen,
   Gauge,
@@ -43,6 +44,7 @@ type Props = {
   onSkills: () => void;
   onBoard?: () => void;
   onToday?: () => void;
+  onCalendar?: () => void;
   links?: NavLink[];
   onLink?: (link: NavLink) => void;
   onArtifacts: () => void;
@@ -74,6 +76,7 @@ export function SidebarFooter({
   onSkills,
   onBoard,
   onToday,
+  onCalendar,
   links = [],
   onLink,
   onArtifacts,
@@ -186,6 +189,16 @@ export function SidebarFooter({
               >
                 <LayoutDashboard className="text-muted-foreground" strokeWidth={1.75} />
                 <Trans>Today</Trans>
+              </Button>
+            ) : null}
+            {onCalendar ? (
+              <Button
+                variant="ghost"
+                className="h-9 w-full justify-start gap-2.5 font-normal"
+                onClick={onCalendar}
+              >
+                <CalendarDays className="text-muted-foreground" strokeWidth={1.75} />
+                <Trans>Calendar</Trans>
               </Button>
             ) : null}
             <Button
