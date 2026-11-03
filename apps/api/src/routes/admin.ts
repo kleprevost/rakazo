@@ -1,3 +1,4 @@
+import { adminComputers } from "../admin-computers.js";
 import {
   adminAudit,
   adminBots,
@@ -34,6 +35,11 @@ export function adminRoutes(ctx: RouterContext) {
         ),
         resume: authed.admin.bots.resume.handler(({ context, input }) =>
           resumeBot(deps, context.actor.userId, input.botId),
+        ),
+      },
+      computers: {
+        list: authed.admin.computers.list.handler(({ context, input }) =>
+          adminComputers(deps, context.actor.userId, input),
         ),
       },
       policy: authed.admin.policy.handler(({ context }) => adminPolicy(deps, context.actor.userId)),

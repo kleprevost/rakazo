@@ -5,6 +5,7 @@ import type {
   ComputerActionRequest,
   ComputerFileEntry,
   ComputerInput,
+  ComputerInspection,
   ComputerObservation,
   ComputerRef,
   ControlLeaseRef,
@@ -131,6 +132,7 @@ export class DockerSandboxProvider implements SandboxProvider {
         takeover: true,
         persistentHome: true,
         multiScreen: true,
+        fleet: { inspect: true },
       },
     };
   }
@@ -219,6 +221,28 @@ export class DockerSandboxProvider implements SandboxProvider {
   async isRunning(computer: ComputerRef, context: AdapterContext): Promise<boolean> {
     if (computer.kind !== "docker") return false;
     return (await this.containerRunning(computer, context)) === true;
+  }
+
+  async inspect(computer: ComputerRef, context: AdapterContext): Promise<ComputerInspection> {
+    const res = await fetch(this.url(`/computers/${computer.id}`), {
+      method: "GET",
+      headers: this.headers(context, computer.botId),
+      signal: context.signal,
+    });
+    if (res.status === 404) {
+      cancelResponseBody(res);
+      return { runtime: "gone", isolation: "container" };
+    }
+    if (!res.ok) {
+      cancelResponseBody(res);
+      throw new Error(`could not inspect computer: ${res.status}`);
+    }
+    const body = await readSandboxJson<{ running?: boolean; image?: string }>(res, context.signal);
+    return {
+      runtime: body.running === true ? "running" : "stopped",
+      ...(body.image ? { image: { ref: body.image } } : {}),
+      isolation: "container",
+    };
   }
 
   async prepare(_computer: ComputerRef, _context: AdapterContext): Promise<void> {}

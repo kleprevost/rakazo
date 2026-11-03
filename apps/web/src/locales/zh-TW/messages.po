@@ -688,6 +688,7 @@ msgstr "進階..."
 msgid "Agent from another app"
 msgstr ""
 
+#: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/admin/AdminOverviewPage.tsx
 #: src/pages/admin/AdminShell.tsx
 msgid "AI employees"
@@ -1669,6 +1670,7 @@ msgstr "電腦已停止"
 #: src/components/ComputerDeviceSettings.tsx
 #: src/pages/AccountSettingsOverlay.tsx
 #: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminShell.tsx
 msgid "Computers"
 msgstr "電腦"
 
@@ -3085,6 +3087,7 @@ msgid "Environment variables: {names}"
 msgstr "環境變數：{names}"
 
 #: src/lib/roster-status.ts
+#: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/shell/sidebar-roster.tsx
 msgid "Error"
 msgstr "錯誤"
@@ -3568,6 +3571,10 @@ msgstr "如果聽到了，說明語音已就緒。"
 msgid "Ignore"
 msgstr "忽略"
 
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Image"
+msgstr ""
+
 #. js-lingui-explicit-id
 #: src/lib/run-error.ts
 msgid "Image input is not configured for this model."
@@ -3725,6 +3732,10 @@ msgstr "隔離"
 msgid "Isolated preview — no access to your account"
 msgstr "隔離預覽 — 無法存取你的帳號"
 
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Isolation"
+msgstr ""
+
 #: src/components/pages/PageViewHost.tsx
 msgid "It may have been deleted, or it belongs to someone else."
 msgstr "它可能已被刪除，或屬於其他人。"
@@ -3779,6 +3790,7 @@ msgid "Language"
 msgstr "語言"
 
 #: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/admin/AdminComputersPage.tsx
 msgid "Last active"
 msgstr ""
 
@@ -4617,6 +4629,10 @@ msgstr ""
 msgid "Not now"
 msgstr "暫不"
 
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Not reported"
+msgstr ""
+
 #: src/pages/shell/agent-import.tsx
 #: src/pages/shell/import-status.ts
 msgid "Not supported in Rakazo"
@@ -4855,6 +4871,7 @@ msgstr ""
 #: src/components/pages/SharePopover.tsx
 #: src/lib/identity-display.ts
 #: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/Board.tsx
 msgid "Owner"
 msgstr "擁有者"
@@ -5148,6 +5165,7 @@ msgstr "受保護的輸入"
 msgid "Protocol"
 msgstr ""
 
+#: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/MemorySettingsOverlay.tsx
 #: src/pages/Onboarding.tsx
 #: src/pages/VoiceSettingsOverlay.tsx
@@ -5161,6 +5179,10 @@ msgstr "供應商"
 #: src/components/CloudAgentCard.tsx
 msgid "Pull request"
 msgstr "Pull request"
+
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Quarantined"
+msgstr ""
 
 #: src/pages/ActivityList.tsx
 msgid "Queued"
@@ -5685,6 +5707,7 @@ msgstr "執行中"
 #: src/components/SubagentCard.tsx
 #: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
+#: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/Calendar.tsx
 #: src/pages/RoutineEditor.tsx
 #: src/pages/Today.tsx
@@ -6298,6 +6321,7 @@ msgid "Started {count}m late"
 msgstr "延遲 {count} 分鐘開始"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/admin/AdminComputersPage.tsx
 msgid "Starting"
 msgstr "正在開始"
 
@@ -6313,6 +6337,7 @@ msgid "State or region"
 msgstr ""
 
 #: src/pages/ActivityList.tsx
+#: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/Board.tsx
 msgid "Status"
 msgstr "狀態"
@@ -6340,10 +6365,18 @@ msgstr "停止朗讀"
 msgid "Stop teaching"
 msgstr "停止示範"
 
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Stopped"
+msgstr ""
+
 #. js-lingui-explicit-id
 #: src/lib/browser-notifications.ts
 msgid "Stopped."
 msgstr "已停止。"
+
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Stopping"
+msgstr ""
 
 #: src/components/ComputerMaintenanceActions.tsx
 msgid "Stopping…"

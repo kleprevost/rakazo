@@ -1,6 +1,6 @@
 # Computer fleet manager (design)
 
-Design only; no application code changes. An Admin page where operators see every bot computer in
+Design; build plan PR 1 (read-only inventory) is implemented. An Admin page where operators see every bot computer in
 the install and act on them, one or in bulk: recreate from an approved image without losing the
 home folder, terminate, quarantine, hibernate, wake. Provider-neutral. It works first with the Docker
 supervisor on the ACA + VM deployment ([aca-vm.md](../aca-vm.md)) and later with the Kubernetes
@@ -338,9 +338,12 @@ ids, outcome code. Never: paths, file names, provider error text, tokens, screen
 
 ## 9. Build plan (each PR independently mergeable, with tests)
 
-1. **Read-only inventory.** `admin.computers.list/get` from existing columns only (kind, state, bots
-   and owners, `runningSince`, disk, `computer_runs` history, last activity) plus the Admin page.
-   No migration, no provider changes. Tests: invariants 1, 2; Postgres test for the join.
+1. **Read-only inventory.** `admin.computers.list` from existing columns (kind, state, bots and
+   owners, `runningSince`, `computer_runs` last activity) plus the Admin page. As built: the optional
+   `fleet.inspect` capability flag and `inspect()` (image reference and isolation) on the Docker and
+   Kubernetes providers, reusing the supervisor's existing `GET /computers/:id`; a computer on a
+   provider without it reports `skipped_unsupported`. No migration, no new supervisor endpoint.
+   `get` and the detail panel wait for PR 2. Tests: invariants 1, 2.
 2. **Observation.** `fleet` capability flags, `inspect`, supervisor `GET /computers/:id/inspect` and
    batch, Kubernetes `inspect`, `computer_observations` and image/isolation columns, sweeper,
    usage/egress/health columns in the UI. Tests: conformance for fake, recorded supervisor, k8s fake
@@ -357,8 +360,7 @@ ids, outcome code. Never: paths, file names, provider error text, tokens, screen
    Kubernetes label patch and RBAC change documented. Tests: 9, 10, 11.
 8. **Kubernetes parity and orphans.** `list`, usage, orphan report, AKS notes in `azure-aks.md`.
 9. Follow-up: signature verification (a provider-neutral `ImageVerifier` called before provision, with
-   the Docker supervisor and an admission policy as adapters), `recreate_when_idle` enforcement,
-   optional force-recreate with run cancellation.
+   the Docker supervisor and an admission policy as adapters), `recreate_when_idle` enforcement.
 
 ### Acceptance test (PR 5)
 Postgres test with `FakeSandboxProvider`, `LocalAgentHomeStore` and the real job runner: seed a running
@@ -370,7 +372,7 @@ returns the per-computer outcome. Negative case: make the checkpoint throw and a
 `failed_checkpoint` and an untouched running computer. An opt-in Docker variant mirrors
 `team-desktops.docker.test.ts` against a real supervisor (not in CI by default).
 
-## 10. Risks and open questions
+## 10. Risks and decisions
 
 Risks
 - **Team computers are shared.** Recreating or quarantining one affects every bot on it; the UI lists
@@ -387,14 +389,17 @@ Risks
 - Remote providers do not expose image digests; they show `unknown` and cannot be policed.
 - Homes over the save limits can never be recreated safely; the operation refuses them by design.
 
-Open questions
-1. Naming and semantics: is a separate `adminQuarantinedAt` flag acceptable next to the existing
-   `quarantined` safety state, or should the safety state be renamed in a deferred migration?
-2. Should an operator be able to recreate a busy computer (cancel runs first, using the suspend
-   primitive), and if so only with `suspendBots`, or never?
-3. Is the policy file the right place for the allow list given redeploys, or does the enterprise
-   want runtime editing (a DB table and an audit trail) despite admin.md's policy-as-code stance?
-4. Supervisor image selection vs. one image per supervisor: is a per-request `image` worth the new
-   attack surface, or do we keep the single image and drive upgrades by supervisor restarts?
-5. Restart history granularity: are `computer_runs` stretches enough, or do operators need crash
-   restarts inside a stretch (only providers with `restartCount`)?
+## Decisions
+
+Settled by the maintainer; this and later PRs follow them.
+
+1. **Admin quarantine is a separate flag** (`adminQuarantinedAt`, section 4) from the existing
+   automatic safety `quarantined` state. The safety state is not renamed.
+2. **No force-recreate.** Recreate and terminate are idle-only. To recreate a busy computer the
+   operator suspends the bot first (the existing suspend cancels its runs), then recreates.
+3. **The allowed-image list lives in the central policy file**, not the database. A per-request
+   supervisor `image` is accepted only if its digest is on that list; the supervisor keeps its own
+   copy of the check (invariant 12).
+
+Restart history stays `computer_runs` stretches (section 4) until a provider reports `restartCount`
+(PR 2).

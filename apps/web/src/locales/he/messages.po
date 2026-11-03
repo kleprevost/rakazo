@@ -687,6 +687,7 @@ msgstr "מתקדם..."
 msgid "Agent from another app"
 msgstr ""
 
+#: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/admin/AdminOverviewPage.tsx
 #: src/pages/admin/AdminShell.tsx
 msgid "AI employees"
@@ -1668,6 +1669,7 @@ msgstr "המחשב כבוי"
 #: src/components/ComputerDeviceSettings.tsx
 #: src/pages/AccountSettingsOverlay.tsx
 #: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminShell.tsx
 msgid "Computers"
 msgstr "מחשבים"
 
@@ -3084,6 +3086,7 @@ msgid "Environment variables: {names}"
 msgstr "משתני סביבה: {names}"
 
 #: src/lib/roster-status.ts
+#: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/shell/sidebar-roster.tsx
 msgid "Error"
 msgstr "שגיאה"
@@ -3567,6 +3570,10 @@ msgstr "אם שמעת את זה, הקול מוכן."
 msgid "Ignore"
 msgstr "התעלמות"
 
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Image"
+msgstr ""
+
 #. js-lingui-explicit-id
 #: src/lib/run-error.ts
 msgid "Image input is not configured for this model."
@@ -3724,6 +3731,10 @@ msgstr "מבודד"
 msgid "Isolated preview — no access to your account"
 msgstr "תצוגה מקדימה מבודדת — ללא גישה לחשבון"
 
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Isolation"
+msgstr ""
+
 #: src/components/pages/PageViewHost.tsx
 msgid "It may have been deleted, or it belongs to someone else."
 msgstr "ייתכן שהוא נמחק או שהוא שייך למישהו אחר."
@@ -3778,6 +3789,7 @@ msgid "Language"
 msgstr "שפה"
 
 #: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/admin/AdminComputersPage.tsx
 msgid "Last active"
 msgstr ""
 
@@ -4616,6 +4628,10 @@ msgstr ""
 msgid "Not now"
 msgstr "לא עכשיו"
 
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Not reported"
+msgstr ""
+
 #: src/pages/shell/agent-import.tsx
 #: src/pages/shell/import-status.ts
 msgid "Not supported in Rakazo"
@@ -4854,6 +4870,7 @@ msgstr ""
 #: src/components/pages/SharePopover.tsx
 #: src/lib/identity-display.ts
 #: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/Board.tsx
 msgid "Owner"
 msgstr "בעלים"
@@ -5147,6 +5164,7 @@ msgstr "קלט מוגן"
 msgid "Protocol"
 msgstr ""
 
+#: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/MemorySettingsOverlay.tsx
 #: src/pages/Onboarding.tsx
 #: src/pages/VoiceSettingsOverlay.tsx
@@ -5160,6 +5178,10 @@ msgstr "ספקים"
 #: src/components/CloudAgentCard.tsx
 msgid "Pull request"
 msgstr "Pull request"
+
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Quarantined"
+msgstr ""
 
 #: src/pages/ActivityList.tsx
 msgid "Queued"
@@ -5684,6 +5706,7 @@ msgstr "פועל"
 #: src/components/SubagentCard.tsx
 #: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
+#: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/Calendar.tsx
 #: src/pages/RoutineEditor.tsx
 #: src/pages/Today.tsx
@@ -6297,6 +6320,7 @@ msgid "Started {count}m late"
 msgstr "התחיל באיחור של {count} דק׳"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/admin/AdminComputersPage.tsx
 msgid "Starting"
 msgstr "מתחיל"
 
@@ -6312,6 +6336,7 @@ msgid "State or region"
 msgstr ""
 
 #: src/pages/ActivityList.tsx
+#: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/Board.tsx
 msgid "Status"
 msgstr "סטטוס"
@@ -6339,10 +6364,18 @@ msgstr "הפסקת ההקראה"
 msgid "Stop teaching"
 msgstr "הפסקת הלימוד"
 
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Stopped"
+msgstr ""
+
 #. js-lingui-explicit-id
 #: src/lib/browser-notifications.ts
 msgid "Stopped."
 msgstr "נעצר."
+
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Stopping"
+msgstr ""
 
 #: src/components/ComputerMaintenanceActions.tsx
 msgid "Stopping…"

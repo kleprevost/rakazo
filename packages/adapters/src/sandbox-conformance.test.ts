@@ -63,6 +63,26 @@ describe("sandbox conformance", () => {
     await boxd.destroy(e, ctx);
   });
 
+  it("inspects a computer only where the provider declares it", async () => {
+    const providers: SandboxProvider[] = [
+      new FakeSandboxProvider(),
+      fakeBoat(),
+      fakeBoxdProvider(),
+      emulatedNovita().provider(),
+      new DesktopSandboxProvider(),
+      new FakeWuyingDesktop().provider(),
+    ];
+    for (const provider of providers)
+      expect(typeof provider.inspect === "function").toBe(
+        provider.describe().capabilities.fleet?.inspect === true,
+      );
+    const fake = new FakeSandboxProvider();
+    const computer = await provisionPrepared(fake, { botId: "bot-i", homePath: "/tmp/i" }, ctx);
+    await expect(fake.inspect(computer, ctx)).resolves.toMatchObject({ runtime: "running" });
+    await fake.destroy(computer, ctx);
+    await expect(fake.inspect(computer, ctx)).resolves.toMatchObject({ runtime: "gone" });
+  });
+
   it("offers the same observation, action, and workspace contract across providers", async () => {
     const providers: SandboxProvider[] = [
       new FakeSandboxProvider(),

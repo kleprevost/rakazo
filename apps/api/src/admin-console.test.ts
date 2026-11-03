@@ -194,6 +194,7 @@ describe("admin console authorization", () => {
       () => member.bots.list({ limit: 10 }),
       () => member.bots.suspend({ botId: "bot-1" }),
       () => member.bots.resume({ botId: "bot-1" }),
+      () => member.computers.list({ limit: 10 }),
       () => member.policy(),
       () => member.audit({ limit: 10 }),
     ];

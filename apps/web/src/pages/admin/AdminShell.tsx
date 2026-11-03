@@ -52,6 +52,9 @@ export function AdminShell({ children }: { children: ReactNode }) {
         <NavLink to="/admin/bots" className={linkClass}>
           <Trans>AI employees</Trans>
         </NavLink>
+        <NavLink to="/admin/computers" className={linkClass}>
+          <Trans>Computers</Trans>
+        </NavLink>
         <NavLink to="/admin/policy" className={linkClass}>
           <Trans>Policy</Trans>
         </NavLink>

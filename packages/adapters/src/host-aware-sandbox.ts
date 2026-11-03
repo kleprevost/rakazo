@@ -196,6 +196,12 @@ export class HostAwareSandbox implements SandboxProvider {
     return provider.isRunning?.(computer, context) ?? false;
   }
 
+  async inspect(computer: ComputerRef, context: AdapterContext) {
+    const provider = this.route(computer);
+    if (!provider.inspect) throw new Error("this computer cannot be inspected");
+    return provider.inspect(computer, context);
+  }
+
   async isStopped(computer: ComputerRef, context: AdapterContext): Promise<boolean> {
     return this.route(computer).isStopped?.(computer, context) ?? false;
   }

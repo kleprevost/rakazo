@@ -78,6 +78,35 @@ export const AdminBotPageSchema = z.object({
 });
 export type AdminBotPage = z.infer<typeof AdminBotPageSchema>;
 
+export const AdminComputerSchema = z.object({
+  id: z.string(),
+  /** The provider kind that holds it, such as `docker` or `kubernetes`. */
+  kind: z.string(),
+  scope: z.string(),
+  state: z.string(),
+  ownerName: z.string().nullable(),
+  ownerEmail: z.string().nullable(),
+  spaceName: z.string().nullable(),
+  bots: z.array(z.object({ id: z.string(), name: z.string() })),
+  /** The image reference the machine was started from; null until the provider reports one. */
+  image: z.string().nullable(),
+  isolation: z.enum(["container", "microvm", "vm", "host", "unknown"]).nullable(),
+  /**
+   * Whether `image` and `isolation` came from the provider: `skipped_unsupported` when it cannot
+   * report them, `unavailable` when it could not be reached, `not_running` when nothing was asked.
+   */
+  inspection: z.enum(["inspected", "skipped_unsupported", "unavailable", "not_running"]),
+  runningSince: z.string().nullable(),
+  lastActivityAt: z.string().nullable(),
+});
+export type AdminComputer = z.infer<typeof AdminComputerSchema>;
+
+export const AdminComputerPageSchema = z.object({
+  computers: z.array(AdminComputerSchema),
+  nextCursor: z.string().nullable(),
+});
+export type AdminComputerPage = z.infer<typeof AdminComputerPageSchema>;
+
 const SpendRowSchema = z.object({ id: z.string(), label: z.string(), spentUsd: z.number() });
 
 export const AdminPolicyViewSchema = z.object({
@@ -151,6 +180,8 @@ export const adminContract = {
       .output(z.object({ cancelledRuns: z.number().int() })),
     resume: oc.input(z.object({ botId: Id })).output(z.object({ ok: z.literal(true) })),
   },
+  /** Every bot computer in the deployment. Read-only; metadata only, never content. */
+  computers: { list: oc.input(AdminPageInputSchema).output(AdminComputerPageSchema) },
   policy: oc.output(AdminPolicyViewSchema),
   audit: oc.input(AdminAuditInputSchema).output(AdminAuditPageSchema),
 };

@@ -4,6 +4,7 @@ import type {
   ComputerActionRequest,
   ComputerFileEntry,
   ComputerInput,
+  ComputerInspection,
   ComputerRef,
   ControlLeaseRef,
   PortableFile,
@@ -51,6 +52,7 @@ export class FakeSandboxProvider implements SandboxProvider {
         takeover: true,
         persistentHome: true,
         multiScreen: true,
+        fleet: { inspect: true },
       },
     };
   }
@@ -84,6 +86,16 @@ export class FakeSandboxProvider implements SandboxProvider {
 
   async isRunning(computer: ComputerRef, _context: AdapterContext): Promise<boolean> {
     return this.boxes.get(computer.id)?.running === true;
+  }
+
+  async inspect(computer: ComputerRef, _context: AdapterContext): Promise<ComputerInspection> {
+    const box = this.boxes.get(computer.id);
+    if (!box) return { runtime: "gone", isolation: "container" };
+    return {
+      runtime: box.running ? "running" : "stopped",
+      image: { ref: "fake/computer:test" },
+      isolation: "container",
+    };
   }
 
   async prepare(_computer: ComputerRef, _context: AdapterContext): Promise<void> {}

@@ -35,6 +35,7 @@ import type {
   ComputerActionResult,
   ComputerFileEntry,
   ComputerInput,
+  ComputerInspection,
   ComputerObservation,
   ComputerRef,
   ConnectorCall,
@@ -152,6 +153,11 @@ export interface SandboxProvider {
    * disk kept, so it resumes as it was without anything running now.
    */
   isStopped?(computer: ComputerRef, context: AdapterContext): Promise<boolean>;
+  /**
+   * Read-only report on one computer (image, isolation), offered when `capabilities.fleet.inspect`
+   * is true. Resolves `gone` for a reference the provider no longer holds; throws when it cannot tell.
+   */
+  inspect?(computer: ComputerRef, context: AdapterContext): Promise<ComputerInspection>;
   /** True only when this computer currently mounts the server's home directory. */
   hasMountedHome?(computer: ComputerRef, context: AdapterContext): Promise<boolean>;
   /** Perform idempotent provider setup after the lifecycle has captured the reference. */

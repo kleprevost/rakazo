@@ -687,6 +687,7 @@ msgstr "고급..."
 msgid "Agent from another app"
 msgstr ""
 
+#: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/admin/AdminOverviewPage.tsx
 #: src/pages/admin/AdminShell.tsx
 msgid "AI employees"
@@ -1668,6 +1669,7 @@ msgstr "컴퓨터가 중지됨"
 #: src/components/ComputerDeviceSettings.tsx
 #: src/pages/AccountSettingsOverlay.tsx
 #: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminShell.tsx
 msgid "Computers"
 msgstr "컴퓨터"
 
@@ -3084,6 +3086,7 @@ msgid "Environment variables: {names}"
 msgstr "환경 변수: {names}"
 
 #: src/lib/roster-status.ts
+#: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/shell/sidebar-roster.tsx
 msgid "Error"
 msgstr ""
@@ -3567,6 +3570,10 @@ msgstr "샘플이 들렸다면 음성 설정이 완료되었습니다."
 msgid "Ignore"
 msgstr ""
 
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Image"
+msgstr ""
+
 #. js-lingui-explicit-id
 #: src/lib/run-error.ts
 msgid "Image input is not configured for this model."
@@ -3724,6 +3731,10 @@ msgstr "이 Bot만 사용"
 msgid "Isolated preview — no access to your account"
 msgstr ""
 
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Isolation"
+msgstr ""
+
 #: src/components/pages/PageViewHost.tsx
 msgid "It may have been deleted, or it belongs to someone else."
 msgstr "삭제되었거나 다른 사람의 페이지일 수 있습니다."
@@ -3778,6 +3789,7 @@ msgid "Language"
 msgstr "언어"
 
 #: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/admin/AdminComputersPage.tsx
 msgid "Last active"
 msgstr ""
 
@@ -4616,6 +4628,10 @@ msgstr ""
 msgid "Not now"
 msgstr "나중에"
 
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Not reported"
+msgstr ""
+
 #: src/pages/shell/agent-import.tsx
 #: src/pages/shell/import-status.ts
 msgid "Not supported in Rakazo"
@@ -4854,6 +4870,7 @@ msgstr ""
 #: src/components/pages/SharePopover.tsx
 #: src/lib/identity-display.ts
 #: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/Board.tsx
 msgid "Owner"
 msgstr "소유자"
@@ -5147,6 +5164,7 @@ msgstr ""
 msgid "Protocol"
 msgstr ""
 
+#: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/MemorySettingsOverlay.tsx
 #: src/pages/Onboarding.tsx
 #: src/pages/VoiceSettingsOverlay.tsx
@@ -5160,6 +5178,10 @@ msgstr "서비스"
 #: src/components/CloudAgentCard.tsx
 msgid "Pull request"
 msgstr "풀 리퀘스트"
+
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Quarantined"
+msgstr ""
 
 #: src/pages/ActivityList.tsx
 msgid "Queued"
@@ -5684,6 +5706,7 @@ msgstr "실행 중"
 #: src/components/SubagentCard.tsx
 #: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
+#: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/Calendar.tsx
 #: src/pages/RoutineEditor.tsx
 #: src/pages/Today.tsx
@@ -6297,6 +6320,7 @@ msgid "Started {count}m late"
 msgstr "{count}분 늦게 시작됨"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/admin/AdminComputersPage.tsx
 msgid "Starting"
 msgstr "시작 중"
 
@@ -6312,6 +6336,7 @@ msgid "State or region"
 msgstr ""
 
 #: src/pages/ActivityList.tsx
+#: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/Board.tsx
 msgid "Status"
 msgstr ""
@@ -6339,10 +6364,18 @@ msgstr "읽기 중지"
 msgid "Stop teaching"
 msgstr "가르치기 종료"
 
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Stopped"
+msgstr ""
+
 #. js-lingui-explicit-id
 #: src/lib/browser-notifications.ts
 msgid "Stopped."
 msgstr "중지되었습니다."
+
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Stopping"
+msgstr ""
 
 #: src/components/ComputerMaintenanceActions.tsx
 msgid "Stopping…"
