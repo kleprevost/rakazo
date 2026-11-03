@@ -30,9 +30,9 @@ type Claims = Record<string, unknown>;
 type Verified =
   | { status: "valid"; claims: Claims; sub: string; idToken: string }
   /** No usable identity: no token, or one that failed verification. */
-  | { status: "absent" }
+  | { status: "absent"; reason: string }
   /** The issuer's keys could not be read, so nothing is known about this request. */
-  | { status: "unavailable" };
+  | { status: "unavailable"; reason: string };
 
 const SUBJECT_TYPES = new Set([
   "sub",
@@ -70,6 +70,12 @@ function principalAgrees(header: string, claims: Claims): boolean {
   }
 }
 
+/** A loggable code for a verification failure: never the token or a claim value. */
+function errorReason(error: unknown): string {
+  if (error instanceof errors.JOSEError) return error.code;
+  return error instanceof Error ? error.name : "unknown";
+}
+
 function isUnavailable(error: unknown) {
   if (!(error instanceof errors.JOSEError)) return true;
   return error.code === "ERR_JWKS_TIMEOUT" || error.code === "ERR_JOSE_GENERIC";
@@ -77,17 +83,20 @@ function isUnavailable(error: unknown) {
 
 export async function verifyEasyAuthHeaders(keys: OidcKeys, headers: Headers): Promise<Verified> {
   const idToken = headers.get(EASY_AUTH_ID_TOKEN_HEADER);
-  if (!idToken || idToken.length > MAX_TOKEN_LENGTH) return { status: "absent" };
+  if (!idToken) return { status: "absent", reason: "no-token" };
+  if (idToken.length > MAX_TOKEN_LENGTH) return { status: "absent", reason: "token-too-long" };
   let claims: Claims;
   try {
     claims = await keys.verifyIdToken(idToken);
   } catch (error) {
-    return isUnavailable(error) ? { status: "unavailable" } : { status: "absent" };
+    const reason = errorReason(error);
+    return isUnavailable(error) ? { status: "unavailable", reason } : { status: "absent", reason };
   }
   if (typeof claims.sub !== "string" || !claims.sub.trim() || typeof claims.exp !== "number")
-    return { status: "absent" };
+    return { status: "absent", reason: "missing-claims" };
   const principal = headers.get(EASY_AUTH_PRINCIPAL_HEADER);
-  if (principal !== null && !principalAgrees(principal, claims)) return { status: "absent" };
+  if (principal !== null && !principalAgrees(principal, claims))
+    return { status: "absent", reason: "principal-mismatch" };
   return { status: "valid", claims, sub: claims.sub, idToken };
 }
 
@@ -102,6 +111,8 @@ export interface EasyAuthDeps {
 export interface EasyAuthResult {
   /** Cookies the rest of this request must not see, though the session row was left alone. */
   hide: string[];
+  /** What this pass did, for diagnostics. Never contains tokens or claim values. */
+  outcome: string;
 }
 
 /**
@@ -115,10 +126,10 @@ async function resolve(
   inflight: Map<string, Promise<NonNullable<CreatedSession>>>,
 ): Promise<EasyAuthResult> {
   const { config, keys } = deps;
-  const none: EasyAuthResult = { hide: [] };
+  const none = (outcome: string): EasyAuthResult => ({ hide: [], outcome });
   const headers = ctx.headers;
   // Native clients authenticate with a bearer and never carry Easy Auth headers.
-  if (!headers || /^bearer\s/i.test(headers.get("authorization") ?? "")) return none;
+  if (!headers || /^bearer\s/i.test(headers.get("authorization") ?? "")) return none("bearer");
   const adapter = ctx.context.internalAdapter;
   const verified = await verifyEasyAuthHeaders(keys, headers);
   const current = await getSessionFromCtx(ctx, { disableCookieCache: true });
@@ -131,10 +142,13 @@ async function resolve(
     deleteSessionCookie(ctx);
   };
   if (verified.status === "unavailable")
-    return { hide: marker ? [ctx.context.authCookies.sessionToken.name] : [] };
+    return {
+      hide: marker ? [ctx.context.authCookies.sessionToken.name] : [],
+      outcome: `unavailable:${verified.reason}`,
+    };
   if (verified.status === "absent") {
     if (marker) await end();
-    return none;
+    return none(`${marker ? "ended" : "skipped"}:${verified.reason}`);
   }
   const accountId = oidcAccountSubject(config.issuer, verified.sub);
   const account = await adapter.findAccountByKey({ providerId: "oidc", accountId });
@@ -147,7 +161,7 @@ async function resolve(
         update: { idToken: null },
       });
     if (marker) await end();
-    return none;
+    return none("denied");
   }
   const syncToken = async () => {
     if (!account) return;
@@ -158,18 +172,18 @@ async function resolve(
   if (current) {
     if (marker?.value === accountId) {
       await syncToken();
-      return none;
+      return none("kept");
     }
     if (!marker && account?.userId === current.user.id) {
       // The same person already signed in another way. That session keeps its own rules.
       await syncToken();
-      return none;
+      return none("kept-native");
     }
     await end();
   }
-  if (!create) return none;
+  if (!create) return none(current ? "ended:other-identity" : "skipped:no-create");
   const email = typeof verified.claims.email === "string" ? verified.claims.email.trim() : "";
-  if (!email) return none;
+  if (!email) return none("skipped:no-email");
   let pending = inflight.get(accountId);
   if (!pending) {
     pending = (async () => {
@@ -207,10 +221,10 @@ async function resolve(
     // Concurrent first requests share one session, so one cookie is issued to all of them.
     await setSessionCookie(ctx, await pending);
   } catch (error) {
-    if (error instanceof SignInRefused || isAPIError(error)) return none;
+    if (error instanceof SignInRefused || isAPIError(error)) return none("refused");
     throw error;
   }
-  return none;
+  return none(current ? "replaced" : "created");
 }
 
 class SignInRefused extends Error {}

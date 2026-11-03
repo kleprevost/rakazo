@@ -814,7 +814,7 @@ export function createAuth(prisma: PrismaClient, env: AuthEnv) {
               headers: Headers;
               body: { create: boolean };
               returnHeaders: true;
-            }) => Promise<{ headers: Headers; response: { hide: string[] } }>;
+            }) => Promise<{ headers: Headers; response: { hide: string[]; outcome: string } }>;
           };
           const { headers: out, response } = await api.easyAuthSession({
             headers,
@@ -825,6 +825,7 @@ export function createAuth(prisma: PrismaClient, env: AuthEnv) {
           return {
             setCookies,
             cookie: rewriteRequestCookie(headers.get("cookie"), setCookies, response.hide),
+            outcome: response.outcome,
           };
         }
       : undefined,
