@@ -23,10 +23,14 @@ describe("isAdmin", () => {
   });
 
   it("grants an SSO admin only once their email is verified", async () => {
-    const deps = { prisma, auth, env: {} as never };
+    const deps = { prisma, auth, env: { ssoAdminEnabled: true } as never };
     expect(await isAdmin(deps, "verified")).toBe(true);
     expect(await isAdmin(deps, "unverified")).toBe(false);
-    const revoked = { prisma, auth: { isSsoAdmin: async () => false }, env: {} as never };
+    const revoked = {
+      prisma,
+      auth: { isSsoAdmin: async () => false },
+      env: { ssoAdminEnabled: true } as never,
+    };
     expect(await isAdmin(revoked, "verified")).toBe(false);
   });
 });

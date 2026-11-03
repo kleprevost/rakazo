@@ -12,6 +12,7 @@ import { boundDirectApprovalDetails, catalogApprovalDetails } from "./approval-e
 import type { ExecutorDeps } from "./executor-deps.js";
 import type { EffectiveModelRole } from "./model-roles.js";
 import { effectiveModelRole } from "./model-roles.js";
+import { effectiveApprovalPreference } from "./policy-tools.js";
 import { routineTaskInstructions } from "./routine-watch.js";
 import { CATALOG_APPROVAL_TOOL, PASSED_EFFECT_STATUSES } from "./run-effects.js";
 import { BUILTIN_AGENT_TOOL_NAMES } from "./run-tool-selection.js";
@@ -99,10 +100,12 @@ export function createRunTrustLoaders(
     autoReviewPreferencePromise ??= findAutoReviewPreference(deps.prisma, {
       userId: run.userId,
       spaceId: run.spaceId,
-    }).then((row) => ({
-      enabled: row?.enabled ?? true,
-      skipApprovals: row?.skipApprovals ?? false,
-    }));
+    }).then((row) =>
+      effectiveApprovalPreference({
+        enabled: row?.enabled ?? true,
+        skipApprovals: row?.skipApprovals ?? false,
+      }),
+    );
     return autoReviewPreferencePromise;
   };
   // The owner's own words for this run: the message they sent, or the instructions of the
