@@ -9,3 +9,7 @@
 - Run `pnpm exec biome check --write <files>` before committing; import order is enforced.
 - Review sub-agent diffs for house rules they miss: WS1 used inline `import("…")` types (must be top-level `import type`).
 - The full adapters vitest suite exceeds the tool timeout; run the relevant files.
+- Upstream's Pi runtime already knew `azure` and `opencode`; the only gap was the deployment-model key lookup. Investigate-first briefs keep PRs small.
+- Worktree agents: the guard rejects compound shell commands (cd + heredoc + git); brief agents to use single commands and Edit/Write.
+- Better Auth: throwing from a provider's `getUserInfo` yields raw 403 JSON; return `{ error }` from `validateUserInfo` to redirect with a code.
+- Sonnet cost so far: ~100-125k tokens per workstream, including the PR.
