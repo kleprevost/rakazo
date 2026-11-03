@@ -1,0 +1,120 @@
+# Runs on the Docker VM: computer supervisor + worker. Derived from the supervisor, computer and
+# worker services in infra/compose/docker-compose.images.yml (same images, commands and limits).
+# Deployed to /opt/rakazo by cloud-init and started with:
+#   docker compose --env-file /etc/rakazo/vm.env -f /opt/rakazo/docker-compose.yml up -d
+# Postgres, api and web are not here: they run elsewhere (managed Postgres, Container Apps).
+name: rakazo
+
+services:
+  # Pull-only stub so `compose up` fetches the computer image the supervisor starts for each bot.
+  computer:
+    image: ${RAKAZO_COMPUTER_IMAGE}:${RAKAZO_COMPUTER_IMAGE_TAG}
+    command: ["true"]
+    network_mode: none
+    restart: "no"
+
+  # Access to the supervisor is equivalent to control of the Docker host: port 7091 is open to the
+  # ACA subnet only (NSG), and every call needs SANDBOX_SUPERVISOR_TOKEN.
+  supervisor:
+    image: ${RAKAZO_IMAGE}:${RAKAZO_IMAGE_TAG}
+    restart: unless-stopped
+    command: ["pnpm", "--filter", "@rakazo/sandbox-supervisor", "start"]
+    init: true
+    user: root
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 256
+    mem_limit: 512m
+    environment:
+      MAX_UPLOAD_SIZE_MB: ${MAX_UPLOAD_SIZE_MB:-10}
+      NODE_ENV: production
+      DATA_DIR: /data
+      SUPERVISOR_HOST: "0.0.0.0"
+      SUPERVISOR_PORT: "7091"
+      DOCKER_SOCKET: /var/run/docker.sock
+      RAKAZO_COMPUTER_IMAGE: ${RAKAZO_COMPUTER_IMAGE}:${RAKAZO_COMPUTER_IMAGE_TAG}
+      RAKAZO_COMPUTER_MEMORY: ${RAKAZO_COMPUTER_MEMORY:-2g}
+      RAKAZO_COMPUTER_CPUS: ${RAKAZO_COMPUTER_CPUS:-2}
+      RAKAZO_COMPUTER_PIDS_LIMIT: ${RAKAZO_COMPUTER_PIDS_LIMIT:-2048}
+      SANDBOX_COMMAND_TIMEOUT_MS: ${SANDBOX_COMMAND_TIMEOUT_MS:-300000}
+      SANDBOX_SUPERVISOR_TOKEN: ${SANDBOX_SUPERVISOR_TOKEN:?Set SANDBOX_SUPERVISOR_TOKEN}
+      SANDBOX_SCREEN_NETWORK: isolated
+      # PLACEHOLDER: switch for the supervisor screen/terminal proxy (sibling PR). Verify the name.
+      SANDBOX_SCREEN_VIA_SUPERVISOR: ${SANDBOX_SCREEN_VIA_SUPERVISOR:-true}
+      # restricted refuses to start computers unless restrict-computer-egress.sh is in place.
+      SANDBOX_COMPUTER_EGRESS: restricted
+      SANDBOX_COMPUTER_DNS: ${SANDBOX_COMPUTER_DNS:-}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    ports:
+      - "7091:7091"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /data:/data
+    networks:
+      - app
+    depends_on:
+      computer:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - fetch('http://127.0.0.1:7091/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+  worker:
+    image: ${RAKAZO_IMAGE}:${RAKAZO_IMAGE_TAG}
+    restart: unless-stopped
+    # Directly, not through pnpm, so a stop reaches it (see infra/compose/docker-compose.images.yml).
+    working_dir: /app/apps/worker
+    command: ["node", "--enable-source-maps", "dist/index.js"]
+    # A stop lets the running jobs finish rather than killing them mid-way (JOB_DRAIN_TIMEOUT_MS is
+    # 45 minutes in packages/adapters/src/wakeup.ts). This is why the worker is not on Container Apps.
+    stop_grace_period: 50m
+    healthcheck:
+      test: ["CMD", "node", "dist/health-check.js"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 2m
+    init: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    pids_limit: 512
+    mem_limit: 2g
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: ${DATABASE_URL:?Set DATABASE_URL}
+      DATA_DIR: /data
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:?Set ENCRYPTION_KEY}
+      CONTENT_ENCRYPTION: "on"
+      WAKEUP_DRIVER: graphile
+      AGENT_RUNTIME: pi
+      API_URL: ${API_URL}
+      RAKAZO_POLICY_FILE: ${RAKAZO_POLICY_FILE:-}
+      SANDBOX_PROVIDER: docker
+      SANDBOX_SUPERVISOR_URL: http://supervisor:7091
+      SANDBOX_SUPERVISOR_TOKEN: ${SANDBOX_SUPERVISOR_TOKEN:?Set SANDBOX_SUPERVISOR_TOKEN}
+      # PLACEHOLDER: same switch as on the supervisor and the api. Verify the name.
+      SANDBOX_SCREEN_VIA_SUPERVISOR: ${SANDBOX_SCREEN_VIA_SUPERVISOR:-true}
+      PI_DEFAULT_PROVIDER: ${PI_DEFAULT_PROVIDER:-azure}
+      PI_DEFAULT_MODEL: ${PI_DEFAULT_MODEL:?Set PI_DEFAULT_MODEL}
+      AZURE_OPENAI_RESOURCE_NAME: ${AZURE_OPENAI_RESOURCE_NAME:?Set AZURE_OPENAI_RESOURCE_NAME}
+      AZURE_OPENAI_API_KEY: ${AZURE_OPENAI_API_KEY:?Set AZURE_OPENAI_API_KEY}
+      AZURE_OPENAI_DEPLOYMENT_NAME_MAP: ${AZURE_OPENAI_DEPLOYMENT_NAME_MAP:-}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    volumes:
+      - /data:/data
+    networks:
+      - app
+    depends_on:
+      supervisor:
+        condition: service_healthy
+
+networks:
+  app:
