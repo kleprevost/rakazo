@@ -28,7 +28,6 @@ const REFRESH_MS = 10_000;
 
 type Chat = { botId: string; groupId: string | null };
 const chatPath = ({ botId, groupId }: Chat) => (groupId ? `/app/g/${groupId}` : `/app/${botId}`);
-const chatTarget = ({ botId, groupId }: Chat) => (groupId ? { groupId } : { botId });
 
 export function TodayPage() {
   const { t } = useLingui();
@@ -260,27 +259,10 @@ function AttentionRow({ item }: { item: TodayAttention }) {
         </span>
       </div>
       {item.kind === "approval" ? (
-        <div className="mt-1.5 flex gap-2">
-          {item.actions.map((action) => (
-            <Button
-              key={action.id}
-              size="sm"
-              variant={action.id === "deny" ? "outline" : "default"}
-              disabled={busy}
-              onClick={() =>
-                void act(() =>
-                  rpc.threads.answer({
-                    ...chatTarget(item),
-                    runId: item.runId,
-                    messageId: item.messageId,
-                    answer: action.id,
-                  }),
-                )
-              }
-            >
-              {action.id === "deny" ? <Trans>Deny</Trans> : <Trans>Allow</Trans>}
-            </Button>
-          ))}
+        <div className="mt-1.5">
+          <Link to={chatPath(item)} className={buttonVariants({ variant: "outline", size: "sm" })}>
+            <Trans>Open</Trans>
+          </Link>
         </div>
       ) : null}
       {item.kind === "failed_routine" ? (

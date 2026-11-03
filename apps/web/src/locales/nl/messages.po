@@ -710,7 +710,6 @@ msgid "All time"
 msgstr "Alle tijd"
 
 #: src/components/ApprovalRulesSettings.tsx
-#: src/pages/Today.tsx
 msgid "Allow"
 msgstr "Toestaan"
 
@@ -2721,7 +2720,6 @@ msgid "Denied"
 msgstr "Geweigerd"
 
 #: src/components/AskCard.tsx
-#: src/pages/Today.tsx
 msgid "Deny"
 msgstr "Weigeren"
 
@@ -4606,6 +4604,7 @@ msgstr "Alleen jij"
 #: src/pages/shell/computer-panel.tsx
 #: src/pages/shell/import-setup-card.tsx
 #: src/pages/shell/message-view.tsx
+#: src/pages/Today.tsx
 msgid "Open"
 msgstr "Openen"
 

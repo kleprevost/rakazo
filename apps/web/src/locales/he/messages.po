@@ -710,7 +710,6 @@ msgid "All time"
 msgstr "כל הזמנים"
 
 #: src/components/ApprovalRulesSettings.tsx
-#: src/pages/Today.tsx
 msgid "Allow"
 msgstr "לאפשר"
 
@@ -2721,7 +2720,6 @@ msgid "Denied"
 msgstr "נדחה"
 
 #: src/components/AskCard.tsx
-#: src/pages/Today.tsx
 msgid "Deny"
 msgstr "דחייה"
 
@@ -4606,6 +4604,7 @@ msgstr "רק את/ה"
 #: src/pages/shell/computer-panel.tsx
 #: src/pages/shell/import-setup-card.tsx
 #: src/pages/shell/message-view.tsx
+#: src/pages/Today.tsx
 msgid "Open"
 msgstr "פתיחה"
 
