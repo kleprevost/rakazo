@@ -1,9 +1,10 @@
 import { useLingui } from "@lingui/react/macro";
 import type { Bot } from "@rakazo/contracts";
 import { Button, Popover, PopoverContent, PopoverTrigger } from "@rakazo/ui-web";
-import { Bell, PanelLeftClose, PanelLeftOpen, Plus, Search } from "lucide-react";
+import { Bell, LayoutDashboard, PanelLeftClose, PanelLeftOpen, Plus, Search } from "lucide-react";
 import { IconTooltip } from "../../components/IconTooltip";
 import { desktopBridge } from "../../lib/desktop";
+import { TODAY_PATH } from "../../lib/landing";
 import type { Panel } from "../../lib/right-panel-state";
 import { WindowChrome } from "../WindowChrome";
 import { BotCreatePicker } from "./bot-picker";
@@ -63,6 +64,21 @@ export function SidebarHeader({
             </Button>
           </IconTooltip>
         ) : null}
+        <IconTooltip label={t`Today`}>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            aria-label={t`Today`}
+            data-testid="sidebar-today"
+            onClick={() => {
+              setMobileSidebarOpen(false);
+              navigate(TODAY_PATH);
+            }}
+            className="app-no-drag flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground/70 hover:text-foreground/75"
+          >
+            <LayoutDashboard size={15} strokeWidth={1.8} aria-hidden="true" />
+          </Button>
+        </IconTooltip>
         <IconTooltip label={t`Activity`}>
           <Button
             variant="ghost"

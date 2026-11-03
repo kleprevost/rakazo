@@ -6,7 +6,9 @@ export function todayRoutes(ctx: RouterContext) {
   return {
     today: {
       summary: authed.today.summary.handler(({ context }) =>
-        todaySummary(deps.prisma, context.actor),
+        todaySummary(deps.prisma, context.actor, new Date(), {
+          workItems: deps.env?.ticketBoardEnabled === true,
+        }),
       ),
     },
   };

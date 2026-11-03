@@ -100,3 +100,63 @@ consistent. That is a separate PR that reuses `today.summary` as is.
   dedupe and supersession, completed filter and artifacts, upcoming routines.
 - `apps/web/src/pages/Today.test.tsx`: loading, empty, error and retry, populated links, approval
   answer, routine retry with failure.
+
+## Wave 2: Today as home
+
+Track E. Makes Today the centre of the product on web and desktop.
+
+### Landing
+
+- The first plain `/app` visit after sign-in goes to `/app/today` (replace, so Back does not trap).
+  It happens in the shell's roster load, after the first-run check, so a user with no bots, groups
+  or spaces still goes to `/onboarding` and never sees an empty Today.
+- Anything that already names a destination wins: `/app/:botId`, `/app/g/:id`, `/app?settings=...`,
+  `/app?mcp_oauth=...`, `/onboarding`, `/app/board`. `App.tsx` marks the landing as spent when a
+  signed-in user is on any of those, and re-arms it on sign-out (`apps/web/src/lib/landing.ts`).
+- "Back" links that point at `/app` (Today, Board, Artifacts) open the last chat as before, because
+  the landing is spent for that session. A reload at `/app` lands on Today again.
+- Desktop hosts the same web UI, so it follows. No server or setting is involved.
+
+### Navigation
+
+Today is an icon in the sidebar header (next to Activity), reusing the existing "Today" string, and
+the account-menu entry is removed so there is one way in. No new copy anywhere in this wave.
+
+### Work items
+
+`today.summary` gains `work`: open assignments (tickets) the user created or that are assigned to
+one of their bots, from `listWorkItems` with a new `involvingUserId` filter. Phases shown are
+running, waiting, review and failed, rendered as one section per phase using the existing phase
+labels; done and cancelled tickets are skipped. Each row links to `/app/board?ticket=<id>`, which
+now opens that ticket. Empty when `TICKET_BOARD_ENABLED` is off. Bounded at 20 rows, newest first.
+
+### Team visibility: scoped out
+
+Bots, threads, groups and runs each carry one `userId` and every existing read (`listBots`,
+`getBot`, thread and run routes) filters on it. `SpaceMember` only holds a role. There is no sharing
+table, no team or shared bot, and no group membership across users. A "work on bots the user may
+see but did not start" has no rule to reuse, and inventing one would widen access to other people's
+chats and runs. Not built.
+
+What is safe and included: tickets are already visible space-wide on the board, and the new rows
+only add tickets the user created or whose assignee is the user's own bot. A ticket the user
+created that now sits with a colleague's bot still shows, but without the bot's name (the bot
+lookup is scoped to the user). Revisit when a bot sharing model exists.
+
+### Mobile: deferred
+
+The contract is reusable, but a native screen is not cheap in this PR: mobile calls the API through
+its own path-keyed client, so `today/summary` needs wiring there; it needs a home entry point and a
+route in the native stack, SwiftUI/Expo UI rows rather than a port of the web layout, and strings
+in all mobile catalogs; and approval and retry actions need the mobile thread cache to stay in
+step. Mobile already has a native Board screen for tickets. Follow-up PR, same `today.summary`.
+
+### Tests
+
+- `apps/api/src/today.test.ts`: assignments off without the board, query scoped to the user's
+  tickets and bots, phase grouping, other users' bots never named.
+- `packages/db/src/work-items.postgres.test.ts`: real rows prove another user's ticket and finished
+  tickets stay out (`VERIFY_DATABASE=1`).
+- `apps/web`: landing module and App route settling, header Today button, Today work rows, Board
+  `?ticket=` deep link. The roster redirect itself has no hook-level test (no harness exists for
+  the shell roster); its decision logic is `takeLanding` and is covered there.
