@@ -129,10 +129,12 @@ import {
   parsePositiveInteger,
   provisionMessagingIdentity,
   pushSessionExpiresAt,
+  recordDirectoryClaims,
   requireMembership,
   rowSecurityWarning,
   runAsSystem,
   securityEventRetentionDays,
+  sweepExpiredEmployeeGrants,
   verifyContentKeys,
 } from "@rakazo/db";
 import type { Logger } from "@rakazo/logging";
@@ -567,6 +569,9 @@ async function buildApp(overrides: CreateAppOverrides): Promise<AppHandles> {
         ),
     },
     onEmailError,
+    onDirectoryClaims: (userId, claims, via) =>
+      recordDirectoryClaims(prisma, userId, claims, { via }).then(() => undefined),
+    onDirectoryClaimsError: (error) => getLogger().error("directory claims not recorded", error),
     afterSignIn:
       email && env.welcomeEmailEnabled
         ? (userId, headers) =>
@@ -781,6 +786,14 @@ async function buildApp(overrides: CreateAppOverrides): Promise<AppHandles> {
           (error) => getLogger().error("saved home retention failed", error),
         )
       : undefined;
+
+  // Expired employee grants stop conferring access: each instance may run it, rows are recomputed.
+  const stopEmployeeGrantExpiry = startHourlySweep(
+    async () => {
+      await sweepExpiredEmployeeGrants(prisma);
+    },
+    (error) => getLogger().error("employee grant expiry failed", error),
+  );
 
   const router = createRouter({
     speechSummary:
@@ -1520,6 +1533,7 @@ async function buildApp(overrides: CreateAppOverrides): Promise<AppHandles> {
       await stopInstalledBridges?.();
       await stopReferralEmails?.();
       await stopHomeRetention?.();
+      await stopEmployeeGrantExpiry();
       await reconciler?.stop();
       await stopSsoRevalidation();
       await oauthTokenUpgrade;

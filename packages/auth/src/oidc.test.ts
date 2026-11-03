@@ -4,7 +4,12 @@ import { memoryAdapter } from "better-auth/adapters/memory";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Auth, AuthEnv } from "./index.js";
 import { createAuth } from "./index.js";
-import { isCurrentOidcAccount, isOidcEmailVerified, oidcAccountSubject } from "./oidc.js";
+import {
+  isCurrentOidcAccount,
+  isOidcEmailVerified,
+  oidcAccountSubject,
+  oidcDirectoryClaims,
+} from "./oidc.js";
 import { encryptStoredOAuthTokens, openIdToken, sealIdToken } from "./token-storage.js";
 
 const state = vi.hoisted(() => ({ db: {} as Record<string, Record<string, unknown>[]> }));
@@ -1591,4 +1596,46 @@ it("counts only stored OIDC subjects bound to the current issuer", async () => {
   expect(await isCurrentOidcAccount({ ...account, idToken: "malformed" }, issuer, secret)).toBe(
     false,
   );
+});
+
+describe("oidcDirectoryClaims", () => {
+  const config = {
+    issuer,
+    clientId: "client",
+    clientSecret: "secret",
+    name: "SSO",
+    scopes: [],
+    allowSignupBypass: false,
+  };
+
+  it("reads the configured claim and ignores non-string entries", () => {
+    expect(
+      oidcDirectoryClaims({ ...config, accessClaim: "roles" }, { roles: ["a", 1, "b"] }),
+    ).toEqual({
+      values: ["a", "b"],
+      truncated: false,
+    });
+    expect(oidcDirectoryClaims(config, {})).toEqual({ values: [], truncated: false });
+  });
+
+  it("records Entra group overage as truncated", () => {
+    const overage = { _claim_names: { groups: "src1" }, _claim_sources: { src1: {} } };
+    expect(oidcDirectoryClaims(config, overage)).toEqual({ values: [], truncated: true });
+    expect(oidcDirectoryClaims(config, { hasgroups: true })).toEqual({
+      values: [],
+      truncated: true,
+    });
+    // A different claim is not affected by a groups overflow.
+    expect(
+      oidcDirectoryClaims({ ...config, accessClaim: "roles" }, { ...overage, roles: ["a"] }),
+    ).toEqual({
+      values: ["a"],
+      truncated: false,
+    });
+  });
+
+  it("marks oversized values as truncated rather than dropping them silently", () => {
+    const claims = oidcDirectoryClaims(config, { groups: ["ok", "x".repeat(300)] });
+    expect(claims).toEqual({ values: ["ok"], truncated: true });
+  });
 });
