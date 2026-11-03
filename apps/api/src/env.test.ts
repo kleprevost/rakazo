@@ -406,6 +406,15 @@ describe("OIDC environment", () => {
       );
     expect(() => loadEnv({ ...base, OIDC_REVALIDATE_MINUTES: "60" })).toThrow(/requires OIDC/);
   });
+  it("enables Easy Auth only with OIDC configured and no revalidation", () => {
+    expect(loadEnv({ ...base, ...oidc }).easyAuth).toBe(false);
+    expect(loadEnv({ ...base, ...oidc, AUTH_EASY_AUTH: "true" }).easyAuth).toBe(true);
+    expect(() => loadEnv({ ...base, AUTH_EASY_AUTH: "true" })).toThrow(/requires OIDC/);
+    expect(() => loadEnv({ ...base, ...oidc, AUTH_EASY_AUTH: "yes" })).toThrow(/true or false/);
+    expect(() =>
+      loadEnv({ ...base, ...oidc, AUTH_EASY_AUTH: "true", OIDC_REVALIDATE_MINUTES: "60" }),
+    ).toThrow(/cannot be combined/);
+  });
   it("trusts the SSO email only when OIDC_TRUST_EMAIL is true", () => {
     expect(loadEnv({ ...base, ...oidc }).oidc?.trustEmail).toBe(false);
     expect(loadEnv({ ...base, ...oidc, OIDC_TRUST_EMAIL: "true" }).oidc?.trustEmail).toBe(true);

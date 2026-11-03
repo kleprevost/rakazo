@@ -1,14 +1,13 @@
 import type { PrismaClient } from "@rakazo/db";
 import { recordSecurityEvent, runAsSystem } from "@rakazo/db";
 import { symmetricDecrypt, symmetricEncrypt } from "better-auth/crypto";
-import { createRemoteJWKSet, customFetch, jwtVerify } from "jose";
 import type { OidcConfig } from "./oidc.js";
 import { isCurrentOidcAccount, isOidcAccessAllowed, oidcAccountSubject } from "./oidc.js";
+import { createOidcKeys } from "./oidc-keys.js";
 import type { TokenKey } from "./token-storage.js";
 import { sealIdToken } from "./token-storage.js";
 
 const REQUEST_TIMEOUT_MS = 10_000;
-const DISCOVERY_TTL_MS = 5 * 60_000;
 const RETRY_AFTER_MS = 5 * 60_000;
 const BATCH_SIZE = 20;
 const MAX_BATCHES_PER_RUN = 10;
@@ -29,12 +28,6 @@ export interface OidcRevalidationDeps {
 
 type Outcome = "refreshed" | "skipped" | "revoked" | "transient";
 
-interface Endpoints {
-  tokenEndpoint: string;
-  jwksUri: string;
-  authMethods: string[];
-}
-
 /** The IdP answered, but refused the refresh token. Everything else is transient. */
 class RefreshRejected extends Error {}
 
@@ -48,39 +41,8 @@ export function createOidcRevalidator(deps: OidcRevalidationDeps) {
   const { config, key, prisma, revokeSessions } = deps;
   const request = deps.fetch ?? fetch;
   const now = deps.now ?? (() => new Date());
-  let endpoints: { value: Endpoints; at: number } | undefined;
-  let jwks: ReturnType<typeof createRemoteJWKSet> | undefined;
-  let jwksUri: string | undefined;
-
-  const discover = async (): Promise<Endpoints> => {
-    if (endpoints && now().getTime() - endpoints.at < DISCOVERY_TTL_MS) return endpoints.value;
-    const response = await request(
-      `${config.issuer.replace(/\/$/, "")}/.well-known/openid-configuration`,
-      { signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) },
-    );
-    if (!response.ok) throw new Error("discovery failed");
-    const doc = (await response.json()) as Record<string, unknown>;
-    const tokenEndpoint = doc.token_endpoint;
-    const jwksUriValue = doc.jwks_uri;
-    if (
-      doc.issuer !== config.issuer ||
-      typeof tokenEndpoint !== "string" ||
-      typeof jwksUriValue !== "string" ||
-      !tokenEndpoint.startsWith("https://") ||
-      !jwksUriValue.startsWith("https://")
-    )
-      throw new Error("discovery document is not usable");
-    const methods = doc.token_endpoint_auth_methods_supported;
-    const value = {
-      tokenEndpoint,
-      jwksUri: jwksUriValue,
-      authMethods: Array.isArray(methods)
-        ? methods.filter((item): item is string => typeof item === "string")
-        : [],
-    };
-    endpoints = { value, at: now().getTime() };
-    return value;
-  };
+  const keys = createOidcKeys({ config, fetch: request, now });
+  const { discover } = keys;
 
   const refresh = async (refreshToken: string) => {
     const found = await discover();
@@ -119,21 +81,8 @@ export function createOidcRevalidator(deps: OidcRevalidationDeps) {
     };
   };
 
-  /** Verified exactly like sign-in: signature from the discovered key set, issuer and audience. */
   const verify = async (idToken: string, accountId: string) => {
-    const found = await discover();
-    if (!jwks || jwksUri !== found.jwksUri) {
-      jwks = createRemoteJWKSet(new URL(found.jwksUri), {
-        timeoutDuration: REQUEST_TIMEOUT_MS,
-        [customFetch]: request,
-      });
-      jwksUri = found.jwksUri;
-    }
-    const { payload } = await jwtVerify(idToken, jwks, {
-      issuer: config.issuer,
-      audience: config.clientId,
-      clockTolerance: 60,
-    });
+    const payload = await keys.verifyIdToken(idToken);
     if (
       typeof payload.sub !== "string" ||
       oidcAccountSubject(config.issuer, payload.sub) !== accountId

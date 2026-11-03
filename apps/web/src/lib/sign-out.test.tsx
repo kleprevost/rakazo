@@ -15,10 +15,13 @@ import { COMPOSER_ENTER_TO_SEND_STORAGE_KEY } from "./composer-enter-to-send-pre
 import { selectedSpaceId, selectSpace } from "./rpc";
 import { LOG_OUT_FAILED_KEY, signOut, syncLogOutFailure, useSignOut } from "./sign-out";
 
-const { requestSignOut, endCallBeforeSignOut } = vi.hoisted(() => ({
+const { requestSignOut, endCallBeforeSignOut, capabilities } = vi.hoisted(() => ({
   requestSignOut: vi.fn(),
   endCallBeforeSignOut: vi.fn(async () => undefined),
+  capabilities: vi.fn(),
 }));
+
+vi.mock("./auth-capabilities", () => ({ fetchAuthCapabilities: capabilities }));
 
 vi.mock("@lingui/core/macro", () => ({ t: (parts: TemplateStringsArray) => parts.join("") }));
 vi.mock("./auth", () => ({ authClient: { signOut: requestSignOut } }));
@@ -33,6 +36,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   vi.stubGlobal("location", location);
   requestSignOut.mockResolvedValue({ data: { success: true }, error: null });
+  capabilities.mockResolvedValue({ sso: null });
   localStorage.setItem(SIGNED_IN_USER_KEY, "user-1");
   selectSpace("space-1");
   writeComposerDraft("bot:bot-1", "unsent thought");
@@ -75,6 +79,16 @@ describe("signOut", () => {
     // Other tabs reload when the signed-in user is cleared.
     expect(localStorage.getItem(SIGNED_IN_USER_KEY)).toBeNull();
     expect(selectedSpaceId()).toBeNull();
+  });
+
+  it("also ends the platform session behind built-in authentication", async () => {
+    capabilities.mockResolvedValue({
+      sso: { name: "SSO", availability: "available", easyAuth: true },
+    });
+    await signOut("/sign-in");
+    expect(location.assign).toHaveBeenCalledWith(
+      "/.auth/logout?post_logout_redirect_uri=%2Fsign-in",
+    );
   });
 
   it("leaves no saved draft for whoever uses this browser next", async () => {

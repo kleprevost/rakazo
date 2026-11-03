@@ -1,8 +1,10 @@
 import { t } from "@lingui/core/macro";
 import { useEffect, useRef, useState } from "react";
 import { authClient } from "./auth";
+import { fetchAuthCapabilities } from "./auth-capabilities";
 import { endCallBeforeSignOut, forgetSignedInUser, sessionChangedUnderPage } from "./call-session";
 import { clearComposerDrafts } from "./composer-draft";
+import { easyAuthLogoutUrl } from "./easy-auth";
 import { clearSpaceSelection } from "./rpc";
 
 /** Kept across the reload after a failed sign-out, so the fresh page can say it failed. */
@@ -27,7 +29,10 @@ export async function signOut(destination: string): Promise<void> {
     forgetSignedInUser();
     clearSpaceSelection();
     clearComposerDrafts();
-    window.location.assign(destination);
+    // Behind built-in authentication, the platform's own session must end too, or the next
+    // request would sign the same person straight back in.
+    const easyAuth = (await fetchAuthCapabilities().catch(() => null))?.sso?.easyAuth === true;
+    window.location.assign(easyAuth ? easyAuthLogoutUrl(destination) : destination);
   } else {
     try {
       sessionStorage.setItem(LOG_OUT_FAILED_KEY, "1");

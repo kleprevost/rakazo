@@ -87,6 +87,11 @@ within about an hour. Mechanics and failure handling are in
 - SCIM provisioning, where Entra pushes deprovisioning, could replace the polling later. It is
   not implemented.
 
+## Easy Auth
+
+Behind Azure App Service or Container Apps built-in authentication, browsers can sign in through
+the platform instead of Rakazo's redirect. See [easy-auth.md](easy-auth.md).
+
 ## Not verified
 
 Written from Entra's documented behavior and tested offline with simulated ID tokens only. Not

@@ -35,6 +35,12 @@ import {
   signedBearer,
 } from "./account-security.js";
 import { breachedPasswordCheck } from "./breached-password.js";
+import {
+  EASY_AUTH_SESSION_PATH,
+  easyAuthMarkerKey,
+  easyAuthPlugin,
+  rewriteRequestCookie,
+} from "./easy-auth.js";
 import type { EmailLocaleOf } from "./email.js";
 import { emailLocale, passwordResetEmail, signInCodeEmail, verificationEmail } from "./email.js";
 import { hasRecentIdentityConfirmation, identityConfirmation } from "./identity-confirmation.js";
@@ -45,6 +51,7 @@ import {
   isOidcAdminAccount,
   oidcDiscovery,
 } from "./oidc.js";
+import { createOidcKeys } from "./oidc-keys.js";
 import { createOidcRevalidator } from "./oidc-revalidate.js";
 import { passkeyRelyingParty } from "./passkey.js";
 import type { TokenKey } from "./token-storage.js";
@@ -73,6 +80,11 @@ export interface AuthEnv {
   /** Opt-in: rejects new passwords found in Have I Been Pwned. Calls an outside service. */
   breachedPasswordCheck?: boolean;
   oidc?: OidcConfig;
+  /**
+   * Behind App Service / Container Apps built-in authentication: a request carrying a verified
+   * Easy Auth ID token for the configured OIDC app gets a Rakazo session. Needs `oidc`.
+   */
+  easyAuth?: boolean;
   secret: string;
   baseURL: string;
   webOrigin: string;
@@ -169,6 +181,10 @@ export function createAuth(prisma: PrismaClient, env: AuthEnv) {
       return emailLocale(null, headers);
     }
   };
+  if (env.easyAuth && !env.oidc) throw new Error("Easy Auth requires OIDC configuration");
+  // Easy Auth sessions hold no refresh token, so revalidation would end them at its first pass.
+  if (env.easyAuth && env.oidc?.revalidateMinutes)
+    throw new Error("Easy Auth cannot be combined with OIDC revalidation");
   const discovery = env.oidc ? oidcDiscovery(env.oidc) : undefined;
   /** Whether another account with email sign-in already has a workspace. */
   const hasAdmittedAccount = async (
@@ -390,6 +406,9 @@ export function createAuth(prisma: PrismaClient, env: AuthEnv) {
       ),
       identityConfirmation(env.email, emailLocaleOf),
       ...(discovery ? [discovery.plugin] : []),
+      ...(env.easyAuth && env.oidc
+        ? [easyAuthPlugin({ config: env.oidc, keys: createOidcKeys({ config: env.oidc }) })]
+        : []),
       ...(emailCodeSignIn
         ? [
             emailOTP({
@@ -631,7 +650,7 @@ export function createAuth(prisma: PrismaClient, env: AuthEnv) {
             // The auth adapter can still be inside the signup transaction.
             const user = await ctx?.context.internalAdapter.findUserById(session.userId);
             const policy = signupPolicyFromEnv(env);
-            const oidcSignIn = isOidcCallback(ctx);
+            const oidcSignIn = isOidcCallback(ctx) || ctx?.path === EASY_AUTH_SESSION_PATH;
             const bypassAllowlist = oidcSignIn && env.oidc?.allowSignupBypass;
             if (!user || isMessagingEmail(user.email)) {
               throw new APIError("FORBIDDEN", {
@@ -716,6 +735,12 @@ export function createAuth(prisma: PrismaClient, env: AuthEnv) {
                 metadata: { via: ctx.path },
               });
             }
+            if (env.easyAuth)
+              await authContext
+                ?.then(({ internalAdapter }) =>
+                  internalAdapter.deleteVerificationByIdentifier(easyAuthMarkerKey(session.id)),
+                )
+                .catch(() => undefined);
             if (replacedSession(ctx)?.id !== session.id) await env.afterDeleteSession?.(session);
           },
         },
@@ -776,6 +801,33 @@ export function createAuth(prisma: PrismaClient, env: AuthEnv) {
     consumeAccountExportToken: async (token: string) =>
       consumeAccountExportToken((await auth.$context).internalAdapter, token),
     disposeOidcDiscovery: () => discovery?.dispose(),
+    /**
+     * Easy Auth pass for one request: establishes, keeps or ends the Rakazo session from the
+     * request's verified Easy Auth identity. Undefined unless `easyAuth` is on. `cookie` is the
+     * `Cookie` header the rest of the request must use (undefined: unchanged); `setCookies` go to
+     * the response. Pass headers whose client-IP header is already resolved.
+     */
+    easyAuth: env.easyAuth
+      ? async (headers: Headers, options: { create: boolean }) => {
+          const api = auth.api as unknown as {
+            easyAuthSession: (input: {
+              headers: Headers;
+              body: { create: boolean };
+              returnHeaders: true;
+            }) => Promise<{ headers: Headers; response: { hide: string[] } }>;
+          };
+          const { headers: out, response } = await api.easyAuthSession({
+            headers,
+            body: { create: options.create },
+            returnHeaders: true,
+          });
+          const setCookies = out.getSetCookie();
+          return {
+            setCookies,
+            cookie: rewriteRequestCookie(headers.get("cookie"), setCookies, response.hide),
+          };
+        }
+      : undefined,
     /**
      * One pass of SSO revalidation (OIDC_REVALIDATE_MINUTES). Safe to run from several instances.
      * Undefined when SSO or revalidation is not configured.
