@@ -2,6 +2,8 @@ import type { Policy } from "@rakazo/contracts";
 import { PolicySchema } from "@rakazo/contracts";
 import { describe, expect, it } from "vitest";
 import {
+  budgetPeriodStart,
+  evaluateBudgets,
   evaluateModelUse,
   evaluateUserConnection,
   filterModelCatalog,
@@ -29,6 +31,13 @@ const FULL = {
   },
   messaging: { allowSurfaces: ["web", "teams"] },
   data: { allowAccountExport: true },
+  budgets: {
+    period: "month",
+    organizationUsd: 5000,
+    perUserUsd: 200,
+    perBotUsd: 100,
+    warnAtPercent: 80,
+  },
 };
 
 describe("policy schema", () => {
@@ -157,5 +166,56 @@ describe("filterModelCatalog", () => {
     expect(
       filterModelCatalog(open, entries).map((entry) => `${entry.provider}/${entry.id}`),
     ).toEqual(["azure/gpt-5", "azure/gpt-5-mini"]);
+  });
+});
+
+describe("budgets", () => {
+  const policy = parsePolicy(
+    "version: 1\nbudgets:\n  organizationUsd: 1000\n  perUserUsd: 100\n  perBotUsd: 50\n",
+  );
+  const spend = (organization: number, user: number, bot: number) => ({ organization, user, bot });
+
+  it("rejects non-positive limits, unknown periods and unknown keys", () => {
+    for (const budgets of [
+      { perUserUsd: 0 },
+      { perUserUsd: -1 },
+      { period: "week" },
+      { warnAtPercent: 100 },
+      { perTeamUsd: 5 },
+    ]) {
+      expect(PolicySchema.safeParse({ version: 1, budgets }).success).toBe(false);
+    }
+  });
+
+  it("allows every run without a budget", () => {
+    expect(evaluateBudgets(undefined, spend(1e9, 1e9, 1e9))).toEqual({ allowed: true });
+    expect(evaluateBudgets(parsePolicy("version: 1\nbudgets: {}\n"), spend(1, 1, 1))).toEqual({
+      allowed: true,
+    });
+  });
+
+  it("allows under a limit and refuses at and over it, one scope at a time", () => {
+    expect(evaluateBudgets(policy, spend(999.99, 99.99, 49.99))).toEqual({ allowed: true });
+    expect(evaluateBudgets(policy, spend(1000, 0, 0))).toEqual({
+      allowed: false,
+      rule: "budgets.organization",
+    });
+    expect(evaluateBudgets(policy, spend(10, 100, 0))).toEqual({
+      allowed: false,
+      rule: "budgets.user",
+    });
+    expect(evaluateBudgets(policy, spend(10, 10, 50.5))).toEqual({
+      allowed: false,
+      rule: "budgets.bot",
+    });
+  });
+
+  it("starts the period at the first instant of the UTC month", () => {
+    expect(budgetPeriodStart(new Date("2026-11-30T23:59:59.999Z")).toISOString()).toBe(
+      "2026-11-01T00:00:00.000Z",
+    );
+    expect(budgetPeriodStart(new Date("2026-12-01T00:00:00.000Z")).toISOString()).toBe(
+      "2026-12-01T00:00:00.000Z",
+    );
   });
 });

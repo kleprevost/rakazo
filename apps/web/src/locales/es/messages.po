@@ -3916,6 +3916,11 @@ msgstr "mes"
 msgid "Monthly"
 msgstr "Mensual"
 
+#. js-lingui-explicit-id
+#: src/lib/run-error.ts
+msgid "Monthly budget reached"
+msgstr "Presupuesto mensual alcanzado"
+
 #: src/components/ModelCredits.tsx
 msgid "Monthly credits"
 msgstr "Créditos mensuales"

@@ -108,6 +108,7 @@ evaluator (`packages/core/src/policy.ts`). **Every section is enforced** except 
   a run reads it, and `autoReview.set` refuses a looser mode with `FORBIDDEN`/`policy`; the mode
   the settings read returns is the clamped one, so pickers show the effective mode. Not covered:
   a tool called from inside a routine's watch, and allow/ask rules themselves.
+- Budgets: see [Budgets](#budgets).
 - Not yet: a capabilities flag for clients; routines, agent import and other paths that pin a model
   without going through the bot-model check are caught at run time only.
 
@@ -119,6 +120,38 @@ models:
   allowModels: ["azure/gpt-*"]
   allowUserConnections: false
 ```
+
+## Budgets
+```yaml
+budgets:
+  period: month          # calendar month, UTC; the only option
+  organizationUsd: 5000  # all usage in the install
+  perUserUsd: 200        # the human the run is billed to
+  perBotUsd: 100
+  warnAtPercent: 80      # accepted, not enforced yet
+```
+All keys are optional; an absent limit is no limit, and with none set no query is made.
+
+- **Cost source.** Every model call already writes a `UsageRecord` (user, bot, space, time,
+  `costUsd`). Budgets sum `costUsd` since the first instant of the UTC month; nothing new is
+  recorded. A call without a reported cost counts as zero, so a provider that reports no cost is
+  not limited. One aggregate (organization, user and bot in a single `FILTER` query, run as
+  system because they span Spaces) is served by the covering index
+  `usage_records_period_spend_idx` (additive migration).
+- **Who is billed.** The run's `userId`: the bot's owner, who is also the member whose Space the
+  run belongs to. Usage on a user's own model connection counts too (a budget is a spend cap on
+  everything the install runs, not only on managed credits).
+- **Gate.** In the run executor right after the routine/webhook trigger check, before any model is
+  resolved or called. At or over any limit (organization, then user, then bot) the run fails
+  terminally (no retry; a routine backs off like other account errors) with "Monthly budget
+  reached", and `policy.denied` is recorded with rule `budgets.organization`, `budgets.user` or
+  `budgets.bot` and subject `monthly-budget`.
+- **Overshoot.** The check happens once at run start. Runs already in flight, and runs that start
+  concurrently, finish and are counted afterwards, so spend can pass a limit by the cost of those
+  runs. No lock serializes runs.
+- **Not covered.** Warnings (`warnAtPercent`), an admin spend view, mid-run cut-off, per-space
+  budgets, and gates outside the executor (voice, memory and other model calls made outside runs
+  still count toward spend but are not themselves refused).
 
 ## Delivery
 1. **Foundation + models** (first PR): contract, file loader, evaluator, audit events, a capabilities
