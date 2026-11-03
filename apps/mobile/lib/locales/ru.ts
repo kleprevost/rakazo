@@ -426,6 +426,7 @@ export const RU_MESSAGES: Record<string, string> = {
   "Request timed out": "Время ожидания запроса истекло",
   "Enter a password": "Введите пароль",
   "Enter a valid email": "Введите корректный адрес электронной почты",
+  "Your account does not have access": "У вашей учётной записи нет доступа",
   "Something went wrong. Try again.": "Что-то пошло не так. Попробуйте ещё раз.",
   "Could not reach that server": "Не удалось связаться с этим сервером",
   "Could not reach this model server": "Не удалось связаться с сервером этой модели.",
