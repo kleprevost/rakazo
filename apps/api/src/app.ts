@@ -103,6 +103,7 @@ import {
   verifyModelServesAgents,
   withSecretPersistence,
 } from "@rakazo/adapters";
+import type { Auth } from "@rakazo/auth";
 import { createAuth, isBlockedAuthPath, loopbackTwinOrigins } from "@rakazo/auth";
 import type { Actor, AuthCapabilities } from "@rakazo/contracts";
 import {
@@ -617,6 +618,9 @@ async function buildApp(overrides: CreateAppOverrides): Promise<AppHandles> {
   const oauthTokenUpgrade = auth
     .encryptStoredOAuthTokens()
     .catch((error) => getLogger().error("oauth token encryption upgrade failed", error));
+  // Opt-in SSO revalidation. The API already holds the client secret and token key, so the
+  // worker needs neither. Instances claim accounts in Postgres, so each may run the timer.
+  const stopSsoRevalidation = startSsoRevalidation(auth, env.oidc?.revalidateMinutes);
   const mcpArgsMove = moveMcpArgsIntoSecrets(prisma, secrets, { signal: shutdown.signal })
     .then(({ moved }) => {
       if (moved) getLogger().info("mcp server arguments encrypted", { count: moved });
@@ -1480,6 +1484,7 @@ async function buildApp(overrides: CreateAppOverrides): Promise<AppHandles> {
       await stopInstalledBridges?.();
       await stopReferralEmails?.();
       await reconciler?.stop();
+      await stopSsoRevalidation();
       await oauthTokenUpgrade;
       await mcpArgsMove;
       await runsStopped;
@@ -1641,4 +1646,27 @@ export function logUnexpectedRpcError(error: unknown, path: readonly string[]): 
   if (error instanceof ORPCError && error.status < 500) return;
   const where = `rpc ${path.join("/")} failed`;
   getLogger().error(where, error);
+}
+
+function startSsoRevalidation(auth: Auth, minutes: number | undefined) {
+  if (!minutes || !auth.revalidateSso) return async () => undefined;
+  const revalidate = auth.revalidateSso;
+  const tick = Math.min(5 * 60_000, Math.max(30_000, (minutes * 60_000) / 4));
+  let running: Promise<void> | undefined;
+  const run = () => {
+    running ??= revalidate((error) => getLogger().warn("sso revalidation deferred", { error }))
+      .then(({ revoked }) => {
+        if (revoked > 0) getLogger().info("sso revalidation ended sessions", { users: revoked });
+      })
+      .catch((error) => getLogger().error("sso revalidation failed", error))
+      .finally(() => {
+        running = undefined;
+      });
+  };
+  const timer = setInterval(run, tick);
+  timer.unref();
+  return async () => {
+    clearInterval(timer);
+    await running;
+  };
 }

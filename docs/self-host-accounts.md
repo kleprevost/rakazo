@@ -169,6 +169,36 @@ the value is gone, or immediately after a denied one; `RAKAZO_ADMIN_EMAILS` admi
 affected, and an admin still needs a verified email. For Microsoft Entra ID see
 [enterprise/entra-id.md](enterprise/entra-id.md).
 
+#### Revalidating signed-in users
+
+Access is otherwise checked only at sign-in, so a user removed at the provider keeps their
+sessions until they expire. Set `OIDC_REVALIDATE_MINUTES` (at least 5; unset is off) to have the
+API re-check every user whose account has an SSO identity from the configured issuer:
+
+- Each due account is refreshed with its stored refresh token, and the new ID token is verified
+  like a sign-in token (signature from the discovered key set, issuer, audience, subject).
+- The provider rejects the refresh token (`invalid_grant`: user disabled or deleted, token
+  revoked), or the new ID token fails `OIDC_ALLOWED_VALUES`: every session of that user on every
+  device ends, the stored SSO tokens are cleared, and an `auth.session.revoked` security event
+  (`via: sso_revalidation`, with a reason and no tokens) is recorded.
+- The admin value is gone but access remains: sessions stay and the new ID token is stored, so
+  SSO admin drops at once.
+- Network errors, timeouts, 5xx and 429 responses, and misconfigured client credentials change
+  nothing and are retried within minutes. Only an explicit `invalid_grant` ends sessions.
+- If the provider returns no ID token while `OIDC_ALLOWED_VALUES` is set, access cannot be
+  re-checked and the user's sessions end.
+- Fail closed: an SSO user with no refresh token, including anyone who signed in before this was
+  enabled, is signed out `OIDC_REVALIDATE_MINUTES` after their last sign-in and must sign in
+  again. `offline_access` is requested automatically at sign-in; some providers need more (for
+  example Google needs `access_type=offline`). Password, passkey and other non-SSO accounts are
+  never touched.
+
+It runs in the API process, which already holds the client secret and the token key, so the
+worker gets neither. Each instance runs a timer and claims accounts in Postgres, so several API
+instances never refresh the same token twice. Checks are spread over small batches. Revocation
+lags the provider by up to the interval plus a few minutes; the access token lifetime is not
+involved. SCIM provisioning would remove that lag by having the provider push deprovisioning,
+but it is not implemented.
 `OIDC_TRUST_EMAIL=true` counts the SSO email as verified when the ID token omits
 `email_verified`, as Microsoft Entra ID does. It never applies when `email_verified` is `false`,
 or when an `xms_edov` claim is present and not `true`. It is only safe when the issuer is a

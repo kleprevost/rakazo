@@ -210,6 +210,12 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): AppEnv {
   const passwordAuth = source.AUTH_PASSWORD_ENABLED !== "false";
   if (!passwordAuth && !issuer)
     throw new Error("AUTH_PASSWORD_ENABLED=false requires OIDC configuration");
+  const revalidate = optional(source.OIDC_REVALIDATE_MINUTES);
+  if (revalidate && !issuer) throw new Error("OIDC_REVALIDATE_MINUTES requires OIDC configuration");
+  if (revalidate && !/^\d+$/.test(revalidate))
+    throw new Error("OIDC_REVALIDATE_MINUTES must be a whole number of minutes");
+  if (revalidate && Number(revalidate) < 5)
+    throw new Error("OIDC_REVALIDATE_MINUTES must be at least 5");
   const oidc =
     issuer && clientId && clientSecret
       ? {
@@ -224,6 +230,7 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): AppEnv {
           accessClaim: optional(source.OIDC_ACCESS_CLAIM) ?? "groups",
           allowedValues: list(source.OIDC_ALLOWED_VALUES),
           adminValues: list(source.OIDC_ADMIN_VALUES),
+          revalidateMinutes: revalidate ? Number(revalidate) : undefined,
           trustEmail: source.OIDC_TRUST_EMAIL === "true",
         }
       : undefined;
