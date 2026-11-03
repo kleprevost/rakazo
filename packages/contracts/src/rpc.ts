@@ -178,6 +178,7 @@ import {
 import { SearchQueryOutputSchema } from "./search.js";
 import { SecurityEventListInputSchema, SecurityEventSchema } from "./security-events.js";
 import { SettingsScopeSchema, SpaceSettingSchema, settingsScopeInput } from "./settings-scope.js";
+import { TodaySummarySchema } from "./today.js";
 
 const botId = z.object({ botId: Id });
 const groupId = z.object({ groupId: Id });
@@ -1381,6 +1382,10 @@ export const appContract = {
   },
   runs: {
     list: oc.input(z.object({ filter: z.enum(["active", "recent"]) })).output(RunsListOutputSchema),
+  },
+  /** The signed-in user's bots at a glance: what needs them, what is running, what finished. */
+  today: {
+    summary: oc.output(TodaySummarySchema),
   },
   /** The signed-in user's wallet; absent when the deployment offers none. */
   paymentWallet: {
