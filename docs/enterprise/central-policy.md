@@ -121,6 +121,12 @@ models:
   allowUserConnections: false
 ```
 
+## Capabilities
+Optional `capabilities` section for the [capability broker](./features/capability-broker.md): `ceiling`,
+`deny` and `alwaysAsk` scope lists (`mail.send`, `calendar.*`, `ext.*`, `*.*`), `ownerGrantable`
+(non-read scopes bot owners may grant themselves), `requireGrants`, and tool-to-scope `mappings`.
+Schema and pure evaluator exist; nothing enforces them yet. Absent = no change in behavior.
+
 ## Budgets
 ```yaml
 budgets:
