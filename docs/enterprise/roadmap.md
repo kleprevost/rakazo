@@ -17,7 +17,7 @@ Not linked from the public docs site (`apps/www/src/docs.ts` lists slugs explici
 | 1 Secrets | Key Vault `SecretStore` + `KeyProvider`, workload identity | Merged (#1) |
 | 2 Identity | Entra via OIDC: claim allow-list, SSO admin; trusted email option | Merged (#3, #6) |
 | 3 Inference | Foundry + OpenCode Zen as deployment model and connections | Merged (#2) |
-| 4 Compute + hosting | Bicep AKS, Kata pool + `rakazo-kata` RuntimeClass, network policy, kustomize manifests | #7 |
+| 4 Compute + hosting | Bicep AKS, Kata pool + `rakazo-kata` RuntimeClass, network policy, kustomize manifests | Merged (#7) |
 
 ## Next: M1 gaps (one small batch)
 - Revoke access promptly when a user is terminated or loses their role (in progress).
