@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import type { SecretClient } from "@azure/keyvault-secrets";
 import type {
   AdapterContext,
   SecretContext,
@@ -57,7 +58,7 @@ export function azureKeyVaultUrl(value: string | undefined, name = "AZURE_KEY_VA
 /** The SDK loads on first use, so deployments without Key Vault never load it. */
 export function sdkSecretsClient(vaultUrl: string): KeyVaultSecretsApi {
   const connect = (() => {
-    let client: Promise<import("@azure/keyvault-secrets").SecretClient> | undefined;
+    let client: Promise<SecretClient> | undefined;
     return () =>
       (client ??= Promise.all([import("@azure/identity"), import("@azure/keyvault-secrets")]).then(
         ([identity, secrets]) =>

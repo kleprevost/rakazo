@@ -14,7 +14,7 @@ Not linked from the public docs site (`apps/www/src/docs.ts` lists slugs explici
 ## Milestone 1 — Azure-native foundation
 | WS | Scope | Existing base | Status |
 |---|---|---|---|
-| 1 Secrets | Azure Key Vault `SecretStore` + `KeyProvider` adapters, workload identity (DefaultAzureCredential) | `infisical-secret-store.ts`, `aws-kms-key-provider.ts`, conformance tests | in progress |
+| 1 Secrets | Azure Key Vault `SecretStore` + `KeyProvider` adapters, workload identity (DefaultAzureCredential) | `infisical-secret-store.ts`, `aws-kms-key-provider.ts`, conformance tests | PR #1 in review (secret migration CLI to/from Key Vault not supported yet) |
 | 2 Identity | Entra via existing OIDC: restrict to tenant (`tid`), optional group allow-list, admin role from group; docs | `packages/auth/src/oidc.ts` | todo |
 | 3 Inference | Foundry + OpenCode Zen as deployment model / connections; verify via existing OpenAI-compatible + Pi providers before writing code | `pi-models.ts`, OpenAI-compatible connections | todo |
 | 4 Compute + hosting | AKS reference deployment (Helm or manifests), Kata `runtimeClass` for bot pods, network policy, workload identity wiring | `kubernetes-sandbox.ts` (supports runtimeClass) | todo |

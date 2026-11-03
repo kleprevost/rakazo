@@ -1,4 +1,6 @@
 import { createHash, timingSafeEqual } from "node:crypto";
+import type { DefaultAzureCredential } from "@azure/identity";
+import type { CryptographyClient } from "@azure/keyvault-keys";
 import type { KeyProvider, KeyWrapContext, WrappedDataKey } from "@rakazo/adapter-kit";
 import { azureKeyVaultUrl } from "./azure-key-vault-secret-store.js";
 
@@ -43,14 +45,16 @@ function parseKeyId(keyId: string) {
 const keyIdMessage =
   "AZURE_KEY_VAULT_KEY_ID must be a key identifier with a version (https://<vault>.vault.azure.net/keys/<name>/<version>)";
 
+const loadSdk = () => Promise.all([import("@azure/identity"), import("@azure/keyvault-keys")]);
+
 /** The SDK loads on first use, so deployments without Key Vault never load it. */
 export function sdkKeyCrypto(): KeyVaultCrypto {
   const connect = (() => {
-    let loaded: Promise<[typeof import("@azure/identity"), typeof import("@azure/keyvault-keys")]>;
-    const clients = new Map<string, import("@azure/keyvault-keys").CryptographyClient>();
-    let credential: InstanceType<typeof import("@azure/identity").DefaultAzureCredential>;
+    let loaded: ReturnType<typeof loadSdk> | undefined;
+    const clients = new Map<string, CryptographyClient>();
+    let credential: DefaultAzureCredential | undefined;
     return async (keyId: string) => {
-      loaded ??= Promise.all([import("@azure/identity"), import("@azure/keyvault-keys")]);
+      loaded ??= loadSdk();
       const [identity, keys] = await loaded;
       credential ??= new identity.DefaultAzureCredential();
       let client = clients.get(keyId);
