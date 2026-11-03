@@ -318,6 +318,10 @@ resource webAuth 'Microsoft.App/containerApps/authConfigs@2025-01-01' = if (depl
         validation: {
           allowedAudiences: [oidcClientId]
         }
+        // offline_access lets the web app call /.auth/refresh before the stored ID token expires.
+        login: {
+          loginParameters: ['scope=openid profile email offline_access']
+        }
       }
     }
     login: {
