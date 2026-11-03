@@ -8,6 +8,7 @@ import {
 } from "@rakazo/adapter-kit";
 import type { MessageBlock, ModelRoleChoice, RunStatus } from "@rakazo/contracts";
 import {
+  BOT_SUSPENDED_MESSAGE,
   BUDGET_REACHED_MESSAGE,
   disabledBuiltinToolSet,
   POLICY_DENIED_MESSAGE,
@@ -898,6 +899,12 @@ export function createRunExecutor(executorDeps: ExecutorDeps) {
             await backOffRoutineAfterAccountError(deps, run.routineId);
           }
         };
+        // Every source of work ends here, so one check covers messages, routines, webhooks,
+        // messaging channels, delegation, ticket wakes and helpers. The routine is left as is.
+        if (bot.suspendedAt) {
+          await failRunBeforeModel(BOT_SUSPENDED_MESSAGE);
+          return;
+        }
         // A routine or webhook the policy switched off is kept, but never runs.
         if (
           await policyDenied(() =>

@@ -21,6 +21,7 @@ import {
   touchGroupUpdatedAt,
 } from "@rakazo/db";
 import { getLogger } from "@rakazo/logging";
+import { assertBotNotSuspended } from "../bot-suspension.js";
 import type { RouterDeps } from "../router.js";
 import { createRoutineTestRun, routineTestRunNonce, routineTestTarget } from "../routines.js";
 import { withSerializableRetry } from "../serializable-retry.js";
@@ -89,6 +90,62 @@ export function takeoverReleaser(deps: RouterDeps, actor: Actor, target: ThreadT
   };
 }
 
+type SendThreadInput = Parameters<typeof sendThreadMessage>[3] & {
+  botId?: string;
+  groupId?: string;
+};
+
+/** The one user-message send: model, teaching and image checks, then message and run in one commit. */
+export async function sendThread(
+  deps: RouterDeps,
+  codexCatalog: RouterContext["codexCatalog"],
+  actor: Actor,
+  input: SendThreadInput,
+  startRoutines?: Parameters<typeof sendThreadMessage>[5],
+) {
+  const setup = await modelSetup(deps, actor);
+  const target = await resolveThreadTarget(deps.prisma, actor, input);
+  // A bot with its own runnable model needs no main model, and stopping work needs none.
+  const noModel =
+    setup.needsModel && !(await botsRunOwnModels(deps, actor, sendTargetBotIds(target, input)));
+  if (noModel && (target.kind !== "bot" || !isStopMessage(input))) {
+    throw new ORPCError("BAD_REQUEST", { message: MODEL_REQUIRED_SEND_ERROR });
+  }
+  if (target.kind === "bot") {
+    await assertTeachingSendAllowed(deps.prisma, actor.spaceId, target.botId);
+    if (!isStopMessage(input)) await assertBotNotSuspended(deps.prisma, target.botId);
+  }
+  const confirmingImages = input.imageHandling === "confirm" && Boolean(input.artifactIds?.length);
+  // Reuse the funding modelSetup resolved; a send never asks billing twice.
+  const deployment = setup.hasDeployment
+    ? { provider: deps.env.defaultProvider, model: deps.env.defaultModel }
+    : null;
+  return sendThreadMessage(
+    {
+      ...deps,
+      maxAttachmentsPerMessage: deps.env.maxAttachmentsPerMessage,
+      imageAdmission: confirmingImages
+        ? {
+            secrets: deps.secrets,
+            deployment,
+            hostedProvider: setup.creditsAvailable ? deployment?.provider : undefined,
+            codexCatalog,
+          }
+        : undefined,
+    },
+    actor,
+    target,
+    { ...input, noModel },
+    takeoverReleaser(deps, actor, target),
+    startRoutines,
+  ).catch((error: unknown) => {
+    if (error instanceof AttachmentValidationError) {
+      throw new ORPCError("BAD_REQUEST", { message: error.message });
+    }
+    throw error;
+  });
+}
+
 export function threadsRoutes(ctx: RouterContext) {
   const { deps, authed, callsEnabled, codexCatalog, repos, agentSkills } = ctx;
   /** The bot a reaction can wake: the thread's bot, or in a group the bot that wrote the message. */
@@ -101,53 +158,11 @@ export function threadsRoutes(ctx: RouterContext) {
             select: { botId: true },
           })
         )?.botId ?? target.memberBotIds[0]!);
-  const send = async (
+  const send = (
     actor: Actor,
-    input: Parameters<typeof sendThreadMessage>[3] & { botId?: string; groupId?: string },
+    input: SendThreadInput,
     startRoutines?: Parameters<typeof sendThreadMessage>[5],
-  ) => {
-    const setup = await modelSetup(deps, actor);
-    const target = await resolveThreadTarget(deps.prisma, actor, input);
-    // A bot with its own runnable model needs no main model, and stopping work needs none.
-    const noModel =
-      setup.needsModel && !(await botsRunOwnModels(deps, actor, sendTargetBotIds(target, input)));
-    if (noModel && (target.kind !== "bot" || !isStopMessage(input))) {
-      throw new ORPCError("BAD_REQUEST", { message: MODEL_REQUIRED_SEND_ERROR });
-    }
-    if (target.kind === "bot") {
-      await assertTeachingSendAllowed(deps.prisma, actor.spaceId, target.botId);
-    }
-    const confirmingImages =
-      input.imageHandling === "confirm" && Boolean(input.artifactIds?.length);
-    // Reuse the funding modelSetup resolved; a send never asks billing twice.
-    const deployment = setup.hasDeployment
-      ? { provider: deps.env.defaultProvider, model: deps.env.defaultModel }
-      : null;
-    return sendThreadMessage(
-      {
-        ...deps,
-        maxAttachmentsPerMessage: deps.env.maxAttachmentsPerMessage,
-        imageAdmission: confirmingImages
-          ? {
-              secrets: deps.secrets,
-              deployment,
-              hostedProvider: setup.creditsAvailable ? deployment?.provider : undefined,
-              codexCatalog,
-            }
-          : undefined,
-      },
-      actor,
-      target,
-      { ...input, noModel },
-      takeoverReleaser(deps, actor, target),
-      startRoutines,
-    ).catch((error: unknown) => {
-      if (error instanceof AttachmentValidationError) {
-        throw new ORPCError("BAD_REQUEST", { message: error.message });
-      }
-      throw error;
-    });
-  };
+  ) => sendThread(deps, codexCatalog, actor, input, startRoutines);
   return {
     threads: {
       head: authed.threads.head.handler(async ({ context, input }) => {
@@ -383,6 +398,7 @@ export function threadsRoutes(ctx: RouterContext) {
         const target = await resolveThreadTarget(deps.prisma, context.actor, input);
         if (target.kind === "bot") {
           await assertTeachingSendAllowed(deps.prisma, context.actor.spaceId, target.botId);
+          await assertBotNotSuspended(deps.prisma, target.botId);
           const sent = await deps.events.sendUserMessage({
             spaceId: context.actor.spaceId,
             threadId: target.threadId,

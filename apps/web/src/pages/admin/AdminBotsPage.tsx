@@ -1,15 +1,21 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import type { AdminBot } from "@rakazo/contracts";
 import {
   Badge,
+  Button,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
+  toast,
 } from "@rakazo/ui-web";
 import { useInfiniteQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { useSpaceQueries } from "../../lib/query";
+import { rpc } from "../../lib/rpc";
+import { errorText } from "../../lib/user-error";
 import { AdminQuery, LoadMore } from "./AdminQuery";
 import { AdminShell } from "./AdminShell";
 import { formatUsd, formatWhen } from "./format";
@@ -25,7 +31,7 @@ export function AdminBotsPage() {
 }
 
 function AdminBots() {
-  const { t, i18n } = useLingui();
+  const { i18n } = useLingui();
   const bots = useInfiniteQuery(
     useSpaceQueries().admin.bots.list.infiniteOptions({
       input: (cursor: string | null) => ({ limit: PAGE_SIZE, ...(cursor ? { cursor } : {}) }),
@@ -62,33 +68,89 @@ function AdminBots() {
             <TableHead className="text-end">
               <Trans>This month</Trans>
             </TableHead>
+            <TableHead />
           </TableRow>
         </TableHeader>
         <TableBody>
           {rows.map((bot) => (
-            <TableRow key={bot.id} aria-label={bot.name}>
-              <TableCell className="font-medium">
-                {bot.name}
-                {bot.archived ? (
-                  <Badge variant="outline" className="ms-2">
-                    {t`Archived`}
-                  </Badge>
-                ) : null}
-              </TableCell>
-              <TableCell>{bot.ownerEmail ?? bot.ownerName}</TableCell>
-              <TableCell>{bot.spaceName}</TableCell>
-              <TableCell>{bot.model}</TableCell>
-              <TableCell className="text-muted-foreground">
-                {bot.lastActiveAt ? formatWhen(bot.lastActiveAt, i18n.locale) : null}
-              </TableCell>
-              <TableCell className="text-end">
-                {formatUsd(bot.monthlySpendUsd, i18n.locale)}
-              </TableCell>
-            </TableRow>
+            <BotRow
+              key={bot.id}
+              bot={bot}
+              locale={i18n.locale}
+              onChanged={() => void bots.refetch()}
+            />
           ))}
         </TableBody>
       </Table>
       <LoadMore query={bots} />
     </AdminQuery>
+  );
+}
+
+function BotRow({
+  bot,
+  locale,
+  onChanged,
+}: {
+  bot: AdminBot;
+  locale: string;
+  onChanged: () => void;
+}) {
+  const { t } = useLingui();
+  const [confirming, setConfirming] = useState(false);
+  const [busy, setBusy] = useState(false);
+  async function toggle() {
+    setBusy(true);
+    try {
+      if (bot.suspendedAt) await rpc.admin.bots.resume({ botId: bot.id });
+      else await rpc.admin.bots.suspend({ botId: bot.id });
+      onChanged();
+    } catch (error) {
+      toast.error(errorText(error, t`Could not update`));
+    } finally {
+      setBusy(false);
+      setConfirming(false);
+    }
+  }
+  return (
+    <TableRow aria-label={bot.name}>
+      <TableCell className="font-medium">
+        {bot.name}
+        {bot.archived ? (
+          <Badge variant="outline" className="ms-2">
+            {t`Archived`}
+          </Badge>
+        ) : null}
+        {bot.suspendedAt ? (
+          <Badge variant="secondary" className="ms-2">
+            {t`Suspended`}
+          </Badge>
+        ) : null}
+      </TableCell>
+      <TableCell>{bot.ownerEmail ?? bot.ownerName}</TableCell>
+      <TableCell>{bot.spaceName}</TableCell>
+      <TableCell>{bot.model}</TableCell>
+      <TableCell className="text-muted-foreground">
+        {bot.lastActiveAt ? formatWhen(bot.lastActiveAt, locale) : null}
+      </TableCell>
+      <TableCell className="text-end">{formatUsd(bot.monthlySpendUsd, locale)}</TableCell>
+      <TableCell className="text-end">
+        <Button
+          variant={confirming ? "destructive" : "ghost"}
+          size="sm"
+          disabled={busy}
+          onClick={() => (bot.suspendedAt || confirming ? void toggle() : setConfirming(true))}
+          onBlur={() => setConfirming(false)}
+        >
+          {bot.suspendedAt ? (
+            <Trans>Resume</Trans>
+          ) : confirming ? (
+            <Trans>Confirm</Trans>
+          ) : (
+            <Trans>Suspend</Trans>
+          )}
+        </Button>
+      </TableCell>
+    </TableRow>
   );
 }

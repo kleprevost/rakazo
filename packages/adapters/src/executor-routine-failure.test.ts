@@ -5,6 +5,7 @@ import {
   SandboxRateLimitError,
   TransientModelError,
 } from "@rakazo/adapter-kit";
+import { BOT_SUSPENDED_MESSAGE, RUN_TRIGGERS } from "@rakazo/contracts";
 import type * as DbModule from "@rakazo/db";
 import { countUnreadInboxChats, installSecurityEventStore } from "@rakazo/db";
 import { createLogger, createTestSink, installLogger } from "@rakazo/logging";
@@ -50,6 +51,7 @@ interface Scenario {
   lateLookupFails?: boolean;
   setupFailsOnce?: boolean;
   spend?: { organization: number; user: number; bot: number };
+  suspended?: boolean;
 }
 
 async function failRun(scenario: Scenario) {
@@ -147,6 +149,7 @@ async function failRun(scenario: Scenario) {
         computerId: "computer-1",
         computerSwitching: false,
         memoryScope: null,
+        suspendedAt: scenario.suspended ? new Date(NOW) : null,
         computer: { id: "computer-1", scope: "dedicated" },
       })),
       findMany: vi.fn(async () => []),
@@ -1165,5 +1168,18 @@ describe("a routine or webhook the policy switched off", () => {
         metadata: { rule: `bots.${Object.keys(bots)[0]}`, subject: trigger, surface: "run" },
       }),
     });
+  });
+});
+
+describe("a run of a suspended AI employee", () => {
+  it.each(RUN_TRIGGERS)("fails a %s run before the model", async (trigger) => {
+    const { runtimeRun, prisma } = await failRun({
+      error: new Error(BOT_SUSPENDED_MESSAGE),
+      trigger,
+      suspended: true,
+    });
+    expect(runtimeRun).not.toHaveBeenCalled();
+    // Not an account failure: the routine's schedule is left alone.
+    expect(prisma.$transaction).not.toHaveBeenCalled();
   });
 });

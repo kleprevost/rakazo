@@ -45,15 +45,10 @@ const AttentionBase = TodayBotRef.extend({
 
 export const TodayAttentionSchema = z.discriminatedUnion("kind", [
   /**
-   * An approval card the signed-in user can answer. `actions` are the card's own choices, answered
-   * through `threads.answer` with `messageId`.
+   * An approval card waiting in a chat. `text` is a clipped preview only; the whole card, with its
+   * destination and arguments, is decided in the chat, never from this summary.
    */
-  AttentionBase.extend({
-    kind: z.literal("approval"),
-    messageId: Id,
-    text: z.string(),
-    actions: z.array(z.object({ id: z.string(), label: z.string() })),
-  }),
+  AttentionBase.extend({ kind: z.literal("approval"), messageId: Id, text: z.string() }),
   /** A question from a bot, answered in the chat. */
   AttentionBase.extend({ kind: z.literal("question"), messageId: Id, text: z.string() }),
   AttentionBase.extend({

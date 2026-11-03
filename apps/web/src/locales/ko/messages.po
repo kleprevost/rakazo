@@ -478,6 +478,10 @@ msgstr ""
 msgid "Account menu for {name}"
 msgstr "{name}의 계정 메뉴"
 
+#: src/pages/Calendar.tsx
+msgid "Actions"
+msgstr "작업"
+
 #. placeholder {0}: bot.name
 #. placeholder {0}: group.spaceName
 #. placeholder {0}: page.title
@@ -717,7 +721,6 @@ msgid "All time"
 msgstr ""
 
 #: src/components/ApprovalRulesSettings.tsx
-#: src/pages/Today.tsx
 msgid "Allow"
 msgstr "허용"
 
@@ -1045,6 +1048,7 @@ msgstr "아바타 스튜디오"
 #: src/pages/admin/AdminShell.tsx
 #: src/pages/Auth.tsx
 #: src/pages/Board.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/McpServersOverlay.tsx
 #: src/pages/NavLinkPage.tsx
 #: src/pages/PluginsOverlay.tsx
@@ -1196,7 +1200,9 @@ msgstr ""
 msgid "Built-in"
 msgstr "기본 제공"
 
+#: src/pages/Calendar.tsx
 #: src/pages/shell/hire-role-dialog.tsx
+#: src/pages/shell/sidebar-header.tsx
 msgid "Calendar"
 msgstr ""
 
@@ -1677,6 +1683,7 @@ msgstr "컴퓨터가 꺼져 있습니다. SANDBOX_PROVIDER=docker와 SANDBOX_SUP
 msgid "Configure a plugin catalog on the server to connect apps."
 msgstr ""
 
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/admin/AdminUsersPage.tsx
 msgid "Confirm"
 msgstr ""
@@ -1959,6 +1966,7 @@ msgid "Could not clear conversation"
 msgstr "대화 내용을 비우지 못했습니다."
 
 #: src/components/ComputerUpdateProgress.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/Today.tsx
 msgid "Could not complete action"
 msgstr ""
@@ -2426,6 +2434,7 @@ msgstr "MCP 서버를 테스트하지 못했습니다."
 msgid "Could not transcribe that recording."
 msgstr ""
 
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/ScratchpadSection.tsx
 msgid "Could not update"
 msgstr "업데이트하지 못했습니다."
@@ -2630,6 +2639,10 @@ msgstr ""
 msgid "day"
 msgstr "일"
 
+#: src/pages/Calendar.tsx
+msgid "Day"
+msgstr "일"
+
 #: src/pages/shell/message-cards.tsx
 msgid "Day-to-day work"
 msgstr ""
@@ -2755,7 +2768,6 @@ msgid "Denied"
 msgstr "거부됨"
 
 #: src/components/AskCard.tsx
-#: src/pages/Today.tsx
 msgid "Deny"
 msgstr "거부"
 
@@ -2911,6 +2923,7 @@ msgstr "계정이 없나요?"
 #: src/lib/ticket-status.ts
 #: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/shell/avatar-studio-popover.tsx
 #: src/pages/shell/import-setup-card.tsx
 #: src/pages/shell/message-view.tsx
@@ -2971,6 +2984,7 @@ msgstr ""
 #: src/components/AskCard.tsx
 #: src/components/vault/VaultItemDetail.tsx
 #: src/pages/AccountSettingsOverlay.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/McpServersOverlay.tsx
 msgid "Edit"
 msgstr "편집"
@@ -3073,6 +3087,10 @@ msgstr "환경 변수: {names}"
 #: src/pages/shell/sidebar-roster.tsx
 msgid "Error"
 msgstr ""
+
+#: src/pages/Calendar.tsx
+msgid "Event-triggered"
+msgstr "이벤트로 실행"
 
 #: src/lib/cron.ts
 #: src/pages/ExternalConversationSettings.tsx
@@ -3205,6 +3223,7 @@ msgstr "실패"
 #: src/components/SubagentCard.tsx
 #: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
+#: src/pages/Calendar.tsx
 msgid "Failed"
 msgstr "실패"
 
@@ -4427,6 +4446,10 @@ msgstr ""
 msgid "New variable"
 msgstr ""
 
+#: src/pages/Calendar.tsx
+msgid "Next"
+msgstr "다음"
+
 #: src/components/markdown-copy.tsx
 msgid "Next page"
 msgstr "다음 페이지"
@@ -4610,6 +4633,10 @@ msgstr "작동하지 않음"
 msgid "Nothing remembered yet"
 msgstr "아직 기억한 내용이 없습니다"
 
+#: src/pages/Calendar.tsx
+msgid "Nothing scheduled"
+msgstr "예약된 항목 없음"
+
 #: src/pages/admin/AdminPolicyPage.tsx
 #: src/pages/admin/AdminQuery.tsx
 msgid "Nothing to show."
@@ -4700,6 +4727,7 @@ msgstr "나만"
 #: src/pages/shell/computer-panel.tsx
 #: src/pages/shell/import-setup-card.tsx
 #: src/pages/shell/message-view.tsx
+#: src/pages/Today.tsx
 msgid "Open"
 msgstr "열기"
 
@@ -4951,6 +4979,10 @@ msgstr "API 키를 붙여넣으세요"
 msgid "Paste your API key, then test again."
 msgstr "API 키를 붙여넣은 뒤 다시 테스트하세요."
 
+#: src/pages/Calendar.tsx
+msgid "Pause"
+msgstr "일시중지"
+
 #: src/pages/RoutineEditor.tsx
 #: src/pages/shell/import-status.ts
 msgid "Paused"
@@ -5070,6 +5102,10 @@ msgstr "{0} 미리보기"
 #: src/pages/Artifacts.tsx
 msgid "Preview isn't available for this file type — download it to view it."
 msgstr ""
+
+#: src/pages/Calendar.tsx
+msgid "Previous"
+msgstr "이전"
 
 #: src/components/markdown-copy.tsx
 msgid "Previous page"
@@ -5531,6 +5567,11 @@ msgstr "복원됨"
 msgid "Restoring your workspace"
 msgstr ""
 
+#: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/Calendar.tsx
+msgid "Resume"
+msgstr "재개"
+
 #: src/components/AccountAccess.tsx
 #: src/components/integrations/plugin-marketplace.tsx
 #: src/components/integrations/skills-dialog.tsx
@@ -5541,6 +5582,7 @@ msgstr ""
 #: src/pages/ModelRoleSettings.tsx
 #: src/pages/PluginsOverlay.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
+#: src/pages/shell/hire-role-dialog.tsx
 #: src/pages/SpaceSettingOverrides.tsx
 #: src/pages/Today.tsx
 msgid "Retry"
@@ -5623,6 +5665,10 @@ msgstr "실행 시간"
 msgid "Run history"
 msgstr "실행 기록"
 
+#: src/pages/Calendar.tsx
+msgid "Run now"
+msgstr "지금 실행"
+
 #: src/pages/shell/use-routine-editor.ts
 msgid "Run time must be in the future."
 msgstr "실행 시간은 미래여야 합니다."
@@ -5634,6 +5680,7 @@ msgstr "실행 중"
 #: src/components/SubagentCard.tsx
 #: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/RoutineEditor.tsx
 #: src/pages/Today.tsx
 msgid "Running"
@@ -6104,6 +6151,7 @@ msgstr "건너뛰기"
 msgid "Skip or deploy key"
 msgstr "건너뛰거나 배포 키"
 
+#: src/pages/Calendar.tsx
 #: src/pages/shell/message-view.tsx
 msgid "Skipped"
 msgstr ""
@@ -6355,6 +6403,20 @@ msgstr "이미지 지원"
 #: src/pages/Onboarding.tsx
 msgid "Supports thinking"
 msgstr "사고 모드 지원"
+
+#: src/pages/admin/AdminBotsPage.tsx
+msgid "Suspend"
+msgstr "일시 중지"
+
+#: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/shell/chat-header.tsx
+msgid "Suspended"
+msgstr "일시 중지됨"
+
+#. js-lingui-explicit-id
+#: src/lib/run-error.ts
+msgid "Suspended by your organization"
+msgstr "조직에서 일시 중지함"
 
 #: src/components/ModelCredits.tsx
 #: src/pages/model-settings/space-bots-model.tsx
@@ -6725,6 +6787,7 @@ msgid "To:"
 msgstr "받는 사람:"
 
 #: src/pages/Artifacts.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/shell/chat-context.tsx
 #: src/pages/shell/sidebar-header.tsx
 #: src/pages/Today.tsx
@@ -6804,6 +6867,7 @@ msgstr "신뢰할 수 있는 사이트"
 #: src/components/pages/PageNotice.tsx
 #: src/components/pages/PagesList.tsx
 #: src/pages/ActivityList.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/Onboarding.tsx
 #: src/pages/SharedPage.tsx
 #: src/pages/SpaceSearch.tsx
@@ -7141,6 +7205,10 @@ msgstr "수요일"
 #: src/lib/billing.ts
 msgid "week"
 msgstr ""
+
+#: src/pages/Calendar.tsx
+msgid "Week"
+msgstr "주"
 
 #: src/lib/cron.ts
 #: src/pages/RoutineEditor.tsx

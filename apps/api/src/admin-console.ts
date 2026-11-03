@@ -167,6 +167,7 @@ export async function adminBots(
         modelProvider: true,
         modelId: true,
         archivedAt: true,
+        suspendedAt: true,
         space: { select: { name: true } },
       },
       orderBy: [{ createdAt: "desc" }, { id: "desc" }],
@@ -208,6 +209,7 @@ export async function adminBots(
       lastActiveAt: lastActive.get(bot.id)?.toISOString() ?? null,
       monthlySpendUsd: spent.get(bot.id) ?? 0,
       archived: bot.archivedAt !== null,
+      suspendedAt: bot.suspendedAt?.toISOString() ?? null,
     })),
     nextCursor: rows.length > input.limit ? (page.at(-1)?.id ?? null) : null,
   };

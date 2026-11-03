@@ -478,6 +478,10 @@ msgstr "Libellé du compte"
 msgid "Account menu for {name}"
 msgstr "Menu du compte de {name}"
 
+#: src/pages/Calendar.tsx
+msgid "Actions"
+msgstr "Actions"
+
 #. placeholder {0}: bot.name
 #. placeholder {0}: group.spaceName
 #. placeholder {0}: page.title
@@ -717,7 +721,6 @@ msgid "All time"
 msgstr "Toute la période"
 
 #: src/components/ApprovalRulesSettings.tsx
-#: src/pages/Today.tsx
 msgid "Allow"
 msgstr "Autoriser"
 
@@ -1045,6 +1048,7 @@ msgstr "Studio d'avatars"
 #: src/pages/admin/AdminShell.tsx
 #: src/pages/Auth.tsx
 #: src/pages/Board.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/McpServersOverlay.tsx
 #: src/pages/NavLinkPage.tsx
 #: src/pages/PluginsOverlay.tsx
@@ -1196,7 +1200,9 @@ msgstr "Parcourir les serveurs MCP"
 msgid "Built-in"
 msgstr "Intégré"
 
+#: src/pages/Calendar.tsx
 #: src/pages/shell/hire-role-dialog.tsx
+#: src/pages/shell/sidebar-header.tsx
 msgid "Calendar"
 msgstr ""
 
@@ -1677,6 +1683,7 @@ msgstr "Les ordinateurs sont désactivés. Définissez SANDBOX_PROVIDER=docker a
 msgid "Configure a plugin catalog on the server to connect apps."
 msgstr "Configurez un catalogue de plugins sur le serveur pour connecter des applications."
 
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/admin/AdminUsersPage.tsx
 msgid "Confirm"
 msgstr ""
@@ -1959,6 +1966,7 @@ msgid "Could not clear conversation"
 msgstr "Impossible d'effacer la conversation"
 
 #: src/components/ComputerUpdateProgress.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/Today.tsx
 msgid "Could not complete action"
 msgstr "Impossible de terminer l'action"
@@ -2426,6 +2434,7 @@ msgstr "Impossible de tester le serveur MCP"
 msgid "Could not transcribe that recording."
 msgstr ""
 
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/ScratchpadSection.tsx
 msgid "Could not update"
 msgstr "Impossible de mettre à jour"
@@ -2630,6 +2639,10 @@ msgstr ""
 msgid "day"
 msgstr "jour"
 
+#: src/pages/Calendar.tsx
+msgid "Day"
+msgstr "Jour"
+
 #: src/pages/shell/message-cards.tsx
 msgid "Day-to-day work"
 msgstr "Travail quotidien"
@@ -2755,7 +2768,6 @@ msgid "Denied"
 msgstr "Refusé"
 
 #: src/components/AskCard.tsx
-#: src/pages/Today.tsx
 msgid "Deny"
 msgstr "Refuser"
 
@@ -2911,6 +2923,7 @@ msgstr "Vous n'avez pas de compte ?"
 #: src/lib/ticket-status.ts
 #: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/shell/avatar-studio-popover.tsx
 #: src/pages/shell/import-setup-card.tsx
 #: src/pages/shell/message-view.tsx
@@ -2971,6 +2984,7 @@ msgstr ""
 #: src/components/AskCard.tsx
 #: src/components/vault/VaultItemDetail.tsx
 #: src/pages/AccountSettingsOverlay.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/McpServersOverlay.tsx
 msgid "Edit"
 msgstr "Modifier"
@@ -3073,6 +3087,10 @@ msgstr "Variables d’environnement : {names}"
 #: src/pages/shell/sidebar-roster.tsx
 msgid "Error"
 msgstr ""
+
+#: src/pages/Calendar.tsx
+msgid "Event-triggered"
+msgstr "Déclenchées par événement"
 
 #: src/lib/cron.ts
 #: src/pages/ExternalConversationSettings.tsx
@@ -3205,6 +3223,7 @@ msgstr "échoué"
 #: src/components/SubagentCard.tsx
 #: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
+#: src/pages/Calendar.tsx
 msgid "Failed"
 msgstr "Échoué"
 
@@ -4427,6 +4446,10 @@ msgstr ""
 msgid "New variable"
 msgstr ""
 
+#: src/pages/Calendar.tsx
+msgid "Next"
+msgstr "Suivant"
+
 #: src/components/markdown-copy.tsx
 msgid "Next page"
 msgstr "Page suivante"
@@ -4610,6 +4633,10 @@ msgstr "Ne fonctionne pas"
 msgid "Nothing remembered yet"
 msgstr "Rien n'est mémorisé pour le moment"
 
+#: src/pages/Calendar.tsx
+msgid "Nothing scheduled"
+msgstr "Rien de planifié"
+
 #: src/pages/admin/AdminPolicyPage.tsx
 #: src/pages/admin/AdminQuery.tsx
 msgid "Nothing to show."
@@ -4700,6 +4727,7 @@ msgstr "Vous uniquement"
 #: src/pages/shell/computer-panel.tsx
 #: src/pages/shell/import-setup-card.tsx
 #: src/pages/shell/message-view.tsx
+#: src/pages/Today.tsx
 msgid "Open"
 msgstr "Ouvrir"
 
@@ -4951,6 +4979,10 @@ msgstr "Collez votre clé API"
 msgid "Paste your API key, then test again."
 msgstr "Collez votre clé API, puis testez à nouveau."
 
+#: src/pages/Calendar.tsx
+msgid "Pause"
+msgstr "Mettre en pause"
+
 #: src/pages/RoutineEditor.tsx
 #: src/pages/shell/import-status.ts
 msgid "Paused"
@@ -5070,6 +5102,10 @@ msgstr "Aperçu de {0}"
 #: src/pages/Artifacts.tsx
 msgid "Preview isn't available for this file type — download it to view it."
 msgstr "L'aperçu n'est pas disponible pour ce type de fichier — téléchargez-le pour le consulter."
+
+#: src/pages/Calendar.tsx
+msgid "Previous"
+msgstr "Précédent"
 
 #: src/components/markdown-copy.tsx
 msgid "Previous page"
@@ -5531,6 +5567,11 @@ msgstr "Restauré"
 msgid "Restoring your workspace"
 msgstr "Restauration de votre espace de travail"
 
+#: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/Calendar.tsx
+msgid "Resume"
+msgstr "Reprendre"
+
 #: src/components/AccountAccess.tsx
 #: src/components/integrations/plugin-marketplace.tsx
 #: src/components/integrations/skills-dialog.tsx
@@ -5541,6 +5582,7 @@ msgstr "Restauration de votre espace de travail"
 #: src/pages/ModelRoleSettings.tsx
 #: src/pages/PluginsOverlay.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
+#: src/pages/shell/hire-role-dialog.tsx
 #: src/pages/SpaceSettingOverrides.tsx
 #: src/pages/Today.tsx
 msgid "Retry"
@@ -5623,6 +5665,10 @@ msgstr "Exécuter à"
 msgid "Run history"
 msgstr "Historique des exécutions"
 
+#: src/pages/Calendar.tsx
+msgid "Run now"
+msgstr "Exécuter maintenant"
+
 #: src/pages/shell/use-routine-editor.ts
 msgid "Run time must be in the future."
 msgstr "L'horaire d'exécution doit être dans le futur."
@@ -5634,6 +5680,7 @@ msgstr "en cours"
 #: src/components/SubagentCard.tsx
 #: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/RoutineEditor.tsx
 #: src/pages/Today.tsx
 msgid "Running"
@@ -6104,6 +6151,7 @@ msgstr "Passer"
 msgid "Skip or deploy key"
 msgstr "Passer ou clé de déploiement"
 
+#: src/pages/Calendar.tsx
 #: src/pages/shell/message-view.tsx
 msgid "Skipped"
 msgstr ""
@@ -6355,6 +6403,20 @@ msgstr "Prend en charge les images"
 #: src/pages/Onboarding.tsx
 msgid "Supports thinking"
 msgstr "Prend en charge la réflexion"
+
+#: src/pages/admin/AdminBotsPage.tsx
+msgid "Suspend"
+msgstr "Suspendre"
+
+#: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/shell/chat-header.tsx
+msgid "Suspended"
+msgstr "Suspendu"
+
+#. js-lingui-explicit-id
+#: src/lib/run-error.ts
+msgid "Suspended by your organization"
+msgstr "Suspendu par votre organisation"
 
 #: src/components/ModelCredits.tsx
 #: src/pages/model-settings/space-bots-model.tsx
@@ -6725,6 +6787,7 @@ msgid "To:"
 msgstr "À :"
 
 #: src/pages/Artifacts.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/shell/chat-context.tsx
 #: src/pages/shell/sidebar-header.tsx
 #: src/pages/Today.tsx
@@ -6804,6 +6867,7 @@ msgstr "Sites de confiance"
 #: src/components/pages/PageNotice.tsx
 #: src/components/pages/PagesList.tsx
 #: src/pages/ActivityList.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/Onboarding.tsx
 #: src/pages/SharedPage.tsx
 #: src/pages/SpaceSearch.tsx
@@ -7141,6 +7205,10 @@ msgstr "mercredi"
 #: src/lib/billing.ts
 msgid "week"
 msgstr ""
+
+#: src/pages/Calendar.tsx
+msgid "Week"
+msgstr "Semaine"
 
 #: src/lib/cron.ts
 #: src/pages/RoutineEditor.tsx

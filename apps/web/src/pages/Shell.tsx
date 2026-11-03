@@ -16,7 +16,6 @@ import {
   isActive,
   isRunWorking,
   memberName,
-  newClientId,
 } from "@rakazo/core";
 import { fetchFresh, writeSaved } from "@rakazo/core/query";
 import type { GroupAvatarMember } from "@rakazo/ui-web";
@@ -876,20 +875,15 @@ function SpaceShell() {
     await refreshBots().catch(() => undefined);
   }
 
-  /** The server creates the bot from the role; its starter task goes out as the first message. */
-  async function hireRole(templateId: string) {
-    const { bot, starterTask } = await rpc.roleTemplates.hire({ templateId });
-    openCreatedBot(bot);
-    dialogs.setCreateBotOpen(false);
-    await rpc.threads
-      .send({
-        botId: bot.id,
-        clientNonce: newClientId(),
-        imageHandling: "confirm",
-        text: starterTask,
-      })
-      .catch(() => undefined);
+  /** The server creates the bot and sends its starter task; a failed starter keeps the dialog open to retry. */
+  async function hireRole(templateId: string, idempotencyKey: string) {
+    const { bot, starter } = await rpc.roleTemplates.hire({ templateId, idempotencyKey });
+    if (starter.status === "queued") {
+      openCreatedBot(bot);
+      dialogs.setCreateBotOpen(false);
+    }
     await refreshBots().catch(() => undefined);
+    return starter;
   }
 
   const contextBot =

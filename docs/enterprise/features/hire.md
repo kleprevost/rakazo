@@ -69,10 +69,15 @@ blocked. Runtime enforcement is unchanged and remains the gate.
 
 ## Starter task
 
-`hire` returns `starterTask`; the web client sends it as the bot's first message through the
-existing `threads.send`, so it is an ordinary user turn that goes through the normal run path. If
-no model is set up the send fails quietly and the user lands in the new chat. The hidden "created"
-intro run is not used: it is limited to asking a question and editing the bot's profile.
+`hire` takes a client-generated `idempotencyKey`. It is stored as the bot's `spawnKey`
+(`hire:<user>:<key>`), so a retried hire returns the same bot and creates nothing twice. The
+server then sends `starterTask` as the bot's first message with the same send path `threads.send`
+uses (model, policy and budget checks, normal run start), under the nonce `hire-starter:<key>`, so
+a retry never adds a second message. The response carries `starter`: `queued`, or `failed` with a
+reason (for example no model set up). The web dialog stays open on `failed` and offers Retry,
+which repeats the call with the same key and only re-attempts the task. A run that starts and then
+fails shows in Today like any failed run. The hidden "created" intro run is not used: it is limited
+to asking a question and editing the bot's profile.
 
 ## Web
 
@@ -93,6 +98,5 @@ UI only. Hired bots appear on mobile like any other bot.
 - Admin-managed templates and an admin view of policy-blocked parts per role.
 - Apply `modelHint` through a provider-neutral model role.
 - Template localization; a per-hire choice of which routines to switch on.
-- Server-side starter task so it survives a closed tab; an idempotency key for lost responses.
 - Map connection kinds to the user's connected apps and offer to connect the missing ones.
 - Mobile hire flow.

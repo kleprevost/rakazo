@@ -478,6 +478,10 @@ msgstr ""
 msgid "Account menu for {name}"
 msgstr "{name} का खाता मेन्यू"
 
+#: src/pages/Calendar.tsx
+msgid "Actions"
+msgstr "कार्रवाइयाँ"
+
 #. placeholder {0}: bot.name
 #. placeholder {0}: group.spaceName
 #. placeholder {0}: page.title
@@ -717,7 +721,6 @@ msgid "All time"
 msgstr ""
 
 #: src/components/ApprovalRulesSettings.tsx
-#: src/pages/Today.tsx
 msgid "Allow"
 msgstr "अनुमति दें"
 
@@ -1045,6 +1048,7 @@ msgstr "अवतार स्टूडियो"
 #: src/pages/admin/AdminShell.tsx
 #: src/pages/Auth.tsx
 #: src/pages/Board.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/McpServersOverlay.tsx
 #: src/pages/NavLinkPage.tsx
 #: src/pages/PluginsOverlay.tsx
@@ -1196,7 +1200,9 @@ msgstr ""
 msgid "Built-in"
 msgstr "अंतर्निहित"
 
+#: src/pages/Calendar.tsx
 #: src/pages/shell/hire-role-dialog.tsx
+#: src/pages/shell/sidebar-header.tsx
 msgid "Calendar"
 msgstr ""
 
@@ -1677,6 +1683,7 @@ msgstr "कंप्यूटर बंद हैं। SANDBOX_PROVIDER=docker 
 msgid "Configure a plugin catalog on the server to connect apps."
 msgstr ""
 
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/admin/AdminUsersPage.tsx
 msgid "Confirm"
 msgstr ""
@@ -1959,6 +1966,7 @@ msgid "Could not clear conversation"
 msgstr "बातचीत साफ़ नहीं की जा सकी"
 
 #: src/components/ComputerUpdateProgress.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/Today.tsx
 msgid "Could not complete action"
 msgstr ""
@@ -2426,6 +2434,7 @@ msgstr "MCP सर्वर का परीक्षण नहीं हो स
 msgid "Could not transcribe that recording."
 msgstr ""
 
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/ScratchpadSection.tsx
 msgid "Could not update"
 msgstr "अपडेट नहीं हो सका"
@@ -2630,6 +2639,10 @@ msgstr ""
 msgid "day"
 msgstr "दिन"
 
+#: src/pages/Calendar.tsx
+msgid "Day"
+msgstr "दिन"
+
 #: src/pages/shell/message-cards.tsx
 msgid "Day-to-day work"
 msgstr ""
@@ -2755,7 +2768,6 @@ msgid "Denied"
 msgstr "अस्वीकृत"
 
 #: src/components/AskCard.tsx
-#: src/pages/Today.tsx
 msgid "Deny"
 msgstr "अस्वीकार करें"
 
@@ -2911,6 +2923,7 @@ msgstr "खाता नहीं है?"
 #: src/lib/ticket-status.ts
 #: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/shell/avatar-studio-popover.tsx
 #: src/pages/shell/import-setup-card.tsx
 #: src/pages/shell/message-view.tsx
@@ -2971,6 +2984,7 @@ msgstr ""
 #: src/components/AskCard.tsx
 #: src/components/vault/VaultItemDetail.tsx
 #: src/pages/AccountSettingsOverlay.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/McpServersOverlay.tsx
 msgid "Edit"
 msgstr "संपादित करें"
@@ -3073,6 +3087,10 @@ msgstr "एनवायरनमेंट वेरिएबल: {names}"
 #: src/pages/shell/sidebar-roster.tsx
 msgid "Error"
 msgstr ""
+
+#: src/pages/Calendar.tsx
+msgid "Event-triggered"
+msgstr "इवेंट से शुरू"
 
 #: src/lib/cron.ts
 #: src/pages/ExternalConversationSettings.tsx
@@ -3205,6 +3223,7 @@ msgstr "असफल"
 #: src/components/SubagentCard.tsx
 #: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
+#: src/pages/Calendar.tsx
 msgid "Failed"
 msgstr "विफल"
 
@@ -4427,6 +4446,10 @@ msgstr ""
 msgid "New variable"
 msgstr ""
 
+#: src/pages/Calendar.tsx
+msgid "Next"
+msgstr "अगला"
+
 #: src/components/markdown-copy.tsx
 msgid "Next page"
 msgstr "अगला पृष्ठ"
@@ -4610,6 +4633,10 @@ msgstr "काम नहीं कर रहा"
 msgid "Nothing remembered yet"
 msgstr "अभी तक कुछ याद नहीं किया गया"
 
+#: src/pages/Calendar.tsx
+msgid "Nothing scheduled"
+msgstr "कुछ शेड्यूल नहीं है"
+
 #: src/pages/admin/AdminPolicyPage.tsx
 #: src/pages/admin/AdminQuery.tsx
 msgid "Nothing to show."
@@ -4700,6 +4727,7 @@ msgstr "सिर्फ़ आप"
 #: src/pages/shell/computer-panel.tsx
 #: src/pages/shell/import-setup-card.tsx
 #: src/pages/shell/message-view.tsx
+#: src/pages/Today.tsx
 msgid "Open"
 msgstr "खोलें"
 
@@ -4951,6 +4979,10 @@ msgstr "अपनी API कुंजी पेस्ट करें"
 msgid "Paste your API key, then test again."
 msgstr "अपनी API कुंजी पेस्ट करें, फिर फिर से परीक्षण करें।"
 
+#: src/pages/Calendar.tsx
+msgid "Pause"
+msgstr "रोकें"
+
 #: src/pages/RoutineEditor.tsx
 #: src/pages/shell/import-status.ts
 msgid "Paused"
@@ -5070,6 +5102,10 @@ msgstr "{0} का प्रीव्यू"
 #: src/pages/Artifacts.tsx
 msgid "Preview isn't available for this file type — download it to view it."
 msgstr ""
+
+#: src/pages/Calendar.tsx
+msgid "Previous"
+msgstr "पिछला"
 
 #: src/components/markdown-copy.tsx
 msgid "Previous page"
@@ -5531,6 +5567,11 @@ msgstr "बहाल किया गया"
 msgid "Restoring your workspace"
 msgstr ""
 
+#: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/Calendar.tsx
+msgid "Resume"
+msgstr "फिर शुरू करें"
+
 #: src/components/AccountAccess.tsx
 #: src/components/integrations/plugin-marketplace.tsx
 #: src/components/integrations/skills-dialog.tsx
@@ -5541,6 +5582,7 @@ msgstr ""
 #: src/pages/ModelRoleSettings.tsx
 #: src/pages/PluginsOverlay.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
+#: src/pages/shell/hire-role-dialog.tsx
 #: src/pages/SpaceSettingOverrides.tsx
 #: src/pages/Today.tsx
 msgid "Retry"
@@ -5623,6 +5665,10 @@ msgstr ""
 msgid "Run history"
 msgstr ""
 
+#: src/pages/Calendar.tsx
+msgid "Run now"
+msgstr "अभी चलाएँ"
+
 #: src/pages/shell/use-routine-editor.ts
 msgid "Run time must be in the future."
 msgstr ""
@@ -5634,6 +5680,7 @@ msgstr "चल रहा है"
 #: src/components/SubagentCard.tsx
 #: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/RoutineEditor.tsx
 #: src/pages/Today.tsx
 msgid "Running"
@@ -6104,6 +6151,7 @@ msgstr "छोड़ें"
 msgid "Skip or deploy key"
 msgstr "छोड़ें या डिप्लॉय कुंजी दें"
 
+#: src/pages/Calendar.tsx
 #: src/pages/shell/message-view.tsx
 msgid "Skipped"
 msgstr ""
@@ -6355,6 +6403,20 @@ msgstr "छवियों का समर्थन"
 #: src/pages/Onboarding.tsx
 msgid "Supports thinking"
 msgstr "सोचने की क्षमता का समर्थन करता है"
+
+#: src/pages/admin/AdminBotsPage.tsx
+msgid "Suspend"
+msgstr "निलंबित करें"
+
+#: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/shell/chat-header.tsx
+msgid "Suspended"
+msgstr "निलंबित"
+
+#. js-lingui-explicit-id
+#: src/lib/run-error.ts
+msgid "Suspended by your organization"
+msgstr "आपके संगठन ने निलंबित किया"
 
 #: src/components/ModelCredits.tsx
 #: src/pages/model-settings/space-bots-model.tsx
@@ -6725,6 +6787,7 @@ msgid "To:"
 msgstr "प्रति:"
 
 #: src/pages/Artifacts.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/shell/chat-context.tsx
 #: src/pages/shell/sidebar-header.tsx
 #: src/pages/Today.tsx
@@ -6804,6 +6867,7 @@ msgstr "विश्वसनीय साइटें"
 #: src/components/pages/PageNotice.tsx
 #: src/components/pages/PagesList.tsx
 #: src/pages/ActivityList.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/Onboarding.tsx
 #: src/pages/SharedPage.tsx
 #: src/pages/SpaceSearch.tsx
@@ -7141,6 +7205,10 @@ msgstr "बुधवार"
 #: src/lib/billing.ts
 msgid "week"
 msgstr ""
+
+#: src/pages/Calendar.tsx
+msgid "Week"
+msgstr "सप्ताह"
 
 #: src/lib/cron.ts
 #: src/pages/RoutineEditor.tsx

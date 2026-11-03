@@ -36,6 +36,12 @@ export const translateRunError: RunErrorTranslator = (message, values) => {
         message: "Blocked by your organization",
         values,
       });
+    case "Suspended by your organization":
+      return i18n._({
+        id: "Suspended by your organization",
+        message: "Suspended by your organization",
+        values,
+      });
     case "Monthly budget reached":
       return i18n._({
         id: "Monthly budget reached",

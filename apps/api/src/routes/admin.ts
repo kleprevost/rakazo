@@ -6,6 +6,7 @@ import {
   adminPolicy,
   adminUsers,
 } from "../admin-console.js";
+import { resumeBot, suspendBot } from "../bot-suspension.js";
 import type { RouterContext } from "./context.js";
 
 /** The deployment admin console. Each handler checks `requireAdmin` before reading anything. */
@@ -27,6 +28,12 @@ export function adminRoutes(ctx: RouterContext) {
       bots: {
         list: authed.admin.bots.list.handler(({ context, input }) =>
           adminBots(deps, context.actor.userId, input),
+        ),
+        suspend: authed.admin.bots.suspend.handler(({ context, input }) =>
+          suspendBot(deps, context.actor.userId, input),
+        ),
+        resume: authed.admin.bots.resume.handler(({ context, input }) =>
+          resumeBot(deps, context.actor.userId, input.botId),
         ),
       },
       policy: authed.admin.policy.handler(({ context }) => adminPolicy(deps, context.actor.userId)),
