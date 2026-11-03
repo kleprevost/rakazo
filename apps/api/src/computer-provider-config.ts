@@ -27,7 +27,7 @@ export interface ComputerProviderConfigDeps {
   prisma: PrismaClient;
   secrets: Pick<SecretStore, "put" | "load" | "delete">;
   sandbox: SandboxProvider;
-  env: Pick<RouterDeps["env"], "sandboxProvider" | "adminEmails">;
+  env: Pick<RouterDeps["env"], "sandboxProvider" | "adminEmails" | "ssoAdminEnabled">;
   auth: Pick<RouterDeps["auth"], "isSsoAdmin">;
   resolveHostname?: ResolveHostname;
   /** Test seam: confirm the desktop answers before saving. */

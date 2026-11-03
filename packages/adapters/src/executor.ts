@@ -128,6 +128,7 @@ import {
   filterToolsByBotPolicy,
   policyDenied,
 } from "./policy-capabilities.js";
+import { policyOfferedTools } from "./policy-tools.js";
 import { loadPurchaseRedactions } from "./purchase-service.js";
 import { loadReplyContext, messageToAgentHistoryText } from "./reply-context.js";
 import { backOffRoutineAfterAccountError } from "./routine-backoff.js";
@@ -1305,10 +1306,11 @@ export function createRunExecutor(executorDeps: ExecutorDeps) {
           !ownerStartedRun || Boolean(turnCheckpoint) || Boolean(checkpointLoadError);
         // The creation intro only asks what the bot is for (see selectBuiltinToolsForRun),
         // so it gets no connector tools either.
-        const tools =
+        const tools = policyOfferedTools(
           run.trigger === "created"
             ? strategicBuiltins
-            : [...strategicBuiltins, ...strategicConnectorTools];
+            : [...strategicBuiltins, ...strategicConnectorTools],
+        );
         const taskCatalogInstruction = tools.some((tool) => tool.name === "task_catalog")
           ? TASK_CATALOG_GUIDANCE
           : undefined;

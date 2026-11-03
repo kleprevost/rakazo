@@ -569,9 +569,11 @@ export function planActionGate(input: {
   newDestination?: boolean;
   /** A click that completes a purchase: a person approves it each time, in every mode. */
   purchase?: boolean;
+  /** Central policy: a person approves it each time, in every mode, whatever Always allow says. */
+  alwaysAsk?: boolean;
 }): "ask" | "allow" | "judge" | "deny" {
   if (input.resolved.decision === "deny") return "deny";
-  if (input.purchase) return "ask";
+  if (input.purchase || input.alwaysAsk) return "ask";
   if (input.mandatory) {
     if (input.mode !== "never") return "ask";
     return input.steerable ? "deny" : "allow";

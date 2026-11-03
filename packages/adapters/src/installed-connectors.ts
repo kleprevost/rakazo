@@ -121,6 +121,7 @@ export class InstalledConnectorProvider implements ConnectorProvider {
     return {
       ...this.remote,
       allowPrivateEndpoint: this.allowPrivateEndpoint,
+      toolSource: true,
     };
   }
 
@@ -401,6 +402,7 @@ export async function verifyMcpInstall(input: {
     headers: connectorHeaders(config, input.credential),
     signal: input.signal,
     allowPrivateEndpoint: input.allowPrivateEndpoint,
+    toolSource: true,
   });
   if (tools.length === 0) throw new Error("MCP server returned no tools");
   return { config, toolCount: tools.length };
@@ -419,7 +421,11 @@ export async function prepareApiInstall(input: {
   requireCredential(auth, input.credential);
   const headers = PublicHeadersSchema.parse(input.config.headers);
   assertNoSensitiveQuery(input.source);
-  const remote = { ...input.remote, allowPrivateEndpoint: input.allowPrivateEndpoint };
+  const remote = {
+    ...input.remote,
+    allowPrivateEndpoint: input.allowPrivateEndpoint,
+    toolSource: true,
+  };
   let source = input.source;
   let operationsValue = input.config.operations;
   if (input.config.openApi === true || input.config.openapi === true) {

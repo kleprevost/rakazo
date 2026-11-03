@@ -33,6 +33,7 @@ import {
   egressRefused,
   withPinnedDnsLookup,
 } from "./network-address.js";
+import { assertToolSourceHostAllowed } from "./policy-integrations.js";
 import { dispatcherFetch, fetchPairedWithDispatcher } from "./undici-fetch.js";
 
 const MAX_MCP_TOOLS = 250;
@@ -45,6 +46,8 @@ export type { ResolveHostname } from "./network-address.js";
 export interface RemoteUrlPolicy {
   /** Deployment-owner escape for loopback / LAN / Docker-network endpoints. Default off. */
   allowPrivateEndpoint?: boolean;
+  /** A user-configured tool source: its host must pass the organization's MCP host policy. */
+  toolSource?: boolean;
 }
 
 export interface RemoteTransportDependencies {
@@ -578,6 +581,7 @@ async function inspectSafeRemoteUrl(
     throw new Error("Connector URL must use HTTPS");
   }
   if (url.username || url.password) throw new Error("Connector URL must not contain credentials");
+  if (policy.toolSource) await assertToolSourceHostAllowed(url.href);
   if (url.hash) throw new Error("Connector URL must not contain a fragment");
   const hostname = url.hostname.replace(/^\[|\]$/g, "");
   if (isCloudMetadataHost(hostname))

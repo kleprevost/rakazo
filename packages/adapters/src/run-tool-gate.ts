@@ -52,6 +52,8 @@ import { RAKAZO_DOCS_URLS } from "./builtin-skills.js";
 import type { ExecutorDeps } from "./executor-deps.js";
 import { findConnectedModelCredential } from "./model-selection.js";
 import { paidRequestEffect } from "./paid-request.js";
+import { PolicyDeniedError } from "./policy-runtime.js";
+import { assertToolAllowed, policyAlwaysAsks } from "./policy-tools.js";
 import { PURCHASE_CHECKED_TOOLS, purchaseApprovalOf } from "./purchase-gate.js";
 import { autoReviewCheckerProvider } from "./run-auto-review.js";
 import type { RunContext, RunTrust } from "./run-context.js";
@@ -172,6 +174,24 @@ export async function gateToolCall(
         declaredReadOnlyFor(toolName),
       ),
     );
+  // Central policy: every name this call goes by, so a denied tool cannot be reached by an alias.
+  const policyToolIds = [...new Set([name, approvalName, ...approvalToolNames])];
+  try {
+    await assertToolAllowed(policyToolIds, name, {
+      userId: run.userId,
+      spaceId: run.spaceId,
+      surface: "run",
+    });
+  } catch (error) {
+    if (!(error instanceof PolicyDeniedError)) throw error;
+    await auditToolCall(ctx, name, "denied", { reason: "policy" });
+    return {
+      result: {
+        error: `${name} is blocked by your organization. Don't try it another way; tell the user it's blocked.`,
+      },
+    };
+  }
+  const policyAlwaysAsk = policyAlwaysAsks(policyToolIds);
   const connectorProviders = ctx.tools.connectedPlugins.map((plugin) => plugin.provider);
   const connectorKind = connectorKindFromToolName(approvalName, connectorProviders);
   // paid_request with only a purchase id sends the request its approval already named.
@@ -245,6 +265,7 @@ export async function gateToolCall(
   const { purchase } = request;
   const requiresApprovalByDefault =
     request.heldForApproval ||
+    policyAlwaysAsk ||
     Boolean(purchase) ||
     commandWatch ||
     requiresUnattendedApproval ||
@@ -257,6 +278,7 @@ export async function gateToolCall(
   const gated = requiresApprovalByDefault || connectorReadGated;
   const requiresMandatoryApproval =
     Boolean(purchase) ||
+    policyAlwaysAsk ||
     commandWatch ||
     scheduleNamesNewSite ||
     requiresUnattendedApproval ||
@@ -315,7 +337,9 @@ export async function gateToolCall(
           )
         : false));
   const plan = USER_COMPUTER_TOOLS.has(name)
-    ? await userComputerGate(ctx, approvalResolved.decision === "deny", name, args)
+    ? policyAlwaysAsk && approvalResolved.decision !== "deny"
+      ? "ask"
+      : await userComputerGate(ctx, approvalResolved.decision === "deny", name, args)
     : planActionGate({
         resolved: approvalResolved,
         mode,
@@ -329,6 +353,7 @@ export async function gateToolCall(
         checkerConfigured,
         newDestination: siteGate === "new",
         purchase: Boolean(purchase),
+        alwaysAsk: policyAlwaysAsk,
       });
   // Nobody is there to approve a purchase a webhook run reaches.
   if (purchase && run.trigger === "webhook" && plan !== "deny") {
@@ -385,6 +410,7 @@ export async function gateToolCall(
   // A fetch to a new site is gated like any action, so it needs an effect to approve.
   const applied =
     READ_ONLY_AGENT_TOOLS.has(name) &&
+    !policyAlwaysAsk &&
     siteGate !== "new" &&
     nextApprovedTool !== name &&
     !approvedEffectKey

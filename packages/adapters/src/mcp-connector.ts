@@ -67,6 +67,8 @@ import {
 import type { McpServerHealthUpdate } from "./mcp-server-health.js";
 import { needsMcpOAuthClient, recordMcpServerHealth } from "./mcp-server-health.js";
 import { McpSession, mcpStdioRefusal } from "./mcp-transport.js";
+import { assertStdioMcpAllowed } from "./policy-integrations.js";
+import { PolicyDeniedError } from "./policy-runtime.js";
 import type { RemoteTransportDependencies } from "./remote-mcp.js";
 import { ConnectorRedirectError, isMcpSessionGoneError } from "./remote-mcp.js";
 import { appendToolCompletionAudit } from "./tool-completion-audit.js";
@@ -1075,6 +1077,17 @@ export class McpConnector implements ConnectorProvider {
         // Only a deployment change or an edit to the server fixes a refusal, so wait for one.
         const refusal = mcpStdioRefusal(command, this.options);
         if (refusal) throw new McpConnectFailure(refusal, "reconnect");
+        try {
+          await assertStdioMcpAllowed({
+            userId: context.userId,
+            spaceId: context.spaceId,
+            surface: "mcp",
+          });
+        } catch (error) {
+          if (error instanceof PolicyDeniedError)
+            throw new McpConnectFailure(error.message, "reconnect");
+          throw error;
+        }
         const npx = parseNpxLaunch(command, args);
         if (!npx && isNpxCommand(command))
           throw new McpConnectFailure("This npx command isn't supported here", "reconnect");

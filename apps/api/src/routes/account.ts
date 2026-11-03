@@ -1,5 +1,6 @@
 import { ORPCError } from "@orpc/server";
 import {
+  effectiveApprovalPreference,
   effectiveModelRole,
   hasHostedModelCredits,
   isAutoReviewCheckerConfigured,
@@ -38,6 +39,7 @@ import { requireAdmin } from "../admins.js";
 import { aiConsentStatus, allowAiConsent } from "../ai-consent.js";
 import type { BillingService } from "../billing.js";
 import { firstModelConnectAnalytics } from "../model-connect-analytics.js";
+import { assertApprovalModeForRequest } from "../policy-guard.js";
 import type { RouterDeps } from "../router.js";
 import { withSerializableRetry } from "../serializable-retry.js";
 import {
@@ -251,13 +253,22 @@ export function accountRoutes(ctx: RouterContext) {
         return loadAutoReviewSettings(deps, context.actor, input?.scope);
       }),
       set: authed.autoReview.set.handler(async ({ context, input }) => {
+        const update = input.mode
+          ? approvalPreferenceFromMode(input.mode)
+          : { enabled: input.enabled, skipApprovals: input.skipApprovals };
+        const current = await findAutoReviewPreference(deps.prisma, context.actor, input.scope);
+        await assertApprovalModeForRequest(
+          context.actor,
+          approvalModeFromPreference({
+            enabled: update.enabled ?? current?.enabled ?? true,
+            skipApprovals: update.skipApprovals ?? current?.skipApprovals ?? false,
+          }),
+        );
         await deps.prisma.$transaction((tx) =>
           saveAutoReviewPreference(
             tx,
             context.actor,
-            input.mode
-              ? approvalPreferenceFromMode(input.mode)
-              : { enabled: input.enabled, skipApprovals: input.skipApprovals },
+            update,
             { enabled: true, skipApprovals: false },
             input.scope,
           ),
@@ -487,10 +498,10 @@ async function loadAutoReviewSettings(deps: RouterDeps, actor: Actor, scope?: Se
     ),
     findAutoReviewPreference(deps.prisma, actor, scope),
   ]);
-  const stored = {
+  const stored = effectiveApprovalPreference({
     enabled: preference?.enabled ?? true,
     skipApprovals: preference?.skipApprovals ?? false,
-  };
+  });
   const settings = { ...stored, mode: approvalModeFromPreference(stored) };
   const deploymentChecker = role.primarySource === "deployment" ? role.primary : null;
   const memberChoices = [
