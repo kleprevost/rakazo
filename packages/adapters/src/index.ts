@@ -33,6 +33,7 @@ export {
   storeBotSecret,
 } from "./bot-secrets.js";
 export * from "./boxd-sandbox.js";
+export * from "./brokered-connector.js";
 export * from "./browser-emulator.js";
 export * from "./browser-provider-factory.js";
 export * from "./browser-tools.js";

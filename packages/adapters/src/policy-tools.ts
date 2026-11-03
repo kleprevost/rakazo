@@ -36,6 +36,11 @@ export async function assertToolAllowed(
   if (!decision.allowed) await deny(decision.rule, subject, audience);
 }
 
+/** What a bot is told when the policy refuses one of its tool calls. */
+export function policyBlockedToolMessage(name: string): string {
+  return `${name} is blocked by your organization. Don't try it another way; tell the user it's blocked.`;
+}
+
 /** Refuse saving an approval mode looser than the policy floor. */
 export async function assertApprovalModeAllowed(
   mode: ApprovalMode,

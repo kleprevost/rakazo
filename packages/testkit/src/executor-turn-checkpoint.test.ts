@@ -141,6 +141,7 @@ function fixture(
       task: { findUniqueOrThrow: async () => task, updateMany: async () => ({ count: 1 }) },
       bot: {
         ...empty,
+        findUnique: async () => ({ suspendedAt: null, name: "Assistant" }),
         update: async () => ({}),
         findUniqueOrThrow: async () => ({
           id: run.botId,

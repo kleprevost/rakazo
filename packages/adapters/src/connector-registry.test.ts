@@ -121,7 +121,9 @@ describe("ConnectorRegistry", () => {
   });
 
   it("registers only the providers it is given", async () => {
-    const stack = createConnectorStack(undefined, [new StubConnector("first", [tool("a")])]);
+    const stack = createConnectorStack(undefined, [new StubConnector("first", [tool("a")])], {
+      bot: { findUnique: async () => ({ suspendedAt: null, name: "Bot" }) },
+    } as never);
 
     await expect(stack.connector.discoverTools(context)).resolves.toEqual([
       expect.objectContaining({ name: "a", route: { connectorId: "first", toolName: "a" } }),
@@ -129,7 +131,7 @@ describe("ConnectorRegistry", () => {
     const events: ConnectorEvent[] = [];
     for await (const event of stack.connector.execute(
       { tool: "destination.write", args: {}, executionId: "execution" },
-      context,
+      { ...context, botId: "bot-1" },
     )) {
       events.push(event);
     }

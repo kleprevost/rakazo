@@ -61,7 +61,9 @@ async function connect(connector: ComposioConnector, provider: string, userId = 
 describe("ComposioConnector over the fake Composio client", () => {
   it("stays registered when supplied without a live Composio key", () => {
     const { connector } = setup();
-    expect(createConnectorStack(connector).connector.managed("composio")).toBe(connector);
+    expect(createConnectorStack(connector, [], {} as never).connector.managed("composio")).toBe(
+      connector,
+    );
   });
 
   it("serves and searches the toolkit catalog", async () => {

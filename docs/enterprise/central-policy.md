@@ -106,8 +106,10 @@ evaluator (`packages/core/src/policy.ts`). **Every section is enforced** except 
   model is offered. `approvals.alwaysAsk` makes the gate ask in every mode, over Always allow and
   allow rules (a Block rule still refuses). `approvals.minimumMode` clamps the effective mode where
   a run reads it, and `autoReview.set` refuses a looser mode with `FORBIDDEN`/`policy`; the mode
-  the settings read returns is the clamped one, so pickers show the effective mode. Not covered:
-  a tool called from inside a routine's watch, and allow/ask rules themselves.
+  the settings read returns is the clamped one, so pickers show the effective mode. A tool called
+  from inside a routine's watch passes the same `tools.deny` and `integrations.allowConnectors`
+  checks (and the suspension check) in `BrokeredConnector`, which wraps every connector call. Not
+  covered: allow/ask rules themselves.
 - Budgets: see [Budgets](#budgets).
 - Not yet: a capabilities flag for clients; routines, agent import and other paths that pin a model
   without going through the bot-model check are caught at run time only.

@@ -144,6 +144,7 @@ function world(printed = "") {
           },
         },
         bot: {
+          findUnique: async () => ({ suspendedAt: null, name: "Assistant" }),
           findUniqueOrThrow: async () => ({
             id: run.botId,
             name: "Assistant",

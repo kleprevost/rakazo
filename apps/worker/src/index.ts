@@ -228,11 +228,11 @@ async function main() {
     {},
     allowPrivateEndpoint,
   );
-  const stack = createConnectorStack(undefined, [
-    installedConnectors,
-    ...integrationSettings.providers(),
-    mcp,
-  ]);
+  const stack = createConnectorStack(
+    undefined,
+    [installedConnectors, ...integrationSettings.providers(), mcp],
+    prisma,
+  );
   integrationSettings.warmDirectories();
   const memoryProviders = new SpaceMemoryProviderResolver(prisma, secrets);
   const home = createAgentHomeStore(dataDir, prisma);
