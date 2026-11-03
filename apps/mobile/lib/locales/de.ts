@@ -1,4 +1,6 @@
 export const DE_MESSAGES: Record<string, string> = {
+  "Add rule": "Regel hinzufügen",
+  "Tool name": "Tool-Name",
   "Daily check-ins on unfinished work": "Tägliche Rückfragen zu offenen Aufgaben",
   "Pages this group builds for you appear here.":
     "Seiten, die diese Gruppe für dich erstellt, erscheinen hier.",
@@ -279,7 +281,6 @@ export const DE_MESSAGES: Record<string, string> = {
   "No matching bots": "Keine passenden Bots",
   "No messages yet": "Noch keine Nachrichten",
   "No results": "Keine Ergebnisse",
-  Now: "Jetzt",
   Personal: "Persönlich",
   Recent: "Kürzlich",
   Search: "Suchen",
@@ -522,6 +523,10 @@ export const DE_MESSAGES: Record<string, string> = {
   Release: "Freigeben",
   Skip: "Überspringen",
   "Take control": "Kontrolle übernehmen",
+  "Clean up": "Aufräumen",
+  "Computer is {percent}% full": "Computer ist zu {percent} % voll",
+  "Your computer's disk is nearly full. Free up space by removing build output and caches you no longer need.":
+    "Die Festplatte deines Computers ist fast voll. Schaffe Platz, indem du Build-Ausgaben und Caches entfernst, die du nicht mehr brauchst.",
   "You have control": "Du hast die Kontrolle",
   "Active model": "Aktives Modell",
   "Authorization code": "Autorisierungscode",
@@ -696,6 +701,7 @@ export const DE_MESSAGES: Record<string, string> = {
   "Live working status": "Live-Arbeitsstatus",
   More: "Mehr",
   "Needs attention": "Aufmerksamkeit erforderlich",
+  Unread: "Ungelesen",
   "Notification settings": "Benachrichtigungseinstellungen",
   Notifications: "Benachrichtigungen",
   "Questions, approvals, takeover": "Fragen, Freigaben, Übernahme",
@@ -723,6 +729,7 @@ export const DE_MESSAGES: Record<string, string> = {
   "Always allow": "Immer erlauben",
   "Always allow this tool": "Dieses Tool immer erlauben",
   "Always allow {site}": "{site} immer erlauben",
+  "Replaces the login saved for {site}": "Ersetzt die für {site} gespeicherte Anmeldung",
   "Could not submit answer": "Antwort konnte nicht gesendet werden",
   Deny: "Ablehnen",
   "Please try again.": "Versuche es erneut.",
@@ -1275,6 +1282,12 @@ export const DE_MESSAGES: Record<string, string> = {
   "Invite friends": "Freunde einladen",
   "Get a free month for each friend who starts a trial.":
     "Erhalte einen Gratismonat für jeden Freund, der eine Testphase startet.",
+  "Invite a friend": "Freund einladen",
+  "Give a friend {weeks} weeks free": "Schenk einem Freund {weeks} Wochen gratis",
+  "They get {weeks} weeks free.": "Sie bekommen {weeks} Wochen gratis.",
+  "You get a free month when they start their trial with a new card.":
+    "Du bekommst einen Gratismonat, wenn sie ihre Testphase mit einer neuen Karte starten.",
+  "Share link": "Link teilen",
   "1 free month earned": "1 Gratismonat verdient",
   "{count} free months earned": "{count} Gratismonate verdient",
   "Submit a plugin": "Plugin einreichen",

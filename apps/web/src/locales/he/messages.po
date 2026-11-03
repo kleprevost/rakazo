@@ -603,6 +603,10 @@ msgstr "הוספת מפתח גישה"
 msgid "Add provider"
 msgstr "הוספת ספק"
 
+#: src/components/ApprovalRulesSettings.tsx
+msgid "Add rule"
+msgstr ""
+
 #: src/pages/McpServersOverlay.tsx
 msgid "Add server"
 msgstr "הוספת שרת"
@@ -1368,6 +1372,10 @@ msgstr ""
 msgid "Claude subscription"
 msgstr ""
 
+#: src/pages/shell/computer-panel.tsx
+msgid "Clean up"
+msgstr "ניקוי"
+
 #: src/components/AskCard.tsx
 #: src/pages/shell/dialogs.tsx
 msgid "Clear"
@@ -1549,6 +1557,10 @@ msgstr "הפעלת המחשב נכשלה"
 #: src/components/ModelCredits.tsx
 msgid "Computer hours left"
 msgstr "שעות מחשב שנותרו"
+
+#: src/pages/shell/computer-panel.tsx
+msgid "Computer is {percent}% full"
+msgstr "המחשב מלא ב-{percent}%"
 
 #: src/pages/shell/computer-overlay.tsx
 msgid "Computer is asleep"
@@ -1759,7 +1771,6 @@ msgstr ""
 msgid "Copied"
 msgstr "הועתק"
 
-#: src/components/InviteDialog.tsx
 #: src/components/VaultSettings.tsx
 #: src/pages/model-settings/connection-controls.tsx
 #: src/pages/Onboarding.tsx
@@ -1779,6 +1790,7 @@ msgstr "העתקת קוד"
 msgid "Copy diagram source"
 msgstr "העתקת מקור הדיאגרמה"
 
+#: src/components/InviteDialog.tsx
 #: src/components/pages/PublicPageShell.tsx
 #: src/components/pages/SharePopover.tsx
 msgid "Copy link"
@@ -2716,6 +2728,7 @@ msgstr "מנתק…"
 #: src/components/ComputerUpdateProgress.tsx
 #: src/components/PasskeyOffer.tsx
 #: src/components/teach/TeachComputerOverlay.tsx
+#: src/pages/shell/computer-panel.tsx
 #: src/pages/shell/message-cards.tsx
 msgid "Dismiss"
 msgstr "סגירה"
@@ -3179,10 +3192,6 @@ msgstr ""
 msgid "General"
 msgstr "כללי"
 
-#: src/components/InviteDialog.tsx
-msgid "Get a free month for each friend who starts a trial."
-msgstr "קבלו חודש חינם על כל חבר שמתחיל תקופת ניסיון."
-
 #: src/components/SidebarFooter.tsx
 msgid "Get the mobile app"
 msgstr "הורדת האפליקציה לנייד"
@@ -3194,6 +3203,10 @@ msgstr "מתכונן"
 #: src/pages/RoutineEditor.tsx
 msgid "Git event"
 msgstr "אירוע Git"
+
+#: src/components/InviteDialog.tsx
+msgid "Give a friend {weeks} weeks free"
+msgstr "תנו לחבר {weeks} שבועות בחינם"
 
 #: src/pages/NotFound.tsx
 msgid "Go home"
@@ -3485,7 +3498,10 @@ msgstr "יחידת המרווח"
 msgid "Invalid code"
 msgstr "קוד לא תקין"
 
-#: src/components/InviteDialog.tsx
+#: src/pages/shell/chat-header.tsx
+msgid "Invite a friend"
+msgstr "הזמנת חבר"
+
 #: src/components/SidebarFooter.tsx
 msgid "Invite friends"
 msgstr "הזמנת חברים"
@@ -4093,6 +4109,10 @@ msgid "Needs an OAuth client ID"
 msgstr "נדרש מזהה לקוח OAuth"
 
 #: src/pages/ActivityList.tsx
+msgid "Needs attention"
+msgstr "דורש תשומת לב"
+
+#: src/pages/ActivityList.tsx
 msgid "Needs input"
 msgstr "ממתין לקלט"
 
@@ -4344,10 +4364,6 @@ msgstr "עדיין אין זיכרונות"
 #: src/pages/shell/bot-panel.tsx
 msgid "Notifications"
 msgstr "התראות"
-
-#: src/pages/ActivityList.tsx
-msgid "Now"
-msgstr "עכשיו"
 
 #: src/pages/McpOAuthCallback.tsx
 msgid "OAuth authorization was cancelled."
@@ -5130,6 +5146,10 @@ msgstr "החלפת מפתח"
 msgid "Replace value"
 msgstr "החלפת ערך"
 
+#: src/components/AskCard.tsx
+msgid "Replaces the login saved for {replacedSite}"
+msgstr "מחליף את פרטי ההתחברות שנשמרו עבור {replacedSite}"
+
 #: src/pages/ExternalConversationSettings.tsx
 msgid "Replies to"
 msgstr "משיב ל"
@@ -5350,6 +5370,7 @@ msgstr "כמו {botName}"
 msgid "Saturday"
 msgstr "שבת"
 
+#: src/components/ApprovalRulesSettings.tsx
 #: src/components/AskCard.tsx
 #: src/components/ComputerProviderSettings.tsx
 #: src/components/PasskeySettings.tsx
@@ -6172,6 +6193,10 @@ msgstr "הקבצים או הבחירות כבר לא תואמים. יש לבחו
 msgid "These saved settings can't be read. Remove it and add it again."
 msgstr "לא ניתן לקרוא את ההגדרות השמורות. יש להסיר ולהוסיף מחדש."
 
+#: src/components/InviteDialog.tsx
+msgid "They get {weeks} weeks free."
+msgstr "הם מקבלים {weeks} שבועות בחינם."
+
 #: src/components/call/CallCard.tsx
 #: src/pages/ModelRoleSettings.tsx
 #: src/pages/RoutineEditor.tsx
@@ -6394,6 +6419,7 @@ msgstr ""
 msgid "Tool arguments must be JSON"
 msgstr ""
 
+#: src/components/ApprovalRulesSettings.tsx
 #: src/pages/RoutineEditor.tsx
 msgid "Tool name"
 msgstr "שם הכלי"
@@ -6501,6 +6527,10 @@ msgstr "ביטול השתקה"
 #: src/pages/BotContextMenu.tsx
 msgid "Unpin"
 msgstr "ביטול הצמדה"
+
+#: src/pages/ActivityList.tsx
+msgid "Unread"
+msgstr "לא נקראו"
 
 #. placeholder {0}: pending.file.name
 #: src/pages/shell/use-composer-actions.ts
@@ -6841,6 +6871,10 @@ msgstr "לא יבוצע"
 msgid "Work"
 msgstr ""
 
+#: src/pages/ActivityList.tsx
+msgid "Working"
+msgstr "בעבודה"
+
 #: src/pages/shell/agent-import.tsx
 msgid "Working instructions"
 msgstr "הוראות עבודה"
@@ -6894,6 +6928,10 @@ msgstr "אפשר לסגור את החלון."
 msgid "You declined"
 msgstr ""
 
+#: src/components/InviteDialog.tsx
+msgid "You get a free month when they start their trial with a new card."
+msgstr "אתם מקבלים חודש חינם כשהם מתחילים את תקופת הניסיון עם כרטיס חדש."
+
 #: src/pages/shell/computer-overlay.tsx
 msgid "You have control"
 msgstr "השליטה אצלך"
@@ -6910,6 +6948,10 @@ msgstr "Anthropic"
 #: src/components/ModelCredits.tsx
 msgid "Your card is charged {annualPrice} today, less the unused part of this month."
 msgstr "הכרטיס שלך יחויב היום ב-{annualPrice}, בניכוי החלק שלא נוצל מהחודש הזה."
+
+#: src/pages/Shell.tsx
+msgid "Your computer's disk is nearly full. Free up space by removing build output and caches you no longer need."
+msgstr "הדיסק של המחשב כמעט מלא. פנה מקום על ידי מחיקת תוצרי בנייה ומטמונים שכבר לא נחוצים."
 
 #: src/components/AccountDataSettings.tsx
 msgid "Your data"

@@ -1,4 +1,6 @@
 export const RU_MESSAGES: Record<string, string> = {
+  "Add rule": "Добавить правило",
+  "Tool name": "Название инструмента",
   "Daily check-ins on unfinished work": "Ежедневные напоминания о незавершённой работе",
   "Pages this group builds for you appear here.":
     "Здесь появятся страницы, которые эта группа создаст для вас.",
@@ -307,6 +309,7 @@ export const RU_MESSAGES: Record<string, string> = {
   "Always allow": "Всегда разрешать",
   "Always allow this tool": "Всегда разрешать этот инструмент",
   "Always allow {site}": "Всегда разрешать {site}",
+  "Replaces the login saved for {site}": "Заменяет сохранённый вход для {site}",
   "Always allowed": "Всегда разрешено",
   "Android blocked notifications.": "Android заблокировал уведомления.",
   Answer: "Ответить",
@@ -596,6 +599,7 @@ export const RU_MESSAGES: Record<string, string> = {
   "Move to": "Переместить в",
   Name: "Имя",
   "Needs attention": "Требует внимания",
+  Unread: "Непрочитанные",
   "Needs input": "Требуется ввод данных",
   "Needs takeover": "Ожидает передачи управления",
   "New password": "Новый пароль",
@@ -617,7 +621,6 @@ export const RU_MESSAGES: Record<string, string> = {
   "No messages yet": "Сообщений пока нет",
   "No results": "Нет результатов",
   "Not now": "Не сейчас",
-  Now: "Сейчас",
   Notifications: "Уведомления",
   "No longer active": "Больше не активно",
   "Notification settings": "Настройки уведомлений",
@@ -740,6 +743,10 @@ export const RU_MESSAGES: Record<string, string> = {
   Stop: "Остановить",
   Submit: "Отправить",
   "Take control": "Взять управление",
+  "Clean up": "Очистить",
+  "Computer is {percent}% full": "Компьютер заполнен на {percent}%",
+  "Your computer's disk is nearly full. Free up space by removing build output and caches you no longer need.":
+    "Диск компьютера почти заполнен. Освободите место, удалив ненужные результаты сборки и кеши.",
   "Tap + to create a bot": "Нажмите +, чтобы создать бота",
   Team: "Команда",
   "Team Computer": "Командный компьютер",
@@ -1306,6 +1313,12 @@ export const RU_MESSAGES: Record<string, string> = {
   "Invite friends": "Пригласить друзей",
   "Get a free month for each friend who starts a trial.":
     "Получайте бесплатный месяц за каждого друга, который начнёт пробный период.",
+  "Invite a friend": "Пригласить друга",
+  "Give a friend {weeks} weeks free": "Подарите другу {weeks} недели бесплатно",
+  "They get {weeks} weeks free.": "Друг получает {weeks} недели бесплатно.",
+  "You get a free month when they start their trial with a new card.":
+    "Вы получите бесплатный месяц, когда друг начнёт пробный период с новой картой.",
+  "Share link": "Поделиться ссылкой",
   "1 free month earned": "Получен 1 бесплатный месяц",
   "{count} free months earned": "Бесплатных месяцев получено: {count}",
   "Submit a plugin": "Предложить плагин",

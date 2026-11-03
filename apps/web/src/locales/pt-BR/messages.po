@@ -603,6 +603,10 @@ msgstr "Adicionar chave de acesso"
 msgid "Add provider"
 msgstr "Adicionar provedor"
 
+#: src/components/ApprovalRulesSettings.tsx
+msgid "Add rule"
+msgstr ""
+
 #: src/pages/McpServersOverlay.tsx
 msgid "Add server"
 msgstr "Adicionar servidor"
@@ -1368,6 +1372,10 @@ msgstr ""
 msgid "Claude subscription"
 msgstr ""
 
+#: src/pages/shell/computer-panel.tsx
+msgid "Clean up"
+msgstr "Limpar"
+
 #: src/components/AskCard.tsx
 #: src/pages/shell/dialogs.tsx
 msgid "Clear"
@@ -1549,6 +1557,10 @@ msgstr "Falha ao inicializar o computador"
 #: src/components/ModelCredits.tsx
 msgid "Computer hours left"
 msgstr "Horas de computador restantes"
+
+#: src/pages/shell/computer-panel.tsx
+msgid "Computer is {percent}% full"
+msgstr "O computador está {percent}% cheio"
 
 #: src/pages/shell/computer-overlay.tsx
 msgid "Computer is asleep"
@@ -1759,7 +1771,6 @@ msgstr ""
 msgid "Copied"
 msgstr "Copiado"
 
-#: src/components/InviteDialog.tsx
 #: src/components/VaultSettings.tsx
 #: src/pages/model-settings/connection-controls.tsx
 #: src/pages/Onboarding.tsx
@@ -1779,6 +1790,7 @@ msgstr "Copiar código"
 msgid "Copy diagram source"
 msgstr "Copiar fonte do diagrama"
 
+#: src/components/InviteDialog.tsx
 #: src/components/pages/PublicPageShell.tsx
 #: src/components/pages/SharePopover.tsx
 msgid "Copy link"
@@ -2716,6 +2728,7 @@ msgstr "Desconectando…"
 #: src/components/ComputerUpdateProgress.tsx
 #: src/components/PasskeyOffer.tsx
 #: src/components/teach/TeachComputerOverlay.tsx
+#: src/pages/shell/computer-panel.tsx
 #: src/pages/shell/message-cards.tsx
 msgid "Dismiss"
 msgstr "Dispensar"
@@ -3179,10 +3192,6 @@ msgstr ""
 msgid "General"
 msgstr "Geral"
 
-#: src/components/InviteDialog.tsx
-msgid "Get a free month for each friend who starts a trial."
-msgstr "Ganhe um mês grátis para cada amigo que iniciar um teste."
-
 #: src/components/SidebarFooter.tsx
 msgid "Get the mobile app"
 msgstr "Baixar o aplicativo móvel"
@@ -3194,6 +3203,10 @@ msgstr ""
 #: src/pages/RoutineEditor.tsx
 msgid "Git event"
 msgstr ""
+
+#: src/components/InviteDialog.tsx
+msgid "Give a friend {weeks} weeks free"
+msgstr "Dê {weeks} semanas grátis a um amigo"
 
 #: src/pages/NotFound.tsx
 msgid "Go home"
@@ -3485,7 +3498,10 @@ msgstr "Unidade do intervalo:"
 msgid "Invalid code"
 msgstr "Código inválido"
 
-#: src/components/InviteDialog.tsx
+#: src/pages/shell/chat-header.tsx
+msgid "Invite a friend"
+msgstr "Convidar um amigo"
+
 #: src/components/SidebarFooter.tsx
 msgid "Invite friends"
 msgstr "Convidar amigos"
@@ -4093,6 +4109,10 @@ msgid "Needs an OAuth client ID"
 msgstr "Precisa de um ID de cliente OAuth"
 
 #: src/pages/ActivityList.tsx
+msgid "Needs attention"
+msgstr "Precisa de atenção"
+
+#: src/pages/ActivityList.tsx
 msgid "Needs input"
 msgstr "Precisa de entrada"
 
@@ -4344,10 +4364,6 @@ msgstr "Nada memorizado ainda"
 #: src/pages/shell/bot-panel.tsx
 msgid "Notifications"
 msgstr "Notificações"
-
-#: src/pages/ActivityList.tsx
-msgid "Now"
-msgstr "Agora"
 
 #: src/pages/McpOAuthCallback.tsx
 msgid "OAuth authorization was cancelled."
@@ -5130,6 +5146,10 @@ msgstr "Substituir chave"
 msgid "Replace value"
 msgstr ""
 
+#: src/components/AskCard.tsx
+msgid "Replaces the login saved for {replacedSite}"
+msgstr "Substitui o login salvo para {replacedSite}"
+
 #: src/pages/ExternalConversationSettings.tsx
 msgid "Replies to"
 msgstr "Responde a"
@@ -5350,6 +5370,7 @@ msgstr "Igual a {botName}"
 msgid "Saturday"
 msgstr "sábado"
 
+#: src/components/ApprovalRulesSettings.tsx
 #: src/components/AskCard.tsx
 #: src/components/ComputerProviderSettings.tsx
 #: src/components/PasskeySettings.tsx
@@ -6172,6 +6193,10 @@ msgstr "Estes arquivos ou escolhas não correspondem mais. Escolha os arquivos d
 msgid "These saved settings can't be read. Remove it and add it again."
 msgstr ""
 
+#: src/components/InviteDialog.tsx
+msgid "They get {weeks} weeks free."
+msgstr "Seu amigo ganha {weeks} semanas grátis."
+
 #: src/components/call/CallCard.tsx
 #: src/pages/ModelRoleSettings.tsx
 #: src/pages/RoutineEditor.tsx
@@ -6394,6 +6419,7 @@ msgstr "Os argumentos devem ser um objeto JSON"
 msgid "Tool arguments must be JSON"
 msgstr "Os argumentos devem ser JSON"
 
+#: src/components/ApprovalRulesSettings.tsx
 #: src/pages/RoutineEditor.tsx
 msgid "Tool name"
 msgstr "Nome da ferramenta"
@@ -6501,6 +6527,10 @@ msgstr "Reativar som"
 #: src/pages/BotContextMenu.tsx
 msgid "Unpin"
 msgstr "Desafixar"
+
+#: src/pages/ActivityList.tsx
+msgid "Unread"
+msgstr "Não lidas"
 
 #. placeholder {0}: pending.file.name
 #: src/pages/shell/use-composer-actions.ts
@@ -6841,6 +6871,10 @@ msgstr ""
 msgid "Work"
 msgstr ""
 
+#: src/pages/ActivityList.tsx
+msgid "Working"
+msgstr "Trabalhando"
+
 #: src/pages/shell/agent-import.tsx
 msgid "Working instructions"
 msgstr "Instruções de trabalho"
@@ -6894,6 +6928,10 @@ msgstr "Você pode fechar esta janela."
 msgid "You declined"
 msgstr ""
 
+#: src/components/InviteDialog.tsx
+msgid "You get a free month when they start their trial with a new card."
+msgstr "Você ganha um mês grátis quando eles começarem o teste com um cartão novo."
+
 #: src/pages/shell/computer-overlay.tsx
 msgid "You have control"
 msgstr "Você tem o controle"
@@ -6910,6 +6948,10 @@ msgstr "Seu Anthropic"
 #: src/components/ModelCredits.tsx
 msgid "Your card is charged {annualPrice} today, less the unused part of this month."
 msgstr "Seu cartão será cobrado em {annualPrice} hoje, menos a parte não usada deste mês."
+
+#: src/pages/Shell.tsx
+msgid "Your computer's disk is nearly full. Free up space by removing build output and caches you no longer need."
+msgstr "O disco do seu computador está quase cheio. Libere espaço removendo saídas de build e caches de que você não precisa mais."
 
 #: src/components/AccountDataSettings.tsx
 msgid "Your data"
