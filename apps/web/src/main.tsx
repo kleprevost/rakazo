@@ -9,7 +9,9 @@ import { App } from "./App";
 import { DesktopUpdatesProvider } from "./components/DesktopUpdates";
 import { I18nBootstrap } from "./components/I18nBootstrap";
 import { applyUiDirection } from "./lib/apply-ui-direction";
+import { fetchAuthCapabilities } from "./lib/auth-capabilities";
 import { clientUpdates } from "./lib/client-update";
+import { keepEasyAuthFresh } from "./lib/easy-auth";
 import { webLogoAvatarActivity } from "./lib/logo-avatar-activity";
 import { reportCaughtReactError } from "./lib/monitoring";
 import { markAfterPaint, markOnce } from "./lib/performance";
@@ -29,6 +31,11 @@ registerServiceWorker();
 lockStandaloneZoom();
 applyUiDirection(resolveUiLocale());
 applyUiAppearance();
+void fetchAuthCapabilities()
+  .then((capabilities) => {
+    if (capabilities.sso?.easyAuth) keepEasyAuthFresh();
+  })
+  .catch(() => undefined);
 captureReferral(window.location.search);
 
 function PerformanceProbe() {

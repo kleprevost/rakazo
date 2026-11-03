@@ -102,12 +102,13 @@ ingress). So Rakazo never acts on those headers alone:
 
 - **Mobile and desktop.** They keep the built-in OIDC flow and cannot use Easy Auth, so the app
   registration needs both redirect URIs and the client secret.
-- **Lifetime and revocation.** The token store does not refresh itself; the ID token usually
-  expires after about an hour. After that, requests no longer carry a valid identity and Rakazo
-  ends the session. The person lands on the sign-in screen, and the SSO button signs in again
-  without a prompt while the platform session is alive. This bounds revocation to roughly the ID
-  token lifetime for browsers, but open streams are cut when it happens. Calling `/.auth/refresh`
-  periodically from the web client is not implemented.
+- **Lifetime and revocation.** The stored ID token usually expires after about an hour. The web
+  app calls `/.auth/refresh` every 30 minutes (and when a tab regains focus after that long), so
+  sessions stay up while the user can still get tokens. This needs `offline_access` in the Entra
+  provider's login scopes (`loginParameters: ["scope=openid profile email offline_access"]`; the
+  Container Apps Bicep sets it). If a refresh fails, for example because the user was disabled in
+  Entra, the token expires, Rakazo ends the session and the person lands on the sign-in screen.
+  Revocation for browsers is therefore bounded by roughly the ID token lifetime.
 - **No refresh-token revalidation.** `OIDC_REVALIDATE_MINUTES` is rejected in this mode: Easy Auth
   sessions hold no refresh token, so the revalidator would end them. Disabling a user in Entra
   stops new tokens, not tokens already issued, and does not end native sessions.
