@@ -407,6 +407,7 @@ async function buildApp(overrides: CreateAppOverrides): Promise<AppHandles> {
       boatApiUrl: env.boatApiUrl,
       dataDir: env.dataDir,
       prisma,
+      secrets,
     }));
   const mcpOAuth = new McpOAuthBroker(
     prisma,

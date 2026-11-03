@@ -1,7 +1,8 @@
 import { ORPCError } from "@orpc/server";
 import type { RouterDeps } from "./router.js";
 
-type AdminDeps = Pick<RouterDeps, "prisma" | "env"> & {
+type AdminDeps = Pick<RouterDeps, "prisma"> & {
+  env: Pick<RouterDeps["env"], "adminEmails">;
   auth: Pick<RouterDeps["auth"], "isSsoAdmin">;
 };
 
