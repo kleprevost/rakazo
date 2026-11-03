@@ -35,6 +35,9 @@ export type PiCatalogEntry = {
   thinkingLevels?: ThinkingLevel[];
   /** The model reads images. Left out where a connection setting decides it. */
   images?: boolean;
+  /** List price in USD per million tokens; left out where the registry has none. */
+  inputUsdPerMillion?: number;
+  outputUsdPerMillion?: number;
   placeholder?: boolean;
   /** Provider models share one pinned HTTPS models-list base URL. */
   catalogProbe?: boolean;
@@ -320,6 +323,10 @@ function buildPiCatalog(): PiCatalogEntry[] {
           ? { placeholder: true }
           : { images: model.input.includes("image") }),
         ...(probeBaseUrl ? { catalogProbe: true } : {}),
+        // A zero rate is the registry's "unknown" (local, compatible, subscription models).
+        ...(model.cost?.input > 0 || model.cost?.output > 0
+          ? { inputUsdPerMillion: model.cost.input, outputUsdPerMillion: model.cost.output }
+          : {}),
       });
     }
   }

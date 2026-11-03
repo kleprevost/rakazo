@@ -4994,6 +4994,10 @@ msgstr "En pausa"
 msgid "Pending"
 msgstr "Pendiente"
 
+#: src/pages/shell/chat-model-picker.tsx
+msgid "Per million tokens, input / output"
+msgstr "Por millón de tokens, entrada / salida"
+
 #: src/pages/shell/bot-panel.tsx
 msgid "Permissions"
 msgstr "Permisos"

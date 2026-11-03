@@ -87,6 +87,26 @@ describe("ChatModelPicker", () => {
     expect(container.querySelector("select")?.options).toHaveLength(10);
   });
 
+  it("shows a known price on each row and nothing for an unknown one", () => {
+    const priced = (list: ChatModelChoice[]) =>
+      list.map((choice, index) => (index === 1 ? { ...choice, price: "$2 / $8" } : choice));
+    render(priced(choices(2)), "");
+    expect([...container.querySelectorAll("option")].map((option) => option.textContent)).toEqual([
+      "Space default",
+      "Model 1 (OpenRouter) · $2 / $8",
+      "Model 2 (OpenRouter)",
+    ]);
+
+    render(priced(choices(11)), "");
+    act(() => container.querySelector<HTMLButtonElement>("button#model")!.click());
+    expect(
+      options().map(
+        (option) =>
+          option.querySelector('[title="Per million tokens, input / output"]')?.textContent,
+      ),
+    ).toEqual([undefined, "$2 / $8", ...Array(10).fill(undefined)]);
+  });
+
   it("marks a short list's selected model when it cannot read images", () => {
     const list = choices(2).map((choice, index) =>
       index === 1 ? { ...choice, images: false } : { ...choice, images: true },

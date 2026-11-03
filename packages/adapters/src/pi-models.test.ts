@@ -220,6 +220,19 @@ describe("catalog provider authentication", () => {
 });
 
 describe("Pi model catalog", () => {
+  it("prices a model from the registry and leaves unpriced models without one", () => {
+    const catalog = listPiCatalog();
+    expect(
+      catalog.find((entry) => entry.provider === "azure" && entry.id === "gpt-4.1"),
+    ).toMatchObject({ inputUsdPerMillion: 2, outputUsdPerMillion: 8 });
+    const unpriced = catalog.filter((entry) => entry.provider === "openai-compatible");
+    expect(unpriced.length).toBeGreaterThan(0);
+    for (const entry of unpriced) {
+      expect(entry.inputUsdPerMillion).toBeUndefined();
+      expect(entry.outputUsdPerMillion).toBeUndefined();
+    }
+  });
+
   it("recommends one Luna or Haiku model per supported provider", () => {
     expect(
       listPiCatalog()

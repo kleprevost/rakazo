@@ -158,6 +158,15 @@ az containerapp revision restart -g rakazo-rg -n rakazo-api \
 The policy is read once at startup, so both processes restart. Set `policyFile` to an empty string
 to run without one.
 
+### Exposing more Foundry deployments
+
+The starter policy (`allowProviders: [azure]`, `allowUserConnections: false`) keeps members off
+their own credentials but still lists every Azure model the deployment serves. Azure serves only the
+deployments you create, so the picker shows `piDefaultModel` plus each model id named in
+`azureOpenAiDeploymentNameMap` (`<catalog model id>=<deployment name>,...`). Add the models, redeploy
+the apps with `deployVm=false` and restart api and worker; see
+[inference.md](./inference.md#organization-models). Use `allowModels` to offer only some of them.
+
 ## Easy Auth (optional)
 
 `enableEasyAuth=true` configures the web app's Entra provider (token store on, unauthenticated

@@ -128,7 +128,10 @@ export async function sendThread(
         ? {
             secrets: deps.secrets,
             deployment,
-            hostedProvider: setup.creditsAvailable ? deployment?.provider : undefined,
+            hostedProvider:
+              setup.creditsAvailable || !deps.billing?.modelCreditsEnabled
+                ? deployment?.provider
+                : undefined,
             codexCatalog,
           }
         : undefined,

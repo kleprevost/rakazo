@@ -4994,6 +4994,10 @@ msgstr "一時停止中"
 msgid "Pending"
 msgstr ""
 
+#: src/pages/shell/chat-model-picker.tsx
+msgid "Per million tokens, input / output"
+msgstr "100万トークンあたり、入力 / 出力"
+
 #: src/pages/shell/bot-panel.tsx
 msgid "Permissions"
 msgstr "権限"

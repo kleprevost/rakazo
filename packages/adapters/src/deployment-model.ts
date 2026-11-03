@@ -66,6 +66,36 @@ export function resolveDeploymentModel(env: NodeJS.ProcessEnv = process.env) {
   };
 }
 
+/**
+ * The provider whose deployment credentials serve members: always while credits are metered,
+ * otherwise whenever the deployment model can run (the organization's models).
+ */
+export function hostedModelProvider(
+  meteredCredits: boolean,
+  env: NodeJS.ProcessEnv = process.env,
+): string | undefined {
+  const deployment = resolveDeploymentModel(env);
+  return meteredCredits || deployment.configured ? deployment.provider : undefined;
+}
+
+/**
+ * Whether the deployment's own credentials can serve `modelId`, for the organization models
+ * every member may pick. Azure serves only the deployments the operator named: the models in
+ * `AZURE_OPENAI_DEPLOYMENT_NAME_MAP`, plus the default model. Other providers serve their
+ * whole catalog.
+ */
+export function deploymentServesModel(
+  provider: string,
+  modelId: string,
+  env: NodeJS.ProcessEnv = process.env,
+): boolean {
+  if (provider !== "azure") return true;
+  const deployed = (env.AZURE_OPENAI_DEPLOYMENT_NAME_MAP ?? "")
+    .split(",")
+    .map((pair) => pair.split("=")[0]?.trim());
+  return modelId === env.PI_DEFAULT_MODEL?.trim() || deployed.includes(modelId);
+}
+
 function definedEnv(env: NodeJS.ProcessEnv): Record<string, string> {
   return Object.fromEntries(
     Object.entries(env).filter((entry): entry is [string, string] => entry[1] !== undefined),

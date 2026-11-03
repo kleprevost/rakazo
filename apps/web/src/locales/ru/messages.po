@@ -4994,6 +4994,10 @@ msgstr "Приостановлено"
 msgid "Pending"
 msgstr ""
 
+#: src/pages/shell/chat-model-picker.tsx
+msgid "Per million tokens, input / output"
+msgstr "За миллион токенов, ввод / вывод"
+
 #: src/pages/shell/bot-panel.tsx
 msgid "Permissions"
 msgstr "Разрешения"

@@ -55,7 +55,7 @@ export function ChatModelPicker({
         >
           {choices.map((choice) => (
             <NativeSelectOption key={choice.key} value={choice.key}>
-              {choice.label}
+              {choice.price ? `${choice.label} · ${choice.price}` : choice.label}
             </NativeSelectOption>
           ))}
         </NativeSelect>
@@ -127,6 +127,14 @@ export function ChatModelPicker({
                       <span className="min-w-0 flex-1 truncate">
                         {choice.title ?? choice.label}
                       </span>
+                      {choice.price ? (
+                        <span
+                          className="shrink-0 text-xs text-muted-foreground tabular-nums"
+                          title={t`Per million tokens, input / output`}
+                        >
+                          {choice.price}
+                        </span>
+                      ) : null}
                       {choice.images === false ? (
                         <span className="shrink-0 text-muted-foreground">
                           <TextOnlyMark />

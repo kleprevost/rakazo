@@ -13,7 +13,7 @@ import {
 } from "@rakazo/contracts";
 import { MISSING_MODEL_RUN_ERROR } from "@rakazo/core";
 import { cloudflareProviderEnv } from "./cloudflare-ai-gateway.js";
-import { resolveDeploymentModel } from "./deployment-model.js";
+import { hostedModelProvider, resolveDeploymentModel } from "./deployment-model.js";
 import type { ExecutorDeps } from "./executor-deps.js";
 import type { FleetPrepareDeps } from "./fleet-tools.js";
 import {
@@ -70,9 +70,7 @@ export async function fleetPrepareDeps(
   deps: ExecutorDeps,
   scope: { userId: string; spaceId: string },
 ): Promise<FleetPrepareDeps> {
-  const hostedProvider = (await modelCreditBillingEnabled(deps))
-    ? resolveDeploymentModel().provider
-    : undefined;
+  const hostedProvider = hostedModelProvider(await modelCreditBillingEnabled(deps));
   return {
     prisma: deps.prisma,
     modelChange: {
@@ -431,9 +429,7 @@ export async function resolveConnectedModelKey(
   requireStoredSecret = false,
   credentialId?: string,
 ) {
-  const hostedProvider = (await modelCreditBillingEnabled(deps))
-    ? resolveDeploymentModel().provider
-    : undefined;
+  const hostedProvider = hostedModelProvider(await modelCreditBillingEnabled(deps));
   const validationError = await validateConnectedModelChoice(
     deps.prisma,
     deps.secretStore,
@@ -540,9 +536,7 @@ export async function resolveRunModel(
     override,
     overrideCredential,
     main,
-    hostedProvider: (await modelCreditBillingEnabled(deps))
-      ? resolveDeploymentModel().provider
-      : undefined,
+    hostedProvider: hostedModelProvider(await modelCreditBillingEnabled(deps)),
     defaults: {
       settings,
       deployment: deps.deploymentModelConfigured ? resolveDeploymentModel() : null,

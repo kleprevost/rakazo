@@ -4994,6 +4994,10 @@ msgstr "일시 중지됨"
 msgid "Pending"
 msgstr ""
 
+#: src/pages/shell/chat-model-picker.tsx
+msgid "Per million tokens, input / output"
+msgstr "백만 토큰당, 입력 / 출력"
+
 #: src/pages/shell/bot-panel.tsx
 msgid "Permissions"
 msgstr "권한"

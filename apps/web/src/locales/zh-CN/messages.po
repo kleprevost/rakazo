@@ -4994,6 +4994,10 @@ msgstr "已暂停"
 msgid "Pending"
 msgstr "待处理"
 
+#: src/pages/shell/chat-model-picker.tsx
+msgid "Per million tokens, input / output"
+msgstr "每百万 token，输入 / 输出"
+
 #: src/pages/shell/bot-panel.tsx
 msgid "Permissions"
 msgstr "权限"

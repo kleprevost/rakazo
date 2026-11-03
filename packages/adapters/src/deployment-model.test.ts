@@ -1,5 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { resolveDeploymentModel } from "./deployment-model.js";
+import {
+  deploymentServesModel,
+  hostedModelProvider,
+  resolveDeploymentModel,
+} from "./deployment-model.js";
 
 // Host credentials come from the process, so blank the ones a developer machine or CI
 // host may carry; each case states its own.
@@ -12,6 +16,37 @@ const HOST_CREDENTIAL_ENV = [
   "AWS_CONTAINER_CREDENTIALS_FULL_URI",
   "AWS_WEB_IDENTITY_TOKEN_FILE",
 ];
+
+describe("organization models", () => {
+  const azure = {
+    PI_DEFAULT_PROVIDER: "azure",
+    PI_DEFAULT_MODEL: "gpt-4.1",
+    AZURE_OPENAI_API_KEY: "fake-azure-key",
+    AZURE_OPENAI_DEPLOYMENT_NAME_MAP: "gpt-4.1-mini=mini-prod, gpt-5.1=big-prod",
+  };
+
+  it("serves the named Azure deployments and the default model only", () => {
+    for (const id of ["gpt-4.1", "gpt-4.1-mini", "gpt-5.1"])
+      expect(deploymentServesModel("azure", id, azure)).toBe(true);
+    expect(deploymentServesModel("azure", "gpt-4", azure)).toBe(false);
+    expect(
+      deploymentServesModel("azure", "gpt-4.1-mini", {
+        ...azure,
+        AZURE_OPENAI_DEPLOYMENT_NAME_MAP: "",
+      }),
+    ).toBe(false);
+  });
+
+  it("serves a whole catalog for providers that need no deployment names", () => {
+    expect(deploymentServesModel("opencode", "any-model", {})).toBe(true);
+  });
+
+  it("names the hosted provider while credits are metered or the deployment model can run", () => {
+    expect(hostedModelProvider(false, azure)).toBe("azure");
+    expect(hostedModelProvider(true, {})).toBe("openrouter");
+    expect(hostedModelProvider(false, {})).toBeUndefined();
+  });
+});
 
 describe("resolveDeploymentModel", () => {
   beforeEach(() => {

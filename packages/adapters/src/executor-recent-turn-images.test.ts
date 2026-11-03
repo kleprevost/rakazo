@@ -265,6 +265,7 @@ async function runWithModel(
         defaultModelId: modelId,
       })),
     },
+    space: { findFirst: vi.fn(async () => null) },
     taughtSkill: { findMany: vi.fn(async () => []) },
     vaultCredential: { findMany: vi.fn(async () => []) },
     agentSkill: { findMany: vi.fn(async () => []) },
