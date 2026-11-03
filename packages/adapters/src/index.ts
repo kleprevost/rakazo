@@ -154,6 +154,7 @@ export * from "./pipedream-connector.js";
 export * from "./plugin-connectors.js";
 export * from "./plugin-marketplace.js";
 export * from "./policy-runtime.js";
+export * from "./policy-tools.js";
 export * from "./product-analytics.js";
 export * from "./purchase-poll.js";
 export * from "./purchase-service.js";

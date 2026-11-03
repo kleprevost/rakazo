@@ -53,7 +53,7 @@ data:
 ## Status
 Step 1 is implemented: the full v1 schema (`PolicySchema`, strict, in `packages/contracts/src/policy.ts`),
 the loader and process-wide accessor (`packages/adapters/src/policy-runtime.ts`), and the pure
-evaluator (`packages/core/src/policy.ts`). **Only `models` is enforced**; every other section is
+evaluator (`packages/core/src/policy.ts`). **`models`, `tools` and `approvals` are enforced**; every other section is
 parsed and validated but has no effect yet.
 
 - `RAKAZO_POLICY_FILE` points at a YAML or JSON file (JSON is read by the YAML parser). It is read
@@ -67,6 +67,16 @@ parsed and validated but has no effect yet.
   or backup model, setting the main model and changing a bot's model are refused with `FORBIDDEN`
   and `{ reason: "policy", rule }`. Users see "Blocked by your organization". A saved choice that
   a later policy forbids is kept and fails at run time with that message.
+- Tools and approvals: ids are the tool names the approval Allow/Block lists use (a built-in
+  tool's name, or an installed connector tool's name; every name a call goes by, including each
+  batch action, is checked), globs case-insensitive. `tools.deny` is checked in the run gate
+  (`gateToolCall`): the model gets a short "blocked by your organization" tool error, the run
+  continues, and `policy.denied` is recorded; denied tools are also left out of the tool list the
+  model is offered. `approvals.alwaysAsk` makes the gate ask in every mode, over Always allow and
+  allow rules (a Block rule still refuses). `approvals.minimumMode` clamps the effective mode where
+  a run reads it, and `autoReview.set` refuses a looser mode with `FORBIDDEN`/`policy`; the mode
+  the settings read returns is the clamped one, so pickers show the effective mode. Not covered:
+  a tool called from inside a routine's watch, and allow/ask rules themselves.
 - Not yet: a capabilities flag for clients; routines, agent import and other paths that pin a model
   without going through the bot-model check are caught at run time only.
 
