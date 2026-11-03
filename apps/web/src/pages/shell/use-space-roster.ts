@@ -14,6 +14,7 @@ import { replaceEqualDeep } from "@tanstack/react-query";
 import type { RefObject } from "react";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { takeInitialBootstrap } from "../../lib/bootstrap";
+import { TODAY_PATH, takeLanding } from "../../lib/landing";
 import { localTimezone } from "../../lib/local-timezone";
 import { markOnce } from "../../lib/performance";
 import type { ChatTarget } from "../../lib/query";
@@ -127,6 +128,10 @@ export function useSpaceRoster({
           return;
         }
         const currentGroupId = routeGroupId.current;
+        if (!currentGroupId && !routeBotId.current && takeLanding()) {
+          redirectKeepingOverlay(TODAY_PATH);
+          return;
+        }
         if (currentGroupId) {
           if (!groupList.some((group) => group.id === currentGroupId)) {
             redirectKeepingOverlay(firstThreadRoute(list, groupList));
@@ -400,6 +405,10 @@ export function useSpaceBootstrap({
           if (!groupList.some((group) => group.id === groupId)) {
             redirectKeepingOverlay(firstThreadRoute(bootstrap.bots, groupList));
           }
+          return;
+        }
+        if (!botId && takeLanding()) {
+          redirectKeepingOverlay(TODAY_PATH);
           return;
         }
         const selectedBotId = bootstrap.thread?.botId ?? bootstrap.bots[0]?.id;

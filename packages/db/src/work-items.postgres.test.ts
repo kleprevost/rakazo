@@ -118,6 +118,37 @@ describePostgres("work items (PostgreSQL)", () => {
     expect(items.map((item) => item.id)).toContain(ticket.id);
   });
 
+  it("lists only the user's own open work when asked to", async () => {
+    const colleagueBot = await system.bot.create({
+      data: { spaceId, userId: `colleague-${userId}`, name: "Other", color: "ink" },
+    });
+    const make = async (data: Record<string, unknown>) => {
+      number += 1;
+      return system.ticket.create({
+        data: { spaceId, boardId, number, title: `Scope ${number}`, ...data },
+      });
+    };
+    const mine = await make({ status: "doing", assigneeBotId: botId });
+    const created = await make({
+      status: "doing",
+      assigneeBotId: colleagueBot.id,
+      createdByUserId: userId,
+    });
+    const theirs = await make({ status: "doing", assigneeBotId: colleagueBot.id });
+    const finished = await make({ status: "done", assigneeBotId: botId });
+    const items = await runAsTenant({ spaceId, userId }, () =>
+      listWorkItems(prisma, spaceId, {
+        involvingUserId: userId,
+        phases: ["running", "waiting", "review", "failed"],
+      }),
+    );
+    const ids = items.map((item) => item.id);
+    expect(ids).toContain(mine.id);
+    expect(ids).toContain(created.id);
+    expect(ids).not.toContain(theirs.id);
+    expect(ids).not.toContain(finished.id);
+  });
+
   it("moves a worked ticket to review when its run completes", async () => {
     const { ticket, task, run } = await workedTicket("doing", "running");
     const attempt = await system.attempt.create({

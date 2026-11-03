@@ -1,8 +1,15 @@
-import type { Actor, TodayArtifact, TodayAttention, TodaySummary } from "@rakazo/contracts";
+import type {
+  Actor,
+  TodayArtifact,
+  TodayAttention,
+  TodaySummary,
+  TodayWorkItem,
+} from "@rakazo/contracts";
 import {
   MessageBlock,
   TODAY_COMPLETED_WINDOW_HOURS,
   TODAY_FAILED_WINDOW_DAYS,
+  TODAY_WORK_PHASES,
 } from "@rakazo/contracts";
 import {
   ACTIVE_RUN_STATUSES,
@@ -11,6 +18,7 @@ import {
   WORKING_RUN_STATUSES,
 } from "@rakazo/core";
 import type { Prisma, PrismaClient } from "@rakazo/db";
+import { listWorkItems } from "@rakazo/db";
 import { activityPreview } from "./runs.js";
 
 const ACTIVE_LIMIT = 50;
@@ -19,6 +27,7 @@ const COMPLETED_LIMIT = 10;
 const FAILED_LIMIT = 20;
 const UPCOMING_LIMIT = 10;
 const ARTIFACTS_PER_RUN = 3;
+const WORK_LIMIT = 20;
 const ASK_TEXT_MAX = 300;
 /** Chat replies are not "work done"; these runs started without a person typing. */
 const AUTONOMOUS_TRIGGERS = ["routine", "webhook", "spawn", "bot_message", "cloud_agent"];
@@ -173,6 +182,46 @@ async function artifactsByRun(prisma: PrismaClient, actor: Actor, runIds: string
 }
 
 /**
+ * Open assignments the user created or that sit with one of their bots. Another user's bot is
+ * never named, so a ticket handed to a colleague's bot shows without an assignee.
+ */
+async function workItems(prisma: PrismaClient, actor: Actor): Promise<TodayWorkItem[]> {
+  const items = await listWorkItems(prisma, actor.spaceId, {
+    involvingUserId: actor.userId,
+    phases: [...TODAY_WORK_PHASES],
+  });
+  const shown = items.slice(0, WORK_LIMIT);
+  const botIds = [
+    ...new Set(shown.flatMap((item) => (item.assigneeBotId ? [item.assigneeBotId] : []))),
+  ];
+  const bots = botIds.length
+    ? await prisma.bot.findMany({
+        where: { id: { in: botIds }, spaceId: actor.spaceId, userId: actor.userId },
+        select: { id: true, name: true },
+      })
+    : [];
+  const names = new Map(bots.map((bot) => [bot.id, bot.name]));
+  return shown.flatMap((item) =>
+    item.phase === "running" ||
+    item.phase === "waiting" ||
+    item.phase === "review" ||
+    item.phase === "failed"
+      ? [
+          {
+            id: item.id,
+            ref: item.ref,
+            title: item.title,
+            phase: item.phase,
+            botId: item.assigneeBotId && names.has(item.assigneeBotId) ? item.assigneeBotId : null,
+            botName: (item.assigneeBotId && names.get(item.assigneeBotId)) || null,
+            at: item.updatedAt,
+          },
+        ]
+      : [],
+  );
+}
+
+/**
  * A read model over runs, asks, routines and artifacts for one signed-in user in one space.
  * Every query is scoped to the actor's space and user, so it shows only that user's bots.
  */
@@ -180,10 +229,11 @@ export async function todaySummary(
   prisma: PrismaClient,
   actor: Actor,
   now = new Date(),
+  options: { workItems?: boolean } = {},
 ): Promise<TodaySummary> {
   const completedSince = new Date(now.getTime() - TODAY_COMPLETED_WINDOW_HOURS * HOUR_MS);
   const failedSince = new Date(now.getTime() - TODAY_FAILED_WINDOW_DAYS * DAY_MS);
-  const [active, completedRaw, failedRaw, routines] = await Promise.all([
+  const [active, completedRaw, failedRaw, routines, work] = await Promise.all([
     loadRuns(
       prisma,
       actor,
@@ -217,6 +267,7 @@ export async function todaySummary(
       orderBy: [{ nextRunAt: "asc" }, { id: "asc" }],
       take: UPCOMING_LIMIT,
     }),
+    options.workItems ? workItems(prisma, actor) : [],
   ]);
 
   const waitingInput = active.filter((row) => row.status === "waiting_input");
@@ -317,5 +368,6 @@ export async function todaySummary(
           ]
         : [],
     ),
+    work,
   };
 }

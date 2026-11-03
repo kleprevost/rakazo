@@ -39,6 +39,7 @@ const empty: TodaySummary = {
   active: [],
   completed: [],
   upcoming: [],
+  work: [],
 };
 const populated: TodaySummary = {
   generatedAt: at,
@@ -114,6 +115,18 @@ const populated: TodaySummary = {
       nextRunAt: "2026-03-11T08:00:00.000Z",
     },
   ],
+  work: [
+    { id: "t1", ref: "RAK-1", title: "Draft the board deck", phase: "running", ...bot, at },
+    {
+      id: "t2",
+      ref: "RAK-2",
+      title: "Audit vendor list",
+      phase: "review",
+      botId: null,
+      botName: null,
+      at,
+    },
+  ],
 };
 
 const mounted: Array<() => void> = [];
@@ -180,11 +193,20 @@ it("lists every section with links to the work behind each row", async () => {
   const container = await mount();
   await vi.waitFor(() => expect(container.querySelector('[data-testid="today"]')).not.toBeNull());
   const headings = [...container.querySelectorAll("h2")].map((h) => h.textContent);
-  expect(headings).toEqual(["Needs attention 3", "Working 1", "Done 1", "Coming up 1"]);
+  expect(headings).toEqual([
+    "Needs attention 3",
+    "Working 1",
+    "Running 1",
+    "In review 1",
+    "Done 1",
+    "Coming up 1",
+  ]);
   const hrefs = [...container.querySelectorAll("a")].map((a) => a.getAttribute("href"));
   expect(hrefs).toContain("/app/bot-1");
   expect(hrefs).toContain("/app/g/group-1");
   expect(hrefs).toContain("/app/artifacts/artifact-1");
+  expect(hrefs).toContain("/app/board?ticket=t1");
+  expect(container.textContent).toContain("Draft the board deck");
   expect(container.textContent).toContain("Send the email to Dana?");
   expect(container.textContent).toContain("504: request timed out");
 });

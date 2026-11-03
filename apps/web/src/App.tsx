@@ -22,6 +22,7 @@ import { authClient } from "./lib/auth";
 import { getTicketBoardEnabled, subscribeTicketBoardEnabled } from "./lib/bootstrap";
 import { syncCallIdentity } from "./lib/call-session";
 import { desktopBridge } from "./lib/desktop";
+import { resetLanding, routeSettlesLanding, settleLanding } from "./lib/landing";
 import { syncWebLogoAvatarIdentity } from "./lib/logo-avatar-activity";
 import { identifyMonitoringUser } from "./lib/monitoring";
 import { markAfterPaint, markOnce } from "./lib/performance";
@@ -146,6 +147,11 @@ function SessionApp() {
       .then(() => rpc.analytics.screen({ screen, surface: desktopBridge() ? "desktop" : "web" }))
       .catch(() => undefined);
   }, [analyticsUserId, screen]);
+  useEffect(() => {
+    if (session.isPending) return;
+    if (!analyticsUserId) resetLanding();
+    else if (routeSettlesLanding(pathname, search)) settleLanding();
+  }, [analyticsUserId, session.isPending, pathname, search]);
   const gate = sessionGate(session);
   useLayoutEffect(() => {
     if (gate !== "authenticated" && gate !== "anonymous") return;

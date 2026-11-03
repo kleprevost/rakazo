@@ -70,6 +70,7 @@ vi.mock("./pages/IntegrationSetup", () => ({ IntegrationSetupPage: () => null })
 vi.mock("./pages/McpOAuthCallback", () => ({ McpOAuthCallbackPage: () => null }));
 
 import { App } from "./App";
+import { resetLanding, takeLanding } from "./lib/landing";
 
 it.each([
   signedIn,
@@ -215,6 +216,64 @@ it("tells the call session who is signed in, without counting an unreachable loo
     expect(capability.syncCallIdentity).toHaveBeenLastCalledWith("user-2");
     await render({ isPending: false, data: null, error: null });
     expect(capability.syncCallIdentity).toHaveBeenLastCalledWith(null);
+  } finally {
+    capability.session = null;
+    await act(async () => root.unmount());
+    vi.unstubAllGlobals();
+  }
+});
+
+it.each([
+  ["/app/bot-1", false],
+  ["/app?settings=account", false],
+  ["/app/today", false],
+  ["/app", true],
+])(
+  "%s decides whether the first plain /app visit still lands on Today: %s",
+  async (path, pending) => {
+    vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
+    resetLanding();
+    capability.session = signedIn;
+    const container = document.createElement("div");
+    const root = createRoot(container);
+    try {
+      await act(async () =>
+        root.render(
+          <MemoryRouter initialEntries={[path]}>
+            <App />
+          </MemoryRouter>,
+        ),
+      );
+      expect(takeLanding()).toBe(pending);
+    } finally {
+      capability.session = null;
+      await act(async () => root.unmount());
+      vi.unstubAllGlobals();
+    }
+  },
+);
+
+it("starts at Today again after a sign-out", async () => {
+  vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
+  resetLanding();
+  const container = document.createElement("div");
+  const root = createRoot(container);
+  const render = async (session: SessionState, path: string) => {
+    capability.session = session;
+    await act(async () =>
+      root.render(
+        <MemoryRouter initialEntries={[path]}>
+          <App />
+        </MemoryRouter>,
+      ),
+    );
+  };
+  try {
+    await render(signedIn, "/app/bot-1");
+    expect(takeLanding()).toBe(false);
+    await render({ isPending: false, data: null, error: null }, "/sign-in");
+    await render(signedIn, "/sign-in");
+    expect(takeLanding()).toBe(true);
   } finally {
     capability.session = null;
     await act(async () => root.unmount());
