@@ -61,11 +61,8 @@ const ArtifactsPage = lazyComponent(() =>
 );
 const TodayPage = lazyComponent(() => import("./pages/Today").then((module) => module.TodayPage));
 const BoardPage = lazyComponent(() => import("./pages/Board").then((module) => module.BoardPage));
-const AdminPluginsPage = lazyComponent(() =>
-  import("./pages/AdminPluginsPage").then((module) => module.AdminPluginsPage),
-);
-const AdminAccessPage = lazyComponent(() =>
-  import("./pages/AdminAccessPage").then((module) => module.AdminAccessPage),
+const AdminRoutes = lazyComponent(() =>
+  import("./pages/admin/AdminRoutes").then((module) => module.AdminRoutes),
 );
 const NavLinkPage = lazyComponent(() =>
   import("./pages/NavLinkPage").then((module) => module.NavLinkPage),
@@ -115,8 +112,8 @@ function SessionApp() {
   // A connector sign-in started on another device lands here signed out; finish it after sign-in.
   const signInDestination =
     next === "/integrations/setup" ||
-    next === "/admin/plugins" ||
-    next === "/admin/access" ||
+    next === "/admin" ||
+    next.startsWith("/admin/") ||
     next.startsWith(`${MCP_OAUTH_CALLBACK_PATH}?`) ||
     next.startsWith(`${SLACK_INSTALL_CALLBACK_PATH}?`)
       ? next
@@ -257,19 +254,9 @@ function SessionApp() {
                 }
               />
               <Route
-                path="/admin/plugins"
+                path="/admin/*"
                 element={
-                  user ? (
-                    <AdminPluginsPage />
-                  ) : (
-                    <Navigate to="/sign-in?next=/admin/plugins" replace />
-                  )
-                }
-              />
-              <Route
-                path="/admin/access"
-                element={
-                  user ? <AdminAccessPage /> : <Navigate to="/sign-in?next=/admin/access" replace />
+                  user ? <AdminRoutes /> : <Navigate to={`/sign-in?next=${pathname}`} replace />
                 }
               />
               <Route

@@ -1,53 +1,20 @@
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import type { AccessGrant } from "@rakazo/contracts";
-import {
-  Badge,
-  Button,
-  buttonVariants,
-  Field,
-  FieldLabel,
-  Input,
-  Spinner,
-  toast,
-} from "@rakazo/ui-web";
+import { Badge, Button, Field, FieldLabel, Input, Spinner, toast } from "@rakazo/ui-web";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ChevronLeft } from "lucide-react";
 import type { FormEvent } from "react";
 import { useState } from "react";
-import { Link, Navigate } from "react-router-dom";
-import { PageLoading } from "../components/PageLoading";
 import { formatBillingAmount } from "../lib/billing";
 import { useSpaceQueries } from "../lib/query";
 import { rpc } from "../lib/rpc";
 import { errorText } from "../lib/user-error";
-import { WindowChrome } from "./WindowChrome";
+import { AdminShell } from "./admin/AdminShell";
 
 export function AdminAccessPage() {
-  const { t } = useLingui();
-  const me = useQuery(useSpaceQueries().me.queryOptions());
-  if (me.isPending) return <PageLoading />;
-  if (!me.data?.isAdmin) return <Navigate to="/app" replace />;
   return (
-    <div className="flex h-full min-w-0 flex-col overflow-hidden bg-background text-foreground">
-      <WindowChrome />
-      <header className="flex items-center gap-3 border-b px-4 py-3">
-        <Link
-          to="/app"
-          className={buttonVariants({ variant: "ghost", size: "icon" })}
-          aria-label={t`Back`}
-        >
-          <ChevronLeft />
-        </Link>
-        <h1 className="flex-1 font-medium">
-          <Trans>Free access</Trans>
-        </h1>
-      </header>
-      <main className="min-h-0 flex-1 overflow-y-auto">
-        <div className="mx-auto max-w-3xl space-y-8 px-4 py-6">
-          <AccessGrantsPanel />
-        </div>
-      </main>
-    </div>
+    <AdminShell>
+      <AccessGrantsPanel />
+    </AdminShell>
   );
 }
 

@@ -17,14 +17,6 @@ msgstr ""
 msgid " (unread)"
 msgstr "（未读）"
 
-#: src/pages/Today.tsx
-msgid "Coming up"
-msgstr "即将开始"
-
-#: src/pages/Today.tsx
-msgid "Nothing today"
-msgstr "今天没有内容"
-
 #. placeholder {0}: pinned.length
 #: src/pages/model-settings/space-bots-model.tsx
 msgid "{0, plural, one {# bot has its own model:} other {# bots have their own model:}}"
@@ -650,6 +642,19 @@ msgstr "已添加"
 msgid "Adding…"
 msgstr "正在添加…"
 
+#: src/components/SidebarFooter.tsx
+#: src/pages/admin/AdminShell.tsx
+msgid "Admin"
+msgstr ""
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Admin (email list)"
+msgstr ""
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Admin (SSO)"
+msgstr ""
+
 #: src/pages/McpServersOverlay.tsx
 #: src/pages/model-settings/compatible-model-fields.tsx
 #: src/pages/ModelSettingsOverlay.tsx
@@ -668,6 +673,12 @@ msgstr "高级..."
 msgid "Agent from another app"
 msgstr ""
 
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminShell.tsx
+msgid "AI employees"
+msgstr ""
+
+#: src/pages/admin/AdminAuditPage.tsx
 #: src/pages/PluginsOverlay.tsx
 msgid "All"
 msgstr "全部"
@@ -695,6 +706,7 @@ msgid "All time"
 msgstr "全部时间"
 
 #: src/components/ApprovalRulesSettings.tsx
+#: src/pages/Today.tsx
 msgid "Allow"
 msgstr "允许"
 
@@ -906,6 +918,7 @@ msgstr "归档"
 msgid "archived"
 msgstr "已归档"
 
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/shell/archived-chats.tsx
 msgid "Archived"
 msgstr "已归档"
@@ -948,6 +961,10 @@ msgstr "附加文件"
 #: src/pages/shell/chat-shared.ts
 msgid "Attachment"
 msgstr "附件"
+
+#: src/pages/admin/AdminShell.tsx
+msgid "Audit log"
+msgstr ""
 
 #: src/pages/PluginsOverlay.tsx
 msgid "Authentication"
@@ -1012,8 +1029,7 @@ msgstr "头像工作室"
 
 #: src/components/integrations/plugin-marketplace.tsx
 #: src/components/integrations/skills-dialog.tsx
-#: src/pages/AdminAccessPage.tsx
-#: src/pages/AdminPluginsPage.tsx
+#: src/pages/admin/AdminShell.tsx
 #: src/pages/Auth.tsx
 #: src/pages/Board.tsx
 #: src/pages/McpServersOverlay.tsx
@@ -1023,6 +1039,7 @@ msgstr "头像工作室"
 #: src/pages/SettingsOverlay.tsx
 #: src/pages/shell/agent-import.tsx
 #: src/pages/shell/hire-role-dialog.tsx
+#: src/pages/Today.tsx
 msgid "Back"
 msgstr "返回"
 
@@ -1247,6 +1264,7 @@ msgid "cancelled"
 msgstr "已取消"
 
 #: src/components/AskCard.tsx
+#: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
 msgid "Cancelled"
 msgstr "已取消"
@@ -1537,6 +1555,10 @@ msgstr "第 {index} 列"
 msgid "Comfortable"
 msgstr "舒适"
 
+#: src/pages/Today.tsx
+msgid "Coming up"
+msgstr "即将开始"
+
 #: src/pages/McpServersOverlay.tsx
 #: src/pages/RoutineEditor.tsx
 msgid "Command"
@@ -1605,6 +1627,7 @@ msgstr "电脑已停止"
 
 #: src/components/ComputerDeviceSettings.tsx
 #: src/pages/AccountSettingsOverlay.tsx
+#: src/pages/admin/AdminOverviewPage.tsx
 msgid "Computers"
 msgstr "电脑"
 
@@ -1619,6 +1642,10 @@ msgstr "电脑未开启。请设置 SANDBOX_PROVIDER=docker 并提供 SANDBOX_SU
 #: src/pages/PluginsOverlay.tsx
 msgid "Configure a plugin catalog on the server to connect apps."
 msgstr "要连接应用，请先在服务器上配置插件目录。"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Confirm"
+msgstr ""
 
 #: src/pages/KnowledgeSection.tsx
 msgid "Confirm delete"
@@ -1889,6 +1916,7 @@ msgid "Could not clear conversation"
 msgstr "无法清空对话"
 
 #: src/components/ComputerUpdateProgress.tsx
+#: src/pages/Today.tsx
 msgid "Could not complete action"
 msgstr "无法完成操作"
 
@@ -2030,6 +2058,10 @@ msgstr "无法下载 {name}。请重试。"
 #: src/components/integrations/plugin-marketplace.tsx
 msgid "Could not enable tools"
 msgstr "无法启用工具"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Could not end sessions"
+msgstr ""
 
 #: src/pages/AdminAccessPage.tsx
 msgid "Could not grant access"
@@ -2402,6 +2434,10 @@ msgstr "无法加载页面。"
 msgid "Couldn't load submissions"
 msgstr "无法加载提交记录"
 
+#: src/pages/admin/AdminQuery.tsx
+msgid "Couldn't load this page"
+msgstr ""
+
 #: src/pages/SharedPage.tsx
 msgid "Couldn't load this page. Try again."
 msgstr "无法加载此页面。请重试。"
@@ -2581,6 +2617,10 @@ msgstr "Hermes 默认内容"
 msgid "Default from OpenClaw"
 msgstr "OpenClaw 默认内容"
 
+#: src/pages/admin/AdminOverviewPage.tsx
+msgid "Default model"
+msgstr ""
+
 #: src/pages/MemorySettingsOverlay.tsx
 msgid "Default scope"
 msgstr "默认范围"
@@ -2667,6 +2707,7 @@ msgid "Denied"
 msgstr "已拒绝"
 
 #: src/components/AskCard.tsx
+#: src/pages/Today.tsx
 msgid "Deny"
 msgstr "拒绝"
 
@@ -2696,6 +2737,7 @@ msgstr ""
 msgid "Desktop update"
 msgstr "桌面更新"
 
+#: src/pages/admin/AdminAuditPage.tsx
 #: src/pages/RoutineRunHistory.tsx
 #: src/pages/shell/composer-error.tsx
 msgid "Details"
@@ -2816,10 +2858,12 @@ msgstr "还没有账户？"
 #: src/components/AccountDataSettings.tsx
 #: src/components/ToolActivityDisclosure.tsx
 #: src/lib/ticket-status.ts
+#: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
 #: src/pages/shell/avatar-studio-popover.tsx
 #: src/pages/shell/import-setup-card.tsx
 #: src/pages/shell/message-view.tsx
+#: src/pages/Today.tsx
 msgid "Done"
 msgstr "完成"
 
@@ -2869,6 +2913,10 @@ msgstr "复制"
 msgid "Each name can be used once."
 msgstr "每个名称只能使用一次。"
 
+#: src/pages/admin/AdminOverviewPage.tsx
+msgid "Easy Auth"
+msgstr ""
+
 #: src/components/AskCard.tsx
 #: src/pages/AccountSettingsOverlay.tsx
 #: src/pages/McpServersOverlay.tsx
@@ -2887,6 +2935,8 @@ msgstr "编辑名称"
 msgid "Edit Profile"
 msgstr "编辑资料"
 
+#: src/pages/admin/AdminAuditPage.tsx
+#: src/pages/admin/AdminUsersPage.tsx
 #: src/pages/AdminAccessPage.tsx
 #: src/pages/Auth.tsx
 #: src/pages/shell/hire-role-dialog.tsx
@@ -2909,6 +2959,10 @@ msgstr "需要验证邮箱"
 #: src/pages/shell/bot-panel.tsx
 msgid "Enable {0}"
 msgstr "启用 {0}"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "End sessions"
+msgstr ""
 
 #: src/components/ComputerProviderSettings.tsx
 msgid "End user ID"
@@ -3083,6 +3137,7 @@ msgid "failed"
 msgstr "失败"
 
 #: src/components/SubagentCard.tsx
+#: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
 msgid "Failed"
 msgstr "失败"
@@ -3185,7 +3240,7 @@ msgstr "忘记密码？"
 msgid "Free"
 msgstr "免费"
 
-#: src/pages/AdminAccessPage.tsx
+#: src/pages/admin/AdminShell.tsx
 msgid "Free access"
 msgstr ""
 
@@ -3202,6 +3257,7 @@ msgid "Friday"
 msgstr "周五"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/admin/AdminAuditPage.tsx
 msgid "From"
 msgstr "从"
 
@@ -3448,6 +3504,7 @@ msgid "In progress"
 msgstr "进行中"
 
 #: src/lib/ticket-status.ts
+#: src/lib/work-phase.ts
 msgid "In review"
 msgstr "审核中"
 
@@ -3621,6 +3678,10 @@ msgstr "标签"
 msgid "Language"
 msgstr "语言"
 
+#: src/pages/admin/AdminBotsPage.tsx
+msgid "Last active"
+msgstr ""
+
 #. placeholder {0}: new Date(state.checkedAt).toLocaleString()
 #: src/pages/RoutineEditor.tsx
 msgid "Last check {0}: changed"
@@ -3630,6 +3691,10 @@ msgstr "上次检查 {0}：有变化"
 #: src/pages/RoutineEditor.tsx
 msgid "Last check {0}: no changes"
 msgstr "上次检查 {0}：无变化"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Last sign-in"
+msgstr ""
 
 #: src/components/DesktopUpdates.tsx
 msgid "Later"
@@ -3685,6 +3750,7 @@ msgstr "正在聆听…"
 msgid "Load earlier messages"
 msgstr "加载更早的消息"
 
+#: src/pages/admin/AdminQuery.tsx
 #: src/pages/Artifacts.tsx
 msgid "Load more"
 msgstr "加载更多"
@@ -3729,6 +3795,7 @@ msgstr "正在加载语音提供方…"
 #: src/components/integrations/plugin-marketplace.tsx
 #: src/components/integrations/skills-dialog.tsx
 #: src/components/PageLoading.tsx
+#: src/pages/admin/AdminQuery.tsx
 #: src/pages/AdminAccessPage.tsx
 #: src/pages/Artifacts.tsx
 #: src/pages/IntegrationSetup.tsx
@@ -3877,6 +3944,7 @@ msgid "Medium"
 msgstr "中"
 
 #: src/lib/identity-display.ts
+#: src/pages/admin/AdminUsersPage.tsx
 msgid "Member"
 msgstr "成员"
 
@@ -4008,6 +4076,7 @@ msgid "Mode"
 msgstr "模式"
 
 #: src/pages/AccountSettingsOverlay.tsx
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/model-settings/compatible-model-fields.tsx
 #: src/pages/Onboarding.tsx
 #: src/pages/RoutineEditor.tsx
@@ -4123,6 +4192,7 @@ msgstr ""
 #: src/components/teach/SkillDraftCard.tsx
 #: src/components/VaultSettings.tsx
 #: src/pages/AccountSettingsOverlay.tsx
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/Auth.tsx
 #: src/pages/GroupPanel.tsx
 #: src/pages/McpServersOverlay.tsx
@@ -4163,6 +4233,7 @@ msgid "Needs an OAuth client ID"
 msgstr "需要 OAuth 客户端 ID"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/Today.tsx
 msgid "Needs attention"
 msgstr "需要处理"
 
@@ -4393,6 +4464,11 @@ msgstr "不在 Rakazo 目录中"
 msgid "Not in the plugin catalog"
 msgstr "不在插件目录中"
 
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminPolicyPage.tsx
+msgid "Not loaded"
+msgstr ""
+
 #: src/components/GitHubStarPrompt.tsx
 #: src/pages/shell/message-cards.tsx
 msgid "Not now"
@@ -4414,6 +4490,15 @@ msgstr "无法正常工作"
 #: src/pages/KnowledgeSection.tsx
 msgid "Nothing remembered yet"
 msgstr "暂无记忆"
+
+#: src/pages/admin/AdminPolicyPage.tsx
+#: src/pages/admin/AdminQuery.tsx
+msgid "Nothing to show."
+msgstr ""
+
+#: src/pages/Today.tsx
+msgid "Nothing today"
+msgstr "今天没有内容"
 
 #: src/pages/shell/bot-panel.tsx
 msgid "Notifications"
@@ -4586,6 +4671,7 @@ msgid "Or paste an API key"
 msgstr "或粘贴 API 密钥"
 
 #: src/components/ComputerProviderSettings.tsx
+#: src/pages/admin/AdminPolicyPage.tsx
 msgid "Organization"
 msgstr ""
 
@@ -4610,8 +4696,13 @@ msgstr "其他模型…"
 msgid "Output"
 msgstr "输出"
 
+#: src/pages/admin/AdminShell.tsx
+msgid "Overview"
+msgstr ""
+
 #: src/components/pages/SharePopover.tsx
 #: src/lib/identity-display.ts
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/Board.tsx
 msgid "Owner"
 msgstr "所有者"
@@ -4684,6 +4775,7 @@ msgstr "通行密钥"
 #: src/components/ConfirmIdentityDialog.tsx
 #: src/components/VaultSettings.tsx
 #: src/pages/AccountSettingsOverlay.tsx
+#: src/pages/admin/AdminOverviewPage.tsx
 #: src/pages/Auth.tsx
 msgid "Password"
 msgstr "密码"
@@ -4810,13 +4902,19 @@ msgstr "插件"
 msgid "Plugin GitHub URL"
 msgstr "插件 GitHub URL"
 
-#: src/pages/AdminPluginsPage.tsx
+#: src/pages/admin/AdminShell.tsx
 msgid "Plugin submissions"
 msgstr "插件提交"
 
 #: src/components/integrations/skills-dialog.tsx
 msgid "Plugins"
 msgstr "插件"
+
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminPolicyPage.tsx
+#: src/pages/admin/AdminShell.tsx
+msgid "Policy"
+msgstr ""
 
 #: src/pages/RoutineEditor.tsx
 msgid "Post \"No changes\" in chat"
@@ -4951,6 +5049,10 @@ msgstr ""
 #: src/pages/ActivityList.tsx
 msgid "Recent"
 msgstr "最近"
+
+#: src/pages/admin/AdminPolicyPage.tsx
+msgid "Recent denials"
+msgstr ""
 
 #: src/pages/PluginsOverlay.tsx
 msgid "Recommended"
@@ -5305,12 +5407,14 @@ msgstr "正在恢复工作区"
 #: src/components/integrations/plugin-marketplace.tsx
 #: src/components/integrations/skills-dialog.tsx
 #: src/components/PasskeySettings.tsx
+#: src/pages/admin/AdminQuery.tsx
 #: src/pages/AdminAccessPage.tsx
 #: src/pages/Auth.tsx
 #: src/pages/ModelRoleSettings.tsx
 #: src/pages/PluginsOverlay.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
 #: src/pages/SpaceSettingOverrides.tsx
+#: src/pages/Today.tsx
 msgid "Retry"
 msgstr "重试"
 
@@ -5344,6 +5448,10 @@ msgstr "撤销"
 
 #: src/pages/AdminAccessPage.tsx
 msgid "Revoked"
+msgstr ""
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Role"
 msgstr ""
 
 #: src/components/ComputerProviderSettings.tsx
@@ -5396,8 +5504,10 @@ msgid "running"
 msgstr "运行中"
 
 #: src/components/SubagentCard.tsx
+#: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
 #: src/pages/RoutineEditor.tsx
+#: src/pages/Today.tsx
 msgid "Running"
 msgstr "运行中"
 
@@ -5660,6 +5770,10 @@ msgstr "服务器名称"
 msgid "Server URL"
 msgstr "服务器 URL"
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Sessions ended"
+msgstr ""
+
 #: src/components/call/CallCard.tsx
 #: src/components/SidebarFooter.tsx
 #: src/pages/MessagingSettingsPanel.tsx
@@ -5812,6 +5926,10 @@ msgstr "请使用订阅登录，或改为测试 API 密钥。"
 msgid "Sign up"
 msgstr "注册"
 
+#: src/pages/admin/AdminOverviewPage.tsx
+msgid "Sign-in"
+msgstr ""
+
 #: src/components/integrations/plugin-marketplace.tsx
 msgid "Sign-in cancelled. Try again."
 msgstr "登录已取消。请重试。"
@@ -5910,6 +6028,7 @@ msgid "Sorted by {column}, descending"
 msgstr "按 {column} 排序，降序"
 
 #: src/lib/identity-display.ts
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/SettingsOverlay.tsx
 msgid "Space"
 msgstr "工作区"
@@ -5939,6 +6058,8 @@ msgid "Speech model"
 msgstr "语音模型"
 
 #: src/components/AccountAccess.tsx
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminUsersPage.tsx
 msgid "SSO"
 msgstr ""
 
@@ -6349,6 +6470,8 @@ msgstr "此模型无法读取图片。请选择支持图片的模型。"
 msgid "This model's context window is too small. Choose another model."
 msgstr "此模型的上下文窗口太小。请选择其他模型。"
 
+#: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/admin/AdminPolicyPage.tsx
 #: src/pages/Artifacts.tsx
 msgid "This month"
 msgstr "本月"
@@ -6442,6 +6565,7 @@ msgid "Title"
 msgstr "标题"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/admin/AdminAuditPage.tsx
 msgid "To"
 msgstr "到"
 
@@ -6451,6 +6575,7 @@ msgid "To {0}"
 msgstr "到 {0}"
 
 #: src/lib/ticket-status.ts
+#: src/lib/work-phase.ts
 msgid "To do"
 msgstr "待办"
 
@@ -6458,8 +6583,10 @@ msgstr "待办"
 msgid "To:"
 msgstr "至:"
 
+#: src/components/SidebarFooter.tsx
 #: src/pages/Artifacts.tsx
 #: src/pages/shell/chat-context.tsx
+#: src/pages/Today.tsx
 msgid "Today"
 msgstr "今天"
 
@@ -6539,6 +6666,7 @@ msgstr "受信任的网站"
 #: src/pages/Onboarding.tsx
 #: src/pages/SharedPage.tsx
 #: src/pages/SpaceSearch.tsx
+#: src/pages/Today.tsx
 msgid "Try again"
 msgstr "重试"
 
@@ -6551,6 +6679,7 @@ msgid "Tuesday"
 msgstr "周二"
 
 #: src/components/VaultSettings.tsx
+#: src/pages/admin/AdminAuditPage.tsx
 msgid "Type"
 msgstr "类型"
 
@@ -6730,6 +6859,10 @@ msgstr "使用工作区默认"
 msgid "Use up to 512 letters, digits, _ or -."
 msgstr "最多 512 个字母、数字、_ 或 -。"
 
+#: src/pages/admin/AdminAuditPage.tsx
+msgid "User"
+msgstr ""
+
 #: src/pages/memory-providers/HonchoSettingsForm.tsx
 msgid "User peer"
 msgstr "用户 peer"
@@ -6738,6 +6871,11 @@ msgstr "用户 peer"
 #: src/components/VaultSettings.tsx
 msgid "Username"
 msgstr "用户名"
+
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminShell.tsx
+msgid "Users"
+msgstr ""
 
 #: src/pages/shell/import-status.ts
 msgid "Uses files that are not imported"
@@ -6781,6 +6919,13 @@ msgstr "正在校验…"
 #: src/pages/Artifacts.tsx
 msgid "Version"
 msgstr "版本"
+
+#. placeholder {0}: data.policy.version
+#. placeholder {0}: view.version
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminPolicyPage.tsx
+msgid "Version {0}"
+msgstr ""
 
 #: src/pages/PluginsOverlay.tsx
 msgid "View all"
@@ -6899,6 +7044,10 @@ msgstr "返回什么"
 msgid "What to watch"
 msgstr "监视内容"
 
+#: src/pages/admin/AdminAuditPage.tsx
+msgid "When"
+msgstr ""
+
 #: src/pages/RoutineEditor.tsx
 msgid "When a webhook fires"
 msgstr "当 Webhook 触发时"
@@ -6936,6 +7085,7 @@ msgid "Work"
 msgstr "工作"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/Today.tsx
 msgid "Working"
 msgstr "工作中"
 

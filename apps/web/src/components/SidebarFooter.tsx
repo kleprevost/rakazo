@@ -20,6 +20,7 @@ import {
   Plug,
   ScrollText,
   Settings,
+  ShieldCheck,
   Smartphone,
   SquareKanban,
   UserPlus,
@@ -48,6 +49,8 @@ type Props = {
   onSettings: () => void;
   onUsage: () => void;
   onInvite?: () => void;
+  /** Admins only. */
+  onAdmin?: () => void;
   onLogOut: () => void;
   signingOut: boolean;
   logOutError: string | null;
@@ -77,6 +80,7 @@ export function SidebarFooter({
   onSettings,
   onUsage,
   onInvite,
+  onAdmin,
   onLogOut,
   signingOut,
   logOutError,
@@ -221,6 +225,16 @@ export function SidebarFooter({
               <Gauge className="text-muted-foreground" strokeWidth={1.75} />
               <Trans>Usage</Trans>
             </Button>
+            {onAdmin ? (
+              <Button
+                variant="ghost"
+                className="h-9 w-full justify-start gap-2.5 font-normal"
+                onClick={onAdmin}
+              >
+                <ShieldCheck className="text-muted-foreground" strokeWidth={1.75} />
+                <Trans>Admin</Trans>
+              </Button>
+            ) : null}
             <div className="my-1 border-t border-border" />
             <a
               className={`${buttonVariants({ variant: "ghost" })} h-9 w-full justify-start gap-2.5 font-normal`}

@@ -17,14 +17,6 @@ msgstr ""
 msgid " (unread)"
 msgstr " (ongelezen)"
 
-#: src/pages/Today.tsx
-msgid "Coming up"
-msgstr "Binnenkort"
-
-#: src/pages/Today.tsx
-msgid "Nothing today"
-msgstr "Niets vandaag"
-
 #. placeholder {0}: pinned.length
 #: src/pages/model-settings/space-bots-model.tsx
 msgid "{0, plural, one {# bot has its own model:} other {# bots have their own model:}}"
@@ -650,6 +642,19 @@ msgstr "Toegevoegd"
 msgid "Adding…"
 msgstr "Toevoegen…"
 
+#: src/components/SidebarFooter.tsx
+#: src/pages/admin/AdminShell.tsx
+msgid "Admin"
+msgstr ""
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Admin (email list)"
+msgstr ""
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Admin (SSO)"
+msgstr ""
+
 #: src/pages/McpServersOverlay.tsx
 #: src/pages/model-settings/compatible-model-fields.tsx
 #: src/pages/ModelSettingsOverlay.tsx
@@ -668,6 +673,12 @@ msgstr "Geavanceerd..."
 msgid "Agent from another app"
 msgstr ""
 
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminShell.tsx
+msgid "AI employees"
+msgstr ""
+
+#: src/pages/admin/AdminAuditPage.tsx
 #: src/pages/PluginsOverlay.tsx
 msgid "All"
 msgstr ""
@@ -695,6 +706,7 @@ msgid "All time"
 msgstr "Alle tijd"
 
 #: src/components/ApprovalRulesSettings.tsx
+#: src/pages/Today.tsx
 msgid "Allow"
 msgstr "Toestaan"
 
@@ -906,6 +918,7 @@ msgstr "Archiveren"
 msgid "archived"
 msgstr "gearchiveerd"
 
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/shell/archived-chats.tsx
 msgid "Archived"
 msgstr "Gearchiveerd"
@@ -948,6 +961,10 @@ msgstr "Bestand bijvoegen"
 #: src/pages/shell/chat-shared.ts
 msgid "Attachment"
 msgstr "Bijlage"
+
+#: src/pages/admin/AdminShell.tsx
+msgid "Audit log"
+msgstr ""
 
 #: src/pages/PluginsOverlay.tsx
 msgid "Authentication"
@@ -1012,8 +1029,7 @@ msgstr "Avatarstudio"
 
 #: src/components/integrations/plugin-marketplace.tsx
 #: src/components/integrations/skills-dialog.tsx
-#: src/pages/AdminAccessPage.tsx
-#: src/pages/AdminPluginsPage.tsx
+#: src/pages/admin/AdminShell.tsx
 #: src/pages/Auth.tsx
 #: src/pages/Board.tsx
 #: src/pages/McpServersOverlay.tsx
@@ -1023,6 +1039,7 @@ msgstr "Avatarstudio"
 #: src/pages/SettingsOverlay.tsx
 #: src/pages/shell/agent-import.tsx
 #: src/pages/shell/hire-role-dialog.tsx
+#: src/pages/Today.tsx
 msgid "Back"
 msgstr "Terug"
 
@@ -1247,6 +1264,7 @@ msgid "cancelled"
 msgstr "geannuleerd"
 
 #: src/components/AskCard.tsx
+#: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
 msgid "Cancelled"
 msgstr "Geannuleerd"
@@ -1537,6 +1555,10 @@ msgstr "kolom {index}"
 msgid "Comfortable"
 msgstr "Comfortabel"
 
+#: src/pages/Today.tsx
+msgid "Coming up"
+msgstr "Binnenkort"
+
 #: src/pages/McpServersOverlay.tsx
 #: src/pages/RoutineEditor.tsx
 msgid "Command"
@@ -1605,6 +1627,7 @@ msgstr "De computer is gestopt"
 
 #: src/components/ComputerDeviceSettings.tsx
 #: src/pages/AccountSettingsOverlay.tsx
+#: src/pages/admin/AdminOverviewPage.tsx
 msgid "Computers"
 msgstr "Computers"
 
@@ -1619,6 +1642,10 @@ msgstr "Computers staan uit. Stel SANDBOX_PROVIDER=docker in met SANDBOX_SUPERVI
 #: src/pages/PluginsOverlay.tsx
 msgid "Configure a plugin catalog on the server to connect apps."
 msgstr "Configureer een plugincatalogus op de server om apps te koppelen."
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Confirm"
+msgstr ""
 
 #: src/pages/KnowledgeSection.tsx
 msgid "Confirm delete"
@@ -1889,6 +1916,7 @@ msgid "Could not clear conversation"
 msgstr "Gesprek wissen mislukt"
 
 #: src/components/ComputerUpdateProgress.tsx
+#: src/pages/Today.tsx
 msgid "Could not complete action"
 msgstr "Actie voltooien mislukt"
 
@@ -2029,6 +2057,10 @@ msgstr "{name} downloaden mislukt. Probeer het opnieuw."
 
 #: src/components/integrations/plugin-marketplace.tsx
 msgid "Could not enable tools"
+msgstr ""
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Could not end sessions"
 msgstr ""
 
 #: src/pages/AdminAccessPage.tsx
@@ -2402,6 +2434,10 @@ msgstr "Pagina's konden niet worden geladen."
 msgid "Couldn't load submissions"
 msgstr ""
 
+#: src/pages/admin/AdminQuery.tsx
+msgid "Couldn't load this page"
+msgstr ""
+
 #: src/pages/SharedPage.tsx
 msgid "Couldn't load this page. Try again."
 msgstr "Deze pagina kon niet worden geladen. Probeer het opnieuw."
@@ -2581,6 +2617,10 @@ msgstr "Standaard van Hermes"
 msgid "Default from OpenClaw"
 msgstr "Standaard van OpenClaw"
 
+#: src/pages/admin/AdminOverviewPage.tsx
+msgid "Default model"
+msgstr ""
+
 #: src/pages/MemorySettingsOverlay.tsx
 msgid "Default scope"
 msgstr "Standaardbereik"
@@ -2667,6 +2707,7 @@ msgid "Denied"
 msgstr "Geweigerd"
 
 #: src/components/AskCard.tsx
+#: src/pages/Today.tsx
 msgid "Deny"
 msgstr "Weigeren"
 
@@ -2696,6 +2737,7 @@ msgstr ""
 msgid "Desktop update"
 msgstr "Desktopupdate"
 
+#: src/pages/admin/AdminAuditPage.tsx
 #: src/pages/RoutineRunHistory.tsx
 #: src/pages/shell/composer-error.tsx
 msgid "Details"
@@ -2816,10 +2858,12 @@ msgstr "Heb je geen account?"
 #: src/components/AccountDataSettings.tsx
 #: src/components/ToolActivityDisclosure.tsx
 #: src/lib/ticket-status.ts
+#: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
 #: src/pages/shell/avatar-studio-popover.tsx
 #: src/pages/shell/import-setup-card.tsx
 #: src/pages/shell/message-view.tsx
+#: src/pages/Today.tsx
 msgid "Done"
 msgstr "Klaar"
 
@@ -2869,6 +2913,10 @@ msgstr "Dupliceren"
 msgid "Each name can be used once."
 msgstr "Elke naam kan maar één keer worden gebruikt."
 
+#: src/pages/admin/AdminOverviewPage.tsx
+msgid "Easy Auth"
+msgstr ""
+
 #: src/components/AskCard.tsx
 #: src/pages/AccountSettingsOverlay.tsx
 #: src/pages/McpServersOverlay.tsx
@@ -2887,6 +2935,8 @@ msgstr "Naam bewerken"
 msgid "Edit Profile"
 msgstr "Profiel bewerken"
 
+#: src/pages/admin/AdminAuditPage.tsx
+#: src/pages/admin/AdminUsersPage.tsx
 #: src/pages/AdminAccessPage.tsx
 #: src/pages/Auth.tsx
 #: src/pages/shell/hire-role-dialog.tsx
@@ -2909,6 +2959,10 @@ msgstr "E-mailverificatie vereist"
 #: src/pages/shell/bot-panel.tsx
 msgid "Enable {0}"
 msgstr "{0} inschakelen"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "End sessions"
+msgstr ""
 
 #: src/components/ComputerProviderSettings.tsx
 msgid "End user ID"
@@ -3083,6 +3137,7 @@ msgid "failed"
 msgstr "mislukt"
 
 #: src/components/SubagentCard.tsx
+#: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
 msgid "Failed"
 msgstr "Mislukt"
@@ -3185,7 +3240,7 @@ msgstr "Wachtwoord vergeten?"
 msgid "Free"
 msgstr "Gratis"
 
-#: src/pages/AdminAccessPage.tsx
+#: src/pages/admin/AdminShell.tsx
 msgid "Free access"
 msgstr ""
 
@@ -3202,6 +3257,7 @@ msgid "Friday"
 msgstr "vrijdag"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/admin/AdminAuditPage.tsx
 msgid "From"
 msgstr "Van"
 
@@ -3448,6 +3504,7 @@ msgid "In progress"
 msgstr "Bezig"
 
 #: src/lib/ticket-status.ts
+#: src/lib/work-phase.ts
 msgid "In review"
 msgstr "In beoordeling"
 
@@ -3621,6 +3678,10 @@ msgstr "Label"
 msgid "Language"
 msgstr "Taal"
 
+#: src/pages/admin/AdminBotsPage.tsx
+msgid "Last active"
+msgstr ""
+
 #. placeholder {0}: new Date(state.checkedAt).toLocaleString()
 #: src/pages/RoutineEditor.tsx
 msgid "Last check {0}: changed"
@@ -3630,6 +3691,10 @@ msgstr "Laatste controle {0}: gewijzigd"
 #: src/pages/RoutineEditor.tsx
 msgid "Last check {0}: no changes"
 msgstr "Laatste controle {0}: geen wijzigingen"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Last sign-in"
+msgstr ""
 
 #: src/components/DesktopUpdates.tsx
 msgid "Later"
@@ -3685,6 +3750,7 @@ msgstr "Luistert…"
 msgid "Load earlier messages"
 msgstr "Eerdere berichten laden"
 
+#: src/pages/admin/AdminQuery.tsx
 #: src/pages/Artifacts.tsx
 msgid "Load more"
 msgstr "Meer laden"
@@ -3729,6 +3795,7 @@ msgstr "Spraakanbieders laden…"
 #: src/components/integrations/plugin-marketplace.tsx
 #: src/components/integrations/skills-dialog.tsx
 #: src/components/PageLoading.tsx
+#: src/pages/admin/AdminQuery.tsx
 #: src/pages/AdminAccessPage.tsx
 #: src/pages/Artifacts.tsx
 #: src/pages/IntegrationSetup.tsx
@@ -3877,6 +3944,7 @@ msgid "Medium"
 msgstr "Gemiddeld"
 
 #: src/lib/identity-display.ts
+#: src/pages/admin/AdminUsersPage.tsx
 msgid "Member"
 msgstr "Lid"
 
@@ -4008,6 +4076,7 @@ msgid "Mode"
 msgstr "Modus"
 
 #: src/pages/AccountSettingsOverlay.tsx
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/model-settings/compatible-model-fields.tsx
 #: src/pages/Onboarding.tsx
 #: src/pages/RoutineEditor.tsx
@@ -4123,6 +4192,7 @@ msgstr ""
 #: src/components/teach/SkillDraftCard.tsx
 #: src/components/VaultSettings.tsx
 #: src/pages/AccountSettingsOverlay.tsx
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/Auth.tsx
 #: src/pages/GroupPanel.tsx
 #: src/pages/McpServersOverlay.tsx
@@ -4163,6 +4233,7 @@ msgid "Needs an OAuth client ID"
 msgstr "OAuth-client-ID nodig"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/Today.tsx
 msgid "Needs attention"
 msgstr "Heeft aandacht nodig"
 
@@ -4393,6 +4464,11 @@ msgstr "Niet in de catalogus van Rakazo"
 msgid "Not in the plugin catalog"
 msgstr "Niet in de plugincatalogus"
 
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminPolicyPage.tsx
+msgid "Not loaded"
+msgstr ""
+
 #: src/components/GitHubStarPrompt.tsx
 #: src/pages/shell/message-cards.tsx
 msgid "Not now"
@@ -4414,6 +4490,15 @@ msgstr "Werkt niet"
 #: src/pages/KnowledgeSection.tsx
 msgid "Nothing remembered yet"
 msgstr "Nog niets onthouden"
+
+#: src/pages/admin/AdminPolicyPage.tsx
+#: src/pages/admin/AdminQuery.tsx
+msgid "Nothing to show."
+msgstr ""
+
+#: src/pages/Today.tsx
+msgid "Nothing today"
+msgstr "Niets vandaag"
 
 #: src/pages/shell/bot-panel.tsx
 msgid "Notifications"
@@ -4586,6 +4671,7 @@ msgid "Or paste an API key"
 msgstr "Of plak een API-sleutel"
 
 #: src/components/ComputerProviderSettings.tsx
+#: src/pages/admin/AdminPolicyPage.tsx
 msgid "Organization"
 msgstr ""
 
@@ -4610,8 +4696,13 @@ msgstr "Ander model…"
 msgid "Output"
 msgstr "Uitvoer"
 
+#: src/pages/admin/AdminShell.tsx
+msgid "Overview"
+msgstr ""
+
 #: src/components/pages/SharePopover.tsx
 #: src/lib/identity-display.ts
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/Board.tsx
 msgid "Owner"
 msgstr "Eigenaar"
@@ -4684,6 +4775,7 @@ msgstr "Passkeys"
 #: src/components/ConfirmIdentityDialog.tsx
 #: src/components/VaultSettings.tsx
 #: src/pages/AccountSettingsOverlay.tsx
+#: src/pages/admin/AdminOverviewPage.tsx
 #: src/pages/Auth.tsx
 msgid "Password"
 msgstr "Wachtwoord"
@@ -4810,12 +4902,18 @@ msgstr "Plugin"
 msgid "Plugin GitHub URL"
 msgstr ""
 
-#: src/pages/AdminPluginsPage.tsx
+#: src/pages/admin/AdminShell.tsx
 msgid "Plugin submissions"
 msgstr ""
 
 #: src/components/integrations/skills-dialog.tsx
 msgid "Plugins"
+msgstr ""
+
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminPolicyPage.tsx
+#: src/pages/admin/AdminShell.tsx
+msgid "Policy"
 msgstr ""
 
 #: src/pages/RoutineEditor.tsx
@@ -4951,6 +5049,10 @@ msgstr ""
 #: src/pages/ActivityList.tsx
 msgid "Recent"
 msgstr "Recent"
+
+#: src/pages/admin/AdminPolicyPage.tsx
+msgid "Recent denials"
+msgstr ""
 
 #: src/pages/PluginsOverlay.tsx
 msgid "Recommended"
@@ -5305,12 +5407,14 @@ msgstr "Je werkruimte herstellen"
 #: src/components/integrations/plugin-marketplace.tsx
 #: src/components/integrations/skills-dialog.tsx
 #: src/components/PasskeySettings.tsx
+#: src/pages/admin/AdminQuery.tsx
 #: src/pages/AdminAccessPage.tsx
 #: src/pages/Auth.tsx
 #: src/pages/ModelRoleSettings.tsx
 #: src/pages/PluginsOverlay.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
 #: src/pages/SpaceSettingOverrides.tsx
+#: src/pages/Today.tsx
 msgid "Retry"
 msgstr "Opnieuw proberen"
 
@@ -5344,6 +5448,10 @@ msgstr "Intrekken"
 
 #: src/pages/AdminAccessPage.tsx
 msgid "Revoked"
+msgstr ""
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Role"
 msgstr ""
 
 #: src/components/ComputerProviderSettings.tsx
@@ -5396,8 +5504,10 @@ msgid "running"
 msgstr "draait"
 
 #: src/components/SubagentCard.tsx
+#: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
 #: src/pages/RoutineEditor.tsx
+#: src/pages/Today.tsx
 msgid "Running"
 msgstr "Draait"
 
@@ -5660,6 +5770,10 @@ msgstr "Servernaam"
 msgid "Server URL"
 msgstr "Server-URL"
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Sessions ended"
+msgstr ""
+
 #: src/components/call/CallCard.tsx
 #: src/components/SidebarFooter.tsx
 #: src/pages/MessagingSettingsPanel.tsx
@@ -5812,6 +5926,10 @@ msgstr "Meld je aan met het abonnement of test in plaats daarvan de API-sleutel.
 msgid "Sign up"
 msgstr "Registreren"
 
+#: src/pages/admin/AdminOverviewPage.tsx
+msgid "Sign-in"
+msgstr ""
+
 #: src/components/integrations/plugin-marketplace.tsx
 msgid "Sign-in cancelled. Try again."
 msgstr ""
@@ -5910,6 +6028,7 @@ msgid "Sorted by {column}, descending"
 msgstr "Gesorteerd op {column}, aflopend"
 
 #: src/lib/identity-display.ts
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/SettingsOverlay.tsx
 msgid "Space"
 msgstr "Space"
@@ -5939,6 +6058,8 @@ msgid "Speech model"
 msgstr "Spraakmodel"
 
 #: src/components/AccountAccess.tsx
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminUsersPage.tsx
 msgid "SSO"
 msgstr ""
 
@@ -6349,6 +6470,8 @@ msgstr "Dit model kan geen afbeeldingen lezen. Kies een model dat afbeeldingen o
 msgid "This model's context window is too small. Choose another model."
 msgstr "Het contextvenster van dit model is te klein. Kies een ander model."
 
+#: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/admin/AdminPolicyPage.tsx
 #: src/pages/Artifacts.tsx
 msgid "This month"
 msgstr "Deze maand"
@@ -6442,6 +6565,7 @@ msgid "Title"
 msgstr "Titel"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/admin/AdminAuditPage.tsx
 msgid "To"
 msgstr "Aan"
 
@@ -6451,6 +6575,7 @@ msgid "To {0}"
 msgstr "Tot {0}"
 
 #: src/lib/ticket-status.ts
+#: src/lib/work-phase.ts
 msgid "To do"
 msgstr "Te doen"
 
@@ -6458,8 +6583,10 @@ msgstr "Te doen"
 msgid "To:"
 msgstr "Aan:"
 
+#: src/components/SidebarFooter.tsx
 #: src/pages/Artifacts.tsx
 #: src/pages/shell/chat-context.tsx
+#: src/pages/Today.tsx
 msgid "Today"
 msgstr "Vandaag"
 
@@ -6539,6 +6666,7 @@ msgstr "Vertrouwde sites"
 #: src/pages/Onboarding.tsx
 #: src/pages/SharedPage.tsx
 #: src/pages/SpaceSearch.tsx
+#: src/pages/Today.tsx
 msgid "Try again"
 msgstr "Opnieuw proberen"
 
@@ -6551,6 +6679,7 @@ msgid "Tuesday"
 msgstr "dinsdag"
 
 #: src/components/VaultSettings.tsx
+#: src/pages/admin/AdminAuditPage.tsx
 msgid "Type"
 msgstr "Type"
 
@@ -6730,6 +6859,10 @@ msgstr ""
 msgid "Use up to 512 letters, digits, _ or -."
 msgstr "Gebruik maximaal 512 letters, cijfers, _ of -."
 
+#: src/pages/admin/AdminAuditPage.tsx
+msgid "User"
+msgstr ""
+
 #: src/pages/memory-providers/HonchoSettingsForm.tsx
 msgid "User peer"
 msgstr ""
@@ -6738,6 +6871,11 @@ msgstr ""
 #: src/components/VaultSettings.tsx
 msgid "Username"
 msgstr "Gebruikersnaam"
+
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminShell.tsx
+msgid "Users"
+msgstr ""
 
 #: src/pages/shell/import-status.ts
 msgid "Uses files that are not imported"
@@ -6781,6 +6919,13 @@ msgstr "Bezig met verifiëren…"
 #: src/pages/Artifacts.tsx
 msgid "Version"
 msgstr "Versie"
+
+#. placeholder {0}: data.policy.version
+#. placeholder {0}: view.version
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminPolicyPage.tsx
+msgid "Version {0}"
+msgstr ""
 
 #: src/pages/PluginsOverlay.tsx
 msgid "View all"
@@ -6899,6 +7044,10 @@ msgstr "Wat teruggeven"
 msgid "What to watch"
 msgstr "Wat volgen"
 
+#: src/pages/admin/AdminAuditPage.tsx
+msgid "When"
+msgstr ""
+
 #: src/pages/RoutineEditor.tsx
 msgid "When a webhook fires"
 msgstr "Wanneer een webhook afgaat"
@@ -6936,6 +7085,7 @@ msgid "Work"
 msgstr ""
 
 #: src/pages/ActivityList.tsx
+#: src/pages/Today.tsx
 msgid "Working"
 msgstr "Bezig"
 

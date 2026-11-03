@@ -17,14 +17,6 @@ msgstr ""
 msgid " (unread)"
 msgstr " (לא נקראה)"
 
-#: src/pages/Today.tsx
-msgid "Coming up"
-msgstr "בקרוב"
-
-#: src/pages/Today.tsx
-msgid "Nothing today"
-msgstr "אין כלום היום"
-
 #. placeholder {0}: pinned.length
 #: src/pages/model-settings/space-bots-model.tsx
 msgid "{0, plural, one {# bot has its own model:} other {# bots have their own model:}}"
@@ -650,6 +642,19 @@ msgstr "נוסף"
 msgid "Adding…"
 msgstr "מוסיף…"
 
+#: src/components/SidebarFooter.tsx
+#: src/pages/admin/AdminShell.tsx
+msgid "Admin"
+msgstr ""
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Admin (email list)"
+msgstr ""
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Admin (SSO)"
+msgstr ""
+
 #: src/pages/McpServersOverlay.tsx
 #: src/pages/model-settings/compatible-model-fields.tsx
 #: src/pages/ModelSettingsOverlay.tsx
@@ -668,6 +673,12 @@ msgstr "מתקדם..."
 msgid "Agent from another app"
 msgstr ""
 
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminShell.tsx
+msgid "AI employees"
+msgstr ""
+
+#: src/pages/admin/AdminAuditPage.tsx
 #: src/pages/PluginsOverlay.tsx
 msgid "All"
 msgstr ""
@@ -695,6 +706,7 @@ msgid "All time"
 msgstr "כל הזמנים"
 
 #: src/components/ApprovalRulesSettings.tsx
+#: src/pages/Today.tsx
 msgid "Allow"
 msgstr "לאפשר"
 
@@ -906,6 +918,7 @@ msgstr "העברה לארכיון"
 msgid "archived"
 msgstr "בארכיון"
 
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/shell/archived-chats.tsx
 msgid "Archived"
 msgstr "בארכיון"
@@ -948,6 +961,10 @@ msgstr "צירוף קובץ"
 #: src/pages/shell/chat-shared.ts
 msgid "Attachment"
 msgstr "קובץ מצורף"
+
+#: src/pages/admin/AdminShell.tsx
+msgid "Audit log"
+msgstr ""
 
 #: src/pages/PluginsOverlay.tsx
 msgid "Authentication"
@@ -1012,8 +1029,7 @@ msgstr "Avatar Studio"
 
 #: src/components/integrations/plugin-marketplace.tsx
 #: src/components/integrations/skills-dialog.tsx
-#: src/pages/AdminAccessPage.tsx
-#: src/pages/AdminPluginsPage.tsx
+#: src/pages/admin/AdminShell.tsx
 #: src/pages/Auth.tsx
 #: src/pages/Board.tsx
 #: src/pages/McpServersOverlay.tsx
@@ -1023,6 +1039,7 @@ msgstr "Avatar Studio"
 #: src/pages/SettingsOverlay.tsx
 #: src/pages/shell/agent-import.tsx
 #: src/pages/shell/hire-role-dialog.tsx
+#: src/pages/Today.tsx
 msgid "Back"
 msgstr "חזרה"
 
@@ -1247,6 +1264,7 @@ msgid "cancelled"
 msgstr "בוטל"
 
 #: src/components/AskCard.tsx
+#: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
 msgid "Cancelled"
 msgstr "בוטל"
@@ -1537,6 +1555,10 @@ msgstr "עמודה {index}"
 msgid "Comfortable"
 msgstr "מרווח"
 
+#: src/pages/Today.tsx
+msgid "Coming up"
+msgstr "בקרוב"
+
 #: src/pages/McpServersOverlay.tsx
 #: src/pages/RoutineEditor.tsx
 msgid "Command"
@@ -1605,6 +1627,7 @@ msgstr "המחשב כבוי"
 
 #: src/components/ComputerDeviceSettings.tsx
 #: src/pages/AccountSettingsOverlay.tsx
+#: src/pages/admin/AdminOverviewPage.tsx
 msgid "Computers"
 msgstr "מחשבים"
 
@@ -1619,6 +1642,10 @@ msgstr "המחשבים כבויים. יש להגדיר SANDBOX_PROVIDER=docker �
 #: src/pages/PluginsOverlay.tsx
 msgid "Configure a plugin catalog on the server to connect apps."
 msgstr "כדי לחבר אפליקציות, יש להגדיר קטלוג תוספים בשרת."
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Confirm"
+msgstr ""
 
 #: src/pages/KnowledgeSection.tsx
 msgid "Confirm delete"
@@ -1889,6 +1916,7 @@ msgid "Could not clear conversation"
 msgstr "לא ניתן לנקות את השיחה"
 
 #: src/components/ComputerUpdateProgress.tsx
+#: src/pages/Today.tsx
 msgid "Could not complete action"
 msgstr "לא ניתן להשלים את הפעולה"
 
@@ -2029,6 +2057,10 @@ msgstr "לא ניתן להוריד את {name}. אפשר לנסות שוב."
 
 #: src/components/integrations/plugin-marketplace.tsx
 msgid "Could not enable tools"
+msgstr ""
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Could not end sessions"
 msgstr ""
 
 #: src/pages/AdminAccessPage.tsx
@@ -2402,6 +2434,10 @@ msgstr "לא ניתן לטעון את הדפים."
 msgid "Couldn't load submissions"
 msgstr ""
 
+#: src/pages/admin/AdminQuery.tsx
+msgid "Couldn't load this page"
+msgstr ""
+
 #: src/pages/SharedPage.tsx
 msgid "Couldn't load this page. Try again."
 msgstr "לא ניתן היה לטעון את הדף. נסו שוב."
@@ -2581,6 +2617,10 @@ msgstr "ברירת מחדל של Hermes"
 msgid "Default from OpenClaw"
 msgstr "ברירת מחדל של OpenClaw"
 
+#: src/pages/admin/AdminOverviewPage.tsx
+msgid "Default model"
+msgstr ""
+
 #: src/pages/MemorySettingsOverlay.tsx
 msgid "Default scope"
 msgstr "היקף ברירת מחדל"
@@ -2667,6 +2707,7 @@ msgid "Denied"
 msgstr "נדחה"
 
 #: src/components/AskCard.tsx
+#: src/pages/Today.tsx
 msgid "Deny"
 msgstr "דחייה"
 
@@ -2696,6 +2737,7 @@ msgstr ""
 msgid "Desktop update"
 msgstr "עדכון לאפליקציית הדסקטופ"
 
+#: src/pages/admin/AdminAuditPage.tsx
 #: src/pages/RoutineRunHistory.tsx
 #: src/pages/shell/composer-error.tsx
 msgid "Details"
@@ -2816,10 +2858,12 @@ msgstr "אין חשבון?"
 #: src/components/AccountDataSettings.tsx
 #: src/components/ToolActivityDisclosure.tsx
 #: src/lib/ticket-status.ts
+#: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
 #: src/pages/shell/avatar-studio-popover.tsx
 #: src/pages/shell/import-setup-card.tsx
 #: src/pages/shell/message-view.tsx
+#: src/pages/Today.tsx
 msgid "Done"
 msgstr "הושלם"
 
@@ -2869,6 +2913,10 @@ msgstr "שכפול"
 msgid "Each name can be used once."
 msgstr "ניתן להשתמש בכל שם פעם אחת בלבד."
 
+#: src/pages/admin/AdminOverviewPage.tsx
+msgid "Easy Auth"
+msgstr ""
+
 #: src/components/AskCard.tsx
 #: src/pages/AccountSettingsOverlay.tsx
 #: src/pages/McpServersOverlay.tsx
@@ -2887,6 +2935,8 @@ msgstr "עריכת שם"
 msgid "Edit Profile"
 msgstr "עריכת פרופיל"
 
+#: src/pages/admin/AdminAuditPage.tsx
+#: src/pages/admin/AdminUsersPage.tsx
 #: src/pages/AdminAccessPage.tsx
 #: src/pages/Auth.tsx
 #: src/pages/shell/hire-role-dialog.tsx
@@ -2909,6 +2959,10 @@ msgstr "נדרש אימות אימייל"
 #: src/pages/shell/bot-panel.tsx
 msgid "Enable {0}"
 msgstr "הפעלת {0}"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "End sessions"
+msgstr ""
 
 #: src/components/ComputerProviderSettings.tsx
 msgid "End user ID"
@@ -3083,6 +3137,7 @@ msgid "failed"
 msgstr "נכשל"
 
 #: src/components/SubagentCard.tsx
+#: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
 msgid "Failed"
 msgstr "נכשל"
@@ -3185,7 +3240,7 @@ msgstr "שכחת סיסמה?"
 msgid "Free"
 msgstr "חינם"
 
-#: src/pages/AdminAccessPage.tsx
+#: src/pages/admin/AdminShell.tsx
 msgid "Free access"
 msgstr ""
 
@@ -3202,6 +3257,7 @@ msgid "Friday"
 msgstr "יום שישי"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/admin/AdminAuditPage.tsx
 msgid "From"
 msgstr "מתאריך"
 
@@ -3448,6 +3504,7 @@ msgid "In progress"
 msgstr "בתהליך"
 
 #: src/lib/ticket-status.ts
+#: src/lib/work-phase.ts
 msgid "In review"
 msgstr "בבדיקה"
 
@@ -3621,6 +3678,10 @@ msgstr "תווית"
 msgid "Language"
 msgstr "שפה"
 
+#: src/pages/admin/AdminBotsPage.tsx
+msgid "Last active"
+msgstr ""
+
 #. placeholder {0}: new Date(state.checkedAt).toLocaleString()
 #: src/pages/RoutineEditor.tsx
 msgid "Last check {0}: changed"
@@ -3629,6 +3690,10 @@ msgstr ""
 #. placeholder {0}: new Date(state.checkedAt).toLocaleString()
 #: src/pages/RoutineEditor.tsx
 msgid "Last check {0}: no changes"
+msgstr ""
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Last sign-in"
 msgstr ""
 
 #: src/components/DesktopUpdates.tsx
@@ -3685,6 +3750,7 @@ msgstr ""
 msgid "Load earlier messages"
 msgstr "טעינת הודעות קודמות"
 
+#: src/pages/admin/AdminQuery.tsx
 #: src/pages/Artifacts.tsx
 msgid "Load more"
 msgstr "טעינת עוד"
@@ -3729,6 +3795,7 @@ msgstr "טוען ספקי קול…"
 #: src/components/integrations/plugin-marketplace.tsx
 #: src/components/integrations/skills-dialog.tsx
 #: src/components/PageLoading.tsx
+#: src/pages/admin/AdminQuery.tsx
 #: src/pages/AdminAccessPage.tsx
 #: src/pages/Artifacts.tsx
 #: src/pages/IntegrationSetup.tsx
@@ -3877,6 +3944,7 @@ msgid "Medium"
 msgstr "בינוני"
 
 #: src/lib/identity-display.ts
+#: src/pages/admin/AdminUsersPage.tsx
 msgid "Member"
 msgstr "חבר"
 
@@ -4008,6 +4076,7 @@ msgid "Mode"
 msgstr "מצב"
 
 #: src/pages/AccountSettingsOverlay.tsx
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/model-settings/compatible-model-fields.tsx
 #: src/pages/Onboarding.tsx
 #: src/pages/RoutineEditor.tsx
@@ -4123,6 +4192,7 @@ msgstr ""
 #: src/components/teach/SkillDraftCard.tsx
 #: src/components/VaultSettings.tsx
 #: src/pages/AccountSettingsOverlay.tsx
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/Auth.tsx
 #: src/pages/GroupPanel.tsx
 #: src/pages/McpServersOverlay.tsx
@@ -4163,6 +4233,7 @@ msgid "Needs an OAuth client ID"
 msgstr "נדרש מזהה לקוח OAuth"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/Today.tsx
 msgid "Needs attention"
 msgstr "דורש תשומת לב"
 
@@ -4393,6 +4464,11 @@ msgstr "לא בקטלוג של Rakazo"
 msgid "Not in the plugin catalog"
 msgstr "לא נמצא בקטלוג התוספים"
 
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminPolicyPage.tsx
+msgid "Not loaded"
+msgstr ""
+
 #: src/components/GitHubStarPrompt.tsx
 #: src/pages/shell/message-cards.tsx
 msgid "Not now"
@@ -4414,6 +4490,15 @@ msgstr "לא עובד"
 #: src/pages/KnowledgeSection.tsx
 msgid "Nothing remembered yet"
 msgstr "עדיין אין זיכרונות"
+
+#: src/pages/admin/AdminPolicyPage.tsx
+#: src/pages/admin/AdminQuery.tsx
+msgid "Nothing to show."
+msgstr ""
+
+#: src/pages/Today.tsx
+msgid "Nothing today"
+msgstr "אין כלום היום"
 
 #: src/pages/shell/bot-panel.tsx
 msgid "Notifications"
@@ -4586,6 +4671,7 @@ msgid "Or paste an API key"
 msgstr "או הדבקת מפתח API"
 
 #: src/components/ComputerProviderSettings.tsx
+#: src/pages/admin/AdminPolicyPage.tsx
 msgid "Organization"
 msgstr ""
 
@@ -4610,8 +4696,13 @@ msgstr "מודל אחר…"
 msgid "Output"
 msgstr "פלט"
 
+#: src/pages/admin/AdminShell.tsx
+msgid "Overview"
+msgstr ""
+
 #: src/components/pages/SharePopover.tsx
 #: src/lib/identity-display.ts
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/Board.tsx
 msgid "Owner"
 msgstr "בעלים"
@@ -4684,6 +4775,7 @@ msgstr "מפתחות גישה"
 #: src/components/ConfirmIdentityDialog.tsx
 #: src/components/VaultSettings.tsx
 #: src/pages/AccountSettingsOverlay.tsx
+#: src/pages/admin/AdminOverviewPage.tsx
 #: src/pages/Auth.tsx
 msgid "Password"
 msgstr "סיסמה"
@@ -4810,12 +4902,18 @@ msgstr "תוסף"
 msgid "Plugin GitHub URL"
 msgstr ""
 
-#: src/pages/AdminPluginsPage.tsx
+#: src/pages/admin/AdminShell.tsx
 msgid "Plugin submissions"
 msgstr ""
 
 #: src/components/integrations/skills-dialog.tsx
 msgid "Plugins"
+msgstr ""
+
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminPolicyPage.tsx
+#: src/pages/admin/AdminShell.tsx
+msgid "Policy"
 msgstr ""
 
 #: src/pages/RoutineEditor.tsx
@@ -4951,6 +5049,10 @@ msgstr ""
 #: src/pages/ActivityList.tsx
 msgid "Recent"
 msgstr "אחרונים"
+
+#: src/pages/admin/AdminPolicyPage.tsx
+msgid "Recent denials"
+msgstr ""
 
 #: src/pages/PluginsOverlay.tsx
 msgid "Recommended"
@@ -5305,12 +5407,14 @@ msgstr "משחזר את סביבת העבודה"
 #: src/components/integrations/plugin-marketplace.tsx
 #: src/components/integrations/skills-dialog.tsx
 #: src/components/PasskeySettings.tsx
+#: src/pages/admin/AdminQuery.tsx
 #: src/pages/AdminAccessPage.tsx
 #: src/pages/Auth.tsx
 #: src/pages/ModelRoleSettings.tsx
 #: src/pages/PluginsOverlay.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
 #: src/pages/SpaceSettingOverrides.tsx
+#: src/pages/Today.tsx
 msgid "Retry"
 msgstr "לנסות שוב"
 
@@ -5344,6 +5448,10 @@ msgstr "ביטול הרשאה"
 
 #: src/pages/AdminAccessPage.tsx
 msgid "Revoked"
+msgstr ""
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Role"
 msgstr ""
 
 #: src/components/ComputerProviderSettings.tsx
@@ -5396,8 +5504,10 @@ msgid "running"
 msgstr "פועל"
 
 #: src/components/SubagentCard.tsx
+#: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
 #: src/pages/RoutineEditor.tsx
+#: src/pages/Today.tsx
 msgid "Running"
 msgstr "פועל"
 
@@ -5660,6 +5770,10 @@ msgstr "שם השרת"
 msgid "Server URL"
 msgstr "URL של השרת"
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Sessions ended"
+msgstr ""
+
 #: src/components/call/CallCard.tsx
 #: src/components/SidebarFooter.tsx
 #: src/pages/MessagingSettingsPanel.tsx
@@ -5812,6 +5926,10 @@ msgstr "אפשר להתחבר עם המנוי, או לבדוק את מפתח ה-
 msgid "Sign up"
 msgstr "הרשמה"
 
+#: src/pages/admin/AdminOverviewPage.tsx
+msgid "Sign-in"
+msgstr ""
+
 #: src/components/integrations/plugin-marketplace.tsx
 msgid "Sign-in cancelled. Try again."
 msgstr ""
@@ -5910,6 +6028,7 @@ msgid "Sorted by {column}, descending"
 msgstr "מוין לפי {column}, בסדר יורד"
 
 #: src/lib/identity-display.ts
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/SettingsOverlay.tsx
 msgid "Space"
 msgstr "מרחב"
@@ -5939,6 +6058,8 @@ msgid "Speech model"
 msgstr "מודל דיבור"
 
 #: src/components/AccountAccess.tsx
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminUsersPage.tsx
 msgid "SSO"
 msgstr ""
 
@@ -6349,6 +6470,8 @@ msgstr "המודל הזה לא יכול לקרוא תמונות. בחרו מוד
 msgid "This model's context window is too small. Choose another model."
 msgstr "חלון ההקשר של המודל הזה קטן מדי. יש לבחור מודל אחר."
 
+#: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/admin/AdminPolicyPage.tsx
 #: src/pages/Artifacts.tsx
 msgid "This month"
 msgstr "החודש"
@@ -6442,6 +6565,7 @@ msgid "Title"
 msgstr "כותרת"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/admin/AdminAuditPage.tsx
 msgid "To"
 msgstr "עד"
 
@@ -6451,6 +6575,7 @@ msgid "To {0}"
 msgstr "עד {0}"
 
 #: src/lib/ticket-status.ts
+#: src/lib/work-phase.ts
 msgid "To do"
 msgstr "לביצוע"
 
@@ -6458,8 +6583,10 @@ msgstr "לביצוע"
 msgid "To:"
 msgstr "אל:"
 
+#: src/components/SidebarFooter.tsx
 #: src/pages/Artifacts.tsx
 #: src/pages/shell/chat-context.tsx
+#: src/pages/Today.tsx
 msgid "Today"
 msgstr "היום"
 
@@ -6539,6 +6666,7 @@ msgstr "אתרים מהימנים"
 #: src/pages/Onboarding.tsx
 #: src/pages/SharedPage.tsx
 #: src/pages/SpaceSearch.tsx
+#: src/pages/Today.tsx
 msgid "Try again"
 msgstr "לנסות שוב"
 
@@ -6551,6 +6679,7 @@ msgid "Tuesday"
 msgstr "יום שלישי"
 
 #: src/components/VaultSettings.tsx
+#: src/pages/admin/AdminAuditPage.tsx
 msgid "Type"
 msgstr "סוג"
 
@@ -6730,6 +6859,10 @@ msgstr ""
 msgid "Use up to 512 letters, digits, _ or -."
 msgstr ""
 
+#: src/pages/admin/AdminAuditPage.tsx
+msgid "User"
+msgstr ""
+
 #: src/pages/memory-providers/HonchoSettingsForm.tsx
 msgid "User peer"
 msgstr ""
@@ -6738,6 +6871,11 @@ msgstr ""
 #: src/components/VaultSettings.tsx
 msgid "Username"
 msgstr "שם משתמש"
+
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminShell.tsx
+msgid "Users"
+msgstr ""
 
 #: src/pages/shell/import-status.ts
 msgid "Uses files that are not imported"
@@ -6781,6 +6919,13 @@ msgstr "מאמת…"
 #: src/pages/Artifacts.tsx
 msgid "Version"
 msgstr "גרסה"
+
+#. placeholder {0}: data.policy.version
+#. placeholder {0}: view.version
+#: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminPolicyPage.tsx
+msgid "Version {0}"
+msgstr ""
 
 #: src/pages/PluginsOverlay.tsx
 msgid "View all"
@@ -6899,6 +7044,10 @@ msgstr "מה להחזיר"
 msgid "What to watch"
 msgstr ""
 
+#: src/pages/admin/AdminAuditPage.tsx
+msgid "When"
+msgstr ""
+
 #: src/pages/RoutineEditor.tsx
 msgid "When a webhook fires"
 msgstr "כש-webhook מופעל"
@@ -6936,6 +7085,7 @@ msgid "Work"
 msgstr ""
 
 #: src/pages/ActivityList.tsx
+#: src/pages/Today.tsx
 msgid "Working"
 msgstr "בעבודה"
 
