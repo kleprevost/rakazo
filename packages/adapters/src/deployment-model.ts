@@ -45,7 +45,10 @@ export function resolveDeploymentModel(env: NodeJS.ProcessEnv = process.env) {
     anthropic: "claude-sonnet-5",
   };
   const explicitModel = env.PI_DEFAULT_MODEL?.trim();
-  const key = keys[provider];
+  // Any other provider with a standard key variable (OPENCODE_API_KEY, AZURE_OPENAI_API_KEY, ...)
+  // uses the key Pi reports for it; host credentials are not a key.
+  const envKey = provider in keys ? undefined : getEnvApiKey(provider, definedEnv(env));
+  const key = keys[provider] ?? (envKey && envKey !== HOST_CREDENTIALS ? envKey : undefined);
   const hostCredentials =
     !key &&
     Boolean(explicitModel) &&
@@ -61,6 +64,12 @@ export function resolveDeploymentModel(env: NodeJS.ProcessEnv = process.env) {
     configured: Boolean(key) || hostCredentials,
     hostCredentials,
   };
+}
+
+function definedEnv(env: NodeJS.ProcessEnv): Record<string, string> {
+  return Object.fromEntries(
+    Object.entries(env).filter((entry): entry is [string, string] => entry[1] !== undefined),
+  );
 }
 
 export function deploymentModelUsageLookup(): ModelUsageLookup | undefined {

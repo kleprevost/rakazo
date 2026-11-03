@@ -97,6 +97,11 @@ const INDIRECT = {
     "AWS_REGION",
     "AWS_DEFAULT_REGION",
     "AWS_ROLE_ARN",
+    // Azure OpenAI endpoint settings Pi reads itself (the key is in Pi's env key list).
+    "AZURE_OPENAI_BASE_URL",
+    "AZURE_OPENAI_RESOURCE_NAME",
+    "AZURE_OPENAI_API_VERSION",
+    "AZURE_OPENAI_DEPLOYMENT_NAME_MAP",
     // Outbound proxy, read by the HTTP stack.
     "HTTP_PROXY",
     "HTTPS_PROXY",

@@ -50,6 +50,33 @@ describe("resolveDeploymentModel", () => {
     });
   });
 
+  it("uses the standard key variable of any other provider as the deployment key", () => {
+    expect(
+      resolveDeploymentModel({
+        PI_DEFAULT_PROVIDER: "opencode",
+        PI_DEFAULT_MODEL: "example-model",
+        OPENCODE_API_KEY: "oc-key",
+        OPENROUTER_API_KEY: "or-key",
+      }),
+    ).toMatchObject({
+      provider: "opencode",
+      model: "example-model",
+      key: "oc-key",
+      configured: true,
+    });
+    expect(
+      resolveDeploymentModel({
+        PI_DEFAULT_PROVIDER: "azure",
+        PI_DEFAULT_MODEL: "example-deployment",
+        AZURE_OPENAI_API_KEY: "az-key",
+      }),
+    ).toMatchObject({ provider: "azure", key: "az-key", configured: true });
+    // Without its own key a provider is unconfigured, never falling back to another vendor's.
+    expect(
+      resolveDeploymentModel({ PI_DEFAULT_PROVIDER: "azure", OPENROUTER_API_KEY: "or-key" }),
+    ).toMatchObject({ key: undefined, configured: false });
+  });
+
   it("runs a provider that authenticates from the host without a key", () => {
     vi.stubEnv("AWS_CONTAINER_CREDENTIALS_RELATIVE_URI", "/v2/credentials/example");
     const taskRole = {
