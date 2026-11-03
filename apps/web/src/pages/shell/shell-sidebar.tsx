@@ -387,16 +387,6 @@ function ShellSidebarFooter({
           closeMobileSidebar();
           navigate(`/app/x/${link.id}`);
         }}
-        onToday={() => {
-          setMenuOpen(false);
-          closeMobileSidebar();
-          navigate("/app/today");
-        }}
-        onCalendar={() => {
-          setMenuOpen(false);
-          closeMobileSidebar();
-          navigate("/app/calendar");
-        }}
         onArtifacts={() => {
           setMenuOpen(false);
           closeMobileSidebar();

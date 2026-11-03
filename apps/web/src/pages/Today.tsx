@@ -1,6 +1,13 @@
 import { i18n } from "@lingui/core";
 import { Trans, useLingui } from "@lingui/react/macro";
-import type { TodayArtifact, TodayAttention, TodayRun, TodaySummary } from "@rakazo/contracts";
+import type {
+  TodayArtifact,
+  TodayAttention,
+  TodayRun,
+  TodaySummary,
+  TodayWorkItem,
+} from "@rakazo/contracts";
+import { TODAY_WORK_PHASES } from "@rakazo/contracts";
 import { isRetryableError } from "@rakazo/core";
 import { Button, buttonVariants, SectionHeading } from "@rakazo/ui-web";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -13,6 +20,7 @@ import { useSpaceQueries } from "../lib/query";
 import { formatRelativeTime } from "../lib/relative-time";
 import { rpc } from "../lib/rpc";
 import { errorText } from "../lib/user-error";
+import { useWorkPhaseLabels } from "../lib/work-phase";
 import { WindowChrome } from "./WindowChrome";
 
 /** Live updates: the summary refreshes while the page is open, and stops after a refused read. */
@@ -66,8 +74,15 @@ export function TodayPage() {
 }
 
 export function TodayView({ summary }: { summary: TodaySummary }) {
-  const { attention, active, completed, upcoming } = summary;
-  if (!attention.length && !active.length && !completed.length && !upcoming.length) {
+  const { attention, active, completed, upcoming, work } = summary;
+  const phaseLabels = useWorkPhaseLabels();
+  if (
+    !attention.length &&
+    !active.length &&
+    !completed.length &&
+    !upcoming.length &&
+    !work.length
+  ) {
     return (
       <p className="p-4 text-sm text-muted-foreground" data-testid="today-empty">
         <Trans>Nothing today</Trans>
@@ -90,6 +105,16 @@ export function TodayView({ summary }: { summary: TodaySummary }) {
           ))}
         </Section>
       ) : null}
+      {TODAY_WORK_PHASES.map((phase) => {
+        const items = work.filter((item) => item.phase === phase);
+        return items.length ? (
+          <Section key={phase} title={phaseLabels[phase]} count={items.length}>
+            {items.map((item) => (
+              <WorkRow key={item.id} item={item} />
+            ))}
+          </Section>
+        ) : null;
+      })}
       {completed.length ? (
         <Section title={<Trans>Done</Trans>} count={summary.counts.completed}>
           {completed.map((run) => (
@@ -136,6 +161,25 @@ function Section({
       </SectionHeading>
       <ul className="divide-y divide-border">{children}</ul>
     </section>
+  );
+}
+
+function WorkRow({ item }: { item: TodayWorkItem }) {
+  return (
+    <li className="flex items-baseline gap-2 py-2 text-sm">
+      <Link to={`/app/board?ticket=${item.id}`} className="min-w-0 flex-1 truncate hover:underline">
+        <span className="font-medium">{item.ref}</span>{" "}
+        <span className={item.phase === "failed" ? "text-destructive" : "text-muted-foreground"}>
+          {item.title}
+        </span>
+      </Link>
+      {item.botName ? (
+        <span className="max-w-32 shrink-0 truncate text-xs text-muted-foreground">
+          {item.botName}
+        </span>
+      ) : null}
+      <span className="shrink-0 text-xs text-muted-foreground">{formatRelativeTime(item.at)}</span>
+    </li>
   );
 }
 

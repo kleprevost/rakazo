@@ -17,46 +17,6 @@ msgstr ""
 msgid " (unread)"
 msgstr " (sin leer)"
 
-#: src/pages/Calendar.tsx
-msgid "Actions"
-msgstr "Acciones"
-
-#: src/pages/Calendar.tsx
-msgid "Day"
-msgstr "Día"
-
-#: src/pages/Calendar.tsx
-msgid "Event-triggered"
-msgstr "Por eventos"
-
-#: src/pages/Calendar.tsx
-msgid "Next"
-msgstr "Siguiente"
-
-#: src/pages/Calendar.tsx
-msgid "Nothing scheduled"
-msgstr "Nada programado"
-
-#: src/pages/Calendar.tsx
-msgid "Pause"
-msgstr "Pausar"
-
-#: src/pages/Calendar.tsx
-msgid "Previous"
-msgstr "Anterior"
-
-#: src/pages/Calendar.tsx
-msgid "Resume"
-msgstr "Reanudar"
-
-#: src/pages/Calendar.tsx
-msgid "Run now"
-msgstr "Ejecutar ahora"
-
-#: src/pages/Calendar.tsx
-msgid "Week"
-msgstr "Semana"
-
 #. placeholder {0}: pinned.length
 #: src/pages/model-settings/space-bots-model.tsx
 msgid "{0, plural, one {# bot has its own model:} other {# bots have their own model:}}"
@@ -517,6 +477,10 @@ msgstr "Nombre de la cuenta"
 #: src/components/SidebarFooter.tsx
 msgid "Account menu for {name}"
 msgstr "Menú de cuenta de {name}"
+
+#: src/pages/Calendar.tsx
+msgid "Actions"
+msgstr "Acciones"
 
 #. placeholder {0}: bot.name
 #. placeholder {0}: group.spaceName
@@ -1072,6 +1036,7 @@ msgstr "Estudio de avatares"
 #: src/pages/admin/AdminShell.tsx
 #: src/pages/Auth.tsx
 #: src/pages/Board.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/McpServersOverlay.tsx
 #: src/pages/NavLinkPage.tsx
 #: src/pages/PluginsOverlay.tsx
@@ -1217,7 +1182,9 @@ msgstr "Explorar servidores MCP"
 msgid "Built-in"
 msgstr "Integrado"
 
+#: src/pages/Calendar.tsx
 #: src/pages/shell/hire-role-dialog.tsx
+#: src/pages/shell/sidebar-header.tsx
 msgid "Calendar"
 msgstr ""
 
@@ -1956,6 +1923,7 @@ msgid "Could not clear conversation"
 msgstr "No se pudo borrar la conversación"
 
 #: src/components/ComputerUpdateProgress.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/Today.tsx
 msgid "Could not complete action"
 msgstr "No se pudo completar la acción"
@@ -2622,6 +2590,10 @@ msgstr "Datos"
 msgid "day"
 msgstr "día"
 
+#: src/pages/Calendar.tsx
+msgid "Day"
+msgstr "Día"
+
 #: src/pages/shell/message-cards.tsx
 msgid "Day-to-day work"
 msgstr "Trabajo del día a día"
@@ -2900,6 +2872,7 @@ msgstr "¿No tienes una cuenta?"
 #: src/lib/ticket-status.ts
 #: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/shell/avatar-studio-popover.tsx
 #: src/pages/shell/import-setup-card.tsx
 #: src/pages/shell/message-view.tsx
@@ -2959,6 +2932,7 @@ msgstr ""
 
 #: src/components/AskCard.tsx
 #: src/pages/AccountSettingsOverlay.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/McpServersOverlay.tsx
 msgid "Edit"
 msgstr "Editar"
@@ -3059,6 +3033,10 @@ msgstr "Variables de entorno: {names}"
 #: src/pages/shell/sidebar-roster.tsx
 msgid "Error"
 msgstr "Error"
+
+#: src/pages/Calendar.tsx
+msgid "Event-triggered"
+msgstr "Por eventos"
 
 #: src/lib/cron.ts
 #: src/pages/ExternalConversationSettings.tsx
@@ -3179,6 +3157,7 @@ msgstr "fallido"
 #: src/components/SubagentCard.tsx
 #: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
+#: src/pages/Calendar.tsx
 msgid "Failed"
 msgstr "Falló"
 
@@ -4357,6 +4336,10 @@ msgstr "Nuevo space"
 msgid "New ticket"
 msgstr "Nuevo ticket"
 
+#: src/pages/Calendar.tsx
+msgid "Next"
+msgstr "Siguiente"
+
 #: src/components/markdown-copy.tsx
 msgid "Next page"
 msgstr "Página siguiente"
@@ -4530,6 +4513,10 @@ msgstr "No funciona"
 #: src/pages/KnowledgeSection.tsx
 msgid "Nothing remembered yet"
 msgstr "Aún no hay recuerdos"
+
+#: src/pages/Calendar.tsx
+msgid "Nothing scheduled"
+msgstr "Nada programado"
 
 #: src/pages/admin/AdminPolicyPage.tsx
 #: src/pages/admin/AdminQuery.tsx
@@ -4867,6 +4854,10 @@ msgstr "Pega tu clave de API"
 msgid "Paste your API key, then test again."
 msgstr "Pega tu clave de API y vuelve a probar."
 
+#: src/pages/Calendar.tsx
+msgid "Pause"
+msgstr "Pausar"
+
 #: src/pages/RoutineEditor.tsx
 #: src/pages/shell/import-status.ts
 msgid "Paused"
@@ -4981,6 +4972,10 @@ msgstr "Vista previa de {0}"
 #: src/pages/Artifacts.tsx
 msgid "Preview isn't available for this file type — download it to view it."
 msgstr "La vista previa no está disponible para este tipo de archivo; descárgalo para verlo."
+
+#: src/pages/Calendar.tsx
+msgid "Previous"
+msgstr "Anterior"
 
 #: src/components/markdown-copy.tsx
 msgid "Previous page"
@@ -5443,6 +5438,10 @@ msgstr "Restaurado"
 msgid "Restoring your workspace"
 msgstr "Restaurando tu espacio de trabajo"
 
+#: src/pages/Calendar.tsx
+msgid "Resume"
+msgstr "Reanudar"
+
 #: src/components/AccountAccess.tsx
 #: src/components/integrations/plugin-marketplace.tsx
 #: src/components/integrations/skills-dialog.tsx
@@ -5535,6 +5534,10 @@ msgstr "Ejecutar a las"
 msgid "Run history"
 msgstr "Historial de ejecuciones"
 
+#: src/pages/Calendar.tsx
+msgid "Run now"
+msgstr "Ejecutar ahora"
+
 #: src/pages/shell/use-routine-editor.ts
 msgid "Run time must be in the future."
 msgstr "La hora de ejecución debe ser en el futuro."
@@ -5546,6 +5549,7 @@ msgstr "en ejecución"
 #: src/components/SubagentCard.tsx
 #: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/RoutineEditor.tsx
 #: src/pages/Today.tsx
 msgid "Running"
@@ -6008,6 +6012,7 @@ msgstr "Omitir"
 msgid "Skip or deploy key"
 msgstr "Omitir o desplegar clave"
 
+#: src/pages/Calendar.tsx
 #: src/pages/shell/message-view.tsx
 msgid "Skipped"
 msgstr "Omitido"
@@ -6623,9 +6628,10 @@ msgstr "Por hacer"
 msgid "To:"
 msgstr "Para:"
 
-#: src/components/SidebarFooter.tsx
 #: src/pages/Artifacts.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/shell/chat-context.tsx
+#: src/pages/shell/sidebar-header.tsx
 #: src/pages/Today.tsx
 msgid "Today"
 msgstr "Hoy"
@@ -6703,6 +6709,7 @@ msgstr "Sitios de confianza"
 #: src/components/pages/PageNotice.tsx
 #: src/components/pages/PagesList.tsx
 #: src/pages/ActivityList.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/Onboarding.tsx
 #: src/pages/SharedPage.tsx
 #: src/pages/SpaceSearch.tsx
@@ -7033,6 +7040,10 @@ msgstr "miércoles"
 #: src/lib/billing.ts
 msgid "week"
 msgstr "semana"
+
+#: src/pages/Calendar.tsx
+msgid "Week"
+msgstr "Semana"
 
 #: src/lib/cron.ts
 #: src/pages/RoutineEditor.tsx

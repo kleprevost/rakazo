@@ -75,7 +75,7 @@ describe("HireRoleDialog", () => {
     await click(button("Executive Assistant"));
     const preview = document.querySelector('[data-testid="hire-role-preview"]')!.textContent;
     expect(preview).toContain("Morning briefing");
-    expect(preview).toContain("daily-briefing");
+    expect(preview).toContain("executive-briefing");
     expect(preview).toContain("send or forward an email");
     expect(preview).not.toContain("Blocked by your organization");
     await click(button("Hire"));

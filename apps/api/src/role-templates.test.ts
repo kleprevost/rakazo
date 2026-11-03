@@ -86,14 +86,14 @@ describe("hireRole", () => {
     expect(result.blocked).toEqual([]);
     const input = h.createBot.mock.calls[0]?.[1];
     expect(input?.instructions).toContain("Always ask me and wait for a yes");
-    expect(h.skills.map((skill) => skill.name)).toEqual(["daily-briefing", "meeting-prep"]);
-    expect(h.skills[0]?.content.startsWith("---\nname: daily-briefing")).toBe(true);
+    expect(h.skills.map((skill) => skill.name)).toEqual(["executive-briefing", "meeting-prep"]);
+    expect(h.skills[0]?.content.startsWith("---\nname: executive-briefing")).toBe(true);
     expect(h.routines).toEqual([{ name: "Morning briefing", active: false, botId: "bot1" }]);
     expect(h.announceRoutine).toHaveBeenCalledTimes(1);
   });
 
   it("uses the chosen name and keeps skills that already exist", async () => {
-    const h = harness(["daily-briefing"]);
+    const h = harness(["executive-briefing"]);
     await hireRole(
       h.services,
       actor,

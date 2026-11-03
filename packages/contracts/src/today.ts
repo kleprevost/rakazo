@@ -1,4 +1,5 @@
 import * as z from "zod";
+import { WorkPhaseSchema } from "./board.js";
 import { Id, IsoDate, RunStatus } from "./ids.js";
 import { RunTriggerSchema } from "./runs.js";
 
@@ -75,6 +76,24 @@ export const TodayUpcomingSchema = TodayBotRef.extend({
 });
 export type TodayUpcoming = z.infer<typeof TodayUpcomingSchema>;
 
+/** The phases of an assignment that still need watching. Done and cancelled work is not listed. */
+export const TODAY_WORK_PHASES = ["running", "waiting", "review", "failed"] as const;
+export const TodayWorkPhaseSchema = WorkPhaseSchema.extract(TODAY_WORK_PHASES);
+export type TodayWorkPhase = z.infer<typeof TodayWorkPhaseSchema>;
+
+/** An assignment (ticket) from the user's own work: created by them or given to one of their bots. */
+export const TodayWorkItemSchema = z.object({
+  id: Id,
+  ref: z.string(),
+  title: z.string(),
+  phase: TodayWorkPhaseSchema,
+  /** The assignee when it is one of the user's own bots; never another person's bot. */
+  botId: Id.nullable(),
+  botName: z.string().nullable(),
+  at: IsoDate,
+});
+export type TodayWorkItem = z.infer<typeof TodayWorkItemSchema>;
+
 export const TodaySummarySchema = z.object({
   generatedAt: IsoDate,
   counts: z.object({
@@ -89,5 +108,7 @@ export const TodaySummarySchema = z.object({
   /** Autonomous or deliverable-producing runs that finished in the last day. */
   completed: z.array(TodayRunSchema),
   upcoming: z.array(TodayUpcomingSchema),
+  /** Assignments in progress, newest activity first. Empty when the ticket board is off. */
+  work: z.array(TodayWorkItemSchema),
 });
 export type TodaySummary = z.infer<typeof TodaySummarySchema>;

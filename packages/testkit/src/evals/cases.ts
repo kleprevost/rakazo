@@ -80,6 +80,8 @@ export type EvalCase = {
   /** The bot's MEMORY.md, written through the memory API before the first step. */
   botMemory?: string;
   taughtSkill?: true;
+  /** Give the bot a shipped role template's instructions and skills, as hiring does. */
+  roleTemplate?: string;
   history?: ReturnType<typeof historyFixture>;
   configure?: (services: EvalServices) => void;
   routine?: { prompt: string };

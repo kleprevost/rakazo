@@ -11,11 +11,9 @@ import {
 } from "@rakazo/ui-web";
 import {
   BookOpen,
-  CalendarDays,
   Download,
   FolderOpen,
   Gauge,
-  LayoutDashboard,
   Link2,
   LogOut,
   Plug,
@@ -43,8 +41,6 @@ type Props = {
   onIntegrations: () => void;
   onSkills: () => void;
   onBoard?: () => void;
-  onToday?: () => void;
-  onCalendar?: () => void;
   links?: NavLink[];
   onLink?: (link: NavLink) => void;
   onArtifacts: () => void;
@@ -75,8 +71,6 @@ export function SidebarFooter({
   onIntegrations,
   onSkills,
   onBoard,
-  onToday,
-  onCalendar,
   links = [],
   onLink,
   onArtifacts,
@@ -181,26 +175,6 @@ export function SidebarFooter({
               <ScrollText className="text-muted-foreground" strokeWidth={1.75} />
               <Trans>Skills</Trans>
             </Button>
-            {onToday ? (
-              <Button
-                variant="ghost"
-                className="h-9 w-full justify-start gap-2.5 font-normal"
-                onClick={onToday}
-              >
-                <LayoutDashboard className="text-muted-foreground" strokeWidth={1.75} />
-                <Trans>Today</Trans>
-              </Button>
-            ) : null}
-            {onCalendar ? (
-              <Button
-                variant="ghost"
-                className="h-9 w-full justify-start gap-2.5 font-normal"
-                onClick={onCalendar}
-              >
-                <CalendarDays className="text-muted-foreground" strokeWidth={1.75} />
-                <Trans>Calendar</Trans>
-              </Button>
-            ) : null}
             <Button
               variant="ghost"
               className="h-9 w-full justify-start gap-2.5 font-normal"

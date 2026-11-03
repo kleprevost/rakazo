@@ -39,7 +39,14 @@ function fixture() {
   const messages = vi.fn(async (_args: unknown) => [] as unknown[]);
   const artifacts = vi.fn(async (_args: unknown) => [] as unknown[]);
   const routines = vi.fn(async (_args: unknown) => [] as unknown[]);
+  const tickets = vi.fn(async (_args: { where: Record<string, unknown> }) => [] as unknown[]);
+  const tasks = vi.fn(async (_args: unknown) => [] as unknown[]);
+  const bots = vi.fn(async (_args: { where: Record<string, unknown> }) => [] as unknown[]);
   const prisma = {
+    board: { findUnique: vi.fn(async () => ({ id: "board-1", ticketPrefix: "RAK" })) },
+    ticket: { findMany: tickets },
+    task: { findMany: tasks },
+    bot: { findMany: bots },
     run: { findMany: runs },
     message: { findMany: messages },
     artifact: { findMany: artifacts },
@@ -57,7 +64,7 @@ function fixture() {
       }
       return [];
     });
-  return { prisma, runs, messages, artifacts, routines, byStatus };
+  return { prisma, runs, messages, artifacts, routines, tickets, tasks, bots, byStatus };
 }
 
 const approvalBlock = {
@@ -286,5 +293,73 @@ describe("today summary", () => {
         nextRunAt: "2026-03-11T08:00:00.000Z",
       },
     ]);
+  });
+
+  describe("assignments", () => {
+    const ticketRow = (id: string, number: number, overrides: Record<string, unknown> = {}) => ({
+      id,
+      boardId: "board-1",
+      spaceId: "space-1",
+      number,
+      title: `Ticket ${number}`,
+      description: null,
+      status: "doing",
+      priority: null,
+      assigneeBotId: "bot-1",
+      createdByBotId: null,
+      createdByUserId: "user-1",
+      createdAt: at(120),
+      updatedAt: at(number),
+      completedAt: null,
+      ...overrides,
+    });
+
+    it("stays off unless the ticket board is on", async () => {
+      const { prisma, tickets } = fixture();
+      const summary = await todaySummary(prisma, actor, now);
+      expect(summary.work).toEqual([]);
+      expect(tickets).not.toHaveBeenCalled();
+    });
+
+    it("asks only for open tickets the user created or whose assignee is the user's bot", async () => {
+      const { prisma, tickets, bots } = fixture();
+      await todaySummary(prisma, actor, now, { workItems: true });
+      const where = tickets.mock.calls[0]?.[0].where;
+      expect(where).toMatchObject({
+        spaceId: "space-1",
+        OR: [
+          { createdByUserId: "user-1" },
+          { assigneeBot: { userId: "user-1", spaceId: "space-1" } },
+        ],
+        status: { notIn: ["done", "closed"] },
+      });
+      expect(bots).not.toHaveBeenCalled();
+    });
+
+    it("groups open work by phase and never names another user's bot", async () => {
+      const { prisma, tickets, tasks, bots } = fixture();
+      tickets.mockResolvedValue([
+        ticketRow("t1", 1),
+        ticketRow("t2", 2, { assigneeBotId: "bot-other", status: "review" }),
+        ticketRow("t3", 3, { status: "todo" }),
+        ticketRow("t4", 4, { status: "blocked" }),
+      ]);
+      tasks.mockResolvedValue([
+        { ticketId: "t1", runs: [{ status: "failed", createdAt: at(10) }] },
+      ]);
+      // The bot lookup is scoped to the actor, so a colleague's bot never comes back.
+      bots.mockImplementation(async ({ where }) => {
+        expect(where).toMatchObject({ spaceId: "space-1", userId: "user-1" });
+        return [{ id: "bot-1", name: "Maya" }];
+      });
+      const summary = await todaySummary(prisma, actor, now, { workItems: true });
+      expect(TodaySummarySchema.parse(summary)).toEqual(summary);
+      expect(summary.work.map((item) => [item.ref, item.phase, item.botName])).toEqual([
+        ["RAK-1", "failed", "Maya"],
+        ["RAK-2", "review", null],
+        ["RAK-4", "waiting", "Maya"],
+      ]);
+      expect(summary.work[1]?.botId).toBeNull();
+    });
   });
 });
