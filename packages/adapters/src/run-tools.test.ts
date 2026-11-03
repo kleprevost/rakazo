@@ -30,10 +30,21 @@ vi.mock("./run-tool-gate.js", async (importOriginal) => ({
 
 import { applyTool, isToolError } from "./run-tools.js";
 
+const botTable = {
+  findUnique: vi.fn(
+    async (): Promise<{ suspendedAt: Date | null; name: string }> => ({
+      suspendedAt: null,
+      name: "Ada",
+    }),
+  ),
+};
+
 function dispatchContext(tainted: boolean) {
   return {
+    bot: { id: "bot-1", name: "Ada" },
     deps: {
       prisma: {
+        bot: botTable,
         user: {
           findUniqueOrThrow: async () => ({
             timezone: "UTC" as string | null,
@@ -62,6 +73,7 @@ function dispatchContext(tainted: boolean) {
 
 beforeEach(() => {
   audited.length = 0;
+  botTable.findUnique.mockClear();
 });
 
 describe("dispatchTool audit outcomes", () => {
@@ -197,5 +209,41 @@ describe("daily check-in dispatch restriction", () => {
       error: "Daily check-ins can only ask or message the user.",
     });
     expect(audited).toEqual([]);
+  });
+});
+
+describe("dispatchTool live suspension check", () => {
+  it("reads suspension once per call, by primary key, and lets a normal call run", async () => {
+    const ctx = dispatchContext(false);
+    await applyTool(ctx as never, "update_preferences", {}, "call-1");
+    expect(botTable.findUnique).toHaveBeenCalledTimes(1);
+    expect(botTable.findUnique).toHaveBeenCalledWith({
+      where: { id: "bot-1" },
+      select: { suspendedAt: true, name: true },
+    });
+  });
+
+  it("refuses and audits the next call once the bot is suspended mid-run", async () => {
+    const ctx = dispatchContext(false);
+    await expect(
+      applyTool(ctx as never, "update_preferences", {}, "call-1"),
+    ).resolves.toMatchObject({ timezone: "UTC" });
+    botTable.findUnique.mockResolvedValueOnce({ suspendedAt: new Date(), name: "Ada" });
+    await expect(applyTool(ctx as never, "update_preferences", {}, "call-2")).resolves.toEqual({
+      error: "Suspended by your organization",
+    });
+    expect(audited.at(-1)).toEqual({
+      tool: "update_preferences",
+      outcome: "denied",
+      metadata: { reason: "suspended" },
+    });
+  });
+
+  it("fails closed when the read fails", async () => {
+    const ctx = dispatchContext(false);
+    botTable.findUnique.mockRejectedValueOnce(new Error("db down"));
+    await expect(applyTool(ctx as never, "update_preferences", {}, "call-1")).resolves.toEqual({
+      error: "Suspended by your organization",
+    });
   });
 });

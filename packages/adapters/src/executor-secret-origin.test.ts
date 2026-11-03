@@ -109,6 +109,7 @@ async function requestSecretWith(origin: string, extra: Record<string, unknown> 
         },
       },
       bot: {
+        findUnique: async () => ({ suspendedAt: null, name: "Assistant" }),
         findUniqueOrThrow: async () => ({
           id: run.botId,
           name: "Assistant",

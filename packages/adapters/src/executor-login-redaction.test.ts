@@ -112,6 +112,7 @@ async function runAfterFill(
     routine: { findUnique: vi.fn(async () => ({ notify: false, nextRunAt: null })) },
     event: { count: vi.fn(async () => 0) },
     bot: {
+      findUnique: async () => ({ suspendedAt: null, name: "Assistant" }),
       findUniqueOrThrow: vi.fn(async () => ({
         id: run.botId,
         name: "Assistant",

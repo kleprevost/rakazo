@@ -1,4 +1,4 @@
-import type { ConnectorRegistry } from "@rakazo/adapters";
+import type { BrokeredConnector } from "@rakazo/adapters";
 import type { Actor, MessageBlock } from "@rakazo/contracts";
 import {
   appConnectCard,
@@ -24,7 +24,7 @@ import { resolveThreadTarget } from "./thread-target.js";
 type OnboardingDeps = {
   prisma: PrismaClient;
   events: ThreadEvents;
-  connectors: ConnectorRegistry;
+  connectors: BrokeredConnector;
 };
 
 type FocusOption = {

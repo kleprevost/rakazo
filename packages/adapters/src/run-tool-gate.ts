@@ -53,7 +53,7 @@ import type { ExecutorDeps } from "./executor-deps.js";
 import { findConnectedModelCredential } from "./model-selection.js";
 import { paidRequestEffect } from "./paid-request.js";
 import { PolicyDeniedError } from "./policy-runtime.js";
-import { assertToolAllowed, policyAlwaysAsks } from "./policy-tools.js";
+import { assertToolAllowed, policyAlwaysAsks, policyBlockedToolMessage } from "./policy-tools.js";
 import { PURCHASE_CHECKED_TOOLS, purchaseApprovalOf } from "./purchase-gate.js";
 import { autoReviewCheckerProvider } from "./run-auto-review.js";
 import type { RunContext, RunTrust } from "./run-context.js";
@@ -187,7 +187,7 @@ export async function gateToolCall(
     await auditToolCall(ctx, name, "denied", { reason: "policy" });
     return {
       result: {
-        error: `${name} is blocked by your organization. Don't try it another way; tell the user it's blocked.`,
+        error: policyBlockedToolMessage(name),
       },
     };
   }

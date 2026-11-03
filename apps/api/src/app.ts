@@ -24,8 +24,8 @@ import {
   VoiceAccountError,
 } from "@rakazo/adapter-kit";
 import type {
+  BrokeredConnector,
   ComposioProvider,
-  ConnectorRegistry,
   PluginRepoFetcher,
   PluginTextReader,
   RemoteConnectorDependencies,
@@ -227,7 +227,7 @@ export interface AppHandles {
   jobs: JobPublisher;
   sandbox: SandboxProvider;
   composio?: ComposioProvider;
-  connectors: ConnectorRegistry;
+  connectors: BrokeredConnector;
   messaging?: MessagingSurface;
   email?: TransactionalEmailProvider;
   notifications: NotificationProvider;
@@ -509,14 +509,18 @@ async function buildApp(overrides: CreateAppOverrides): Promise<AppHandles> {
         : undefined),
     pipedream,
   });
-  const stack = createConnectorStack(composioOverride, [
-    installed,
-    ...integrationSettings
-      .providers()
-      .filter((provider) => !composioOverride || provider.describe().id !== "composio"),
-    mcp,
-    ...connectorOverrides,
-  ]);
+  const stack = createConnectorStack(
+    composioOverride,
+    [
+      installed,
+      ...integrationSettings
+        .providers()
+        .filter((provider) => !composioOverride || provider.describe().id !== "composio"),
+      mcp,
+      ...connectorOverrides,
+    ],
+    prisma,
+  );
   integrationSettings.warmDirectories();
   const runtime =
     runtimeOverride ??

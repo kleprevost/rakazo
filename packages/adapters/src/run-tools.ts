@@ -1,6 +1,8 @@
 import type { AgentToolExecutionObserver } from "@rakazo/adapter-kit";
+import { BOT_SUSPENDED_MESSAGE } from "@rakazo/contracts";
 import { toolResultTaintsRun } from "@rakazo/core";
 import { isTerminatingReplyResult } from "./approval-effect.js";
+import { botSuspendedNow } from "./brokered-connector.js";
 import { IMAGE_RETURNING_COMPUTER_TOOLS, MODEL_CANNOT_SEE_MESSAGE } from "./model-vision.js";
 import type { RunContext } from "./run-context.js";
 import { noteComputerTaskStep } from "./run-progress.js";
@@ -106,6 +108,12 @@ async function dispatchTool(
   noteComputerTaskStep(ctx.state.reply, request.name);
   const gate = await gateToolCall(ctx, request, observer);
   if ("result" in gate) return gate.result;
+  // The gate can wait hours on an approval, and the run's snapshot of the bot is older still:
+  // read suspension again at the instant before the side effect.
+  if ((await botSuspendedNow(ctx.deps.prisma, ctx.bot.id)).suspended) {
+    await auditToolCall(ctx, gate.call.name, "denied", { reason: "suspended" });
+    return { error: BOT_SUSPENDED_MESSAGE };
+  }
   if (!gate.call.applied) return toolHandler(gate.call.name)(ctx, gate.call);
   let outcome: "success" | "failure" = "failure";
   try {

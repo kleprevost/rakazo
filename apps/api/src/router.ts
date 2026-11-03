@@ -11,10 +11,10 @@ import type {
   TransactionalEmailProvider,
 } from "@rakazo/adapter-kit";
 import type {
+  BrokeredConnector,
   CloudAgentConnection,
   CodexLiveCatalog,
   ComposioProvider,
-  ConnectorRegistry,
   FaviconResolver,
   IntegrationProviderSettings,
   McpConnector,
@@ -103,7 +103,7 @@ export interface RouterDeps {
   mcpOAuth?: McpOAuthBroker;
   /** Probes MCP server health; without it servers are never probed from here. */
   mcp?: Pick<McpConnector, "probe">;
-  connectors: ConnectorRegistry;
+  connectors: BrokeredConnector;
   remoteConnectors?: RemoteConnectorDependencies;
   pluginRepoFetcher?: PluginRepoFetcher;
   pluginMarketplaceRead?: PluginTextReader;

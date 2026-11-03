@@ -14,7 +14,9 @@ import type {
   ManagedConnectorProvider,
 } from "@rakazo/adapter-kit";
 import { ConnectorAuthUnavailableError } from "@rakazo/adapter-kit";
+import type { PrismaClient } from "@rakazo/db";
 import { getLogger } from "@rakazo/logging";
+import { BrokeredConnector } from "./brokered-connector.js";
 import { COMPOSIO_MULTI_EXECUTE_TOOL, composioToolBatch } from "./composio-batch.js";
 import type { ToolkitDirectoryEntry } from "./composio-catalog-cache.js";
 import {
@@ -979,13 +981,18 @@ function connectedComposioConnections(context: AdapterContext): ConnectedConnect
   );
 }
 
+/** Every connector call made through the stack's `connector` passes the brokered enforcement. */
 export function createConnectorStack(
   composio: ComposioProvider | undefined,
-  providers: ConnectorProvider[] = [],
+  providers: ConnectorProvider[],
+  prisma: Pick<PrismaClient, "bot">,
 ) {
   return {
     composio,
-    connector: new ConnectorRegistry([...(composio ? [composio] : []), ...providers]),
+    connector: new BrokeredConnector(
+      new ConnectorRegistry([...(composio ? [composio] : []), ...providers]),
+      prisma,
+    ),
   };
 }
 
