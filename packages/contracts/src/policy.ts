@@ -1,4 +1,5 @@
 import * as z from "zod";
+import { CapabilityPolicySchema } from "./capabilities.js";
 
 const globs = z.array(z.string().min(1).max(256)).max(500);
 const hosts = z.array(z.string().min(1).max(253)).max(500);
@@ -52,6 +53,8 @@ export const PolicySchema = z.strictObject({
     .optional(),
   messaging: z.strictObject({ allowSurfaces: ids.optional() }).optional(),
   data: z.strictObject({ allowAccountExport: z.boolean().optional() }).optional(),
+  /** Scope ceiling, mappings and grant rules for the capability broker. */
+  capabilities: CapabilityPolicySchema.optional(),
   /** Spend limits in USD for the current calendar month (UTC). Absent = no limit. */
   budgets: z
     .strictObject({

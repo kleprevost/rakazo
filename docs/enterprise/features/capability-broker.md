@@ -552,15 +552,34 @@ either order:
 - **Policy schema is strict**: adding `capabilities` is additive for new files, but older binaries
   reading a new file fail to start (fail-closed by design); roll out binaries before the file.
 
-## Open questions
-1. Should owners be allowed to grant `write`/`send` scopes themselves, or only admins (owners
-   limited to `read` plus approvals)? Current draft: owners within the ceiling.
-2. Does a team quarantine key off `Space`, `ChatGroup`, or a future org-level group from OIDC
-   claims (central-policy.md leaves per-group policy open)? The draft supports the first two.
-3. Should personal connections be auto-revoked on quarantine of the *only* bot using them?
-   Draft says no unless opted in.
-4. Can `run.userId` stay the owner when shared employees land, with `actingUserId` added, or
-   does it change meaning (affects budgets and every `userId` filter named above)?
-5. Is cancel-only acceptable for quarantine, or do some customers need a drain mode for
-   planned isolation?
-6. Cache policy for E3: strictly per-call reads (draft) versus a sub-second per-run cache.
+## Decisions
+Recorded by the maintainer; the evaluator encodes 1-3.
+
+1. **Who may grant what.** Bot owners may grant read scopes (`read`, `fetch`) themselves. Write,
+   send, spend and every other non-read scope needs an admin, or must be on an admin-set allow-list
+   in central policy (`capabilities.ownerGrantable`). An owner row outside that is ignored (trace
+   detail `owner_not_permitted`); an owner's own `ask` or `deny` row is always honored.
+2. **Run principal.** The principal is the acting requester. With shared employees each user has
+   their own instance, so owner == requester; service-instance work runs as the service principal.
+   `RunPrincipal` is therefore `{actingUserId, sharedIdentityId?}` and `run.userId` keeps its meaning.
+3. **Quarantine is cancel-only at first.** There is no drain mode. Personal connections are never
+   auto-revoked: quarantine blocks the bot from using them and revokes bot-scoped grants (and
+   bot-exclusive credentials) only. This replaces the optional `revokeCredentials` escape hatch for
+   personal connections.
+
+Still open: whether a team quarantine keys off `Space`, `ChatGroup` or a future org group, and
+whether E3 reads strictly per call or from a sub-second per-run cache (draft: per call).
+
+## Status
+Build-plan PR 3 is implemented as pure logic, not wired into enforcement: the scope taxonomy,
+strict grant and mapping schemas and the policy `capabilities` section (`packages/contracts/src/capabilities.ts`);
+the classifier and built-in table (`packages/core/src/capability-classifier.ts`,
+`capability-builtin-scopes.ts`); and the evaluator with rule trace (`capability-evaluator.ts`:
+`evaluateCapability`, and `evaluateCall` for classify-then-decide, the simulator's entry point).
+Choices the design left open:
+- `capabilities.mappings[].readScopes` (needs `trustAnnotations: true`) names what a trusted
+  `readOnlyHint` classifies as; without it annotations never relax a mapped call.
+- Admin mappings are authoritative: annotations are ignored on a mapped call.
+- `recipient_domain` is accepted in grants but no extractor exists yet, so such grants deny until one does.
+- `capabilityMode` (off, shadow, enforce) and `requireGrants` are the caller's: the evaluator always
+  evaluates as enforce and returns the outcome.
