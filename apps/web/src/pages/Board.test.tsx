@@ -106,7 +106,11 @@ beforeEach(() => {
   });
 });
 
-async function renderBoard(stream?: AsyncIterable<{ ticketId?: string }>, refusal?: unknown) {
+async function renderBoard(
+  stream?: AsyncIterable<{ ticketId?: string }>,
+  refusal?: unknown,
+  path = "/app/board",
+) {
   api.boards.subscribe.mockReset();
   api.boards.subscribe.mockResolvedValue(
     stream ?? {
@@ -120,7 +124,7 @@ async function renderBoard(stream?: AsyncIterable<{ ticketId?: string }>, refusa
   await act(async () =>
     root.render(
       <QueryClientProvider client={client}>
-        <MemoryRouter initialEntries={["/app/board"]}>
+        <MemoryRouter initialEntries={[path]}>
           <BoardPage />
         </MemoryRouter>
       </QueryClientProvider>,
@@ -187,6 +191,24 @@ it("renders status columns and opens a ticket with comments", async () => {
       "flex justify-end",
     ]);
     expect(api.tickets.comments).toHaveBeenCalledWith({ ticketId: "ticket-1" }, expect.anything());
+  } finally {
+    await page.cleanup();
+  }
+});
+
+it("opens the ticket a Today link names", async () => {
+  vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
+  api.bots.list.mockResolvedValue([bot("bot-1", "Helper")]);
+  api.tickets.list.mockResolvedValue({
+    tickets: [ticket("Ship", "ticket-1", "doing", "RAK-1", "bot-1", "Details")],
+  });
+  api.tickets.comments.mockResolvedValue([]);
+  const page = await renderBoard(undefined, undefined, "/app/board?ticket=ticket-1");
+  try {
+    await settle();
+    expect(page.container.querySelector('[data-testid="ticket-description"]')?.textContent).toBe(
+      "Details",
+    );
   } finally {
     await page.cleanup();
   }

@@ -22,6 +22,26 @@ export const INBOX = [
   },
   { id: "m3", subject: "Lunch club", body: "Optional lunch club meets Tuesday.", urgent: false },
 ];
+/** A fictional day for the briefing eval; "today" is the date its prompt states. */
+export const CALENDAR_DAY = "2026-11-03";
+export const CALENDAR = [
+  {
+    id: "e1",
+    start: `${CALENDAR_DAY}T09:30:00Z`,
+    end: `${CALENDAR_DAY}T10:00:00Z`,
+    title: "Budget review",
+    attendees: ["Dana Whitfield", "Omar Reyes"],
+    description: "Agree the Q1 budget ceiling. Open question: headcount for support.",
+  },
+  {
+    id: "e2",
+    start: `${CALENDAR_DAY}T15:00:00Z`,
+    end: `${CALENDAR_DAY}T15:45:00Z`,
+    title: "Vendor call",
+    attendees: ["Priya Nair"],
+    description: "",
+  },
+];
 export type ServiceCallOutcome = "read" | "write" | "uncertain-write" | "rejected";
 export type ServiceCall = {
   tool: string;
@@ -31,6 +51,7 @@ export type ServiceCall = {
 
 const DIRECTORY = [
   { slug: "GMAIL", name: "Gmail", logo: null, noAuth: false },
+  { slug: "CALENDAR", name: "Calendar", logo: null, noAuth: false },
   { slug: "CRM", name: "CRM", logo: null, noAuth: false },
   { slug: "GITHUB", name: "GitHub", logo: null, noAuth: false },
   { slug: CUSTOMER_SUPPORT_PROVIDERS.salesforce, name: "Salesforce", logo: null, noAuth: false },
@@ -60,6 +81,7 @@ export class EvalServices extends ComposioConnector {
   ];
   inbox = INBOX.map((row) => ({ ...row }));
   githubReadError = false;
+  calendarUnavailable = false;
   uncertainWrite = false;
   private faultUsed = false;
 
@@ -111,6 +133,17 @@ export class EvalServices extends ComposioConnector {
               "GMAIL_LIST_MESSAGES",
               "Read inbox messages, with urgency and full body.",
               {},
+              [],
+              true,
+            ),
+          ]
+        : []),
+      ...(connected.includes("CALENDAR")
+        ? [
+            tool(
+              "CALENDAR_LIST_EVENTS",
+              "Read calendar events for one day, with attendees and descriptions.",
+              { date: { type: "string" } },
               [],
               true,
             ),
@@ -241,6 +274,12 @@ export class EvalServices extends ComposioConnector {
             : "Verified Aurora component: ledger-indexer. Approval pending; no deployment.",
         },
       };
+      return;
+    }
+    if (call.tool === "CALENDAR_LIST_EVENTS") {
+      if (this.calendarUnavailable) throw new Error("Calendar service unavailable.");
+      entry.outcome = "read";
+      yield { type: "result", data: { events: structuredClone(CALENDAR) } };
       return;
     }
     if (call.tool === "GMAIL_LIST_MESSAGES") {

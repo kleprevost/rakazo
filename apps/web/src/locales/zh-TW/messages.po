@@ -479,6 +479,10 @@ msgstr "帳號標籤"
 msgid "Account menu for {name}"
 msgstr "{name} 的帳號選單"
 
+#: src/pages/Calendar.tsx
+msgid "Actions"
+msgstr "操作"
+
 #. placeholder {0}: bot.name
 #. placeholder {0}: group.spaceName
 #. placeholder {0}: page.title
@@ -1033,6 +1037,7 @@ msgstr "頭像工作室"
 #: src/pages/admin/AdminShell.tsx
 #: src/pages/Auth.tsx
 #: src/pages/Board.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/McpServersOverlay.tsx
 #: src/pages/NavLinkPage.tsx
 #: src/pages/PluginsOverlay.tsx
@@ -1178,7 +1183,9 @@ msgstr "瀏覽 MCP 伺服器"
 msgid "Built-in"
 msgstr "內建"
 
+#: src/pages/Calendar.tsx
 #: src/pages/shell/hire-role-dialog.tsx
+#: src/pages/shell/sidebar-header.tsx
 msgid "Calendar"
 msgstr ""
 
@@ -1918,6 +1925,7 @@ msgid "Could not clear conversation"
 msgstr "無法清空對話"
 
 #: src/components/ComputerUpdateProgress.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/Today.tsx
 msgid "Could not complete action"
 msgstr "無法完成操作"
@@ -2585,6 +2593,10 @@ msgstr ""
 msgid "day"
 msgstr "天"
 
+#: src/pages/Calendar.tsx
+msgid "Day"
+msgstr "日"
+
 #: src/pages/shell/message-cards.tsx
 msgid "Day-to-day work"
 msgstr "日常工作"
@@ -2863,6 +2875,7 @@ msgstr "還沒有帳號？"
 #: src/lib/ticket-status.ts
 #: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/shell/avatar-studio-popover.tsx
 #: src/pages/shell/import-setup-card.tsx
 #: src/pages/shell/message-view.tsx
@@ -2922,6 +2935,7 @@ msgstr ""
 
 #: src/components/AskCard.tsx
 #: src/pages/AccountSettingsOverlay.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/McpServersOverlay.tsx
 msgid "Edit"
 msgstr "編輯"
@@ -3022,6 +3036,10 @@ msgstr "環境變數：{names}"
 #: src/pages/shell/sidebar-roster.tsx
 msgid "Error"
 msgstr "錯誤"
+
+#: src/pages/Calendar.tsx
+msgid "Event-triggered"
+msgstr "事件觸發"
 
 #: src/lib/cron.ts
 #: src/pages/ExternalConversationSettings.tsx
@@ -3142,6 +3160,7 @@ msgstr "失敗"
 #: src/components/SubagentCard.tsx
 #: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
+#: src/pages/Calendar.tsx
 msgid "Failed"
 msgstr "失敗"
 
@@ -4320,6 +4339,10 @@ msgstr "新增空間"
 msgid "New ticket"
 msgstr "新增工作項目"
 
+#: src/pages/Calendar.tsx
+msgid "Next"
+msgstr "下一個"
+
 #: src/components/markdown-copy.tsx
 msgid "Next page"
 msgstr "下一頁"
@@ -4493,6 +4516,10 @@ msgstr "無法正常工作"
 #: src/pages/KnowledgeSection.tsx
 msgid "Nothing remembered yet"
 msgstr "尚無記憶"
+
+#: src/pages/Calendar.tsx
+msgid "Nothing scheduled"
+msgstr "沒有排程"
 
 #: src/pages/admin/AdminPolicyPage.tsx
 #: src/pages/admin/AdminQuery.tsx
@@ -4830,6 +4857,10 @@ msgstr "貼上你的 API 金鑰"
 msgid "Paste your API key, then test again."
 msgstr "請貼上你的 API 金鑰，然後重新測試。"
 
+#: src/pages/Calendar.tsx
+msgid "Pause"
+msgstr "暫停"
+
 #: src/pages/RoutineEditor.tsx
 #: src/pages/shell/import-status.ts
 msgid "Paused"
@@ -4944,6 +4975,10 @@ msgstr "預覽 {0}"
 #: src/pages/Artifacts.tsx
 msgid "Preview isn't available for this file type — download it to view it."
 msgstr "此檔案類型無法預覽，請下載後檢視。"
+
+#: src/pages/Calendar.tsx
+msgid "Previous"
+msgstr "上一個"
 
 #: src/components/markdown-copy.tsx
 msgid "Previous page"
@@ -5407,6 +5442,7 @@ msgid "Restoring your workspace"
 msgstr "正在還原工作空間"
 
 #: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/Calendar.tsx
 msgid "Resume"
 msgstr "恢復"
 
@@ -5502,6 +5538,10 @@ msgstr "執行時間"
 msgid "Run history"
 msgstr "執行紀錄"
 
+#: src/pages/Calendar.tsx
+msgid "Run now"
+msgstr "立即執行"
+
 #: src/pages/shell/use-routine-editor.ts
 msgid "Run time must be in the future."
 msgstr "執行時間必須是將來的時間。"
@@ -5513,6 +5553,7 @@ msgstr "執行中"
 #: src/components/SubagentCard.tsx
 #: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/RoutineEditor.tsx
 #: src/pages/Today.tsx
 msgid "Running"
@@ -5975,6 +6016,7 @@ msgstr "跳過"
 msgid "Skip or deploy key"
 msgstr "跳過或使用部署金鑰"
 
+#: src/pages/Calendar.tsx
 #: src/pages/shell/message-view.tsx
 msgid "Skipped"
 msgstr ""
@@ -6604,9 +6646,10 @@ msgstr "待辦"
 msgid "To:"
 msgstr "收件人："
 
-#: src/components/SidebarFooter.tsx
 #: src/pages/Artifacts.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/shell/chat-context.tsx
+#: src/pages/shell/sidebar-header.tsx
 #: src/pages/Today.tsx
 msgid "Today"
 msgstr "今天"
@@ -6684,6 +6727,7 @@ msgstr "受信任的網站"
 #: src/components/pages/PageNotice.tsx
 #: src/components/pages/PagesList.tsx
 #: src/pages/ActivityList.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/Onboarding.tsx
 #: src/pages/SharedPage.tsx
 #: src/pages/SpaceSearch.tsx
@@ -7013,6 +7057,10 @@ msgstr "週三"
 
 #: src/lib/billing.ts
 msgid "week"
+msgstr "週"
+
+#: src/pages/Calendar.tsx
+msgid "Week"
 msgstr "週"
 
 #: src/lib/cron.ts

@@ -12,7 +12,13 @@ const WORK_RUNS_LIMIT = 50;
 export async function listWorkItems(
   prisma: PrismaClient,
   spaceId: string,
-  filter: { assigneeBotId?: string; createdByUserId?: string; phases?: WorkPhase[] } = {},
+  filter: {
+    assigneeBotId?: string;
+    createdByUserId?: string;
+    /** Tickets this user created or that are assigned to a bot this user owns. */
+    involvingUserId?: string;
+    phases?: WorkPhase[];
+  } = {},
 ): Promise<WorkItem[]> {
   const board = await ensureBoard(prisma, spaceId);
   const rows = await prisma.ticket.findMany({
@@ -21,6 +27,18 @@ export async function listWorkItems(
       boardId: board.id,
       ...(filter.assigneeBotId ? { assigneeBotId: filter.assigneeBotId } : {}),
       ...(filter.createdByUserId ? { createdByUserId: filter.createdByUserId } : {}),
+      ...(filter.involvingUserId
+        ? {
+            OR: [
+              { createdByUserId: filter.involvingUserId },
+              { assigneeBot: { userId: filter.involvingUserId, spaceId } },
+            ],
+          }
+        : {}),
+      // Done and cancelled tickets only ever read as those phases, so open-work lists skip them.
+      ...(filter.phases && !filter.phases.some((phase) => phase === "done" || phase === "cancelled")
+        ? { status: { notIn: ["done", "closed"] } }
+        : {}),
     },
     orderBy: [{ updatedAt: "desc" }, { id: "desc" }],
   });

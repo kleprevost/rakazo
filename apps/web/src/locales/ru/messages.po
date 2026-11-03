@@ -478,6 +478,10 @@ msgstr "Ярлык аккаунта"
 msgid "Account menu for {name}"
 msgstr "Меню аккаунта {name}"
 
+#: src/pages/Calendar.tsx
+msgid "Actions"
+msgstr "Действия"
+
 #. placeholder {0}: bot.name
 #. placeholder {0}: group.spaceName
 #. placeholder {0}: page.title
@@ -1032,6 +1036,7 @@ msgstr "Студия аватаров"
 #: src/pages/admin/AdminShell.tsx
 #: src/pages/Auth.tsx
 #: src/pages/Board.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/McpServersOverlay.tsx
 #: src/pages/NavLinkPage.tsx
 #: src/pages/PluginsOverlay.tsx
@@ -1177,7 +1182,9 @@ msgstr "Просмотреть MCP-серверы"
 msgid "Built-in"
 msgstr "Встроенный"
 
+#: src/pages/Calendar.tsx
 #: src/pages/shell/hire-role-dialog.tsx
+#: src/pages/shell/sidebar-header.tsx
 msgid "Calendar"
 msgstr ""
 
@@ -1917,6 +1924,7 @@ msgid "Could not clear conversation"
 msgstr "Не удалось очистить диалог"
 
 #: src/components/ComputerUpdateProgress.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/Today.tsx
 msgid "Could not complete action"
 msgstr "Не удалось выполнить действие"
@@ -2584,6 +2592,10 @@ msgstr ""
 msgid "day"
 msgstr "день"
 
+#: src/pages/Calendar.tsx
+msgid "Day"
+msgstr "День"
+
 #: src/pages/shell/message-cards.tsx
 msgid "Day-to-day work"
 msgstr ""
@@ -2862,6 +2874,7 @@ msgstr "У вас нет учетной записи?"
 #: src/lib/ticket-status.ts
 #: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/shell/avatar-studio-popover.tsx
 #: src/pages/shell/import-setup-card.tsx
 #: src/pages/shell/message-view.tsx
@@ -2921,6 +2934,7 @@ msgstr ""
 
 #: src/components/AskCard.tsx
 #: src/pages/AccountSettingsOverlay.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/McpServersOverlay.tsx
 msgid "Edit"
 msgstr "Изменить"
@@ -3021,6 +3035,10 @@ msgstr "Переменные окружения: {names}"
 #: src/pages/shell/sidebar-roster.tsx
 msgid "Error"
 msgstr ""
+
+#: src/pages/Calendar.tsx
+msgid "Event-triggered"
+msgstr "По событию"
 
 #: src/lib/cron.ts
 #: src/pages/ExternalConversationSettings.tsx
@@ -3141,6 +3159,7 @@ msgstr "неуспешный"
 #: src/components/SubagentCard.tsx
 #: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
+#: src/pages/Calendar.tsx
 msgid "Failed"
 msgstr "Ошибка"
 
@@ -4319,6 +4338,10 @@ msgstr "Новое пространство"
 msgid "New ticket"
 msgstr ""
 
+#: src/pages/Calendar.tsx
+msgid "Next"
+msgstr "Далее"
+
 #: src/components/markdown-copy.tsx
 msgid "Next page"
 msgstr "Следующая страница"
@@ -4492,6 +4515,10 @@ msgstr "Не работает"
 #: src/pages/KnowledgeSection.tsx
 msgid "Nothing remembered yet"
 msgstr "Пока ничего не запомнено"
+
+#: src/pages/Calendar.tsx
+msgid "Nothing scheduled"
+msgstr "Ничего не запланировано"
 
 #: src/pages/admin/AdminPolicyPage.tsx
 #: src/pages/admin/AdminQuery.tsx
@@ -4829,6 +4856,10 @@ msgstr "Вставьте свой ключ API"
 msgid "Paste your API key, then test again."
 msgstr "Вставьте API-ключ и повторите тест."
 
+#: src/pages/Calendar.tsx
+msgid "Pause"
+msgstr "Приостановить"
+
 #: src/pages/RoutineEditor.tsx
 #: src/pages/shell/import-status.ts
 msgid "Paused"
@@ -4943,6 +4974,10 @@ msgstr "Предварительный просмотр {0}"
 #: src/pages/Artifacts.tsx
 msgid "Preview isn't available for this file type — download it to view it."
 msgstr ""
+
+#: src/pages/Calendar.tsx
+msgid "Previous"
+msgstr "Назад"
 
 #: src/components/markdown-copy.tsx
 msgid "Previous page"
@@ -5406,6 +5441,7 @@ msgid "Restoring your workspace"
 msgstr "Восстановление вашего рабочего пространства"
 
 #: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/Calendar.tsx
 msgid "Resume"
 msgstr "Возобновить"
 
@@ -5501,6 +5537,10 @@ msgstr "Запустить в"
 msgid "Run history"
 msgstr "История запуска"
 
+#: src/pages/Calendar.tsx
+msgid "Run now"
+msgstr "Запустить сейчас"
+
 #: src/pages/shell/use-routine-editor.ts
 msgid "Run time must be in the future."
 msgstr "Время выполнения должно быть в будущем."
@@ -5512,6 +5552,7 @@ msgstr "выполняется"
 #: src/components/SubagentCard.tsx
 #: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/RoutineEditor.tsx
 #: src/pages/Today.tsx
 msgid "Running"
@@ -5974,6 +6015,7 @@ msgstr "Пропустить"
 msgid "Skip or deploy key"
 msgstr "Пропустить или добавить ключ"
 
+#: src/pages/Calendar.tsx
 #: src/pages/shell/message-view.tsx
 msgid "Skipped"
 msgstr ""
@@ -6603,9 +6645,10 @@ msgstr ""
 msgid "To:"
 msgstr "К:"
 
-#: src/components/SidebarFooter.tsx
 #: src/pages/Artifacts.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/shell/chat-context.tsx
+#: src/pages/shell/sidebar-header.tsx
 #: src/pages/Today.tsx
 msgid "Today"
 msgstr "Сегодня"
@@ -6683,6 +6726,7 @@ msgstr "Доверенные сайты"
 #: src/components/pages/PageNotice.tsx
 #: src/components/pages/PagesList.tsx
 #: src/pages/ActivityList.tsx
+#: src/pages/Calendar.tsx
 #: src/pages/Onboarding.tsx
 #: src/pages/SharedPage.tsx
 #: src/pages/SpaceSearch.tsx
@@ -7013,6 +7057,10 @@ msgstr "среда"
 #: src/lib/billing.ts
 msgid "week"
 msgstr ""
+
+#: src/pages/Calendar.tsx
+msgid "Week"
+msgstr "Неделя"
 
 #: src/lib/cron.ts
 #: src/pages/RoutineEditor.tsx

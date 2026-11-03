@@ -22,6 +22,7 @@ import { authClient } from "./lib/auth";
 import { getTicketBoardEnabled, subscribeTicketBoardEnabled } from "./lib/bootstrap";
 import { syncCallIdentity } from "./lib/call-session";
 import { desktopBridge } from "./lib/desktop";
+import { resetLanding, routeSettlesLanding, settleLanding } from "./lib/landing";
 import { syncWebLogoAvatarIdentity } from "./lib/logo-avatar-activity";
 import { identifyMonitoringUser } from "./lib/monitoring";
 import { markAfterPaint, markOnce } from "./lib/performance";
@@ -60,6 +61,9 @@ const ArtifactsPage = lazyComponent(() =>
   import("./pages/Artifacts").then((module) => module.ArtifactsPage),
 );
 const TodayPage = lazyComponent(() => import("./pages/Today").then((module) => module.TodayPage));
+const CalendarPage = lazyComponent(() =>
+  import("./pages/Calendar").then((module) => module.CalendarPage),
+);
 const BoardPage = lazyComponent(() => import("./pages/Board").then((module) => module.BoardPage));
 const AdminRoutes = lazyComponent(() =>
   import("./pages/admin/AdminRoutes").then((module) => module.AdminRoutes),
@@ -146,6 +150,11 @@ function SessionApp() {
       .then(() => rpc.analytics.screen({ screen, surface: desktopBridge() ? "desktop" : "web" }))
       .catch(() => undefined);
   }, [analyticsUserId, screen]);
+  useEffect(() => {
+    if (session.isPending) return;
+    if (!analyticsUserId) resetLanding();
+    else if (routeSettlesLanding(pathname, search)) settleLanding();
+  }, [analyticsUserId, session.isPending, pathname, search]);
   const gate = sessionGate(session);
   useLayoutEffect(() => {
     if (gate !== "authenticated" && gate !== "anonymous") return;
@@ -276,6 +285,7 @@ function SessionApp() {
                 <Route element={<CallLayout />}>
                   <Route path="/onboarding/:step?" element={<OnboardingPage />} />
                   <Route path="/app/today" element={<TodayPage />} />
+                  <Route path="/app/calendar" element={<CalendarPage />} />
                   <Route path="/app/artifacts" element={<ArtifactsPage />} />
                   <Route path="/app/artifacts/:artifactId" element={<ArtifactsPage />} />
                   {ticketBoardEnabled ? <Route path="/app/board" element={<BoardPage />} /> : null}

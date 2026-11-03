@@ -25,7 +25,7 @@ import {
 import { skipToken, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ChevronLeft } from "lucide-react";
 import { useEffect, useId, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useSpaceQueries } from "../lib/query";
 import { formatRelativeTime } from "../lib/relative-time";
 import { rpc } from "../lib/rpc";
@@ -46,6 +46,16 @@ export function BoardPage() {
   const tickets = ticketsQuery.data?.tickets ?? [];
   const bots = botsQuery.data ?? [];
   const [selected, setSelected] = useState<Ticket | "new" | null>(null);
+  // Today links here with ?ticket=<id>; the ticket opens once, then the link is spent.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const linkedTicket = searchParams.get("ticket");
+  useEffect(() => {
+    if (!linkedTicket) return;
+    const ticket = tickets.find((candidate) => candidate.id === linkedTicket);
+    if (!ticket) return;
+    setSelected(ticket);
+    setSearchParams({}, { replace: true });
+  }, [linkedTicket, tickets, setSearchParams]);
   const [streamError, setError] = useState("");
   const loadFailed = ticketsQuery.error ?? botsQuery.error;
   const error = streamError || (loadFailed ? errorText(loadFailed) : "");
