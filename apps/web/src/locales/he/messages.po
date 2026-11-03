@@ -1089,13 +1089,13 @@ msgstr "לחסום"
 msgid "Blocked"
 msgstr "חסום"
 
-#. js-lingui-explicit-id
-#: src/lib/run-error.ts
+#: src/lib/user-error.ts
+#: src/pages/shell/hire-role-dialog.tsx
 msgid "Blocked by your organization"
 msgstr "נחסם על ידי הארגון שלך"
 
-#: src/lib/user-error.ts
-#: src/pages/shell/hire-role-dialog.tsx
+#. js-lingui-explicit-id
+#: src/lib/run-error.ts
 msgid "Blocked by your organization"
 msgstr "נחסם על ידי הארגון שלך"
 
@@ -4869,6 +4869,10 @@ msgstr "מושהה"
 #: src/pages/PluginSubmissionsPanel.tsx
 msgid "Pending"
 msgstr ""
+
+#: src/pages/shell/chat-model-picker.tsx
+msgid "Per million tokens, input / output"
+msgstr "לכל מיליון אסימונים, קלט / פלט"
 
 #: src/pages/shell/bot-panel.tsx
 msgid "Permissions"

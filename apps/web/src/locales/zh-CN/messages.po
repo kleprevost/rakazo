@@ -1089,13 +1089,13 @@ msgstr "阻止"
 msgid "Blocked"
 msgstr "已阻塞"
 
-#. js-lingui-explicit-id
-#: src/lib/run-error.ts
+#: src/lib/user-error.ts
+#: src/pages/shell/hire-role-dialog.tsx
 msgid "Blocked by your organization"
 msgstr "已被你的组织阻止"
 
-#: src/lib/user-error.ts
-#: src/pages/shell/hire-role-dialog.tsx
+#. js-lingui-explicit-id
+#: src/lib/run-error.ts
 msgid "Blocked by your organization"
 msgstr "已被你的组织阻止"
 
@@ -4869,6 +4869,10 @@ msgstr "已暂停"
 #: src/pages/PluginSubmissionsPanel.tsx
 msgid "Pending"
 msgstr "待处理"
+
+#: src/pages/shell/chat-model-picker.tsx
+msgid "Per million tokens, input / output"
+msgstr "每百万 token，输入 / 输出"
 
 #: src/pages/shell/bot-panel.tsx
 msgid "Permissions"

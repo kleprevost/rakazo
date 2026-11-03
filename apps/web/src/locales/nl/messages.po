@@ -1089,13 +1089,13 @@ msgstr "Blokkeren"
 msgid "Blocked"
 msgstr "Geblokkeerd"
 
-#. js-lingui-explicit-id
-#: src/lib/run-error.ts
+#: src/lib/user-error.ts
+#: src/pages/shell/hire-role-dialog.tsx
 msgid "Blocked by your organization"
 msgstr "Geblokkeerd door je organisatie"
 
-#: src/lib/user-error.ts
-#: src/pages/shell/hire-role-dialog.tsx
+#. js-lingui-explicit-id
+#: src/lib/run-error.ts
 msgid "Blocked by your organization"
 msgstr "Geblokkeerd door je organisatie"
 
@@ -4869,6 +4869,10 @@ msgstr "Gepauzeerd"
 #: src/pages/PluginSubmissionsPanel.tsx
 msgid "Pending"
 msgstr ""
+
+#: src/pages/shell/chat-model-picker.tsx
+msgid "Per million tokens, input / output"
+msgstr "Per miljoen tokens, invoer / uitvoer"
 
 #: src/pages/shell/bot-panel.tsx
 msgid "Permissions"

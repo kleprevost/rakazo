@@ -25,6 +25,7 @@ import {
   modelRoleTarget,
   voicePreferenceTarget,
 } from "@rakazo/db";
+import { hostedProviderOf } from "./hosted-provider.js";
 import type { RouterDeps } from "./router.js";
 import { resolveThreadTarget } from "./thread-target.js";
 import { voiceCredentialServer } from "./voice.js";
@@ -133,7 +134,7 @@ export async function aiConsentStatus(
           override,
           overrideCredential,
           main,
-          hostedProvider: deps.billing?.modelCreditsEnabled ? deps.env.defaultProvider : undefined,
+          hostedProvider: hostedProviderOf(deps),
           defaults: { settings, deployment },
         });
       }),

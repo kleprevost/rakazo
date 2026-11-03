@@ -1089,13 +1089,13 @@ msgstr "Blockieren"
 msgid "Blocked"
 msgstr ""
 
-#. js-lingui-explicit-id
-#: src/lib/run-error.ts
+#: src/lib/user-error.ts
+#: src/pages/shell/hire-role-dialog.tsx
 msgid "Blocked by your organization"
 msgstr "Von deiner Organisation blockiert"
 
-#: src/lib/user-error.ts
-#: src/pages/shell/hire-role-dialog.tsx
+#. js-lingui-explicit-id
+#: src/lib/run-error.ts
 msgid "Blocked by your organization"
 msgstr "Von deiner Organisation blockiert"
 
@@ -4869,6 +4869,10 @@ msgstr ""
 #: src/pages/PluginSubmissionsPanel.tsx
 msgid "Pending"
 msgstr ""
+
+#: src/pages/shell/chat-model-picker.tsx
+msgid "Per million tokens, input / output"
+msgstr "Pro Million Token, Eingabe / Ausgabe"
 
 #: src/pages/shell/bot-panel.tsx
 msgid "Permissions"

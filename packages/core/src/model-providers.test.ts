@@ -10,6 +10,7 @@ import {
   credentialForModel,
   filterModelChoices,
   groupModelChoices,
+  modelPriceLabel,
   pickCatalogModelId,
   popularModelProvidersFirst,
   resolveSelectableModelId,
@@ -132,6 +133,42 @@ describe("clampCatalogThinkingLevel", () => {
 
   it("keeps a concrete level when the model is outside the catalog", () => {
     expect(clampCatalogThinkingLevel("high", undefined)).toBe("high");
+  });
+});
+
+describe("model prices", () => {
+  const priced = {
+    managed: true,
+    provider: "azure",
+    providerName: "Azure OpenAI",
+    id: "gpt-4.1",
+    label: "GPT-4.1",
+    inputUsdPerMillion: 2,
+    outputUsdPerMillion: 8,
+  };
+
+  it("shows input and output list prices per million tokens", () => {
+    expect(modelPriceLabel(priced)).toBe("$2 / $8");
+    expect(modelPriceLabel({ inputUsdPerMillion: 0.1, outputUsdPerMillion: 0.4 })).toBe(
+      "$0.1 / $0.4",
+    );
+    expect(modelPriceLabel({ inputUsdPerMillion: 1.25, outputUsdPerMillion: 10 })).toBe(
+      "$1.25 / $10",
+    );
+  });
+
+  it("shows nothing when a price is unknown", () => {
+    expect(modelPriceLabel({})).toBeUndefined();
+    expect(modelPriceLabel({ inputUsdPerMillion: 2 })).toBeUndefined();
+    const [choice] = connectedModelChoices(
+      [],
+      [{ ...priced, inputUsdPerMillion: undefined, outputUsdPerMillion: undefined }],
+    );
+    expect(choice?.price).toBeUndefined();
+  });
+
+  it("carries the price onto organization model choices", () => {
+    expect(connectedModelChoices([], [priced]).map((choice) => choice.price)).toEqual(["$2 / $8"]);
   });
 });
 

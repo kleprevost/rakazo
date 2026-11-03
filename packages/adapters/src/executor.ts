@@ -92,7 +92,7 @@ import {
   selectRunConnections,
 } from "./connection-context.js";
 import { formatCurrentTimeInstruction } from "./current-time.js";
-import { resolveDeploymentModel } from "./deployment-model.js";
+import { hostedModelProvider, resolveDeploymentModel } from "./deployment-model.js";
 import type { ExecutorDeps } from "./executor-deps.js";
 import type { FleetRun } from "./fleet-tools.js";
 import { loadBotGroupDirectory, loadGroupContext } from "./group-handoff.js";
@@ -869,19 +869,14 @@ export function createRunExecutor(executorDeps: ExecutorDeps) {
         const runtimeFallback = runtimeFallbackModel(deps.runtime);
         const pinError =
           run.modelPinned &&
-          !(
-            (await modelCreditBillingEnabled(deps)) &&
-            modelChoice.modelProvider === runDeployment?.provider
-          )
+          !(runDeployment && modelChoice.modelProvider === runDeployment.provider)
             ? pinnedModelCredentialError(modelChoice, overrideCredential)
             : undefined;
         const selected = selectConfiguredModel({
           override: modelChoice,
           overrideCredential,
           main,
-          hostedProvider: (await modelCreditBillingEnabled(deps))
-            ? resolveDeploymentModel().provider
-            : undefined,
+          hostedProvider: hostedModelProvider(await modelCreditBillingEnabled(deps)),
           defaults: { settings, deployment: runDeployment },
         });
         const selectedProvider = selected.provider ?? runtimeFallback?.provider;

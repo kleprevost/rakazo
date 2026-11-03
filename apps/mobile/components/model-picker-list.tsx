@@ -261,7 +261,7 @@ export function ModelPickerList({
               accessibilityState={{ selected }}
               onPress={() => onSelect(item)}
               title={item.title ?? item.label}
-              detail={item.detail}
+              detail={item.detail ?? item.price}
               value={section.connect ? t("Connect") : undefined}
               chevron={section.connect ? "right" : undefined}
               trailing={

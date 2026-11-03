@@ -156,6 +156,8 @@ export type ConnectedModelChoice = {
   modelLabel?: string;
   /** The catalog says whether the model reads images; unknown for free-form ids. */
   images?: boolean;
+  /** Input / output list price per million tokens, e.g. "$3 / $15"; absent when unknown. */
+  price?: string;
 };
 
 type CatalogModelRef = {
@@ -166,7 +168,20 @@ type CatalogModelRef = {
   providerName?: string;
   placeholder?: boolean;
   images?: boolean;
+  inputUsdPerMillion?: number | undefined;
+  outputUsdPerMillion?: number | undefined;
 };
+
+/** "$3 / $15": input and output list price per million tokens; undefined when either is unknown. */
+export function modelPriceLabel(entry: {
+  inputUsdPerMillion?: number | undefined;
+  outputUsdPerMillion?: number | undefined;
+}): string | undefined {
+  const { inputUsdPerMillion: input, outputUsdPerMillion: output } = entry;
+  if (input === undefined || output === undefined) return undefined;
+  const dollars = (value: number) => `$${Number(value.toFixed(value < 1 ? 3 : 2))}`;
+  return `${dollars(input)} / ${dollars(output)}`;
+}
 
 type CredentialModelRef = {
   provider: string;
@@ -257,6 +272,7 @@ function catalogChoices(providerModels: readonly CatalogModelRef[]): ConnectedMo
       providerLabel: entry.providerName ?? entry.provider,
       modelLabel: entry.label,
       images: entry.images,
+      price: modelPriceLabel(entry),
     };
   });
 }
@@ -351,6 +367,7 @@ export type ChatModelChoice = {
   title?: string;
   detail?: string;
   images?: boolean;
+  price?: string;
 };
 
 /** Filter on full labels before shortening rows; saved/default choices stay first. */

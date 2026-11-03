@@ -38,6 +38,27 @@ OPENCODE_API_KEY=<key>
 Pi's `opencode` provider talks to Zen and picks the right protocol per model. Free-tier models are
 hidden from the picker because they only answer OpenCode's own app; paid Zen models are listed.
 
+## Organization models
+
+The deployment credentials above also serve every member, with no connection of their own. When the
+deployment model can run and model credits are not metered, every catalog model of the deployment
+provider appears in the model pickers, marked as provided by the organization, with its list price
+per million tokens (input / output) when the catalog knows it. Models with no known price show no
+price.
+
+- `allowUserConnections: false` in the [central policy](./central-policy.md) only stops members
+  adding their own credentials or endpoints. It does not hide the organization's models.
+- `allowProviders` and `allowModels` still filter the list. To offer a few models, name them, for
+  example `allowModels: ['azure/gpt-5.1', 'azure/gpt-5.1-mini']`.
+- A member who connects their own key for the deployment provider runs on that key instead.
+- **Foundry lists only deployments you name.** Azure serves a model by its deployment name, so
+  Rakazo cannot tell which models exist on the resource. The picker offers `PI_DEFAULT_MODEL` plus
+  every model id in `AZURE_OPENAI_DEPLOYMENT_NAME_MAP`. To expose another Foundry deployment, add
+  `<catalog model id>=<deployment name>` to the map (comma separated, even when the names match) and
+  restart api and worker. The model id must exist in Pi's Azure catalog.
+- Other providers (for example OpenCode Zen) offer their whole catalog, narrowed by policy.
+- Usage and spend by model: **Settings → Usage**; set `budgets` in the policy to cap spend.
+
 ## Per-user connections
 
 - **Catalog providers.** Azure OpenAI and OpenCode appear in the provider list in

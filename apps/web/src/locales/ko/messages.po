@@ -1089,13 +1089,13 @@ msgstr "차단"
 msgid "Blocked"
 msgstr ""
 
-#. js-lingui-explicit-id
-#: src/lib/run-error.ts
+#: src/lib/user-error.ts
+#: src/pages/shell/hire-role-dialog.tsx
 msgid "Blocked by your organization"
 msgstr "조직에서 차단했습니다"
 
-#: src/lib/user-error.ts
-#: src/pages/shell/hire-role-dialog.tsx
+#. js-lingui-explicit-id
+#: src/lib/run-error.ts
 msgid "Blocked by your organization"
 msgstr "조직에서 차단했습니다"
 
@@ -4869,6 +4869,10 @@ msgstr "일시 중지됨"
 #: src/pages/PluginSubmissionsPanel.tsx
 msgid "Pending"
 msgstr ""
+
+#: src/pages/shell/chat-model-picker.tsx
+msgid "Per million tokens, input / output"
+msgstr "백만 토큰당, 입력 / 출력"
 
 #: src/pages/shell/bot-panel.tsx
 msgid "Permissions"

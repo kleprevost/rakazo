@@ -220,6 +220,7 @@ describe("space catalog auth", () => {
       userModelCredential: { findMany: credentialFindMany },
       userModelPreference: { findMany: preferenceFindMany },
       secret: { findMany: secretFindMany },
+      deploymentSettings: { findUnique: vi.fn().mockResolvedValue({ modelCreditsEnabled: true }) },
     } as unknown as PrismaClient;
     return { prisma, credentialFindMany, preferenceFindMany, secretFindMany };
   }

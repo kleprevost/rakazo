@@ -8,7 +8,7 @@ import {
 } from "@rakazo/contracts";
 import type { PrismaClient } from "@rakazo/db";
 import { chooseModelCredential, findModelCredential, findModelCredentialById } from "@rakazo/db";
-import { resolveDeploymentModel } from "./deployment-model.js";
+import { deploymentServesModel, resolveDeploymentModel } from "./deployment-model.js";
 import { modelCredentialDto } from "./model-connect.js";
 import type { ModelCredentialAuthKind } from "./pi-catalog-availability.js";
 import {
@@ -571,7 +571,11 @@ export async function validateBotModelChange(
       throw error;
     }
     if (!credential) {
-      if (hosted && isCatalogModelChoice(provider, model)) {
+      if (
+        hosted &&
+        isCatalogModelChoice(provider, model) &&
+        deploymentServesModel(provider, model)
+      ) {
         const allowed = listPiCatalog().find(
           (entry) => entry.provider === provider && entry.id === model,
         )?.thinkingLevels;
@@ -740,7 +744,9 @@ export async function validateConnectedModelChoice(
     resolution.hostedProvider === provider &&
     (await hasHostedModelCredits(prisma, actor, provider))
   ) {
-    return isCatalogModelChoice(provider, modelId) ? undefined : "Unknown model for that provider";
+    return isCatalogModelChoice(provider, modelId) && deploymentServesModel(provider, modelId)
+      ? undefined
+      : "Unknown model for that provider";
   }
   const credential = await findConnectedModelCredential(
     prisma,
@@ -880,6 +886,18 @@ export async function hasHostedModelCredits(
 ): Promise<boolean> {
   const deployment = resolveDeploymentModel();
   if (!deployment.configured || deployment.provider !== provider) return false;
+  // Credits not metered: the deployment's credentials are the organization's models, which
+  // a member's own connection to the provider replaces.
+  const settings = await prisma.deploymentSettings.findUnique({
+    where: { id: "default" },
+    select: { modelCreditsEnabled: true },
+  });
+  if (settings?.modelCreditsEnabled === false) {
+    return !(await prisma.userModelCredential.findFirst({
+      where: { userId: scope.userId, provider },
+      select: { id: true },
+    }));
+  }
   const space = await prisma.space.findFirst({
     where: { id: scope.spaceId, organization: { members: { some: { userId: scope.userId } } } },
     select: {

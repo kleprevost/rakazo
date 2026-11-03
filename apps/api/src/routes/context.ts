@@ -10,6 +10,7 @@ import {
   createFaviconResolver,
   decisionModelCatalog,
   deploymentModelRole,
+  deploymentServesModel,
   findConnectedModelCredential,
   hiddenCatalogModel,
   kickModelCredentialRefresh,
@@ -42,6 +43,7 @@ import { createGroupRepos, createRepos, recordSecurityEvent, runAsTenant } from 
 import { createAgentImportServices } from "../agent-import-services.js";
 import { createAgentSkillsService } from "../agent-skills.js";
 import { createBotRemoval } from "../bot-removal.js";
+import { hostedProviderOf } from "../hosted-provider.js";
 import { createMcpServers } from "../mcp-servers.js";
 import { createModelConnector, prepareAllowedThinkingLevels } from "../model-credentials.js";
 import { assertModelAllowedForRequest } from "../policy-guard.js";
@@ -117,7 +119,7 @@ export function createRouterContext(deps: RouterDeps) {
     secretStore: deps.secrets,
     codexCatalog,
     refreshExpiredCredential,
-    hostedProvider: deps.billing?.modelCreditsEnabled ? deps.env.defaultProvider : undefined,
+    hostedProvider: hostedProviderOf(deps),
     defaultModel: async () => {
       const me = await meDto(deps, actor);
       return { provider: me.defaultProvider, model: me.defaultModel };
@@ -149,7 +151,7 @@ export function createRouterContext(deps: RouterDeps) {
       deps.prisma,
       deps.secrets,
       actor,
-      deps.billing?.modelCreditsEnabled ? deps.env.defaultProvider : undefined,
+      hostedProviderOf(deps),
     );
     const available = listAvailablePiCatalog(auth.byProvider, auth.byModel);
     const [live, providerLive] = await Promise.all([
@@ -184,19 +186,28 @@ export function createRouterContext(deps: RouterDeps) {
       )
     )
       selected = await savedCatalogSelections(deps.prisma, actor.userId);
-    return offeredCatalog(merged, selected).map((entry) =>
-      entry.provider === auth.managedProvider
-        ? {
-            ...entry,
-            managed: true,
-            billing:
-              auth.secretIdByModel[entry.provider]?.[entry.id] ||
-              auth.secretIdByProvider[entry.provider]
-                ? entry.billing
-                : "Uses Rakazo credits",
-          }
-        : entry,
-    );
+    const orgBilling = deps.billing?.modelCreditsEnabled
+      ? "Uses Rakazo credits"
+      : "Provided by your organization";
+    return offeredCatalog(merged, selected)
+      .filter(
+        (entry) =>
+          entry.provider !== auth.managedProvider ||
+          deploymentServesModel(entry.provider, entry.id),
+      )
+      .map((entry) =>
+        entry.provider === auth.managedProvider
+          ? {
+              ...entry,
+              managed: true,
+              billing:
+                auth.secretIdByModel[entry.provider]?.[entry.id] ||
+                auth.secretIdByProvider[entry.provider]
+                  ? entry.billing
+                  : orgBilling,
+            }
+          : entry,
+      );
   };
 
   // Shown where a member chose no model, so the list names what actually runs.

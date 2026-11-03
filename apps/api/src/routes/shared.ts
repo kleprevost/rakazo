@@ -101,9 +101,7 @@ export async function modelSetup(deps: RouterDeps, actor: Actor) {
   ]);
   const main =
     member &&
-    (member.credential ||
-      (deps.billing?.modelCreditsEnabled &&
-        (await hasHostedModelCredits(deps.prisma, actor, member.provider))))
+    (member.credential || (await hasHostedModelCredits(deps.prisma, actor, member.provider)))
       ? member
       : null;
   const funding = deps.billing ? await deps.billing.status(actor) : null;
