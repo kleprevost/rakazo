@@ -2,7 +2,7 @@ import { ORPCError } from "@orpc/server";
 import type { RouterDeps } from "./router.js";
 
 type AdminDeps = Pick<RouterDeps, "prisma"> & {
-  env: Pick<RouterDeps["env"], "adminEmails">;
+  env: Pick<RouterDeps["env"], "adminEmails" | "ssoAdminEnabled">;
   auth: Pick<RouterDeps["auth"], "isSsoAdmin">;
 };
 
@@ -12,13 +12,14 @@ type AdminDeps = Pick<RouterDeps, "prisma"> & {
  */
 export async function isAdmin(deps: AdminDeps, userId: string): Promise<boolean> {
   const admins = deps.env.adminEmails ?? [];
+  if (admins.length === 0 && !deps.env.ssoAdminEnabled) return false;
   const user = await deps.prisma.user.findUnique({
     where: { id: userId },
     select: { email: true, emailVerified: true },
   });
   if (!user?.emailVerified) return false;
   if (admins.includes(user.email.toLowerCase())) return true;
-  return deps.auth.isSsoAdmin(userId);
+  return Boolean(deps.env.ssoAdminEnabled) && deps.auth.isSsoAdmin(userId);
 }
 
 export async function requireAdmin(deps: AdminDeps, userId: string): Promise<void> {
