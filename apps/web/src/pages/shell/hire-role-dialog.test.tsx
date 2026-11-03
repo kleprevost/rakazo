@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import type { RoleTemplateListItem } from "@rakazo/contracts";
+import type { HireStarterStatus, RoleTemplateListItem } from "@rakazo/contracts";
 import { findRoleTemplate } from "@rakazo/core";
 import type { ReactNode } from "react";
 import { act } from "react";
@@ -47,7 +47,9 @@ const items = (blocked: RoleTemplateListItem["blocked"] = []): RoleTemplateListI
 
 async function render(
   load: () => Promise<RoleTemplateListItem[]>,
-  onHire: (id: string) => Promise<void> = async () => undefined,
+  onHire: (id: string, key: string) => Promise<HireStarterStatus> = async () => ({
+    status: "queued",
+  }),
 ) {
   await act(async () => {
     root.render(<HireRoleDialog load={load} onHire={onHire} onBack={() => undefined} />);
@@ -70,7 +72,7 @@ async function click(element: HTMLElement) {
 
 describe("HireRoleDialog", () => {
   it("previews what hiring creates and hires the chosen role", async () => {
-    const onHire = vi.fn(async () => undefined);
+    const onHire = vi.fn(async (_id: string, _key: string) => ({ status: "queued" as const }));
     await render(async () => items(), onHire);
     await click(button("Executive Assistant"));
     const preview = document.querySelector('[data-testid="hire-role-preview"]')!.textContent;
@@ -79,7 +81,23 @@ describe("HireRoleDialog", () => {
     expect(preview).toContain("send or forward an email");
     expect(preview).not.toContain("Blocked by your organization");
     await click(button("Hire"));
-    expect(onHire).toHaveBeenCalledWith("executive-assistant");
+    expect(onHire).toHaveBeenCalledWith("executive-assistant", expect.any(String));
+  });
+
+  it("offers a retry with the same key when the first task could not start", async () => {
+    const onHire = vi
+      .fn<(id: string, key: string) => Promise<HireStarterStatus>>()
+      .mockResolvedValueOnce({ status: "failed", reason: "Set up a model first." })
+      .mockResolvedValueOnce({ status: "queued" });
+    await render(async () => items(), onHire);
+    await click(button("Executive Assistant"));
+    await click(button("Hire"));
+    expect(document.querySelector('[data-testid="hire-role-error"]')!.textContent).toContain(
+      "Set up a model first.",
+    );
+    await click(button("Retry"));
+    expect(onHire).toHaveBeenCalledTimes(2);
+    expect(onHire.mock.calls[1]?.[1]).toBe(onHire.mock.calls[0]?.[1]);
   });
 
   it("flags parts central policy blocks", async () => {

@@ -94,12 +94,21 @@ export const HireRoleInput = z.strictObject({
   templateId: slug,
   /** Replaces the template's name. */
   name: z.string().trim().min(1).max(BOT_NAME_MAX_LENGTH).optional(),
+  /** Client-generated per hire attempt; a retry with the same key returns the same bot. */
+  idempotencyKey: z.string().trim().min(8).max(80),
 });
 export type HireRoleInput = z.infer<typeof HireRoleInput>;
 
+/** Whether the first assignment reached the bot's chat as a queued run. */
+export const HireStarterStatusSchema = z.discriminatedUnion("status", [
+  z.object({ status: z.literal("queued") }),
+  z.object({ status: z.literal("failed"), reason: z.string() }),
+]);
+export type HireStarterStatus = z.infer<typeof HireStarterStatusSchema>;
+
 export const HireRoleOutput = z.object({
   bot: BotSchema,
-  starterTask: z.string(),
+  starter: HireStarterStatusSchema,
   blocked: z.array(RoleTemplateBlockSchema),
 });
 export type HireRoleOutput = z.infer<typeof HireRoleOutput>;

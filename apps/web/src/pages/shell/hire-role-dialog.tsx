@@ -1,6 +1,10 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import type { RoleConnectionKind, RoleTemplateListItem } from "@rakazo/contracts";
-import { formatCron } from "@rakazo/core";
+import type {
+  HireStarterStatus,
+  RoleConnectionKind,
+  RoleTemplateListItem,
+} from "@rakazo/contracts";
+import { formatCron, newClientId } from "@rakazo/core";
 import {
   Button,
   Dialog,
@@ -10,13 +14,14 @@ import {
   DialogTitle,
   SectionHeading,
 } from "@rakazo/ui-web";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cronLabels } from "../../lib/cron";
 import { errorText } from "../../lib/user-error";
 
 export interface HireRoleDialogProps {
   load: () => Promise<RoleTemplateListItem[]>;
-  onHire: (templateId: string) => Promise<void>;
+  /** Resolves with the starter task's status; the same key makes a retry return the same bot. */
+  onHire: (templateId: string, idempotencyKey: string) => Promise<HireStarterStatus>;
   onBack: () => void;
 }
 
@@ -67,12 +72,23 @@ export function HireRoleDialog({ load, onHire, onBack }: HireRoleDialogProps) {
     crm: t`CRM`,
   };
 
+  // One key per role pick, so a retry (even after a lost response) never hires twice.
+  const attemptKey = useRef<string | null>(null);
+  // The bot exists but its first task did not start: hiring again re-sends only the task.
+  const [retry, setRetry] = useState(false);
+
   async function hire() {
     if (!selected || submitting) return;
     setError(null);
     setSubmitting(true);
+    attemptKey.current ??= newClientId();
     try {
-      await onHire(selected.template.id);
+      const starter = await onHire(selected.template.id, attemptKey.current);
+      if (starter.status === "failed") {
+        setError(errorText(starter.reason, t`Could not hire`));
+        setRetry(true);
+        setSubmitting(false);
+      }
     } catch (err) {
       setError(errorText(err, t`Could not hire`));
       setSubmitting(false);
@@ -173,13 +189,19 @@ export function HireRoleDialog({ load, onHire, onBack }: HireRoleDialogProps) {
             type="button"
             variant="outline"
             disabled={submitting}
-            onClick={() => (template ? setSelected(null) : onBack())}
+            onClick={() => {
+              if (!template) return onBack();
+              attemptKey.current = null;
+              setRetry(false);
+              setError(null);
+              setSelected(null);
+            }}
           >
             <Trans>Back</Trans>
           </Button>
           {template ? (
             <Button type="button" disabled={submitting} onClick={() => void hire()}>
-              <Trans>Hire</Trans>
+              {retry ? <Trans>Retry</Trans> : <Trans>Hire</Trans>}
             </Button>
           ) : null}
         </DialogFooter>
