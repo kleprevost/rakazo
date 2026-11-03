@@ -9,6 +9,7 @@ import type {
   ComputerActionRequest,
   ComputerFileEntry,
   ComputerInput,
+  ComputerInspection,
   ComputerObservation,
   ComputerRef,
   ControlLeaseRef,
@@ -164,6 +165,7 @@ export class KubernetesSandboxProvider implements SandboxProvider {
         takeover: true,
         persistentHome: this.homeClaim !== undefined,
         multiScreen: true,
+        fleet: { inspect: true },
       },
     };
   }
@@ -236,6 +238,23 @@ export class KubernetesSandboxProvider implements SandboxProvider {
     if (computer.kind !== "kubernetes") return false;
     const pod = await this.readPod(this.podId(computer), context.signal);
     return pod?.status?.phase === "Running" && !pod.metadata?.deletionTimestamp;
+  }
+
+  async inspect(computer: ComputerRef, context: AdapterContext): Promise<ComputerInspection> {
+    const pod = await this.readPod(this.podId(computer), context.signal);
+    if (!pod) return { runtime: "gone", isolation: "unknown" };
+    const container = pod.spec?.containers?.find((entry) => entry.name === CONTAINER_NAME);
+    const running = pod.status?.phase === "Running" && !pod.metadata?.deletionTimestamp;
+    const image = pod.status?.containerStatuses?.find(
+      (entry) => entry.name === CONTAINER_NAME,
+    )?.imageID;
+    const ref = image || container?.image;
+    return {
+      runtime: running ? "running" : "stopped",
+      ...(ref ? { image: { ref } } : {}),
+      // A runtime class can name any sandbox technology, so only the default is known.
+      isolation: this.runtimeClassName ? "unknown" : "container",
+    };
   }
 
   async hasMountedHome(computer: ComputerRef, context: AdapterContext): Promise<boolean> {

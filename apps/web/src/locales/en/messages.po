@@ -687,6 +687,7 @@ msgstr "Advanced..."
 msgid "Agent from another app"
 msgstr "Agent from another app"
 
+#: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/admin/AdminOverviewPage.tsx
 #: src/pages/admin/AdminShell.tsx
 msgid "AI employees"
@@ -1668,6 +1669,7 @@ msgstr "Computer is stopped"
 #: src/components/ComputerDeviceSettings.tsx
 #: src/pages/AccountSettingsOverlay.tsx
 #: src/pages/admin/AdminOverviewPage.tsx
+#: src/pages/admin/AdminShell.tsx
 msgid "Computers"
 msgstr "Computers"
 
@@ -3084,6 +3086,7 @@ msgid "Environment variables: {names}"
 msgstr "Environment variables: {names}"
 
 #: src/lib/roster-status.ts
+#: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/shell/sidebar-roster.tsx
 msgid "Error"
 msgstr "Error"
@@ -3567,6 +3570,10 @@ msgstr "If you heard that, voice is ready."
 msgid "Ignore"
 msgstr "Ignore"
 
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Image"
+msgstr "Image"
+
 #. js-lingui-explicit-id
 #: src/lib/run-error.ts
 msgid "Image input is not configured for this model."
@@ -3724,6 +3731,10 @@ msgstr "Isolated"
 msgid "Isolated preview — no access to your account"
 msgstr "Isolated preview — no access to your account"
 
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Isolation"
+msgstr "Isolation"
+
 #: src/components/pages/PageViewHost.tsx
 msgid "It may have been deleted, or it belongs to someone else."
 msgstr "It may have been deleted, or it belongs to someone else."
@@ -3778,6 +3789,7 @@ msgid "Language"
 msgstr "Language"
 
 #: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/admin/AdminComputersPage.tsx
 msgid "Last active"
 msgstr "Last active"
 
@@ -4616,6 +4628,10 @@ msgstr "Not loaded"
 msgid "Not now"
 msgstr "Not now"
 
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Not reported"
+msgstr "Not reported"
+
 #: src/pages/shell/agent-import.tsx
 #: src/pages/shell/import-status.ts
 msgid "Not supported in Rakazo"
@@ -4854,6 +4870,7 @@ msgstr "Overview"
 #: src/components/pages/SharePopover.tsx
 #: src/lib/identity-display.ts
 #: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/Board.tsx
 msgid "Owner"
 msgstr "Owner"
@@ -5147,6 +5164,7 @@ msgstr "Protected input"
 msgid "Protocol"
 msgstr "Protocol"
 
+#: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/MemorySettingsOverlay.tsx
 #: src/pages/Onboarding.tsx
 #: src/pages/VoiceSettingsOverlay.tsx
@@ -5160,6 +5178,10 @@ msgstr "Providers"
 #: src/components/CloudAgentCard.tsx
 msgid "Pull request"
 msgstr "Pull request"
+
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Quarantined"
+msgstr "Quarantined"
 
 #: src/pages/ActivityList.tsx
 msgid "Queued"
@@ -5684,6 +5706,7 @@ msgstr "running"
 #: src/components/SubagentCard.tsx
 #: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
+#: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/Calendar.tsx
 #: src/pages/RoutineEditor.tsx
 #: src/pages/Today.tsx
@@ -6297,6 +6320,7 @@ msgid "Started {count}m late"
 msgstr "Started {count}m late"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/admin/AdminComputersPage.tsx
 msgid "Starting"
 msgstr "Starting"
 
@@ -6312,6 +6336,7 @@ msgid "State or region"
 msgstr "State or region"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/Board.tsx
 msgid "Status"
 msgstr "Status"
@@ -6339,10 +6364,18 @@ msgstr "Stop speaking"
 msgid "Stop teaching"
 msgstr "Stop teaching"
 
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Stopped"
+msgstr "Stopped"
+
 #. js-lingui-explicit-id
 #: src/lib/browser-notifications.ts
 msgid "Stopped."
 msgstr "Stopped."
+
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Stopping"
+msgstr "Stopping"
 
 #: src/components/ComputerMaintenanceActions.tsx
 msgid "Stopping…"

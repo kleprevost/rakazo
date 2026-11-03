@@ -902,4 +902,25 @@ describe("Docker sandbox streams through the supervisor", () => {
       ),
     ).toMatchObject({ computerId: "abc123", purpose: "terminal" });
   });
+
+  it("inspects a computer through the supervisor and reports a missing one as gone", async () => {
+    const fetchMock = vi.fn(async (url: string | URL | Request) =>
+      String(url).endsWith("/computers/gone")
+        ? new Response("{}", { status: 404 })
+        : Response.json({ id: "box", running: true, image: "registry.example.test/computer:1" }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    const provider = new DockerSandboxProvider("http://supervisor.test", "test-token");
+    expect(provider.describe().capabilities.fleet).toEqual({ inspect: true });
+    await expect(
+      provider.inspect({ id: "box", botId: "bot", kind: "docker", providerRef: "box" }, context),
+    ).resolves.toEqual({
+      runtime: "running",
+      image: { ref: "registry.example.test/computer:1" },
+      isolation: "container",
+    });
+    await expect(
+      provider.inspect({ id: "gone", botId: "bot", kind: "docker", providerRef: "gone" }, context),
+    ).resolves.toMatchObject({ runtime: "gone" });
+  });
 });

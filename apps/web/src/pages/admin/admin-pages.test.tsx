@@ -12,6 +12,7 @@ const api = vi.hoisted(() => ({
   overview: vi.fn(),
   users: vi.fn(),
   bots: vi.fn(),
+  computers: vi.fn(),
   policy: vi.fn(),
   audit: vi.fn(),
   endSessions: vi.fn(),
@@ -50,6 +51,7 @@ vi.mock("../../lib/query", () => {
       overview: plain("overview", () => api.overview()),
       users: { list: paged("users", (input) => api.users(input)) },
       bots: { list: paged("bots", (input) => api.bots(input)) },
+      computers: { list: paged("computers", (input) => api.computers(input)) },
       policy: plain("policy", () => api.policy()),
       audit: paged("audit", (input) => api.audit(input)),
     },
@@ -76,6 +78,7 @@ vi.mock("@rakazo/ui-web", async (importOriginal) => ({
 
 import { AdminAuditPage } from "./AdminAuditPage";
 import { AdminBotsPage } from "./AdminBotsPage";
+import { AdminComputersPage } from "./AdminComputersPage";
 import { AdminOverviewPage } from "./AdminOverviewPage";
 import { AdminPolicyPage } from "./AdminPolicyPage";
 import { AdminUsersPage } from "./AdminUsersPage";
@@ -143,6 +146,7 @@ it("links the sections and shows Free access only when the deployment sells cred
     "/admin",
     "/admin/users",
     "/admin/bots",
+    "/admin/computers",
     "/admin/policy",
     "/admin/audit",
     "/admin/access",
@@ -300,6 +304,75 @@ it("shows the AI employees page: empty, loading, and populated", async () => {
     "$4.25",
   ])
     expect(row).toContain(part);
+});
+
+it("shows the computers page: empty, loading, error with retry, and populated", async () => {
+  api.computers.mockResolvedValue({ computers: [], nextCursor: null });
+  const empty = await show(<AdminComputersPage />);
+  expect(empty.host.textContent).toContain("Nothing to show.");
+
+  document.body.innerHTML = "";
+  api.computers.mockImplementation(never);
+  const loading = await show(<AdminComputersPage />);
+  expect(loading.host.querySelector('[aria-label="Loading…"]')).not.toBeNull();
+
+  document.body.innerHTML = "";
+  api.computers.mockRejectedValue(new Error("boom"));
+  const failed = await show(<AdminComputersPage />);
+  expect(failed.host.querySelector('[role="alert"]')?.textContent).toContain("boom");
+  expect(failed.host.textContent).toContain("Retry");
+
+  document.body.innerHTML = "";
+  const computer = {
+    kind: "docker",
+    scope: "team",
+    ownerName: "Mia",
+    ownerEmail: "mia@example.test",
+    spaceName: "Team space",
+    runningSince: null,
+    lastActivityAt: "2026-02-05T00:00:00.000Z",
+  };
+  api.computers.mockResolvedValue({
+    computers: [
+      {
+        ...computer,
+        id: "c1",
+        state: "running",
+        bots: [
+          { id: "b1", name: "Reporter" },
+          { id: "b2", name: "Analyst" },
+        ],
+        image: "registry.example.test/computer:1",
+        isolation: "container",
+        inspection: "inspected",
+      },
+      {
+        ...computer,
+        id: "c2",
+        kind: "e2b",
+        state: "stopped",
+        bots: [{ id: "b3", name: "Courier" }],
+        image: null,
+        isolation: null,
+        inspection: "skipped_unsupported",
+      },
+    ],
+    nextCursor: null,
+  });
+  const { host } = await show(<AdminComputersPage />);
+  const rows = [...host.querySelectorAll('[data-testid="admin-computers"] tbody tr')].map(
+    (row) => row.textContent ?? "",
+  );
+  for (const part of [
+    "Reporter, Analyst",
+    "mia@example.test",
+    "docker",
+    "Running",
+    "registry.example.test/computer:1",
+    "container",
+  ])
+    expect(rows[0]).toContain(part);
+  for (const part of ["Courier", "e2b", "Stopped", "Not reported"]) expect(rows[1]).toContain(part);
 });
 
 it("suspends an AI employee after a confirming click and resumes it in one click", async () => {

@@ -258,6 +258,19 @@ export interface SandboxCapabilities {
   persistentHome: boolean;
   /** Distinct graphical screens for concurrent Team bots on one computer. */
   multiScreen?: boolean;
+  /** Optional fleet management. A provider without a flag is reported unsupported, never skipped silently. */
+  fleet?: {
+    /** `inspect()` reports the image and isolation of one computer. */
+    inspect: boolean;
+  };
+}
+
+/** What a provider can read about one computer without changing it. */
+export interface ComputerInspection {
+  runtime: "running" | "stopped" | "gone";
+  /** `ref` is the reference the machine was started from; it may be a tag, not a digest. */
+  image?: { ref: string };
+  isolation: "container" | "microvm" | "vm" | "host" | "unknown";
 }
 
 export interface ConnectorTool {

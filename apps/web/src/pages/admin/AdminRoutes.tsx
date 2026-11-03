@@ -4,6 +4,7 @@ import { AdminPluginsPage } from "../AdminPluginsPage";
 import { NotFoundPage } from "../NotFound";
 import { AdminAuditPage } from "./AdminAuditPage";
 import { AdminBotsPage } from "./AdminBotsPage";
+import { AdminComputersPage } from "./AdminComputersPage";
 import { AdminOverviewPage } from "./AdminOverviewPage";
 import { AdminPolicyPage } from "./AdminPolicyPage";
 import { AdminUsersPage } from "./AdminUsersPage";
@@ -15,6 +16,7 @@ export function AdminRoutes() {
       <Route index element={<AdminOverviewPage />} />
       <Route path="users" element={<AdminUsersPage />} />
       <Route path="bots" element={<AdminBotsPage />} />
+      <Route path="computers" element={<AdminComputersPage />} />
       <Route path="policy" element={<AdminPolicyPage />} />
       <Route path="audit" element={<AdminAuditPage />} />
       <Route path="access" element={<AdminAccessPage />} />

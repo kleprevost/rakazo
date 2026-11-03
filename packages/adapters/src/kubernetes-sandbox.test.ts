@@ -173,6 +173,30 @@ describe("KubernetesSandboxProvider", () => {
     expect(script).toContain("computer image is missing required desktop tools");
   });
 
+  it("inspects a pod for its image and isolation, and reports a missing one as gone", async () => {
+    const readNamespacedPod = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ...readyPod,
+        spec: { containers: [{ name: "computer", image: "registry.example.test/computer:v1" }] },
+        status: {
+          ...readyPod.status,
+          containerStatuses: [
+            { name: "computer", imageID: "registry.example.test/computer@sha256:abc" },
+          ],
+        },
+      })
+      .mockRejectedValueOnce(Object.assign(new Error("missing"), { code: 404 }));
+    const provider = providerFor({ readNamespacedPod });
+    expect(provider.describe().capabilities.fleet).toEqual({ inspect: true });
+    await expect(provider.inspect(computer, context)).resolves.toEqual({
+      runtime: "running",
+      image: { ref: "registry.example.test/computer@sha256:abc" },
+      isolation: "container",
+    });
+    await expect(provider.inspect(computer, context)).resolves.toMatchObject({ runtime: "gone" });
+  });
+
   it("creates a ready pod with required isolation metadata", async () => {
     const readNamespacedPod = vi
       .fn()

@@ -481,6 +481,7 @@ describeWithDatabase("API authorization and resource isolation", () => {
       ["admin/bots/list"],
       ["admin/bots/suspend", { botId: "missing-bot" }],
       ["admin/bots/resume", { botId: "missing-bot" }],
+      ["admin/computers/list"],
       ["admin/policy"],
       ["admin/audit"],
       ["roleTemplates/list"],
@@ -2382,7 +2383,13 @@ describeWithDatabase("API authorization and resource isolation", () => {
       await expectForbidden(app, cookie, "deployment/get", {});
       await expectForbidden(app, cookie, "deployment/update", { signupsEnabled: false });
       await expectForbidden(app, cookie, "security/events", {});
-      for (const path of ["admin/overview", "admin/policy", "admin/users/list", "admin/bots/list"])
+      for (const path of [
+        "admin/overview",
+        "admin/policy",
+        "admin/users/list",
+        "admin/bots/list",
+        "admin/computers/list",
+      ])
         await expectForbidden(app, cookie, path, {});
       await expectForbidden(app, cookie, "admin/audit", {});
       await expectForbidden(app, cookie, "admin/users/endSessions", { userId: account.userId });
