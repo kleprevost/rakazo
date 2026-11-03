@@ -49,9 +49,12 @@ TodaySummary {
 
 Rules:
 
-- An `approval` carries the card's own `allow` and `deny` actions and the `messageId`; the page
-  answers through `threads.answer`, so authorization stays where it is. "Always allow" and secret
-  requests are never offered here, so those degrade to a `question` that opens the chat.
+- An `approval` carries the `messageId` and a text clipped to 300 characters, as a preview only.
+  Today never offers Allow or Deny: no existing rule marks an approval as low-risk (every card names
+  an effect or destination, and `docs/approvals.md` lists what always asks), so every approval is
+  decided on its full card in the chat, and Today shows only "Open". Secret requests degrade to a
+  `question` that opens the chat. `threads.answer` already binds an answer to the exact pending
+  ask: the message, the run waiting on it, and the approval's still-`intended` effect.
 - A failed run or routine stays listed for 3 days until something newer has run in the same routine
   or chat; one entry per routine or chat. `failed_routine` offers Retry via `routines.testRun` with
   a nonce derived from the failed run, so a double click starts one run.
