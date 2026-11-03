@@ -13,3 +13,5 @@
 - Worktree agents: the guard rejects compound shell commands (cd + heredoc + git); brief agents to use single commands and Edit/Write.
 - Better Auth: throwing from a provider's `getUserInfo` yields raw 403 JSON; return `{ error }` from `validateUserInfo` to redirect with a code.
 - Sonnet cost so far: ~100-125k tokens per workstream, including the PR.
+- Parallel agents on one feature: give each its own new files (evaluator + assert per area) so merges only conflict on index exports and the status doc.
+- Sub-agents report pre-existing failures without checking `main`; check them yourself (the SSO admin change silently broke 22 router tests).
