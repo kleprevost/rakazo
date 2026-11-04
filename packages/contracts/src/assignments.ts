@@ -67,3 +67,18 @@ export type ListAssignmentsOutput = z.infer<typeof ListAssignmentsOutput>;
 
 export const GetAssignmentInput = z.object({ assignmentId: Id });
 export type GetAssignmentInput = z.infer<typeof GetAssignmentInput>;
+
+/**
+ * An instruction for the job while it works. `clientNonce` makes a retry return the first answer
+ * instead of queueing the instruction twice.
+ */
+export const SteerAssignmentInput = z.object({
+  assignmentId: Id,
+  text: z.string().trim().min(1).max(ASSIGNMENT_BRIEF_MAX_LENGTH),
+  clientNonce: z.string().min(1).max(200),
+});
+export type SteerAssignmentInput = z.infer<typeof SteerAssignmentInput>;
+
+/** The run that will read the instruction: the live one, or the one started for it. */
+export const SteerAssignmentOutput = z.object({ messageId: Id, runId: Id });
+export type SteerAssignmentOutput = z.infer<typeof SteerAssignmentOutput>;

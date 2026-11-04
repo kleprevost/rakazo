@@ -608,6 +608,13 @@ describeWithDatabase("API authorization and resource isolation", () => {
       ["assignments/create"],
       ["assignments/list"],
       ["assignments/get", { assignmentId: "missing-assignment" }],
+      [
+        "assignments/steer",
+        { assignmentId: "missing-assignment", text: "Wrap up", clientNonce: "steer-1" },
+      ],
+      ["assignments/cancel", { assignmentId: "missing-assignment" }],
+      ["assignments/archive", { assignmentId: "missing-assignment" }],
+      ["assignments/unarchive", { assignmentId: "missing-assignment" }],
       ["availability/set"],
       ["availability/items"],
       ["availability/chooseForSpace"],

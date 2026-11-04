@@ -41,7 +41,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Download, Settings, X } from "lucide-react";
 import type { ReactNode } from "react";
 import { Suspense, useEffect, useId, useRef, useState } from "react";
-import { AssignmentsList, useHasAssignments } from "../../components/assignments/AssignmentsList";
+import { AssignmentsList, useAnyAssignments } from "../../components/assignments/AssignmentsList";
 import { BotAccess } from "../../components/capabilities/BotAccess";
 import { ErrorBoundary, SectionLoadFailed } from "../../components/ErrorBoundary";
 import { InstructionSettings } from "../../components/InstructionSettings";
@@ -152,7 +152,7 @@ export function BotSettings({
 }) {
   const { t } = useLingui();
   const ids = useId();
-  const hasAssignments = useHasAssignments(bot.id);
+  const hasAssignments = useAnyAssignments(bot.id);
   const modelRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (focusModel && tab === "settings") {

@@ -1,5 +1,6 @@
 import type { Assignment, AssignmentWork, TicketStatus } from "@rakazo/contracts";
 import { assignmentPhase } from "@rakazo/contracts";
+import { ACTIVE_RUN_STATUSES } from "@rakazo/core";
 import { coerceTicketStatus } from "./board.js";
 import type { PrismaClient } from "./client.js";
 import type { Assignment as AssignmentRow } from "./generated/prisma/client.js";
@@ -208,4 +209,74 @@ export async function getAssignment(
     ...assignment
   } = await getAssignmentWork(prisma, viewer, assignmentId);
   return assignment;
+}
+
+/**
+ * Hides the viewer's assignment from the default lists while keeping its transcript, runs and
+ * files. Refused while a run is live. The thread lock orders this against a send that starts a
+ * run, and the update only fires on an unarchived row, so racing archives end in one state.
+ */
+export async function archiveAssignment(
+  prisma: PrismaClient,
+  viewer: Viewer,
+  assignmentId: string,
+): Promise<"archived" | "live"> {
+  return prisma.$transaction(async (tx) => {
+    const row = await tx.assignment.findFirst({
+      where: { id: assignmentId, spaceId: viewer.spaceId, userId: viewer.userId },
+      select: { threadId: true },
+    });
+    if (!row) throw new IsolationError();
+    await tx.$queryRaw`SELECT id FROM threads WHERE id = ${row.threadId} FOR UPDATE`;
+    const live = await tx.run.count({
+      where: { threadId: row.threadId, status: { in: [...ACTIVE_RUN_STATUSES] } },
+    });
+    if (live > 0) return "live";
+    await tx.assignment.updateMany({
+      where: { id: assignmentId, archivedAt: null },
+      data: { archivedAt: new Date() },
+    });
+    return "archived";
+  });
+}
+
+/** Puts an archived assignment back in the default lists. */
+export async function unarchiveAssignment(
+  prisma: PrismaClient,
+  viewer: Viewer,
+  assignmentId: string,
+): Promise<void> {
+  const { count } = await prisma.assignment.updateMany({
+    where: {
+      id: assignmentId,
+      spaceId: viewer.spaceId,
+      userId: viewer.userId,
+      archivedAt: { not: null },
+    },
+    data: { archivedAt: null },
+  });
+  if (count === 0) {
+    const row = await prisma.assignment.findFirst({
+      where: { id: assignmentId, spaceId: viewer.spaceId, userId: viewer.userId },
+      select: { id: true },
+    });
+    if (!row) throw new IsolationError();
+  }
+}
+
+/** A new message to a stopped or archived assignment resumes it: the same thread, a fresh run. */
+export async function resumeAssignment(
+  prisma: PrismaClient,
+  viewer: Viewer,
+  assignmentId: string,
+): Promise<void> {
+  await prisma.assignment.updateMany({
+    where: {
+      id: assignmentId,
+      spaceId: viewer.spaceId,
+      userId: viewer.userId,
+      OR: [{ cancelledAt: { not: null } }, { archivedAt: { not: null } }],
+    },
+    data: { cancelledAt: null, archivedAt: null },
+  });
 }

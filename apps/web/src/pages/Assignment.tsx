@@ -1,4 +1,4 @@
-import { useLingui } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import type { AssignmentWork, WorkPhase } from "@rakazo/contracts";
 import {
   ACTIVE_RUN_STATUSES,
@@ -9,9 +9,17 @@ import {
   isRunWorking,
 } from "@rakazo/core";
 import type { GroupAvatarMember } from "@rakazo/ui-web";
-import { buttonVariants, Disclosure } from "@rakazo/ui-web";
-import { useQuery } from "@tanstack/react-query";
-import { ChevronLeft } from "lucide-react";
+import {
+  Button,
+  buttonVariants,
+  Disclosure,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@rakazo/ui-web";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { ChevronLeft, MoreHorizontal } from "lucide-react";
 import { useCallback, useMemo, useState, useSyncExternalStore } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { PageLoading } from "../components/PageLoading";
@@ -63,6 +71,8 @@ function AssignmentView({ assignmentId }: { assignmentId: string }) {
   const work = useQuery(queries.assignments.get.queryOptions({ input: { assignmentId } }));
   const assignment = work.data;
   const phaseLabel = useAssignmentPhaseLabel(assignment);
+  const queryClient = useQueryClient();
+  const [actionError, setActionError] = useState("");
   const bots = useQuery(queries.bots.list.queryOptions()).data;
   const bot = bots?.find((candidate) => candidate.id === assignment?.botId);
   const enterToSend = useSyncExternalStore(
@@ -125,6 +135,19 @@ function AssignmentView({ assignmentId }: { assignmentId: string }) {
     () => dismissableAskMessageIds(snapshot, userId),
     [snapshot, userId],
   );
+  const act = async (action: () => Promise<unknown>) => {
+    setActionError("");
+    try {
+      await action();
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: queries.assignments.get.key() }),
+        queryClient.invalidateQueries({ queryKey: queries.assignments.list.key() }),
+        thread.refresh(),
+      ]);
+    } catch (cause) {
+      setActionError(errorText(cause, t`Could not complete action`));
+    }
+  };
   const artifactTarget = useMemo(() => ({ botId: botId ?? "" }), [botId]);
   const workingBots: GroupAvatarMember[] = workingRuns.map((run) => ({
     botId: run.botId,
@@ -176,9 +199,27 @@ function AssignmentView({ assignmentId }: { assignmentId: string }) {
         </Link>
         <h1 className="min-w-0 flex-1 truncate font-medium">{assignment?.title}</h1>
         {assignment ? (
-          <AssignmentStatus work={assignment} label={phaseLabel} phases={phases} />
+          <AssignmentStatus
+            work={assignment}
+            label={assignment.archivedAt && !live ? t`Archived` : phaseLabel}
+            phases={phases}
+          />
+        ) : null}
+        {assignment ? (
+          <AssignmentMenu
+            archived={assignment.archivedAt !== null}
+            live={live}
+            onCancel={() => act(() => rpc.assignments.cancel({ assignmentId }))}
+            onArchive={() => act(() => rpc.assignments.archive({ assignmentId }))}
+            onRestore={() => act(() => rpc.assignments.unarchive({ assignmentId }))}
+          />
         ) : null}
       </header>
+      {actionError ? (
+        <p role="alert" className="px-4 py-2 text-sm text-destructive">
+          {actionError}
+        </p>
+      ) : null}
       {loadFailure ? (
         <p role="alert" className="p-4 text-sm text-destructive">
           {errorText(loadFailure)}
@@ -299,5 +340,46 @@ function AssignmentStatus({
         </ul>
       ) : null}
     </Disclosure>
+  );
+}
+
+/** Cancel stops the job's live runs; Archive hides a finished one; Restore brings it back. */
+function AssignmentMenu({
+  archived,
+  live,
+  onCancel,
+  onArchive,
+  onRestore,
+}: {
+  archived: boolean;
+  live: boolean;
+  onCancel: () => void;
+  onArchive: () => void;
+  onRestore: () => void;
+}) {
+  const { t } = useLingui();
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger aria-label={t`More`} render={<Button variant="ghost" size="icon" />}>
+        <MoreHorizontal />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        {live ? (
+          <DropdownMenuItem onClick={onCancel}>
+            <Trans>Cancel</Trans>
+          </DropdownMenuItem>
+        ) : null}
+        {!live && !archived ? (
+          <DropdownMenuItem onClick={onArchive}>
+            <Trans>Archive</Trans>
+          </DropdownMenuItem>
+        ) : null}
+        {archived ? (
+          <DropdownMenuItem onClick={onRestore}>
+            <Trans>Restore</Trans>
+          </DropdownMenuItem>
+        ) : null}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

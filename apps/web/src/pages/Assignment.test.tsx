@@ -8,7 +8,13 @@ import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 
 const api = vi.hoisted(() => ({
-  assignments: { get: vi.fn(), list: vi.fn() },
+  assignments: {
+    get: vi.fn(),
+    list: vi.fn(),
+    cancel: vi.fn(),
+    archive: vi.fn(),
+    unarchive: vi.fn(),
+  },
   bots: { list: vi.fn() },
   threads: { get: vi.fn(), head: vi.fn(), subscribe: vi.fn(), messages: vi.fn() },
 }));
@@ -33,6 +39,21 @@ vi.mock("./shell/composer", () => ({
     <div data-testid="composer" data-running={String(props.running)} data-draft={props.draftKey} />
   ),
 }));
+vi.mock("@rakazo/ui-web", async (importOriginal) => {
+  const original = await importOriginal<typeof import("@rakazo/ui-web")>();
+  const Container = ({ children }: { children?: ReactNode }) => <div>{children}</div>;
+  return {
+    ...original,
+    DropdownMenu: Container,
+    DropdownMenuContent: Container,
+    DropdownMenuTrigger: ({ children }: { children?: ReactNode }) => <span>{children}</span>,
+    DropdownMenuItem: ({ children, onClick }: { children?: ReactNode; onClick?: () => void }) => (
+      <button type="button" onClick={onClick}>
+        {children}
+      </button>
+    ),
+  };
+});
 vi.mock("@lingui/react/macro", () => {
   const t = (parts: TemplateStringsArray, ...values: unknown[]) =>
     parts.reduce((text, part, index) => text + part + String(values[index] ?? ""), "");
@@ -172,4 +193,46 @@ it("shows the refusal instead of an empty page for an assignment that is not you
   );
   await act(async () => new Promise((resolve) => setTimeout(resolve, 0)));
   expect(container.querySelector('[role="alert"]')).not.toBeNull();
+});
+
+function menuItem(label: string) {
+  return [...container.querySelectorAll("button")].find((node) => node.textContent === label);
+}
+
+it("offers Cancel while the job works and calls the assignment's own cancel", async () => {
+  api.assignments.cancel.mockReset().mockResolvedValue({});
+  await open(assignment([run("run-1", "running")]));
+  expect(menuItem("Archive")).toBeUndefined();
+  await act(async () => menuItem("Cancel")!.click());
+  expect(api.assignments.cancel).toHaveBeenCalledWith({ assignmentId: "assignment-1" });
+});
+
+it("offers Archive for a finished job and Restore for an archived one", async () => {
+  api.assignments.archive.mockReset().mockResolvedValue({});
+  await open(assignment([run("run-1", "completed")], { phase: "done" }));
+  expect(menuItem("Cancel")).toBeUndefined();
+  await act(async () => menuItem("Archive")!.click());
+  expect(api.assignments.archive).toHaveBeenCalledWith({ assignmentId: "assignment-1" });
+
+  await act(async () => root.unmount());
+  root = createRoot(container);
+  api.assignments.unarchive.mockReset().mockResolvedValue({});
+  await open(
+    assignment([run("run-1", "completed")], { phase: "done", archivedAt: "2026-11-02T10:00:00Z" }),
+  );
+  expect(container.querySelector('[data-testid="assignment-status"]')?.textContent).toContain(
+    "Archived",
+  );
+  expect(menuItem("Archive")).toBeUndefined();
+  await act(async () => menuItem("Restore")!.click());
+  expect(api.assignments.unarchive).toHaveBeenCalledWith({ assignmentId: "assignment-1" });
+});
+
+it("shows why an archive was refused", async () => {
+  api.assignments.archive
+    .mockReset()
+    .mockRejectedValue(new Error("Stop the job before archiving it."));
+  await open(assignment([run("run-1", "completed")], { phase: "done" }));
+  await act(async () => menuItem("Archive")!.click());
+  expect(container.querySelector('[role="alert"]')?.textContent).toContain("Stop the job");
 });
