@@ -52,6 +52,7 @@ import { mcpRoutes } from "./routes/mcp.js";
 import { memoryRoutes } from "./routes/memory.js";
 import { messagingRoutes } from "./routes/messaging.js";
 import { modelsRoutes } from "./routes/models.js";
+import { organizationsRoutes } from "./routes/organizations.js";
 import { pagesRoutes } from "./routes/pages.js";
 import { paymentWalletRoutes } from "./routes/payment-wallet.js";
 import { roleTemplatesRoutes } from "./routes/role-templates.js";
@@ -175,6 +176,7 @@ export function createRouter(deps: RouterDeps) {
     ...skillPublishingRoutes(ctx),
     ...capabilityGrantsRoutes(ctx),
     ...spacesRoutes(ctx),
+    ...organizationsRoutes(ctx),
     ...modelsRoutes(ctx),
     ...botsRoutes(ctx),
     ...roleTemplatesRoutes(ctx),
