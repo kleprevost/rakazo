@@ -80,6 +80,7 @@ import {
   BotSectionSchema,
   ByokIntervalSchema,
   CapabilityInstallSchema,
+  ChatAlertSchema,
   CONNECTION_LABEL_MAX_LENGTH,
   ComputerModeSchema,
   ComputerProviderSettingsSchema,
@@ -1359,6 +1360,15 @@ export const appContract = {
     accountToken: oc.output(z.object({ token: z.string() })),
   },
   notifications: {
+    /** Run alerts for the signed-in user's chats in this space, live while connected. */
+    subscribe: oc.output(
+      eventIterator(
+        z.object({
+          type: z.enum(["alert", "heartbeat"]),
+          alert: ChatAlertSchema.optional(),
+        }),
+      ),
+    ),
     subscribeCalls: oc.output(
       eventIterator(
         z.object({

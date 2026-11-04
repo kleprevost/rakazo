@@ -1,3 +1,4 @@
+import type { ComputerSize } from "@rakazo/contracts";
 import type {
   AdapterContext,
   AdapterDescriptor,
@@ -140,6 +141,12 @@ export interface SandboxProvider {
        * central policy, and a provider may check it again.
        */
       image?: { ref: string; digest: string };
+      /**
+       * The size to start at. A computer already running keeps its size; without one, a stopped
+       * computer resumes at its current size and a new one starts at the standard size. A size
+       * the provider cannot move to throws `SandboxSizeUnavailableError`.
+       */
+      size?: ComputerSize;
     },
     context: AdapterContext,
   ): Promise<ComputerRef>;
