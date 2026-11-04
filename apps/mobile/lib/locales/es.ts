@@ -932,6 +932,7 @@ export const ES_MESSAGES: Record<string, string> = {
   "Email is not allowed to register": "Este correo no está autorizado para registrarse",
   "Email verification required": "Se requiere verificar el correo",
   "Link SSO": "Vincular SSO",
+  "This account is deactivated": "Esta cuenta está desactivada",
   "Registration is closed": "El registro está cerrado",
   Retry: "Reintentar",
   "Send deletion code": "Enviar código de eliminación",

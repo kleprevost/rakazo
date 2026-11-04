@@ -2535,6 +2535,10 @@ msgstr ""
 msgid "Could not update"
 msgstr "Не удалось обновить"
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Could not update account"
+msgstr "Не удалось обновить учётную запись"
+
 #: src/components/ModelCredits.tsx
 msgid "Could not update billing"
 msgstr ""
@@ -2758,6 +2762,14 @@ msgstr ""
 #: src/lib/cron.ts
 msgid "days"
 msgstr "дни"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Deactivate"
+msgstr "Отключить"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Deactivated"
+msgstr "Отключена"
 
 #: src/components/call/IncomingCall.tsx
 #: src/pages/MessagingSettingsPanel.tsx
@@ -5453,6 +5465,10 @@ msgstr ""
 msgid "Reactions"
 msgstr ""
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Reactivate"
+msgstr "Включить снова"
+
 #: src/pages/shell/bot-panel.tsx
 msgid "Read replies aloud"
 msgstr "Читать ответы вслух"
@@ -6964,6 +6980,10 @@ msgstr "рассуждение"
 #: src/pages/ModelRoleSettings.tsx
 msgid "Thinking: {0}"
 msgstr "Размышление: {0}"
+
+#: src/lib/user-error.ts
+msgid "This account is deactivated"
+msgstr "Эта учётная запись отключена"
 
 #: src/lib/user-error.ts
 msgid "This app needs its own sign-in setup to connect."

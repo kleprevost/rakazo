@@ -1023,6 +1023,7 @@ export const RU_MESSAGES: Record<string, string> = {
   "Email is not allowed to register": "Регистрация с этим адресом электронной почты запрещена",
   "Email verification required": "Требуется подтверждение электронной почты",
   "Link SSO": "Привязать SSO",
+  "This account is deactivated": "Эта учётная запись отключена",
   "Registration is closed": "Регистрация закрыта",
   Retry: "Повторить",
   "Send deletion code": "Отправить код удаления",

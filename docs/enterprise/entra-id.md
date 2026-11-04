@@ -91,8 +91,13 @@ within about an hour. Mechanics and failure handling are in
   tenant. An access-token lifetime does not matter here, because Rakazo ends sessions itself.
 - Removing an app role from a user is only seen when the refreshed ID token omits it; Entra
   issues new tokens with current assignments.
-- SCIM provisioning, where Entra pushes deprovisioning, could replace the polling later. It is
-  not implemented.
+- SCIM provisioning pushes deprovisioning instead of polling for it: set `SCIM_BEARER_TOKEN`, add
+  an Entra enterprise application with provisioning mode Automatic, tenant URL
+  `https://<host>/api/v1/scim/v2` and that token as the secret token, keep the mapping to
+  `userName` (the sign-in email) and `active`, and turn off Create. A disabled or unassigned user
+  is then signed out, blocked from signing in and their AI employees suspended at the next
+  provisioning cycle (Entra's cycle is about 40 minutes; "Provision on demand" is immediate). See
+  [features/identity-lifecycle.md](features/identity-lifecycle.md). Not verified against a real tenant.
 
 ## Easy Auth
 

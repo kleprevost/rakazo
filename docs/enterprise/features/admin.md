@@ -68,7 +68,7 @@ credentials; the schema is strict).
 ## Deferred
 - Suspend and resume a bot: done, see [suspend.md](./suspend.md).
 - Editing: config editing in the UI, policy editing, role changes. Policy stays policy-as-code.
-- Per-user disable (revoke plus block sign-in), user search and role filters.
+- Per-user disable: done, see [identity-lifecycle.md](./identity-lifecycle.md). User search and role filters remain.
 - Admin roles (security admin, viewer) from the OIDC claim; today admin is all or nothing.
 - Spend warnings (`warnAtPercent`), spend history charts, per-space budgets.
 - Audit: filter by IP, export button on the page (the JSON Lines export route exists), organization

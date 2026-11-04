@@ -221,6 +221,24 @@ afterEach(() => {
 });
 
 describe("Easy Auth sign-in", () => {
+  it("refuses a deprovisioned account on the next request, and again until it is reactivated", async () => {
+    setup();
+    const idToken = await token();
+    expect((await pass({ token: idToken })).session?.user.email).toBe("ada@example.test");
+    const user = rows("user")[0]!;
+
+    // Easy Auth has no revalidation, so the flag is the only thing that ends this session.
+    user.deprovisionedAt = new Date();
+    expect((await pass({ token: idToken })).session).toBeNull();
+    jar.clear();
+    expect((await pass({ token: idToken })).session).toBeNull();
+    expect(sessions().filter((row) => row.userId === user.id)).toHaveLength(1);
+
+    user.deprovisionedAt = null;
+    jar.clear();
+    expect((await pass({ token: idToken })).session?.user.email).toBe("ada@example.test");
+  });
+
   it("signs in a verified identity as the OIDC account and stores its sealed token", async () => {
     setup();
     const idToken = await token();

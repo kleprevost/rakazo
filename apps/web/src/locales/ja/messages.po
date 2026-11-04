@@ -2535,6 +2535,10 @@ msgstr ""
 msgid "Could not update"
 msgstr "更新できませんでした"
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Could not update account"
+msgstr "アカウントを更新できませんでした"
+
 #: src/components/ModelCredits.tsx
 msgid "Could not update billing"
 msgstr "請求情報を更新できませんでした"
@@ -2758,6 +2762,14 @@ msgstr "日々の業務"
 #: src/lib/cron.ts
 msgid "days"
 msgstr "日"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Deactivate"
+msgstr "無効にする"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Deactivated"
+msgstr "無効"
 
 #: src/components/call/IncomingCall.tsx
 #: src/pages/MessagingSettingsPanel.tsx
@@ -5453,6 +5465,10 @@ msgstr "リアクション"
 msgid "Reactions"
 msgstr "リアクション"
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Reactivate"
+msgstr "再び有効にする"
+
 #: src/pages/shell/bot-panel.tsx
 msgid "Read replies aloud"
 msgstr "返信を読み上げる"
@@ -6964,6 +6980,10 @@ msgstr "思考"
 #: src/pages/ModelRoleSettings.tsx
 msgid "Thinking: {0}"
 msgstr "思考: {0}"
+
+#: src/lib/user-error.ts
+msgid "This account is deactivated"
+msgstr "このアカウントは無効化されています"
 
 #: src/lib/user-error.ts
 msgid "This app needs its own sign-in setup to connect."

@@ -2535,6 +2535,10 @@ msgstr ""
 msgid "Could not update"
 msgstr "לא ניתן לעדכן"
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Could not update account"
+msgstr "לא ניתן לעדכן את החשבון"
+
 #: src/components/ModelCredits.tsx
 msgid "Could not update billing"
 msgstr ""
@@ -2758,6 +2762,14 @@ msgstr "עבודה יומיומית"
 #: src/lib/cron.ts
 msgid "days"
 msgstr "ימים"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Deactivate"
+msgstr "השבת"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Deactivated"
+msgstr "מושבת"
 
 #: src/components/call/IncomingCall.tsx
 #: src/pages/MessagingSettingsPanel.tsx
@@ -5453,6 +5465,10 @@ msgstr "הוספת אמוג׳י"
 msgid "Reactions"
 msgstr "אמוג׳י"
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Reactivate"
+msgstr "הפעל מחדש"
+
 #: src/pages/shell/bot-panel.tsx
 msgid "Read replies aloud"
 msgstr "הקראת תשובות בקול"
@@ -6964,6 +6980,10 @@ msgstr "חשיבה"
 #: src/pages/ModelRoleSettings.tsx
 msgid "Thinking: {0}"
 msgstr "חשיבה: {0}"
+
+#: src/lib/user-error.ts
+msgid "This account is deactivated"
+msgstr "החשבון הזה מושבת"
 
 #: src/lib/user-error.ts
 msgid "This app needs its own sign-in setup to connect."

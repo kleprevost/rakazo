@@ -201,8 +201,11 @@ It runs in the API process, which already holds the client secret and the token 
 worker gets neither. Each instance runs a timer and claims accounts in Postgres, so several API
 instances never refresh the same token twice. Checks are spread over small batches. Revocation
 lags the provider by up to the interval plus a few minutes; the access token lifetime is not
-involved. SCIM provisioning would remove that lag by having the provider push deprovisioning,
-but it is not implemented.
+involved. To remove that lag, have the provider push deprovisioning: set `SCIM_BEARER_TOKEN`
+(at least 32 characters; unset leaves the endpoint off) and point a SCIM 2.0 client at
+`/api/v1/scim/v2`. A deactivated account is signed out everywhere, cannot sign in, and its AI
+employees are suspended; nothing is deleted. Admins can do the same in Admin, Users. See
+[identity-lifecycle.md](enterprise/features/identity-lifecycle.md).
 `OIDC_TRUST_EMAIL=true` counts the SSO email as verified when the ID token omits
 `email_verified`, as Microsoft Entra ID does. It never applies when `email_verified` is `false`,
 or when an `xms_edov` claim is present and not `true`. It is only safe when the issuer is a

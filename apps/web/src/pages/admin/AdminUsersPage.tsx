@@ -65,7 +65,12 @@ function AdminUsers() {
         </TableHeader>
         <TableBody>
           {rows.map((user) => (
-            <UserRow key={user.id} user={user} locale={i18n.locale} />
+            <UserRow
+              key={user.id}
+              user={user}
+              locale={i18n.locale}
+              onChanged={() => void users.refetch()}
+            />
           ))}
         </TableBody>
       </Table>
@@ -74,23 +79,49 @@ function AdminUsers() {
   );
 }
 
-function UserRow({ user, locale }: { user: AdminUser; locale: string }) {
+function UserRow({
+  user,
+  locale,
+  onChanged,
+}: {
+  user: AdminUser;
+  locale: string;
+  onChanged: () => void;
+}) {
   const { t } = useLingui();
   const { can } = useAdminRoles();
-  const [confirming, setConfirming] = useState(false);
+  const [confirming, setConfirming] = useState<"end" | "deactivate" | null>(null);
   const [busy, setBusy] = useState(false);
-  async function endSessions() {
+  async function run(action: () => Promise<unknown>, done?: string, failed?: string) {
     setBusy(true);
     try {
-      await rpc.admin.users.endSessions({ userId: user.id });
-      toast.success(t`Sessions ended`);
+      await action();
+      if (done) toast.success(done);
+      onChanged();
     } catch (error) {
-      toast.error(errorText(error, t`Could not end sessions`));
+      toast.error(errorText(error, failed ?? t`Could not update account`));
     } finally {
       setBusy(false);
-      setConfirming(false);
+      setConfirming(null);
     }
   }
+  const confirmable = (
+    kind: "end" | "deactivate",
+    label: string,
+    action: () => Promise<unknown>,
+    done?: string,
+    failed?: string,
+  ) => (
+    <Button
+      variant={confirming === kind ? "destructive" : "ghost"}
+      size="sm"
+      disabled={busy}
+      onClick={() => (confirming === kind ? void run(action, done, failed) : setConfirming(kind))}
+      onBlur={() => setConfirming(null)}
+    >
+      {confirming === kind ? <Trans>Confirm</Trans> : label}
+    </Button>
+  );
   return (
     <TableRow aria-label={user.email}>
       <TableCell className="min-w-0">
@@ -107,22 +138,35 @@ function UserRow({ user, locale }: { user: AdminUser; locale: string }) {
             <Badge variant="outline">{t`Member`}</Badge>
           )}
           {user.ssoLinked ? <Badge variant="outline">{t`SSO`}</Badge> : null}
+          {user.deprovisionedAt ? <Badge variant="destructive">{t`Deactivated`}</Badge> : null}
         </div>
       </TableCell>
       <TableCell className="text-muted-foreground">
         {user.lastSignInAt ? formatWhen(user.lastSignInAt, locale) : null}
       </TableCell>
       <TableCell className="text-end">
-        {user.isSelf || !can("security") ? null : (
+        {user.isSelf || !can("security") ? null : user.deprovisionedAt ? (
           <Button
-            variant={confirming ? "destructive" : "ghost"}
+            variant="ghost"
             size="sm"
             disabled={busy}
-            onClick={() => (confirming ? void endSessions() : setConfirming(true))}
-            onBlur={() => setConfirming(false)}
+            onClick={() => void run(() => rpc.admin.users.reactivate({ userId: user.id }))}
           >
-            {confirming ? <Trans>Confirm</Trans> : <Trans>End sessions</Trans>}
+            <Trans>Reactivate</Trans>
           </Button>
+        ) : (
+          <>
+            {confirmable(
+              "end",
+              t`End sessions`,
+              () => rpc.admin.users.endSessions({ userId: user.id }),
+              t`Sessions ended`,
+              t`Could not end sessions`,
+            )}
+            {confirmable("deactivate", t`Deactivate`, () =>
+              rpc.admin.users.deprovision({ userId: user.id }),
+            )}
+          </>
         )}
       </TableCell>
     </TableRow>

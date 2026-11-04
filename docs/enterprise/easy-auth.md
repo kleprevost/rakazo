@@ -115,7 +115,10 @@ ingress). So Rakazo never acts on those headers alone:
   Revocation for browsers is therefore bounded by roughly the ID token lifetime.
 - **No refresh-token revalidation.** `OIDC_REVALIDATE_MINUTES` is rejected in this mode: Easy Auth
   sessions hold no refresh token, so the revalidator would end them. Disabling a user in Entra
-  stops new tokens, not tokens already issued, and does not end native sessions.
+  stops new tokens, not tokens already issued, and does not end native sessions. To end access at
+  once, deactivate the account in Rakazo (Admin, Users) or push it with SCIM; the deactivation flag
+  is checked on every request, including Easy Auth ones. See
+  [features/identity-lifecycle.md](features/identity-lifecycle.md).
 - **Concurrent first requests** in one API process share one session. Across several API
   instances a burst can create a spare session that expires unused.
 - Sign-in with a different `sub` for the same person (a different app registration) is a different

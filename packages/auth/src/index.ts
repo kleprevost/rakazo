@@ -195,8 +195,9 @@ export function createAuth(prisma: PrismaClient, env: AuthEnv) {
       return emailLocale(null, headers);
     }
   };
-  const isDeprovisioned = async (userId: string) =>
-    (await prisma.user.count({ where: { id: userId, deprovisionedAt: { not: null } } })) > 0;
+  /** A deprovisioned account keeps its data but holds no session and signs in nowhere. */
+  const isDeprovisioned = (user: unknown) =>
+    Boolean((user as { deprovisionedAt?: Date | null } | null)?.deprovisionedAt);
   if (env.easyAuth && !env.oidc) throw new Error("Easy Auth requires OIDC configuration");
   // Easy Auth sessions hold no refresh token, so revalidation would end them at its first pass.
   if (env.easyAuth && env.oidc?.revalidateMinutes)
@@ -338,8 +339,17 @@ export function createAuth(prisma: PrismaClient, env: AuthEnv) {
         : undefined,
     },
     user: {
+      // Read with every user lookup, so each session check sees a deprovisioning at once.
+      additionalFields: {
+        deprovisionedAt: { type: "date", required: false, input: false },
+      },
       validateUserInfo: async ({ user, source }, ctx) => {
         if (source.method !== "oauth" || source.oauth?.providerId !== "oidc") return;
+        if (
+          user.id &&
+          isDeprovisioned(await ctx.context.internalAdapter.findUserById(String(user.id)))
+        )
+          return { error: "ACCOUNT_DEACTIVATED" };
         const expectedUser = (await getOAuthState())?.serverContext?.reauthUserId;
         if (typeof expectedUser === "string" && user.id !== expectedUser)
           return { error: "REAUTHENTICATION_REQUIRED" };
@@ -623,7 +633,7 @@ export function createAuth(prisma: PrismaClient, env: AuthEnv) {
                   if (!session || isMessagingEmail(session.user.email)) return null;
                   // Read on every request, so a deactivated account stops at once on every path,
                   // including Easy Auth, which has no revalidation to end its sessions.
-                  if (await isDeprovisioned(session.user.id)) return null;
+                  if (isDeprovisioned(session.user)) return null;
                   if (session.user.emailVerified) return session;
                   if (env.oidc?.allowSignupBypass) {
                     const accounts = await ctx.context.internalAdapter.findAccounts(
@@ -697,7 +707,7 @@ export function createAuth(prisma: PrismaClient, env: AuthEnv) {
                 message: "Email verification required",
               });
             }
-            if (await isDeprovisioned(user.id)) {
+            if (isDeprovisioned(user)) {
               throw new APIError("FORBIDDEN", {
                 code: "ACCOUNT_DEACTIVATED",
                 message: "This account is deactivated",

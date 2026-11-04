@@ -2535,6 +2535,10 @@ msgstr ""
 msgid "Could not update"
 msgstr "अपडेट नहीं हो सका"
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Could not update account"
+msgstr "खाता अपडेट नहीं किया जा सका"
+
 #: src/components/ModelCredits.tsx
 msgid "Could not update billing"
 msgstr ""
@@ -2758,6 +2762,14 @@ msgstr ""
 #: src/lib/cron.ts
 msgid "days"
 msgstr "दिन"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Deactivate"
+msgstr "निष्क्रिय करें"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Deactivated"
+msgstr "निष्क्रिय"
 
 #: src/components/call/IncomingCall.tsx
 #: src/pages/MessagingSettingsPanel.tsx
@@ -5453,6 +5465,10 @@ msgstr "प्रतिक्रिया दें"
 msgid "Reactions"
 msgstr "प्रतिक्रियाएँ"
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Reactivate"
+msgstr "फिर से सक्रिय करें"
+
 #: src/pages/shell/bot-panel.tsx
 msgid "Read replies aloud"
 msgstr "उत्तर पढ़कर सुनाएं"
@@ -6964,6 +6980,10 @@ msgstr "सोच रहा है"
 #: src/pages/ModelRoleSettings.tsx
 msgid "Thinking: {0}"
 msgstr "सोच: {0}"
+
+#: src/lib/user-error.ts
+msgid "This account is deactivated"
+msgstr "यह खाता निष्क्रिय है"
 
 #: src/lib/user-error.ts
 msgid "This app needs its own sign-in setup to connect."
