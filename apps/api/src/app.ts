@@ -45,6 +45,7 @@ import {
   createBackgroundJobHandlers,
   createCloudAgentConnection,
   createConnectorStack,
+  createDirectoryClaimsSource,
   createFleetObserver,
   createIdleComputerSweeper,
   createJobReconciler,
@@ -62,6 +63,7 @@ import {
   createTicketChangeNotifier,
   createWebProvider,
   deploymentModelUsageLookup,
+  directoryClaimsSupported,
   EmailEmulator,
   ExpoPushProvider,
   GraphileJobPublisher,
@@ -169,6 +171,7 @@ import {
   withClientIp,
 } from "./client-ip.js";
 import { cspReportRoutes } from "./csp-report.js";
+import { runDirectorySync } from "./directory-sync.js";
 import { easyAuthMiddleware } from "./easy-auth.js";
 import { configuredEmailProvider } from "./email.js";
 import type { AppEnv } from "./env.js";
@@ -648,6 +651,13 @@ async function buildApp(overrides: CreateAppOverrides): Promise<AppHandles> {
   // Opt-in SSO revalidation. The API already holds the client secret and token key, so the
   // worker needs neither. Instances claim accounts in Postgres, so each may run the timer.
   const stopSsoRevalidation = startSsoRevalidation(auth, env.oidc?.revalidateMinutes);
+  // Opt-in group sync. It needs the client secret, which the worker never gets, so the API runs it.
+  const stopDirectorySync = await startDirectorySync(
+    prisma,
+    env.oidc,
+    env.directorySyncMinutes,
+    shutdown.signal,
+  );
   const mcpArgsMove = moveMcpArgsIntoSecrets(prisma, secrets, { signal: shutdown.signal })
     .then(({ moved }) => {
       if (moved) getLogger().info("mcp server arguments encrypted", { count: moved });
@@ -1570,6 +1580,7 @@ async function buildApp(overrides: CreateAppOverrides): Promise<AppHandles> {
       await stopEmployeeGrantExpiry();
       await reconciler?.stop();
       await stopSsoRevalidation();
+      await stopDirectorySync();
       await oauthTokenUpgrade;
       await mcpArgsMove;
       await runsStopped;
@@ -1731,6 +1742,42 @@ export function logUnexpectedRpcError(error: unknown, path: readonly string[]): 
   if (error instanceof ORPCError && error.status < 500) return;
   const where = `rpc ${path.join("/")} failed`;
   getLogger().error(where, error);
+}
+
+async function startDirectorySync(
+  prisma: PrismaClient,
+  oidc: AppEnv["oidc"],
+  minutes: number | undefined,
+  signal: AbortSignal,
+) {
+  if (!minutes || !oidc) return async () => undefined;
+  if (!directoryClaimsSupported(oidc.issuer))
+    throw new Error("DIRECTORY_SYNC_MINUTES does not support this OIDC_ISSUER");
+  const source = await createDirectoryClaimsSource(oidc);
+  const tick = Math.min(5 * 60_000, Math.max(60_000, (minutes * 60_000) / 4));
+  let running: Promise<void> | undefined;
+  const run = () => {
+    running ??= runDirectorySync({
+      prisma,
+      source,
+      intervalMs: minutes * 60_000,
+      signal,
+      onDeferred: (error) => getLogger().warn("directory sync deferred", { error }),
+    })
+      .then(({ checked, stale }) => {
+        if (checked > 0) getLogger().info("directory sync", { checked, stale });
+      })
+      .catch((error) => getLogger().error("directory sync failed", error))
+      .finally(() => {
+        running = undefined;
+      });
+  };
+  const timer = setInterval(run, tick);
+  timer.unref();
+  return async () => {
+    clearInterval(timer);
+    await running;
+  };
 }
 
 function startSsoRevalidation(auth: Auth, minutes: number | undefined) {
