@@ -422,8 +422,30 @@ ids, outcome code. Never: paths, file names, provider error text, tokens, screen
    as "Hibernated" (state `suspended`). Tests: 5, 6, 7, 13, 14 (Postgres tests for claims,
    concurrent workers, the window, halt, replay, busy and unsupported items; admin shaping and
    authorization; web progress states).
-5. **Recreate.** `targetImageDigest`, idempotent `ComputerUpdate`, verification and per-item
-   outcomes. **Acceptance test** (below). Tests: 3, 4, 8.
+5. **Recreate.** As built: additive migration (nullable `imageDigest` on operations; per-item
+   `imageDigestBefore/After`, `homeRevisionBefore/After`, `browserProfilesBefore`,
+   `computerUpdateId`; `computer_updates.targetImageDigest` and a unique `idempotencyKey`).
+   A `recreate` operation optionally names an approved image digest. Creation refuses a digest
+   that is not on `computers.images.allow` (`FORBIDDEN`, `computer.image_refused`), and the
+   update checks again before it touches the computer, so a digest withdrawn in between fails the
+   item with nothing destroyed. Each item queues one `ComputerUpdate` keyed by the item id through
+   `queueComputerUpdate` (`update` mode), which refuses a busy computer (live run, lease or
+   control), so busy items are `skipped_busy` and nothing is cancelled (Decision 2). A replayed
+   item finds that update and follows it, never queueing or destroying twice. `replaceComputer`
+   checkpoints first: a failed save is `failed_checkpoint` and the computer keeps running. The
+   named digest becomes a reference pinned to it in the repository the computer already runs from
+   (recorded image, else last observation, else `inspect`), since policy approves digests and a
+   digest names the same content wherever it is pulled. After provisioning the item verifies the
+   recorded and inspected digest, that a non-empty home stayed non-empty and that no
+   `.browser-profiles` entries were lost, else `failed_verify`; it records before and after and
+   writes `computer.recreated`. Without a digest the provider's own image is used. A provider
+   without image selection is `skipped_unsupported` only when a digest was named; a computer that is
+   not running is `skipped_unsupported` (`not_running`). The Computers page gains Recreate beside
+   Hibernate and Wake, with an image picker from the policy once something is selected and a list
+   exists; the operation sheet shows the short image digest and the two failure outcomes. Deviations:
+   no `failed_home_too_large` (a save failure is `failed_checkpoint`), no typed-count confirmation
+   (nothing is lost), no Docker opt-in variant. **Acceptance test**
+   (`fleet-recreate.postgres.test.ts`). Tests: 3, 4, 8.
 6. **Terminate.** Tests: 15 and busy handling.
 7. **Quarantine and release.** Flag, gates, Docker `networkIsolation`, optional suspend composition,
    Kubernetes label patch and RBAC change documented. Tests: 9, 10, 11.

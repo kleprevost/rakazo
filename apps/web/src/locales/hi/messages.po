@@ -1399,6 +1399,10 @@ msgstr ""
 msgid "Check every"
 msgstr "जाँच का अंतराल"
 
+#: src/pages/admin/AdminFleetOperations.tsx
+msgid "Check failed"
+msgstr "जाँच विफल रही"
+
 #. placeholder {0}: state.detail ?? ""
 #: src/pages/RoutineEditor.tsx
 msgid "Check failed: {0}"
@@ -2712,6 +2716,7 @@ msgstr "दिन"
 msgid "Decline"
 msgstr "अस्वीकार करें"
 
+#: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/model-settings/compatible-model-fields.tsx
 #: src/pages/model-settings/role-model-picker.tsx
 #: src/pages/ModelRoleSettings.tsx
@@ -4757,6 +4762,10 @@ msgstr "अभी नहीं"
 msgid "Not reported"
 msgstr ""
 
+#: src/pages/admin/AdminFleetOperations.tsx
+msgid "Not saved, left running"
+msgstr "सहेजा नहीं गया, चालू छोड़ा गया"
+
 #: src/pages/shell/agent-import.tsx
 #: src/pages/shell/import-status.ts
 msgid "Not supported in Rakazo"
@@ -5466,6 +5475,10 @@ msgstr ""
 #: src/components/ComputerUpdateProgress.tsx
 msgid "Recovery restores the last saved workspace. Unsaved work may be lost."
 msgstr "रिकवरी आखिरी सहेजे गए कार्यक्षेत्र को बहाल करती है। बिना सहेजा गया काम खो सकता है।"
+
+#: src/pages/admin/AdminFleetOperations.tsx
+msgid "Recreate"
+msgstr "फिर से बनाएँ"
 
 #: src/components/ComputerMaintenanceActions.tsx
 msgid "Recreate a computer that is not working."

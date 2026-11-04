@@ -4,6 +4,8 @@ import {
   Badge,
   Button,
   Checkbox,
+  NativeSelect,
+  NativeSelectOption,
   Sheet,
   SheetContent,
   SheetHeader,
@@ -21,7 +23,12 @@ import { useState } from "react";
 import { useSpaceQueries } from "../../lib/query";
 import { rpc } from "../../lib/rpc";
 import { errorText } from "../../lib/user-error";
-import { FleetOperations, useFleetLabels, useFleetOperations } from "./AdminFleetOperations";
+import {
+  FleetOperations,
+  shortDigest,
+  useFleetLabels,
+  useFleetOperations,
+} from "./AdminFleetOperations";
 import { AdminQuery, LoadMore } from "./AdminQuery";
 import { AdminShell } from "./AdminShell";
 import { formatBytes, formatWhen } from "./format";
@@ -43,7 +50,14 @@ function AdminComputers() {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [openOperation, setOpenOperation] = useState<string | null>(null);
   const [starting, setStarting] = useState(false);
+  const [image, setImage] = useState("");
   const operations = useFleetOperations();
+  // The approved images come from the policy, read only once there is something to recreate.
+  const policy = useQuery({
+    ...useSpaceQueries().admin.policy.queryOptions(),
+    enabled: selected.size > 0,
+  });
+  const approved = policy.data?.policy?.computers?.images?.allow ?? [];
   const computers = useInfiniteQuery(
     useSpaceQueries().admin.computers.list.infiniteOptions({
       input: (cursor: string | null) => ({
@@ -63,12 +77,13 @@ function AdminComputers() {
       if (!next.delete(id)) next.add(id);
       return next;
     });
-  async function start(kind: "hibernate" | "wake") {
+  async function start(kind: "hibernate" | "wake" | "recreate") {
     setStarting(true);
     try {
       const created = await rpc.admin.computers.operations.create({
         kind,
         computerIds: [...selected],
+        ...(kind === "recreate" && image ? { imageDigest: image } : {}),
       });
       setSelected(new Set());
       setOpenOperation(created.id);
@@ -96,7 +111,7 @@ function AdminComputers() {
       {selected.size > 0 ? (
         <div className="mb-3 flex items-center gap-2">
           <span className="text-muted-foreground tabular-nums">{selected.size}</span>
-          {(["hibernate", "wake"] as const).map((kind) => (
+          {(["hibernate", "wake", "recreate"] as const).map((kind) => (
             <Button
               key={kind}
               variant="outline"
@@ -107,6 +122,21 @@ function AdminComputers() {
               {labels.kind(kind)}
             </Button>
           ))}
+          {approved.length > 0 ? (
+            <NativeSelect
+              aria-label={t`Image`}
+              size="sm"
+              value={image}
+              onChange={(event) => setImage(event.target.value)}
+            >
+              <NativeSelectOption value="">{t`Default`}</NativeSelectOption>
+              {approved.map((entry) => (
+                <NativeSelectOption key={entry.digest} value={entry.digest}>
+                  {entry.tag ?? shortDigest(entry.digest)}
+                </NativeSelectOption>
+              ))}
+            </NativeSelect>
+          ) : null}
         </div>
       ) : null}
       <AdminQuery

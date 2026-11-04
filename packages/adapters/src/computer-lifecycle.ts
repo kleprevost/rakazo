@@ -1000,8 +1000,18 @@ export async function replaceComputer(
   context: AdapterContext,
   controlHolder: "bot" | "none" = "none",
   onProgress?: ComputerUpdateProgress,
-  options?: { handBackIdleTakeover?: boolean },
+  options?: {
+    handBackIdleTakeover?: boolean;
+    /** Provision the replacement from this image. Refused before anything is touched. */
+    image?: { ref: string; digest: string };
+  },
 ): Promise<ComputerRef> {
+  if (options?.image) {
+    // Provisioning checks again, but only after the old machine is gone.
+    await assertComputerImageAllowed(options.image, { ...context, surface: "computer" });
+    if (!deps.sandbox.describe().capabilities.fleet?.imageSelection)
+      throw new Error("This computer provider cannot start from a named image");
+  }
   let existing = await deps.prisma.computer.findUniqueOrThrow({ where: { id: computerId } });
   if (existing.maintenanceId && existing.maintenanceId !== context.operationId)
     throw new ComputerBusyError();
@@ -1275,7 +1285,7 @@ export async function replaceComputer(
     });
     if (stopped.count !== 1) throw new ComputerBusyError();
     await recordComputerRunEnd(deps.prisma, existing, "replaced");
-    return provisionComputer(deps, computerId, context, controlHolder, onProgress);
+    return provisionComputer(deps, computerId, context, controlHolder, onProgress, options?.image);
   } catch (error) {
     const failedState =
       previousState === "quarantined"

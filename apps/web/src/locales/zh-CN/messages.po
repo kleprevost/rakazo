@@ -1399,6 +1399,10 @@ msgstr "重新检查"
 msgid "Check every"
 msgstr "检查间隔"
 
+#: src/pages/admin/AdminFleetOperations.tsx
+msgid "Check failed"
+msgstr "检查失败"
+
 #. placeholder {0}: state.detail ?? ""
 #: src/pages/RoutineEditor.tsx
 msgid "Check failed: {0}"
@@ -2712,6 +2716,7 @@ msgstr "天"
 msgid "Decline"
 msgstr "拒绝"
 
+#: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/model-settings/compatible-model-fields.tsx
 #: src/pages/model-settings/role-model-picker.tsx
 #: src/pages/ModelRoleSettings.tsx
@@ -4757,6 +4762,10 @@ msgstr "暂不"
 msgid "Not reported"
 msgstr ""
 
+#: src/pages/admin/AdminFleetOperations.tsx
+msgid "Not saved, left running"
+msgstr "未保存，保持运行"
+
 #: src/pages/shell/agent-import.tsx
 #: src/pages/shell/import-status.ts
 msgid "Not supported in Rakazo"
@@ -5466,6 +5475,10 @@ msgstr "上一项操作还没停，现在不能恢复。"
 #: src/components/ComputerUpdateProgress.tsx
 msgid "Recovery restores the last saved workspace. Unsaved work may be lost."
 msgstr "恢复操作会还原上次保存的工作区。未保存的工作可能会丢失。"
+
+#: src/pages/admin/AdminFleetOperations.tsx
+msgid "Recreate"
+msgstr "重新创建"
 
 #: src/components/ComputerMaintenanceActions.tsx
 msgid "Recreate a computer that is not working."
