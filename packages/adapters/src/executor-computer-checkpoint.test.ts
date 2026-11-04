@@ -9,6 +9,7 @@ import type * as ModelRolesModule from "./model-roles.js";
 import type * as ModelSelectionModule from "./model-selection.js";
 import { findConnectedModelCredential } from "./model-selection.js";
 import type * as RunModelModule from "./run-model.js";
+import { withRunGates } from "./testing/run-gates.js";
 
 vi.mock("./model-selection.js", async (importOriginal) => ({
   ...(await importOriginal<typeof ModelSelectionModule>()),
@@ -330,10 +331,10 @@ function fixture(runId = "run-1") {
   const executor = createRunExecutor({
     shutdownSignal: shutdown.signal,
     deploymentModelKey: "fixture-model-key",
-    prisma: {
+    prisma: withRunGates({
       ...prisma,
       $transaction: async (work: (tx: typeof prisma) => Promise<unknown>) => work(prisma),
-    },
+    }),
     artifacts: { put: artifactPut, get: vi.fn() },
     runtime: { describe: () => ({ capabilities: { scripted: false } }), run: runtimeRun },
     connector: {
