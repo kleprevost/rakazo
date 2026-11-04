@@ -32,7 +32,9 @@ export function SidebarHeader({
   navigate,
   setNewSpaceOpen,
   setCreateBotOpen,
+  sharedEmployeesEnabled = false,
 }: {
+  sharedEmployeesEnabled?: boolean;
   mini?: boolean;
   createMenuOpen: boolean;
   setCreateMenuOpen: (open: boolean) => void;
@@ -181,6 +183,15 @@ export function SidebarHeader({
                   setMobileSidebarOpen(false);
                   setNewSpaceOpen(true);
                 }}
+                onBrowseEmployees={
+                  sharedEmployeesEnabled
+                    ? () => {
+                        setCreateMenuOpen(false);
+                        setMobileSidebarOpen(false);
+                        navigate("/app/employees");
+                      }
+                    : undefined
+                }
               />
             </PopoverContent>
           ) : null}

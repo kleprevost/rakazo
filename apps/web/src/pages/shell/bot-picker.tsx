@@ -9,7 +9,7 @@ import {
   CommandList,
   CommandSeparator,
 } from "@rakazo/ui-web";
-import { Info, Lock, Plus, Users } from "lucide-react";
+import { Building2, Info, Lock, Plus, Users } from "lucide-react";
 import { useMemo, useState } from "react";
 import { IconTooltip } from "../../components/IconTooltip";
 
@@ -19,12 +19,15 @@ export function BotCreatePicker({
   onOpenBot,
   onCreateGroup,
   onCreateSpace,
+  onBrowseEmployees,
 }: {
   bots: Bot[];
   onCreateBot: () => void;
   onOpenBot: (botId: string) => void;
   onCreateGroup: () => void;
   onCreateSpace: () => void;
+  /** Set only when shared employees are on. */
+  onBrowseEmployees?: () => void;
 }) {
   const { t } = useLingui();
   const [query, setQuery] = useState("");
@@ -102,6 +105,19 @@ export function BotCreatePicker({
                 label={t`Private workspace with its own bots and groups.`}
               />
             </CommandItem>
+            {onBrowseEmployees ? (
+              <CommandItem
+                value="browse-employees"
+                data-testid="browse-employees"
+                onSelect={() => onBrowseEmployees()}
+                className="gap-2"
+              >
+                <span className="flex size-[22px] shrink-0 items-center justify-center">
+                  <Building2 size={16} strokeWidth={1.8} aria-hidden="true" />
+                </span>
+                <Trans>Browse employees</Trans>
+              </CommandItem>
+            ) : null}
           </CommandGroup>
           <CommandSeparator className="shrink-0" />
           <CommandGroup className="min-h-0 max-h-60 overflow-y-auto">

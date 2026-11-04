@@ -64,6 +64,9 @@ const TodayPage = lazyComponent(() => import("./pages/Today").then((module) => m
 const CalendarPage = lazyComponent(() =>
   import("./pages/Calendar").then((module) => module.CalendarPage),
 );
+const EmployeesPage = lazyComponent(() =>
+  import("./pages/Employees").then((module) => module.EmployeesPage),
+);
 const BoardPage = lazyComponent(() => import("./pages/Board").then((module) => module.BoardPage));
 const AdminRoutes = lazyComponent(() =>
   import("./pages/admin/AdminRoutes").then((module) => module.AdminRoutes),
@@ -286,6 +289,7 @@ function SessionApp() {
                   <Route path="/onboarding/:step?" element={<OnboardingPage />} />
                   <Route path="/app/today" element={<TodayPage />} />
                   <Route path="/app/calendar" element={<CalendarPage />} />
+                  <Route path="/app/employees" element={<EmployeesPage />} />
                   <Route path="/app/artifacts" element={<ArtifactsPage />} />
                   <Route path="/app/artifacts/:artifactId" element={<ArtifactsPage />} />
                   {ticketBoardEnabled ? <Route path="/app/board" element={<BoardPage />} /> : null}

@@ -530,6 +530,13 @@ describeWithDatabase("API authorization and resource isolation", () => {
       ["employees/get", { employeeId: "missing-employee" }],
       ["employees/share", { botId: "missing-bot" }],
       ["employees/addInstance", { employeeId: "missing-employee" }],
+      ["employees/directory"],
+      ["employees/requests/create", { employeeId: "missing-employee" }],
+      ["employees/requests/list", { employeeId: "missing-employee" }],
+      [
+        "employees/requests/decide",
+        { employeeId: "missing-employee", requestId: "missing", decision: "deny" },
+      ],
       ["employees/versions/saveDraft", { employeeId: "missing-employee" }],
       ["employees/versions/publish", { employeeId: "missing-employee", versionId: "missing" }],
       ["employees/versions/rollback", { employeeId: "missing-employee", versionId: "missing" }],
