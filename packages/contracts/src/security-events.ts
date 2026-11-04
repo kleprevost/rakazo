@@ -24,6 +24,8 @@ export const SECURITY_EVENT_TYPES = [
   "deployment.settings.changed",
   "bot.suspended",
   "bot.resumed",
+  "bot.quarantined",
+  "bot.released",
   "approval.decided",
   "approval.policy.changed",
   "egress.refused",

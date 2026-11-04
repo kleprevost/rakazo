@@ -18,6 +18,9 @@ const api = vi.hoisted(() => ({
   endSessions: vi.fn(),
   suspend: vi.fn(),
   resume: vi.fn(),
+  quarantines: vi.fn(),
+  quarantineStart: vi.fn(),
+  quarantineLift: vi.fn(),
   toastError: vi.fn(),
   toastSuccess: vi.fn(),
 }));
@@ -27,6 +30,7 @@ vi.mock("../../lib/rpc", () => ({
     admin: {
       users: { endSessions: api.endSessions },
       bots: { suspend: api.suspend, resume: api.resume },
+      quarantine: { start: api.quarantineStart, lift: api.quarantineLift },
     },
   },
 }));
@@ -51,6 +55,7 @@ vi.mock("../../lib/query", () => {
       overview: plain("overview", () => api.overview()),
       users: { list: paged("users", (input) => api.users(input)) },
       bots: { list: paged("bots", (input) => api.bots(input)) },
+      quarantine: { list: plain("quarantines", () => api.quarantines()) },
       computers: { list: paged("computers", (input) => api.computers(input)) },
       policy: plain("policy", () => api.policy()),
       audit: paged("audit", (input) => api.audit(input)),
@@ -121,6 +126,7 @@ beforeEach(() => {
   for (const mock of Object.values(api)) mock.mockReset();
   api.me.mockResolvedValue({ isAdmin: true });
   api.overview.mockResolvedValue({ modelCredits: false });
+  api.quarantines.mockResolvedValue({ quarantines: [] });
 });
 
 it("sends a non-admin back to the app without asking the API for admin data", async () => {
@@ -289,6 +295,7 @@ it("shows the AI employees page: empty, loading, and populated", async () => {
         monthlySpendUsd: 4.25,
         archived: true,
         suspendedAt: null,
+        quarantinedAt: null,
       },
     ],
     nextCursor: null,
@@ -387,6 +394,7 @@ it("suspends an AI employee after a confirming click and resumes it in one click
     monthlySpendUsd: 0,
     archived: false,
     suspendedAt: null as string | null,
+    quarantinedAt: null as string | null,
   };
   api.bots.mockImplementation(async () => ({ bots: [{ ...bot }], nextCursor: null }));
   api.suspend.mockImplementation(async () => {
@@ -412,6 +420,71 @@ it("suspends an AI employee after a confirming click and resumes it in one click
   await settle();
   expect(api.resume).toHaveBeenCalledWith({ botId: "b1" });
   expect(button()?.textContent).toBe("Suspend");
+});
+
+it("quarantines a bot and everyone with a confirming click, and releases a quarantine", async () => {
+  const bot = {
+    id: "b1",
+    name: "Reporter",
+    ownerName: "Mia",
+    ownerEmail: "mia@example.test",
+    spaceName: "Team space",
+    model: null,
+    lastActiveAt: null,
+    monthlySpendUsd: 0,
+    archived: false,
+    suspendedAt: null,
+    quarantinedAt: null as string | null,
+  };
+  let quarantines: unknown[] = [];
+  api.bots.mockImplementation(async () => ({ bots: [{ ...bot }], nextCursor: null }));
+  api.quarantines.mockImplementation(async () => ({ quarantines }));
+  api.quarantineStart.mockImplementation(async () => {
+    bot.quarantinedAt = "2026-02-05T00:00:00.000Z";
+    quarantines = [
+      {
+        id: "q1",
+        scopeKind: "bot",
+        scopeId: "b1",
+        scopeName: "Reporter",
+        reason: "",
+        createdAt: bot.quarantinedAt,
+      },
+    ];
+    return { id: "q1" };
+  });
+  api.quarantineLift.mockImplementation(async () => {
+    bot.quarantinedAt = null;
+    quarantines = [];
+    return { ok: true };
+  });
+  const { host } = await show(<AdminBotsPage />);
+  const rowButtons = () =>
+    [...host.querySelectorAll<HTMLButtonElement>("tbody tr button")].map((b) => b.textContent);
+  expect(rowButtons()).toEqual(["Suspend", "Quarantine"]);
+  const quarantineButton = () =>
+    host.querySelectorAll<HTMLButtonElement>("tbody tr button")[1] as HTMLButtonElement;
+  await act(async () => quarantineButton().click());
+  expect(api.quarantineStart).not.toHaveBeenCalled();
+  await act(async () => quarantineButton().click());
+  await settle();
+  expect(api.quarantineStart).toHaveBeenCalledWith({ scopeKind: "bot", scopeId: "b1" });
+  expect(host.querySelector("tbody tr")?.textContent).toContain("Quarantined");
+  expect(rowButtons()).toEqual(["Suspend"]);
+  const release = [...host.querySelectorAll("button")].find((b) => b.textContent === "Release");
+  await act(async () => release?.click());
+  await settle();
+  expect(api.quarantineLift).toHaveBeenCalledWith({ id: "q1" });
+  expect(rowButtons()).toEqual(["Suspend", "Quarantine"]);
+  const all = () =>
+    [...host.querySelectorAll("button")].find(
+      (b) => b.textContent === "Quarantine all" || b.textContent === "Confirm",
+    );
+  expect(all()?.textContent).toBe("Quarantine all");
+  await act(async () => all()?.click());
+  await act(async () => all()?.click());
+  await settle();
+  expect(api.quarantineStart).toHaveBeenLastCalledWith({ scopeKind: "all" });
 });
 
 it("shows the policy page: error, not loaded, and populated", async () => {

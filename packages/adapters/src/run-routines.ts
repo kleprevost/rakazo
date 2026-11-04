@@ -14,6 +14,7 @@ import {
 } from "@rakazo/core";
 import { getLogger } from "@rakazo/logging";
 import { sanitizedError } from "@rakazo/logging/monitoring";
+import { botBlockedNow } from "./brokered-connector.js";
 import { protectedComputerLifecycleRefusal } from "./desktop-command-guard.js";
 import type { ExecutorDeps } from "./executor-deps.js";
 import { routineRunModelPin } from "./model-selection.js";
@@ -132,9 +133,9 @@ export async function wakeRoutine(deps: ExecutorDeps, routineId: string, schedul
     });
     return;
   }
-  if (bot?.suspendedAt) {
-    // Suspended: skip this occurrence and keep the schedule, so resuming never fires a burst.
-    // The next wake is the next future occurrence; a one-shot that falls due now is dropped.
+  if (bot && (await botBlockedNow(deps.prisma, bot.id)).blocked) {
+    // Suspended or quarantined: skip this occurrence and keep the schedule, so resuming never
+    // fires a burst. The next wake is the next future occurrence; a one-shot that falls due now is dropped.
     const next = isOneShotRoutineCrons(routine.crons)
       ? null
       : nextRoutineRunDateAcross(routine.crons, scheduledAt, new Date(), routine.timezone);

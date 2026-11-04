@@ -695,6 +695,7 @@ msgstr "AI employees"
 
 #: src/components/VaultSettings.tsx
 #: src/pages/admin/AdminAuditPage.tsx
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/PluginsOverlay.tsx
 msgid "All"
 msgstr "All"
@@ -5179,9 +5180,23 @@ msgstr "Providers"
 msgid "Pull request"
 msgstr "Pull request"
 
+#: src/pages/admin/AdminBotsPage.tsx
+msgid "Quarantine"
+msgstr "Quarantine"
+
+#: src/pages/admin/AdminBotsPage.tsx
+msgid "Quarantine all"
+msgstr "Quarantine all"
+
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/admin/AdminComputersPage.tsx
 msgid "Quarantined"
 msgstr "Quarantined"
+
+#. js-lingui-explicit-id
+#: src/lib/run-error.ts
+msgid "Quarantined by your organization"
+msgstr "Quarantined by your organization"
 
 #: src/pages/ActivityList.tsx
 msgid "Queued"
@@ -5369,6 +5384,10 @@ msgstr "Rejected"
 #: src/pages/PluginSubmissionsPanel.tsx
 msgid "Rejecting…"
 msgstr "Rejecting…"
+
+#: src/pages/admin/AdminBotsPage.tsx
+msgid "Release"
+msgstr "Release"
 
 #: src/pages/shell/computer-release-actions.tsx
 msgid "Release control"

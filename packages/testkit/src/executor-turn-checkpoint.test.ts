@@ -139,9 +139,15 @@ function fixture(
         },
       },
       task: { findUniqueOrThrow: async () => task, updateMany: async () => ({ count: 1 }) },
+      quarantine: { findFirst: async () => null },
       bot: {
         ...empty,
-        findUnique: async () => ({ suspendedAt: null, name: "Assistant" }),
+        findUnique: async () => ({
+          suspendedAt: null,
+          name: "Assistant",
+          spaceId: "space-1",
+          groupMembers: [],
+        }),
         update: async () => ({}),
         findUniqueOrThrow: async () => ({
           id: run.botId,

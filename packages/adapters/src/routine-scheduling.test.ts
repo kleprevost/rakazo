@@ -72,9 +72,13 @@ function pendingTimerFixture(reuse = true, suspended = false) {
       findUnique: vi.fn(async () => ({
         id: "bot-1",
         thread: { id: "thread-1" },
+        name: "Ada",
+        spaceId: "space-1",
+        groupMembers: [],
         suspendedAt: suspended ? new Date() : null,
       })),
     },
+    quarantine: { findFirst: vi.fn(async () => null) },
     agentSkill: { findMany: vi.fn(async () => []) },
     $transaction: vi.fn(async (callback: (client: unknown) => Promise<unknown>) => callback(tx)),
   };

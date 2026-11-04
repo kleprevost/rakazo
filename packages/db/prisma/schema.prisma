@@ -557,6 +557,26 @@ model DeploymentSettings {
 /// Append-only security audit trail. No foreign keys, so an account deletion
 /// keeps the record of what happened; retention pruning is the only delete.
 /// Never stores message content, secrets, or tokens.
+/// An admin's incident stop for AI employees: one bot, every bot in a Space or chat group, or all
+/// of them. Checked live on every run, tool and connector call; `liftedAt` ends it. Separate from
+/// a computer's admin quarantine. No tenant data, so no row-level security (like security_events).
+model Quarantine {
+  id              String    @id @default(cuid())
+  /// "bot" | "space" | "group" | "all"
+  scopeKind       String
+  scopeId         String?
+  reason          String    @default("")
+  createdByUserId String
+  createdAt       DateTime  @default(now())
+  liftedAt        DateTime?
+  liftedByUserId  String?
+  /// Counts of what starting it cancelled and revoked.
+  summary         Json?
+
+  @@index([scopeKind, scopeId, liftedAt])
+  @@map("quarantines")
+}
+
 model SecurityEvent {
   id        String   @id @default(cuid())
   type      String

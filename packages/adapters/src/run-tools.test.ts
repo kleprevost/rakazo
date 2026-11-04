@@ -32,11 +32,16 @@ import { applyTool, isToolError } from "./run-tools.js";
 
 const botTable = {
   findUnique: vi.fn(
-    async (): Promise<{ suspendedAt: Date | null; name: string }> => ({
-      suspendedAt: null,
-      name: "Ada",
-    }),
+    async (): Promise<{
+      suspendedAt: Date | null;
+      name: string;
+      spaceId: string;
+      groupMembers: Array<{ groupId: string }>;
+    }> => ({ suspendedAt: null, name: "Ada", spaceId: "space-1", groupMembers: [] }),
   ),
+};
+const quarantineTable = {
+  findFirst: vi.fn(async (): Promise<{ id: string; reason: string } | null> => null),
 };
 
 function dispatchContext(tainted: boolean) {
@@ -45,6 +50,7 @@ function dispatchContext(tainted: boolean) {
     deps: {
       prisma: {
         bot: botTable,
+        quarantine: quarantineTable,
         user: {
           findUniqueOrThrow: async () => ({
             timezone: "UTC" as string | null,
@@ -219,7 +225,12 @@ describe("dispatchTool live suspension check", () => {
     expect(botTable.findUnique).toHaveBeenCalledTimes(1);
     expect(botTable.findUnique).toHaveBeenCalledWith({
       where: { id: "bot-1" },
-      select: { suspendedAt: true, name: true },
+      select: {
+        suspendedAt: true,
+        name: true,
+        spaceId: true,
+        groupMembers: { select: { groupId: true } },
+      },
     });
   });
 
@@ -228,7 +239,12 @@ describe("dispatchTool live suspension check", () => {
     await expect(
       applyTool(ctx as never, "update_preferences", {}, "call-1"),
     ).resolves.toMatchObject({ timezone: "UTC" });
-    botTable.findUnique.mockResolvedValueOnce({ suspendedAt: new Date(), name: "Ada" });
+    botTable.findUnique.mockResolvedValueOnce({
+      suspendedAt: new Date(),
+      name: "Ada",
+      spaceId: "space-1",
+      groupMembers: [],
+    });
     await expect(applyTool(ctx as never, "update_preferences", {}, "call-2")).resolves.toEqual({
       error: "Suspended by your organization",
     });
@@ -236,6 +252,31 @@ describe("dispatchTool live suspension check", () => {
       tool: "update_preferences",
       outcome: "denied",
       metadata: { reason: "suspended" },
+    });
+  });
+
+  it("refuses and audits the next call once a quarantine covers the bot mid-run", async () => {
+    const ctx = dispatchContext(false);
+    quarantineTable.findFirst.mockResolvedValueOnce({ id: "q-1", reason: "incident" });
+    await expect(applyTool(ctx as never, "update_preferences", {}, "call-1")).resolves.toEqual({
+      error: "Quarantined by your organization",
+    });
+    expect(audited.at(-1)).toEqual({
+      tool: "update_preferences",
+      outcome: "denied",
+      metadata: { reason: "quarantined" },
+    });
+    expect(quarantineTable.findFirst).toHaveBeenCalledWith({
+      where: {
+        liftedAt: null,
+        OR: [
+          { scopeKind: "all" },
+          { scopeKind: "bot", scopeId: "bot-1" },
+          { scopeKind: "space", scopeId: "space-1" },
+          { scopeKind: "group", scopeId: { in: [] } },
+        ],
+      },
+      select: { id: true, reason: true },
     });
   });
 

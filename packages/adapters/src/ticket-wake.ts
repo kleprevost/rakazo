@@ -2,6 +2,7 @@ import type { JobPublisher } from "@rakazo/adapter-kit";
 import { runContinueJob } from "@rakazo/adapter-kit";
 import { isTicketCompletedStatus, TicketStatusSchema } from "@rakazo/contracts";
 import type { PrismaClient } from "@rakazo/db";
+import { activeQuarantineFor } from "@rakazo/db";
 import { getLogger } from "@rakazo/logging";
 
 /** Assignment wakes only its current owner, without posting a chat message. */
@@ -23,6 +24,8 @@ export async function wakeTicketAssignee(
       select: { id: true, userId: true, thread: { select: { id: true } } },
     });
     if (!bot?.thread) return null;
+    // A quarantined bot is not woken either: the ticket keeps its status.
+    if (await activeQuarantineFor(tx, bot.id)) return null;
     const task = await tx.task.create({
       data: {
         spaceId: input.spaceId,

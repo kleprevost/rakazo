@@ -151,8 +151,14 @@ async function runTool(
           return { count: 1 };
         },
       },
+      quarantine: { findFirst: async () => null },
       bot: {
-        findUnique: async () => ({ suspendedAt: null, name: "Assistant" }),
+        findUnique: async () => ({
+          suspendedAt: null,
+          name: "Assistant",
+          spaceId: "space-1",
+          groupMembers: [],
+        }),
         findUniqueOrThrow: async () => ({
           id: run.botId,
           name: "Assistant",
