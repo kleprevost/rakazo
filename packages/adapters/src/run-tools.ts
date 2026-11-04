@@ -1,7 +1,9 @@
 import type { AgentToolExecutionObserver } from "@rakazo/adapter-kit";
+import { CAPABILITY_DENIED_MESSAGE } from "@rakazo/contracts";
 import { toolResultTaintsRun } from "@rakazo/core";
 import { isTerminatingReplyResult } from "./approval-effect.js";
 import { botBlockedNow, botBlockMessage } from "./brokered-connector.js";
+import { capabilityGate } from "./capability-enforce.js";
 import { IMAGE_RETURNING_COMPUTER_TOOLS, MODEL_CANNOT_SEE_MESSAGE } from "./model-vision.js";
 import type { RunContext } from "./run-context.js";
 import { noteComputerTaskStep } from "./run-progress.js";
@@ -109,10 +111,32 @@ async function dispatchTool(
   if ("result" in gate) return gate.result;
   // The gate can wait hours on an approval, and the run's snapshot of the bot is older still:
   // read suspension and quarantine again at the instant before the side effect.
-  const { blocked } = await botBlockedNow(ctx.deps.prisma, ctx.bot.id);
-  if (blocked) {
-    await auditToolCall(ctx, gate.call.name, "denied", { reason: blocked });
-    return { error: botBlockMessage(blocked) };
+  const state = await botBlockedNow(ctx.deps.prisma, ctx.bot.id);
+  if (state.blocked) {
+    await auditToolCall(ctx, gate.call.name, "denied", { reason: state.blocked });
+    return { error: botBlockMessage(state.blocked) };
+  }
+  // The same rule for grants: a revoked or expired one, a mode switched on mid-run, or a new
+  // policy is honored by an approval granted before it. An ask is already answered here.
+  const recheck = await capabilityGate({
+    prisma: ctx.deps.prisma,
+    bot: {
+      id: ctx.bot.id,
+      name: state.name,
+      employeeId: state.employeeId,
+      capabilityMode: state.capabilityMode,
+    },
+    spaceId: ctx.run.spaceId,
+    userId: ctx.run.userId,
+    runId: ctx.runId,
+    threadId: ctx.thread.id,
+    surface: "recheck",
+    call: gate.call.capability,
+    connections: ctx.context.connectedConnections,
+  });
+  if (recheck.outcome === "deny") {
+    await auditToolCall(ctx, gate.call.name, "denied", { reason: "capability" });
+    return { error: CAPABILITY_DENIED_MESSAGE };
   }
   if (!gate.call.applied) return toolHandler(gate.call.name)(ctx, gate.call);
   let outcome: "success" | "failure" = "failure";

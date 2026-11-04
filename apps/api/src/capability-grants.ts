@@ -119,7 +119,10 @@ export async function listCapabilityGrants(
       )
     : null;
   return {
-    mode: mode?.capabilityMode === "shadow" ? "shadow" : null,
+    mode:
+      mode?.capabilityMode === "shadow" || mode?.capabilityMode === "enforce"
+        ? mode.capabilityMode
+        : null,
     grants: rows.map((row) => view(row, row.employeeId !== null && bot !== null)),
   };
 }

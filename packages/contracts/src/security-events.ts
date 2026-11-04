@@ -51,6 +51,7 @@ export const SECURITY_EVENT_TYPES = [
   "capability.grant_set",
   "capability.grant_revoked",
   "capability.mode_changed",
+  "capability.denied",
   "employee.access_requested",
   "employee.access_decided",
 ] as const;

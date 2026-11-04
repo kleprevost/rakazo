@@ -1,3 +1,4 @@
+import { CAPABILITY_DENIED_MESSAGE } from "@rakazo/contracts";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createApprovedEffectReplayQueue, terminatingToolResult } from "./approval-effect.js";
 
@@ -13,6 +14,7 @@ vi.mock("./run-tool-gate.js", async (importOriginal) => ({
       executionId: "call-1",
       observer: undefined,
       connectorCall: { tool: request.name, args: request.args, executionId: "call-1" },
+      capability: { source: "builtin", tool: request.name, args: request.args },
       effectKey: `effect-${request.name}`,
       applied: { effect: { id: `effect-${request.name}` } },
       nextApprovedTool: undefined,
@@ -59,7 +61,8 @@ function dispatchContext(tainted: boolean) {
         },
       },
     },
-    run: { userId: "user-1" },
+    run: { userId: "user-1", spaceId: "space-1" },
+    thread: { id: "thread-1" },
     source: { ownerStartedRun: true },
     runId: "run-1",
     state: { tainted, handedOff: false, ownerSettingsRefused: false },
@@ -254,6 +257,37 @@ describe("dispatchTool live suspension check", () => {
       tool: "update_preferences",
       outcome: "denied",
       metadata: { reason: "suspended" },
+    });
+  });
+
+  it("rechecks the capability broker before the effect, reading the mode live, and fails closed", async () => {
+    const ctx = dispatchContext(false);
+    const grants = vi.fn(async (): Promise<unknown[]> => []);
+    (ctx.deps.prisma as Record<string, unknown>).capabilityGrant = { findMany: grants };
+    const enforcing = {
+      suspendedAt: null,
+      name: "Ada",
+      spaceId: "space-1",
+      capabilityMode: "enforce",
+      employeeId: null,
+      groupMembers: [],
+    };
+    // The run started with the broker off; an admin switched it on while the call waited.
+    botTable.findUnique.mockResolvedValueOnce(enforcing);
+    await expect(
+      applyTool(ctx as never, "update_preferences", {}, "call-1"),
+    ).resolves.toMatchObject({ timezone: "UTC" });
+    expect(grants).toHaveBeenCalledTimes(1);
+
+    grants.mockRejectedValueOnce(new Error("db down"));
+    botTable.findUnique.mockResolvedValueOnce(enforcing);
+    await expect(applyTool(ctx as never, "update_preferences", {}, "call-2")).resolves.toEqual({
+      error: CAPABILITY_DENIED_MESSAGE,
+    });
+    expect(audited.at(-1)).toEqual({
+      tool: "update_preferences",
+      outcome: "denied",
+      metadata: { reason: "capability" },
     });
   });
 

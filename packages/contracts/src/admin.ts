@@ -15,6 +15,9 @@ export const BOT_SUSPENDED_MESSAGE = "Suspended by your organization";
 /** The same, when an admin quarantined it (one bot, its Space or chat group, or all bots). */
 export const BOT_QUARANTINED_MESSAGE = "Quarantined by your organization";
 
+/** What a bot is told when the capability broker refuses a call. */
+export const CAPABILITY_DENIED_MESSAGE = "Not permitted for this bot";
+
 /** What a run says when it is refused before the model because the shared employee behind it is unavailable. */
 export const EMPLOYEE_ACCESS_REMOVED_MESSAGE = "Access removed";
 export const EMPLOYEE_SUSPENDED_MESSAGE = "This employee is suspended";
