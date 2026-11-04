@@ -19,6 +19,7 @@ import {
   FolderPlus,
   Pencil,
   Pin,
+  Share2,
   Trash2,
 } from "lucide-react";
 
@@ -38,6 +39,7 @@ export function BotContextMenu({
   onClear,
   onArchive,
   onDelete,
+  onShare,
 }: {
   bot: ChatMenuTarget;
   onClose: () => void;
@@ -52,6 +54,8 @@ export function BotContextMenu({
   onClear: () => void;
   onArchive: () => void;
   onDelete: () => void;
+  /** Present only when the person may share this bot or manage who has access. */
+  onShare?: () => void;
 }) {
   const { t } = useLingui();
 
@@ -108,6 +112,12 @@ export function BotContextMenu({
         <Copy />
         {t`Duplicate`}
       </ContextMenuItem>
+      {onShare ? (
+        <ContextMenuItem onClick={onShare}>
+          <Share2 />
+          {t`Share`}
+        </ContextMenuItem>
+      ) : null}
       <ContextMenuSeparator />
       <ContextMenuItem onClick={onClear}>
         <Eraser />

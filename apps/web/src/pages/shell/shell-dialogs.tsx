@@ -28,6 +28,7 @@ import {
   NewSpaceDialog,
   RenameBotSectionDialog,
 } from "./dialogs";
+import { ShareEmployeeDialog } from "./share-employee-dialog";
 
 type ChatTarget = { kind: "bot"; chat: Bot } | { kind: "group"; chat: Group };
 type SectionTarget = { section: BotSection; spaceId: string };
@@ -52,6 +53,7 @@ export function useShellDialogs() {
   const [newSectionTarget, setNewSectionTarget] = useState<ChatTarget | null>(null);
   const [renameSectionTarget, setRenameSectionTarget] = useState<SectionTarget | null>(null);
   const [deleteSectionTarget, setDeleteSectionTarget] = useState<SectionTarget | null>(null);
+  const [shareTarget, setShareTarget] = useState<Bot | null>(null);
   const [newSpaceOpen, setNewSpaceOpen] = useState(false);
   const [createBotOpen, setCreateBotOpen] = useState(false);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
@@ -74,6 +76,8 @@ export function useShellDialogs() {
     setRenameSectionTarget,
     deleteSectionTarget,
     setDeleteSectionTarget,
+    shareTarget,
+    setShareTarget,
     newSpaceOpen,
     setNewSpaceOpen,
     createBotOpen,
@@ -147,6 +151,8 @@ export function ShellDialogs({
     setRenameSectionTarget,
     deleteSectionTarget,
     setDeleteSectionTarget,
+    shareTarget,
+    setShareTarget,
     newSpaceOpen,
     setNewSpaceOpen,
     createBotOpen,
@@ -383,6 +389,15 @@ export function ShellDialogs({
             setClearTarget(null);
             await refreshBots();
           }}
+        />
+      ) : null}
+
+      {shareTarget ? (
+        <ShareEmployeeDialog
+          bot={shareTarget}
+          api={rpc.employees}
+          onCancel={() => setShareTarget(null)}
+          onShared={() => void refreshBots()}
         />
       ) : null}
 

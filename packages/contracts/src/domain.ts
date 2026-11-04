@@ -113,6 +113,8 @@ export const BotSchema = z.object({
   archivedAt: z.string().nullable(),
   /** Set while an admin has suspended the bot; it takes no runs. */
   suspendedAt: z.string().nullable().optional(),
+  /** Set when this bot is the person's own copy of a shared employee. */
+  employeeId: Id.nullable().optional(),
   unread: z.boolean(),
   parentBotId: Id.nullable(),
   memoryScope: MemoryScopeSchema.nullable(),
@@ -1914,6 +1916,8 @@ export const MeSchema = z.object({
   maxAttachmentsPerMessage: z.number().int().positive().optional(),
   ticketBoardEnabled: z.boolean(),
   phoneCallsEnabled: z.boolean().default(false),
+  /** Whether people can share AI employees and add shared ones. Absent from older servers. */
+  sharedEmployeesEnabled: z.boolean().optional(),
   /** Operator-configured menu links. Absent from older servers. */
   navLinks: z.array(NavLinkSchema).default([]),
   userId: Id,

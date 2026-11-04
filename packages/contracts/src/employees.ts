@@ -99,6 +99,8 @@ export const EmployeeGrantSchema = z.object({
   role: EmployeeRoleSchema,
   grantedBy: z.string(),
   expiresAt: IsoDate.nullable(),
+  /** A person's name, set by the server on listings; a directory group shows its value. */
+  subjectLabel: z.string().optional(),
 });
 export type EmployeeGrant = z.infer<typeof EmployeeGrantSchema>;
 
@@ -146,6 +148,12 @@ export const employeesContract = {
     publish: oc.input(z.object({ employeeId: Id, versionId: Id })).output(EmployeeCardSchema),
     /** Points the employee back at an earlier published version. */
     rollback: oc.input(z.object({ employeeId: Id, versionId: Id })).output(EmployeeCardSchema),
+  },
+  /** People a Manager or Owner can name in a grant. Identity only. */
+  people: {
+    search: oc
+      .input(z.object({ employeeId: Id, q: z.string().max(100) }))
+      .output(z.array(z.object({ userId: Id, name: z.string(), email: z.string() }))),
   },
   grants: {
     list: oc.input(z.object({ employeeId: Id })).output(z.array(EmployeeGrantSchema)),

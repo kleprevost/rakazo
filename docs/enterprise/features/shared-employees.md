@@ -496,3 +496,15 @@ note that is only a copy of a published definition, as on a bot shared in place,
 Not in this PR: `skills` are recorded on versions but not resolved at run time (there is no shared
 skill store yet), approved shared knowledge (PR 7), the employee-level suspend action and
 `instanceKind` (PR 9), and any UI.
+
+PR 5 (sharing dialog and grants UI, web and desktop) adds "Share" to a bot's context menu when
+`me.sharedEmployeesEnabled` is on (new boolean, from `SHARED_EMPLOYEES_ENABLED`). A private bot first
+becomes an employee in place from a confirm step; the same dialog then lists who has access with a
+role menu and remove, adds people (found by name or email through the new `employees.people.search`,
+Owner/Manager only, identity fields only) or a directory group by its claim value, and lists versions
+with Publish and Roll back. Role menus offer only what the pure evaluator would allow (a Manager never
+sees Owner or Manager roles); the server still decides, and its refusals, including the last Owner,
+are shown as returned. `bots.employeeId` and `grants.list`'s `subjectLabel` (the person's name) are
+now in the contracts. Not in this PR: a draft editor, expiry dates, "Add to my bots" (the directory
+in PR 6 is its home), and mobile, which waits for the native follow-up named in the build plan.
+New catalog entries are untranslated in non-English locales and fall back to English.
