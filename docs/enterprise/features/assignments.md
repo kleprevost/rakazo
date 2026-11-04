@@ -1,6 +1,6 @@
 # Independent assignments per employee
 
-Roadmap Wave 4, item 2. Status: design; PR 1 (table, read model, audit) and PR 2 (create, thread targeting, ticket wake) built. Today an employee has one chat; two jobs
+Roadmap Wave 4, item 2. Status: design; PR 1 (table, read model, audit), PR 2 (create, thread targeting, ticket wake) and PR 3 (web and desktop surface) built. Today an employee has one chat; two jobs
 given to it share that thread, its history and its single stream of approvals. This makes each job
 its own addressable unit while the employee, its memory and its tools stay one.
 
@@ -188,3 +188,18 @@ These replace the open questions the first draft carried.
   "Queued" case of decision 4 and applies to dedicated computers too. Running them in parallel on
   one computer would mean keying the lease by run, a non-additive change to an existing unique
   index that the previous release still relies on, so it is left for its own PR.
+
+## PR 3 notes
+- Route `/app/a/:assignmentId` is its own page, not a mode of the shell. It reuses the chat's
+  `Transcript`, `Composer` and `useComposerActions` (which now takes an optional `assignmentId` and
+  addresses sends, answers, reactions and stop to that thread), with a small thread hook that
+  loads, subscribes and pages older messages through `threadTarget.assignmentId`.
+- The status in the header opens to the assignment's runs and files. A ticket run keeps trigger
+  `tickets`, which a chat snapshot hides while it works, so the page takes "running" and the Stop
+  control from `assignments.get` runs. A newest run still in `queued` reads as Queued.
+- Today runs, attention rows and work items, and the board ticket's work, carry `assignmentId` and
+  link to the page; a ticket without an assignment still opens the board dialog. The assignment
+  id is named only to its creator, so the link always opens.
+- The employee panel shows an Assignments tab once the employee has an assignment. Archive and
+  search come with PR 5 and PR 6.
+- Mobile is unchanged: Today and Board rows open the employee chat until PR 7.

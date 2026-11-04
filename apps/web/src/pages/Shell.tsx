@@ -197,7 +197,13 @@ function SpaceShell() {
   const rightPanel = useRightPanel({ searchParams, setSearchParams });
   const { panel, setPanel, modelFocusRequest, setModelFocusRequest } = rightPanel;
   const lastBotTab = useRef<Panel>("routines");
-  if (panel === "routines" || panel === "computer" || panel === "pages" || panel === "settings")
+  if (
+    panel === "routines" ||
+    panel === "computer" ||
+    panel === "pages" ||
+    panel === "assignments" ||
+    panel === "settings"
+  )
     lastBotTab.current = panel;
   const [peerConversation, setPeerConversation] = usePreloadRecoveryState<{
     peerBotId: string;
@@ -273,6 +279,7 @@ function SpaceShell() {
     : panel === "computer" ||
       panel === "routines" ||
       panel === "pages" ||
+      panel === "assignments" ||
       panel === "settings" ||
       panel === "routine";
   // Until the route names the chat reopened from cache, that chat stands in for it.

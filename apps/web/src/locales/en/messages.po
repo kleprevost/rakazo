@@ -1016,6 +1016,10 @@ msgstr "Asks before"
 msgid "Asleep"
 msgstr "Asleep"
 
+#: src/pages/shell/bot-panel.tsx
+msgid "Assignments"
+msgstr "Assignments"
+
 #. placeholder {0}: preset.time
 #: src/lib/cron.ts
 msgid "at {0}"
@@ -1103,6 +1107,7 @@ msgstr "Avatar Studio"
 #: src/components/integrations/skills-dialog.tsx
 #: src/components/vault/VaultPageHeader.tsx
 #: src/pages/admin/AdminShell.tsx
+#: src/pages/Assignment.tsx
 #: src/pages/Auth.tsx
 #: src/pages/Board.tsx
 #: src/pages/Calendar.tsx
@@ -4956,6 +4961,7 @@ msgstr "Only you"
 #: src/components/markdown-link-prompt.tsx
 #: src/components/pages/PagesList.tsx
 #: src/pages/admin/AdminComputersPage.tsx
+#: src/pages/Board.tsx
 #: src/pages/PaymentWalletSettingsPanel.tsx
 #: src/pages/shell/computer-panel.tsx
 #: src/pages/shell/import-setup-card.tsx
@@ -5428,6 +5434,7 @@ msgstr "Quarantined by your organization"
 
 #: src/pages/ActivityList.tsx
 #: src/pages/admin/AdminFleetOperations.tsx
+#: src/pages/Assignment.tsx
 msgid "Queued"
 msgstr "Queued"
 
@@ -6382,6 +6389,7 @@ msgstr "Show bots"
 msgid "Show list"
 msgstr "Show list"
 
+#: src/components/assignments/AssignmentsList.tsx
 #: src/components/pages/PagesList.tsx
 #: src/pages/KnowledgeSection.tsx
 #: src/pages/PluginsOverlay.tsx

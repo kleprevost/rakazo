@@ -16,6 +16,7 @@ vi.mock("../../lib/rpc", () => {
       list: vi.fn(async () => []),
     },
     me: vi.fn(async () => ({})),
+    assignments: { list: vi.fn(async () => ({ items: [], nextCursor: null })) },
   };
   return {
     rpc,

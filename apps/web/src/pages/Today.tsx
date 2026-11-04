@@ -16,6 +16,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Shimmer } from "../components/ai/primitives";
 import { PageLoading } from "../components/PageLoading";
+import { assignmentPath } from "../lib/assignment-path";
 import { useSpaceQueries } from "../lib/query";
 import { formatRelativeTime } from "../lib/relative-time";
 import { rpc } from "../lib/rpc";
@@ -26,8 +27,9 @@ import { WindowChrome } from "./WindowChrome";
 /** Live updates: the summary refreshes while the page is open, and stops after a refused read. */
 const REFRESH_MS = 10_000;
 
-type Chat = { botId: string; groupId: string | null };
-const chatPath = ({ botId, groupId }: Chat) => (groupId ? `/app/g/${groupId}` : `/app/${botId}`);
+type Chat = { botId: string; groupId: string | null; assignmentId?: string | null };
+const chatPath = ({ botId, groupId, assignmentId }: Chat) =>
+  assignmentId ? assignmentPath(assignmentId) : groupId ? `/app/g/${groupId}` : `/app/${botId}`;
 
 export function TodayPage() {
   const { t } = useLingui();
@@ -178,7 +180,10 @@ function Section({
 function WorkRow({ item }: { item: TodayWorkItem }) {
   return (
     <li className="flex items-baseline gap-2 py-2 text-sm">
-      <Link to={`/app/board?ticket=${item.id}`} className="min-w-0 flex-1 truncate hover:underline">
+      <Link
+        to={item.assignmentId ? assignmentPath(item.assignmentId) : `/app/board?ticket=${item.id}`}
+        className="min-w-0 flex-1 truncate hover:underline"
+      >
         <span className="font-medium">{item.ref}</span>{" "}
         <span className={item.phase === "failed" ? "text-destructive" : "text-muted-foreground"}>
           {item.title}

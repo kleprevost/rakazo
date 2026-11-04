@@ -60,6 +60,9 @@ const NotFoundPage = lazyComponent(() =>
 const ArtifactsPage = lazyComponent(() =>
   import("./pages/Artifacts").then((module) => module.ArtifactsPage),
 );
+const AssignmentPage = lazyComponent(() =>
+  import("./pages/Assignment").then((module) => module.AssignmentPage),
+);
 const TodayPage = lazyComponent(() => import("./pages/Today").then((module) => module.TodayPage));
 const CalendarPage = lazyComponent(() =>
   import("./pages/Calendar").then((module) => module.CalendarPage),
@@ -288,6 +291,7 @@ function SessionApp() {
                 <Route element={<CallLayout />}>
                   <Route path="/onboarding/:step?" element={<OnboardingPage />} />
                   <Route path="/app/today" element={<TodayPage />} />
+                  <Route path="/app/a/:assignmentId" element={<AssignmentPage />} />
                   <Route path="/app/calendar" element={<CalendarPage />} />
                   <Route path="/app/employees" element={<EmployeesPage />} />
                   <Route path="/app/artifacts" element={<ArtifactsPage />} />

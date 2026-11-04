@@ -43,7 +43,12 @@ function fixture() {
   const tasks = vi.fn(async (_args: unknown) => [] as unknown[]);
   const bots = vi.fn(async (_args: { where: Record<string, unknown> }) => [] as unknown[]);
   const receipts = vi.fn(async (_args: { where: Record<string, unknown> }) => [] as unknown[]);
+  const assignments = vi.fn(
+    async (_args: { where: Record<string, unknown> }) =>
+      [] as Array<{ id: string; ticketId: string | null }>,
+  );
   const prisma = {
+    assignment: { findMany: assignments },
     routineReceipt: { findMany: receipts },
     board: { findUnique: vi.fn(async () => ({ id: "board-1", ticketPrefix: "RAK" })) },
     ticket: { findMany: tickets },
@@ -66,7 +71,19 @@ function fixture() {
       }
       return [];
     });
-  return { prisma, receipts, runs, messages, artifacts, routines, tickets, tasks, bots, byStatus };
+  return {
+    prisma,
+    receipts,
+    runs,
+    messages,
+    artifacts,
+    routines,
+    tickets,
+    tasks,
+    bots,
+    assignments,
+    byStatus,
+  };
 }
 
 const approvalBlock = {
@@ -154,6 +171,34 @@ describe("today summary", () => {
     ]);
     // The clipped text is a preview; Today carries nothing to decide with.
     expect(summary.attention[0]).not.toHaveProperty("actions");
+  });
+
+  it("names the assignment of a run that works in one, for its row and its approval", async () => {
+    const { prisma, messages, byStatus } = fixture();
+    const thread = { groupId: null, assignment: { id: "assignment-1" } };
+    byStatus({
+      active: [
+        runRow("working", { thread }),
+        runRow("approve", { status: "waiting_input", thread }),
+        runRow("chat"),
+      ],
+    });
+    messages.mockResolvedValue([
+      {
+        id: "message-1",
+        runId: "approve",
+        threadId: "thread-approve",
+        blocks: [approvalBlock],
+      },
+    ]);
+    const summary = await todaySummary(prisma, actor, now);
+    expect(TodaySummarySchema.parse(summary)).toEqual(summary);
+    expect(summary.active.map((run) => run.assignmentId)).toEqual([
+      "assignment-1",
+      "assignment-1",
+      null,
+    ]);
+    expect(summary.attention[0]).toMatchObject({ kind: "approval", assignmentId: "assignment-1" });
   });
 
   it("clips a long approval to a preview and keeps it an approval", async () => {
@@ -409,7 +454,8 @@ describe("today summary", () => {
     });
 
     it("groups open work by phase and never names another user's bot", async () => {
-      const { prisma, tickets, tasks, bots } = fixture();
+      const { prisma, tickets, tasks, bots, assignments } = fixture();
+      assignments.mockResolvedValue([{ id: "assignment-1", ticketId: "t1" }]);
       tickets.mockResolvedValue([
         ticketRow("t1", 1),
         ticketRow("t2", 2, { assigneeBotId: "bot-other", status: "review" }),
@@ -432,6 +478,12 @@ describe("today summary", () => {
         ["RAK-4", "waiting", "Maya"],
       ]);
       expect(summary.work[1]?.botId).toBeNull();
+      // Only the ticket with an assignment of the user's own links to it.
+      expect(summary.work.map((item) => item.assignmentId)).toEqual(["assignment-1", null, null]);
+      expect(assignments.mock.calls[0]?.[0].where).toMatchObject({
+        spaceId: "space-1",
+        userId: "user-1",
+      });
     });
   });
 });
