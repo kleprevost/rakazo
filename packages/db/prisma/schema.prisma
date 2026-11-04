@@ -46,6 +46,10 @@ model User {
   /// emails then follow the language of the browser that asked for them.
   locale                      String?
   marketingEmailOptOutAt      DateTime?
+  /// Set when an admin or the directory deprovisions the account: no session, no sign-in. Data stays.
+  deprovisionedAt             DateTime?
+  /// "admin" | "provisioning" while deprovisioned.
+  deprovisionedVia            String?
   sessions                    Session[]
   accounts                    Account[]
   passkeys                    Passkey[]

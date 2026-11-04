@@ -2539,6 +2539,10 @@ msgstr ""
 msgid "Could not update"
 msgstr "업데이트하지 못했습니다."
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Could not update account"
+msgstr "계정을 업데이트할 수 없습니다"
+
 #: src/components/ModelCredits.tsx
 msgid "Could not update billing"
 msgstr ""
@@ -2762,6 +2766,14 @@ msgstr ""
 #: src/lib/cron.ts
 msgid "days"
 msgstr "일"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Deactivate"
+msgstr "비활성화"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Deactivated"
+msgstr "비활성화됨"
 
 #: src/components/call/IncomingCall.tsx
 #: src/pages/MessagingSettingsPanel.tsx
@@ -5458,6 +5470,10 @@ msgstr "반응하기"
 msgid "Reactions"
 msgstr "반응"
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Reactivate"
+msgstr "다시 활성화"
+
 #: src/pages/shell/bot-panel.tsx
 msgid "Read replies aloud"
 msgstr "답변을 자동으로 읽기"
@@ -6973,6 +6989,10 @@ msgstr "생각 깊이"
 #: src/pages/ModelRoleSettings.tsx
 msgid "Thinking: {0}"
 msgstr "사고: {0}"
+
+#: src/lib/user-error.ts
+msgid "This account is deactivated"
+msgstr "이 계정은 비활성화되었습니다"
 
 #: src/lib/user-error.ts
 msgid "This app needs its own sign-in setup to connect."

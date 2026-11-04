@@ -2539,6 +2539,10 @@ msgstr "Could not transcribe that recording."
 msgid "Could not update"
 msgstr "Could not update"
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Could not update account"
+msgstr "Could not update account"
+
 #: src/components/ModelCredits.tsx
 msgid "Could not update billing"
 msgstr "Could not update billing"
@@ -2762,6 +2766,14 @@ msgstr "Day-to-day work"
 #: src/lib/cron.ts
 msgid "days"
 msgstr "days"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Deactivate"
+msgstr "Deactivate"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Deactivated"
+msgstr "Deactivated"
 
 #: src/components/call/IncomingCall.tsx
 #: src/pages/MessagingSettingsPanel.tsx
@@ -5458,6 +5470,10 @@ msgstr "React"
 msgid "Reactions"
 msgstr "Reactions"
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Reactivate"
+msgstr "Reactivate"
+
 #: src/pages/shell/bot-panel.tsx
 msgid "Read replies aloud"
 msgstr "Read replies aloud"
@@ -6973,6 +6989,10 @@ msgstr "Thinking"
 #: src/pages/ModelRoleSettings.tsx
 msgid "Thinking: {0}"
 msgstr "Thinking: {0}"
+
+#: src/lib/user-error.ts
+msgid "This account is deactivated"
+msgstr "This account is deactivated"
 
 #: src/lib/user-error.ts
 msgid "This app needs its own sign-in setup to connect."

@@ -2539,6 +2539,10 @@ msgstr "No se pudo transcribir esa grabación."
 msgid "Could not update"
 msgstr "No se pudo actualizar"
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Could not update account"
+msgstr "No se pudo actualizar la cuenta"
+
 #: src/components/ModelCredits.tsx
 msgid "Could not update billing"
 msgstr "No se pudo actualizar la facturación"
@@ -2762,6 +2766,14 @@ msgstr "Trabajo del día a día"
 #: src/lib/cron.ts
 msgid "days"
 msgstr "días"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Deactivate"
+msgstr "Desactivar"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Deactivated"
+msgstr "Desactivada"
 
 #: src/components/call/IncomingCall.tsx
 #: src/pages/MessagingSettingsPanel.tsx
@@ -5458,6 +5470,10 @@ msgstr "Reaccionar"
 msgid "Reactions"
 msgstr "Reacciones"
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Reactivate"
+msgstr "Reactivar"
+
 #: src/pages/shell/bot-panel.tsx
 msgid "Read replies aloud"
 msgstr "Leer respuestas en voz alta"
@@ -6973,6 +6989,10 @@ msgstr "Pensando"
 #: src/pages/ModelRoleSettings.tsx
 msgid "Thinking: {0}"
 msgstr "Razonamiento: {0}"
+
+#: src/lib/user-error.ts
+msgid "This account is deactivated"
+msgstr "Esta cuenta está desactivada"
 
 #: src/lib/user-error.ts
 msgid "This app needs its own sign-in setup to connect."

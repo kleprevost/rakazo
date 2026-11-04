@@ -88,7 +88,7 @@ Epics only; each needs its own design before building. Shared employees is desig
 - Fine-grained admin roles: Platform, Security, Fleet, Bot Manager, Auditor.
 - Credential governance: inventory, rotation, expiry and revocation of user and shared credentials.
 - Action recording & audit replay: durable record of tool actions for review.
-- Identity lifecycle: Entra group reconciliation, SCIM deprovisioning.
+- Identity lifecycle: Entra group reconciliation, SCIM deprovisioning. Deprovisioning is built; group reconciliation is next ([plan](features/identity-lifecycle.md)).
 - Admin API: scripted access to metadata and governance operations.
 - Proactive standing responsibilities: employees with owned recurring duties.
 - Quiet autonomous reporting: summaries only when something needs a person.

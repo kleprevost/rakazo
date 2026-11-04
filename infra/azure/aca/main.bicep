@@ -75,6 +75,9 @@ param oidcTenantId string
 param oidcClientId string
 @secure()
 param oidcClientSecret string
+// Optional bearer token for the directory deactivation endpoint (docs/enterprise/features/identity-lifecycle.md).
+@secure()
+param scimBearerToken string = ''
 param oidcName string = 'Microsoft'
 param oidcAccessClaim string = 'roles'
 param oidcAllowedValues string = 'Rakazo.User,Rakazo.Admin'
@@ -209,6 +212,7 @@ module apps 'modules/aca-apps.bicep' = {
     screenProxySecret: screenProxySecret
     supervisorToken: supervisorToken
     oidcClientSecret: oidcClientSecret
+    scimBearerToken: scimBearerToken
     azureOpenAiApiKey: azureOpenAiApiKey
     oidcTenantId: oidcTenantId
     oidcClientId: oidcClientId

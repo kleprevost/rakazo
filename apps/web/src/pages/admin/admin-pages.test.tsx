@@ -22,6 +22,8 @@ const api = vi.hoisted(() => ({
   policy: vi.fn(),
   audit: vi.fn(),
   endSessions: vi.fn(),
+  deprovision: vi.fn(),
+  reactivate: vi.fn(),
   suspend: vi.fn(),
   resume: vi.fn(),
   quarantines: vi.fn(),
@@ -41,7 +43,11 @@ const api = vi.hoisted(() => ({
 vi.mock("../../lib/rpc", () => ({
   rpc: {
     admin: {
-      users: { endSessions: api.endSessions },
+      users: {
+        endSessions: api.endSessions,
+        deprovision: api.deprovision,
+        reactivate: api.reactivate,
+      },
       bots: { suspend: api.suspend, resume: api.resume },
       quarantine: { start: api.quarantineStart, lift: api.quarantineLift },
       computers: {
@@ -238,6 +244,7 @@ it("hides the end-sessions action from an auditor but not from security", async 
         ssoLinked: false,
         lastSignInAt: null,
         isSelf: false,
+        deprovisionedAt: null,
       },
     ],
     nextCursor: null,
@@ -306,6 +313,7 @@ it("shows the users page: empty, error, and populated with the end-sessions acti
         ssoLinked: false,
         lastSignInAt: "2026-02-01T10:00:00.000Z",
         isSelf: true,
+        deprovisionedAt: null,
       },
       {
         id: "u2",
@@ -316,6 +324,7 @@ it("shows the users page: empty, error, and populated with the end-sessions acti
         ssoLinked: true,
         lastSignInAt: null,
         isSelf: false,
+        deprovisionedAt: null,
       },
     ],
     nextCursor: null,
@@ -338,6 +347,44 @@ it("shows the users page: empty, error, and populated with the end-sessions acti
   expect(api.toastSuccess).toHaveBeenCalledWith("Sessions ended");
 });
 
+it("deactivates after a confirming click and offers to reactivate a deactivated account", async () => {
+  const user = (id: string, deprovisionedAt: string | null) => ({
+    id,
+    name: id,
+    email: `${id}@example.test`,
+    createdAt: "2026-01-01T00:00:00.000Z",
+    adminVia: null,
+    ssoLinked: false,
+    lastSignInAt: null,
+    isSelf: false,
+    deprovisionedAt,
+  });
+  api.users.mockResolvedValue({
+    users: [user("active", null), user("gone", "2026-03-01T00:00:00.000Z")],
+    nextCursor: null,
+  });
+  api.deprovision.mockResolvedValue({});
+  api.reactivate.mockResolvedValue({ ok: true });
+  const { host } = await show(<AdminUsersPage />);
+  const rows = host.querySelectorAll('[data-testid="admin-users"] tbody tr');
+  const labels = (row?: Element) =>
+    [...(row?.querySelectorAll("button") ?? [])].map((b) => b.textContent);
+  expect(labels(rows[0])).toEqual(["End sessions", "Deactivate"]);
+  expect(rows[1]?.textContent).toContain("Deactivated");
+  expect(labels(rows[1])).toEqual(["Reactivate"]);
+
+  const deactivate = rows[0]?.querySelectorAll("button")[1] as HTMLButtonElement;
+  await act(async () => deactivate.click());
+  expect(api.deprovision).not.toHaveBeenCalled();
+  expect(deactivate.textContent).toBe("Confirm");
+  await act(async () => deactivate.click());
+  expect(api.deprovision).toHaveBeenCalledWith({ userId: "active" });
+
+  const reactivate = rows[1]?.querySelector("button");
+  await act(async () => reactivate?.click());
+  expect(api.reactivate).toHaveBeenCalledWith({ userId: "gone" });
+});
+
 it("pages users with Load more", async () => {
   const user = (id: string) => ({
     id,
@@ -348,6 +395,7 @@ it("pages users with Load more", async () => {
     ssoLinked: false,
     lastSignInAt: null,
     isSelf: false,
+    deprovisionedAt: null,
   });
   api.users.mockImplementation(async (input: { cursor?: string }) =>
     input.cursor

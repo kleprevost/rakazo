@@ -189,6 +189,7 @@ import { createMessagingReceipts } from "./messaging-receipts.js";
 import { mountMessagingWebhookRoutes } from "./messaging-webhook.js";
 import { monitoringRoutes } from "./monitoring.js";
 import { pluginSubmissionRoutes } from "./plugin-submissions.js";
+import { provisioningRoutes } from "./provisioning.js";
 import { sendReferralEmails } from "./referral-email.js";
 import { mountApiRequestBodyLimits, rpcBodyLimit } from "./request-body-limit.js";
 import { createRouter } from "./router.js";
@@ -974,6 +975,19 @@ async function buildApp(overrides: CreateAppOverrides): Promise<AppHandles> {
     ),
   );
   app.route("/", cspReportRoutes(requestClientIp));
+  if (env.scimBearerToken)
+    app.route(
+      "/",
+      provisioningRoutes({
+        prisma,
+        events,
+        jobs,
+        sandbox,
+        auth,
+        token: env.scimBearerToken,
+        clientIp: requestClientIp,
+      }),
+    );
   app.route(
     "/",
     pluginSubmissionRoutes({

@@ -2539,6 +2539,10 @@ msgstr ""
 msgid "Could not update"
 msgstr "Aktualisierung fehlgeschlagen"
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Could not update account"
+msgstr "Konto konnte nicht aktualisiert werden"
+
 #: src/components/ModelCredits.tsx
 msgid "Could not update billing"
 msgstr ""
@@ -2762,6 +2766,14 @@ msgstr ""
 #: src/lib/cron.ts
 msgid "days"
 msgstr "Tage"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Deactivate"
+msgstr "Deaktivieren"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Deactivated"
+msgstr "Deaktiviert"
 
 #: src/components/call/IncomingCall.tsx
 #: src/pages/MessagingSettingsPanel.tsx
@@ -5458,6 +5470,10 @@ msgstr "Reagieren"
 msgid "Reactions"
 msgstr "Reaktionen"
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Reactivate"
+msgstr "Reaktivieren"
+
 #: src/pages/shell/bot-panel.tsx
 msgid "Read replies aloud"
 msgstr "Antworten vorlesen"
@@ -6973,6 +6989,10 @@ msgstr "Denkmodus"
 #: src/pages/ModelRoleSettings.tsx
 msgid "Thinking: {0}"
 msgstr "Denken: {0}"
+
+#: src/lib/user-error.ts
+msgid "This account is deactivated"
+msgstr "Dieses Konto ist deaktiviert"
 
 #: src/lib/user-error.ts
 msgid "This app needs its own sign-in setup to connect."

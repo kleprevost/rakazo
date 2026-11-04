@@ -2539,6 +2539,10 @@ msgstr ""
 msgid "Could not update"
 msgstr "Güncellenemedi"
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Could not update account"
+msgstr "Hesap güncellenemedi"
+
 #: src/components/ModelCredits.tsx
 msgid "Could not update billing"
 msgstr ""
@@ -2762,6 +2766,14 @@ msgstr ""
 #: src/lib/cron.ts
 msgid "days"
 msgstr "gün"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Deactivate"
+msgstr "Devre dışı bırak"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Deactivated"
+msgstr "Devre dışı"
 
 #: src/components/call/IncomingCall.tsx
 #: src/pages/MessagingSettingsPanel.tsx
@@ -5458,6 +5470,10 @@ msgstr "Tepki ver"
 msgid "Reactions"
 msgstr "Tepkiler"
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Reactivate"
+msgstr "Yeniden etkinleştir"
+
 #: src/pages/shell/bot-panel.tsx
 msgid "Read replies aloud"
 msgstr "Yanıtları sesli oku"
@@ -6973,6 +6989,10 @@ msgstr "Düşünüyor"
 #: src/pages/ModelRoleSettings.tsx
 msgid "Thinking: {0}"
 msgstr "Düşünme: {0}"
+
+#: src/lib/user-error.ts
+msgid "This account is deactivated"
+msgstr "Bu hesap devre dışı bırakıldı"
 
 #: src/lib/user-error.ts
 msgid "This app needs its own sign-in setup to connect."

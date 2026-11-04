@@ -2539,6 +2539,10 @@ msgstr ""
 msgid "Could not update"
 msgstr "无法更新"
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Could not update account"
+msgstr "无法更新账号"
+
 #: src/components/ModelCredits.tsx
 msgid "Could not update billing"
 msgstr "无法更新账单"
@@ -2762,6 +2766,14 @@ msgstr "日常工作"
 #: src/lib/cron.ts
 msgid "days"
 msgstr "天"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Deactivate"
+msgstr "停用"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Deactivated"
+msgstr "已停用"
 
 #: src/components/call/IncomingCall.tsx
 #: src/pages/MessagingSettingsPanel.tsx
@@ -5458,6 +5470,10 @@ msgstr "回应"
 msgid "Reactions"
 msgstr "表情回应"
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Reactivate"
+msgstr "重新启用"
+
 #: src/pages/shell/bot-panel.tsx
 msgid "Read replies aloud"
 msgstr "朗读回复"
@@ -6973,6 +6989,10 @@ msgstr "思考"
 #: src/pages/ModelRoleSettings.tsx
 msgid "Thinking: {0}"
 msgstr "思考：{0}"
+
+#: src/lib/user-error.ts
+msgid "This account is deactivated"
+msgstr "此账号已停用"
 
 #: src/lib/user-error.ts
 msgid "This app needs its own sign-in setup to connect."

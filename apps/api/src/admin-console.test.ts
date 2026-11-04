@@ -282,6 +282,7 @@ describe("admin console data", () => {
       [
         "adminVia",
         "createdAt",
+        "deprovisionedAt",
         "email",
         "id",
         "isSelf",

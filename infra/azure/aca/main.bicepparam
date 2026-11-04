@@ -24,6 +24,8 @@ param screenProxySecret = readEnvironmentVariable('RAKAZO_SCREEN_PROXY_SECRET')
 param supervisorToken = readEnvironmentVariable('RAKAZO_SUPERVISOR_TOKEN')
 param oidcClientSecret = readEnvironmentVariable('RAKAZO_OIDC_CLIENT_SECRET')
 param azureOpenAiApiKey = readEnvironmentVariable('RAKAZO_AZURE_OPENAI_API_KEY')
+// Optional: enables the directory deactivation endpoint. `export RAKAZO_SCIM_BEARER_TOKEN="$(openssl rand -hex 32)"`
+param scimBearerToken = readEnvironmentVariable('RAKAZO_SCIM_BEARER_TOKEN', '')
 
 // Admin SSH public key (no inbound SSH is opened; this only satisfies the VM's login requirement).
 param vmAdminSshPublicKey = readEnvironmentVariable('RAKAZO_VM_SSH_PUBLIC_KEY')
