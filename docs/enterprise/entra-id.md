@@ -47,6 +47,11 @@ OIDC_REVALIDATE_MINUTES=60
 OIDC_TRUST_EMAIL=true
 ```
 
+Narrower operator roles use more app roles (or groups) the same way: `OIDC_SECURITY_VALUES`,
+`OIDC_FLEET_VALUES` and `OIDC_AUDITOR_VALUES`, for example `Rakazo.Security`, `Rakazo.Fleet` and
+`Rakazo.Auditor`. Each value must also be in `OIDC_ALLOWED_VALUES` when that list is set. See
+[admin roles](features/admin-roles.md).
+
 `OIDC_REVALIDATE_MINUTES` is optional but recommended for enterprises (see Revocation below).
 
 Entra's ID token normally has no `email_verified` claim, so without `OIDC_TRUST_EMAIL=true` SSO
@@ -65,7 +70,9 @@ not trust the email. Use a single-tenant app and tenant-specific issuer (never `
   `OIDC_REVALIDATE_MINUTES`, existing sessions last until they expire or are revoked.
 - Admin is derived from the ID token stored at the user's last sign-in, so it needs no database
   column. It is revoked on the next sign-in once the admin value is gone, and immediately after a
-  denied sign-in. Admins named in `RAKAZO_ADMIN_EMAILS` are unaffected.
+  denied sign-in. Admins named in `RAKAZO_ADMIN_EMAILS` are unaffected. The security, fleet and
+  auditor roles follow the same rule, and `RAKAZO_SECURITY_EMAILS`, `RAKAZO_FLEET_EMAILS` and
+  `RAKAZO_AUDITOR_EMAILS` are unaffected the same way.
 
 ## Revocation
 

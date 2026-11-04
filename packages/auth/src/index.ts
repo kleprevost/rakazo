@@ -50,6 +50,7 @@ import {
   isOidcAccessDenied,
   isOidcAdminAccount,
   oidcDiscovery,
+  oidcOperatorRolesForAccount,
   takeOidcDirectoryClaims,
 } from "./oidc.js";
 import { createOidcKeys } from "./oidc-keys.js";
@@ -903,6 +904,20 @@ export function createAuth(prisma: PrismaClient, env: AuthEnv) {
       const key = await tokenKey();
       for (const account of accounts) if (await isOidcAdminAccount(oidc, account, key)) return true;
       return false;
+    },
+    /** The narrower operator roles (security, fleet, auditor) the user's SSO identity carries. */
+    ssoOperatorRoles: async (userId: string) => {
+      const oidc = env.oidc;
+      if (!Object.values(oidc?.roleValues ?? {}).some((values) => values?.length)) return [];
+      const accounts = await prisma.account.findMany({
+        where: { userId, providerId: "oidc" },
+        select: { providerId: true, accountId: true, idToken: true },
+      });
+      const key = await tokenKey();
+      const roles = new Set<"security" | "fleet" | "auditor">();
+      for (const account of accounts)
+        for (const role of await oidcOperatorRolesForAccount(oidc!, account, key)) roles.add(role);
+      return [...roles];
     },
   });
 }

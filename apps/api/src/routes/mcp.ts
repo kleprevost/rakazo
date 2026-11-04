@@ -26,7 +26,7 @@ import {
   spaceAvailability,
 } from "@rakazo/db";
 import { getLogger } from "@rakazo/logging";
-import { requireAdmin } from "../admins.js";
+import { requireAdminRole } from "../admins.js";
 import {
   assertNameFreeWhereAvailable,
   lockOwner,
@@ -135,11 +135,11 @@ export function mcpRoutes(ctx: RouterContext) {
         };
       }),
       submissions: authed.marketplace.submissions.handler(async ({ context, input }) => {
-        await requireAdmin(deps, context.actor.userId);
+        await requireAdminRole(deps, context.actor.userId, "platform");
         return listPluginSubmissions(deps.prisma, input.status);
       }),
       review: authed.marketplace.review.handler(async ({ context, input }) => {
-        await requireAdmin(deps, context.actor.userId);
+        await requireAdminRole(deps, context.actor.userId, "platform");
         return reviewPluginSubmission(deps, input, context.signal);
       }),
     },

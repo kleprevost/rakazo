@@ -1911,6 +1911,10 @@ export const ServerUpdateRequestSchema = z.object({
 });
 export type ServerUpdateRequest = z.infer<typeof ServerUpdateRequestSchema>;
 
+/** Operator roles. `platform` is everything; the others each cover one slice of the admin console. */
+export const AdminRoleSchema = z.enum(["platform", "security", "fleet", "auditor"]);
+export type AdminRole = z.infer<typeof AdminRoleSchema>;
+
 export const MeSchema = z.object({
   maxUploadSizeBytes: z.number().int().positive().optional(),
   maxAttachmentsPerMessage: z.number().int().positive().optional(),
@@ -1928,6 +1932,8 @@ export const MeSchema = z.object({
   isDeploymentOwner: z.boolean(),
   /** Listed in RAKAZO_ADMIN_EMAILS with a verified email: reviews plugins, adds stdio MCP servers, grants access. */
   isAdmin: z.boolean().default(false),
+  /** Operator roles held, for the Admin section. `isAdmin` is the `platform` role. */
+  adminRoles: z.array(AdminRoleSchema).optional(),
   needsModel: z.boolean(),
   defaultProvider: z.string().nullable(),
   defaultModel: z.string().nullable(),

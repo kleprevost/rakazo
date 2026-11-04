@@ -5,11 +5,14 @@ import type { AdminComputer, AdminComputerDetail, AdminComputerPage } from "@rak
 import { computerImageCompliance } from "@rakazo/core";
 import type { Prisma } from "@rakazo/db";
 import { runAsSystem } from "@rakazo/db";
-import { requireAdmin } from "./admins.js";
+import { requireAdminRole } from "./admins.js";
 import type { RouterDeps } from "./router.js";
 
 type ComputersDeps = Pick<RouterDeps, "prisma" | "sandbox"> & {
-  env: Pick<RouterDeps["env"], "adminEmails" | "ssoAdminEnabled">;
+  env: Pick<
+    RouterDeps["env"],
+    "adminEmails" | "ssoAdminEnabled" | "operatorEmails" | "ssoOperatorRolesEnabled"
+  >;
   auth: Pick<RouterDeps["auth"], "isSsoAdmin">;
 };
 
@@ -112,7 +115,7 @@ export async function adminComputers(
   actorId: string,
   input: { cursor?: string; limit: number; imageCompliance?: "not_approved" },
 ): Promise<AdminComputerPage> {
-  await requireAdmin(deps, actorId);
+  await requireAdminRole(deps, actorId, ["fleet", "auditor"]);
   const rows = await system("list computers", () =>
     deps.prisma.computer.findMany({
       select: {
@@ -207,7 +210,7 @@ export async function adminComputer(
   actorId: string,
   computerId: string,
 ): Promise<AdminComputerDetail> {
-  await requireAdmin(deps, actorId);
+  await requireAdminRole(deps, actorId, ["fleet", "auditor"]);
   const computer = await system("read computer", () =>
     deps.prisma.computer.findUnique({
       where: { id: computerId },

@@ -16,7 +16,7 @@ import { liftQuarantine, listQuarantines, startQuarantine } from "../bot-quarant
 import { resumeBot, suspendBot } from "../bot-suspension.js";
 import type { RouterContext } from "./context.js";
 
-/** The deployment admin console. Each handler checks `requireAdmin` before reading anything. */
+/** The deployment admin console. Each handler checks `requireAdminRole` before reading anything. */
 export function adminRoutes(ctx: RouterContext) {
   const { deps, authed } = ctx;
   return {
