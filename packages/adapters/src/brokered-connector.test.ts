@@ -4,7 +4,11 @@ import type {
   ConnectorProvider,
   ConnectorTool,
 } from "@rakazo/adapter-kit";
-import { BOT_QUARANTINED_MESSAGE, BOT_SUSPENDED_MESSAGE } from "@rakazo/contracts";
+import {
+  BOT_QUARANTINED_MESSAGE,
+  BOT_SUSPENDED_MESSAGE,
+  CAPABILITY_DENIED_MESSAGE,
+} from "@rakazo/contracts";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const recorded = vi.hoisted(() => ({ audit: [] as unknown[], security: [] as unknown[] }));
@@ -171,6 +175,44 @@ describe("BrokeredConnector", () => {
     findUnique.mockResolvedValueOnce(null as never);
     expect(await run(connector, {})).toEqual([{ type: "error", message: BOT_SUSPENDED_MESSAGE }]);
     expect(stub.executed).toEqual([]);
+  });
+
+  it("enforces the capability broker for a call with no run, failing closed", async () => {
+    const stub = new StubConnector();
+    const findMany = vi.fn(async (): Promise<unknown[]> => []);
+    const prisma = {
+      bot: {
+        findUnique: vi.fn(async () => ({
+          suspendedAt: null,
+          name: "Ada",
+          spaceId: "space-1",
+          capabilityMode: "enforce",
+          employeeId: null,
+          groupMembers: [],
+        })),
+      },
+      quarantine: { findFirst: vi.fn(async () => null) },
+      capabilityGrant: { findMany },
+    };
+    const connector = new BrokeredConnector(new ConnectorRegistry([stub]), prisma as never);
+    const watch = { ...context, runId: undefined };
+    // No grant covers the tool.
+    expect(await run(connector, {}, watch)).toEqual([
+      { type: "error", message: CAPABILITY_DENIED_MESSAGE },
+    ]);
+    findMany.mockRejectedValueOnce(new Error("db down"));
+    expect(await run(connector, {}, watch)).toEqual([
+      { type: "error", message: CAPABILITY_DENIED_MESSAGE },
+    ]);
+    expect(stub.executed).toEqual([]);
+    expect(recorded.audit).toEqual([
+      expect.objectContaining({ outcome: "denied", metadata: { reason: "capability" } }),
+      expect.objectContaining({ outcome: "denied", metadata: { reason: "capability" } }),
+    ]);
+    expect(recorded.security).toEqual([
+      expect.objectContaining({ type: "capability.denied" }),
+      expect.objectContaining({ type: "capability.denied" }),
+    ]);
   });
 
   it("refuses a tool the policy denies, by any name it goes by", async () => {

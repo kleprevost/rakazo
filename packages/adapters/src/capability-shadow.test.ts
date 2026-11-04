@@ -305,7 +305,7 @@ describe("recordShadowDecision", () => {
     expect(metadata()).toMatchObject({ decision: "deny", rule: "quarantine" });
   });
 
-  it("records for every bot when central policy requires grants", async () => {
+  it("leaves a bot to enforcement, and records nothing, when central policy requires grants", async () => {
     const { prisma } = setup();
     const policy: Policy = { version: 1, capabilities: { requireGrants: true } };
     await recordShadowDecision({
@@ -315,7 +315,7 @@ describe("recordShadowDecision", () => {
       policy,
       call: { source: "builtin", tool: "read_file", args: {} },
     });
-    expect(metadata()).toMatchObject({ mode: "policy", decision: "deny" });
+    expect(recorded.audit).toEqual([]);
   });
 
   it("never throws, and records nothing, when it cannot evaluate", async () => {

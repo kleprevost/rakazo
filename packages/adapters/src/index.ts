@@ -41,6 +41,8 @@ export * from "./builtin-skills.js";
 export * from "./builtin-tool-bridge.js";
 export * from "./builtin-tools.js";
 export { loadUserIncomingCalls, settleCallRequest } from "./call-request.js";
+export * from "./capability-decision.js";
+export * from "./capability-enforce.js";
 export * from "./capability-shadow.js";
 export * from "./cartesia-voice.js";
 export * from "./chat-sdk-surface.js";

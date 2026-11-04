@@ -8,6 +8,7 @@ vi.mock("@rakazo/db", async (importOriginal) => ({
   }),
 }));
 
+import { CAPABILITY_DENIED_MESSAGE } from "@rakazo/contracts";
 import { createApprovedEffectReplayQueue } from "./approval-effect.js";
 import { gateToolCall } from "./run-tool-gate.js";
 
@@ -110,5 +111,48 @@ describe("gateToolCall in shadow mode", () => {
       }),
     ]);
     expect(JSON.stringify(recorded.audit)).not.toContain("PRIVATE-QUERY");
+  });
+});
+
+describe("gateToolCall in enforce mode", () => {
+  const webFetchGrant = {
+    id: "g-1",
+    botId: "bot-1",
+    employeeId: null,
+    spaceId: "space-1",
+    kind: "bot",
+    scope: "web.fetch",
+    resource: null,
+    effect: "allow",
+    principalUserId: null,
+    createdByUserId: "admin-1",
+    createdVia: "admin",
+    expiresAt: null,
+    revokedAt: null,
+    revokedReason: null,
+    createdAt: new Date("2026-01-01T00:00:00Z"),
+  };
+
+  it("refuses a call with no covering grant before any approval, and audits it", async () => {
+    const outcome = await gate(gateContext("enforce"), "web_search", { query: "PRIVATE-QUERY" });
+    expect(outcome).toEqual({ result: { error: CAPABILITY_DENIED_MESSAGE } });
+    expect(recorded.audit).toEqual([
+      expect.objectContaining({
+        action: "tool.call",
+        outcome: "denied",
+        metadata: expect.objectContaining({ reason: "capability" }),
+      }),
+    ]);
+    expect(shadowEvents()).toEqual([]);
+    expect(JSON.stringify(recorded.audit)).not.toContain("PRIVATE-QUERY");
+  });
+
+  it("lets a call with a covering grant through, carrying what it classified", async () => {
+    const outcome = await gate(gateContext("enforce", [webFetchGrant]), "web_search", {
+      query: "q",
+    });
+    expect(outcome).toMatchObject({
+      call: { capability: { source: "builtin", tool: "web_search" } },
+    });
   });
 });

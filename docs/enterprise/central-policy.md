@@ -136,7 +136,13 @@ models:
 Optional `capabilities` section for the [capability broker](./features/capability-broker.md): `ceiling`,
 `deny` and `alwaysAsk` scope lists (`mail.send`, `calendar.*`, `ext.*`, `*.*`), `ownerGrantable`
 (non-read scopes bot owners may grant themselves), `requireGrants`, and tool-to-scope `mappings`.
-Schema and pure evaluator exist; nothing enforces them yet. Absent = no change in behavior.
+Absent = no change in behavior. With `requireGrants: true` every bot is enforced: a tool call with no
+covering grant is refused at the decision gate, again just before it runs (so a revoked or expired grant
+ends access on the next call), and in routine watches; evaluator errors refuse too. `ceiling`, `deny`
+and `alwaysAsk` are part of that decision (`alwaysAsk` makes the approval mandatory); in `shadow` they
+only appear in the recorded would-be decision. `mappings` classify connector and MCP tools; an unmapped tool needs an `ext.<slug>` grant.
+Refusals are `capability.denied` security events carrying the rule and scopes only. Roll out in order:
+binaries, a `shadow` period, then `requireGrants`.
 
 ## Budgets
 ```yaml

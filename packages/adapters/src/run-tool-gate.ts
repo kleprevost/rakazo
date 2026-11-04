@@ -6,6 +6,8 @@ import type {
   ToolBatch,
 } from "@rakazo/adapter-kit";
 import { runContinueJob } from "@rakazo/adapter-kit";
+import { CAPABILITY_DENIED_MESSAGE } from "@rakazo/contracts";
+import type { ClassifyInput } from "@rakazo/core";
 import {
   applyJudgeDecision,
   approvalModeFromPreference,
@@ -49,7 +51,8 @@ import {
 } from "./auto-review.js";
 import { reviewWithBackups } from "./auto-review-backups.js";
 import { RAKAZO_DOCS_URLS } from "./builtin-skills.js";
-import { classifyInputForTool, recordShadowDecision } from "./capability-shadow.js";
+import { capabilityGate } from "./capability-enforce.js";
+import { classifyInputForTool } from "./capability-shadow.js";
 import type { ExecutorDeps } from "./executor-deps.js";
 import { findConnectedModelCredential } from "./model-selection.js";
 import { paidRequestEffect } from "./paid-request.js";
@@ -97,6 +100,8 @@ export interface ToolCall {
   readonly executionId: string;
   readonly observer: AgentToolExecutionObserver | undefined;
   readonly connectorCall: ConnectorCall;
+  /** What the capability broker classified, so the instant before the effect decides the same call. */
+  readonly capability: ClassifyInput;
   /** Idempotency key of this call's effect; also the delivery key of what it sends. */
   readonly effectKey: string;
   /** The effect recorded for this call. Read-only tools that need no approval have none. */
@@ -192,11 +197,20 @@ export async function gateToolCall(
       },
     };
   }
-  const policyAlwaysAsk = policyAlwaysAsks(policyToolIds);
   const connectorProviders = ctx.tools.connectedPlugins.map((plugin) => plugin.provider);
   const connectorKind = connectorKindFromToolName(approvalName, connectorProviders);
-  // Shadow mode: record what the capability broker would decide here. Never changes the outcome.
-  await recordShadowDecision({
+  // Capability broker: off does nothing, shadow records what it would decide, enforce refuses a
+  // denied call before any approval card and turns an ask into a mandatory approval.
+  const capabilityCall = classifyInputForTool({
+    name,
+    args,
+    route: connectorCall.route,
+    tool: connectorTool,
+    appSlug: connectorKind,
+    connectionId: connectorCall.connectionId,
+    batchActions: batch ? [...batch.actions, ...(batch.complete ? [] : [undefined])] : undefined,
+  });
+  const capability = await capabilityGate({
     prisma: deps.prisma,
     bot: ctx.bot,
     spaceId: run.spaceId,
@@ -204,15 +218,14 @@ export async function gateToolCall(
     runId,
     threadId: ctx.thread.id,
     surface: "gate",
-    call: classifyInputForTool({
-      name,
-      args,
-      route: connectorCall.route,
-      tool: connectorTool,
-      appSlug: connectorKind,
-      batchActions: batch ? [...batch.actions, ...(batch.complete ? [] : [undefined])] : undefined,
-    }),
+    call: capabilityCall,
+    connections: context.connectedConnections,
   });
+  if (capability.outcome === "deny") {
+    await auditToolCall(ctx, name, "denied", { reason: "capability" });
+    return { result: { error: CAPABILITY_DENIED_MESSAGE } };
+  }
+  const policyAlwaysAsk = policyAlwaysAsks(policyToolIds) || capability.outcome === "ask";
   // paid_request with only a purchase id sends the request its approval already named.
   const sendsToSite =
     SITE_SENDING_TOOLS.has(name) && (name === "web_fetch" || args.url !== undefined);
@@ -551,6 +564,7 @@ export async function gateToolCall(
     executionId,
     observer,
     connectorCall,
+    capability: capabilityCall,
     effectKey,
     applied,
     nextApprovedTool,
