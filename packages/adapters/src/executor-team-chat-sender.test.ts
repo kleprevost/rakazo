@@ -2,6 +2,7 @@ import type { AgentRunRequest, MemoryReadRequest } from "@rakazo/adapter-kit";
 import { describe, expect, it, vi } from "vitest";
 import type * as ComputerLifecycleModule from "./computer-lifecycle.js";
 import { createRunExecutor } from "./executor.js";
+import { withRunGates } from "./testing/run-gates.js";
 
 vi.mock("./computer-lifecycle.js", async (importOriginal) => ({
   ...(await importOriginal<typeof ComputerLifecycleModule>()),
@@ -221,10 +222,10 @@ async function teamChatRun(input: {
   });
   const executor = createRunExecutor({
     deploymentModelKey: "fixture-model-key",
-    prisma: {
+    prisma: withRunGates({
       ...prisma,
       $transaction: async (work: (tx: typeof prisma) => Promise<unknown>) => work(prisma),
-    },
+    }),
     runtime: { describe: () => ({ capabilities: { scripted: false } }), run: runtimeRun },
     connector: {
       discoverTools: async () => [],
