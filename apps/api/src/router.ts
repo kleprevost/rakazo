@@ -36,6 +36,7 @@ import type { BoardEvents, PrismaClient, ThreadEvents } from "@rakazo/db";
 import type { BillingService } from "./billing.js";
 import { accountRoutes } from "./routes/account.js";
 import { adminRoutes } from "./routes/admin.js";
+import { assignmentsRoutes } from "./routes/assignments.js";
 import { availabilityRoutes } from "./routes/availability.js";
 import { boardsRoutes } from "./routes/boards.js";
 import { botsRoutes } from "./routes/bots.js";
@@ -181,6 +182,7 @@ export function createRouter(deps: RouterDeps) {
     ...memoryRoutes(ctx),
     ...routinesRoutes(ctx),
     ...boardsRoutes(ctx),
+    ...assignmentsRoutes(ctx),
     ...mcpRoutes(ctx),
     ...availabilityRoutes(ctx),
     ...connectionsRoutes(ctx),

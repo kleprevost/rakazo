@@ -102,7 +102,11 @@ describe("resolveMcpApprovalCards", () => {
         id: "group-thread",
         spaceId: "space",
         userId: "user",
-        OR: [{ botId: "bot" }, { group: { members: { some: { botId: "bot" } } } }],
+        OR: [
+          { botId: "bot" },
+          { assignment: { botId: "bot" } },
+          { group: { members: { some: { botId: "bot" } } } },
+        ],
       },
       select: { id: true, botId: true },
     });
@@ -224,7 +228,11 @@ describe("resolveMcpApprovalCards", () => {
       where: {
         spaceId: "space",
         userId: "user",
-        OR: [{ botId: "bot" }, { groupId: { not: null }, messages: { some: { botId: "bot" } } }],
+        OR: [
+          { botId: "bot" },
+          { assignment: { botId: "bot" } },
+          { groupId: { not: null }, messages: { some: { botId: "bot" } } },
+        ],
       },
       select: { id: true, botId: true },
     });
@@ -363,6 +371,18 @@ describe("queueMcpConnectedRun", () => {
       data: expect.objectContaining({ taskId: "task", trigger: "user", status: "queued" }),
       select: { id: true },
     });
+  });
+
+  it("also queues in one of the bot's live assignment threads", async () => {
+    const tx = connectedFixture();
+    await queueMcpConnectedRun(tx, actor, input);
+    expect(tx.thread.findFirst).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          OR: expect.arrayContaining([{ assignment: { botId: "bot", archivedAt: null } }]),
+        }),
+      }),
+    );
   });
 
   it("does not queue while the bot is still busy in that chat", async () => {

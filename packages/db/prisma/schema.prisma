@@ -470,6 +470,7 @@ model Space {
   agentSecrets                AgentSecret[]
   board                       Board?
   tickets                     Ticket[]
+  assignments                 Assignment[]
   ticketComments              TicketComment[]
   agentSkillSpaces            AgentSkillSpace[]
   mcpServerSpaces             McpServerSpace[]
@@ -843,6 +844,7 @@ model Bot {
   pages             Page[]
   tasks             Task[]
   runs              Run[]
+  assignments       Assignment[]
   steeringMessages  SteeringMessage[]
   mcpServers        BotMcpServer[]
   agentImports      AgentImport[]
@@ -959,6 +961,8 @@ model Thread {
   tasks                       Task[]
   runs                        Run[]
   routines                    Routine[]
+  /// Set when this thread is an assignment's conversation; such a thread has botId null.
+  assignment                  Assignment?
 
   @@index([spaceId])
   @@index([spaceId, userId])
@@ -2291,6 +2295,7 @@ model Ticket {
   completedAt       DateTime?
   comments        TicketComment[]
   tasks           Task[]
+  assignment      Assignment?
 
   @@unique([boardId, number])
   @@index([spaceId, status])
@@ -2758,4 +2763,37 @@ model EmployeeKnowledgeProposal {
   @@index([employeeId, status])
   @@index([proposedByUserId])
   @@map("employee_knowledge_proposals")
+}
+
+/// One job given to one employee, with its own conversation. The thread has botId null, so
+/// "the bot's primary thread" lookups never return it; runs, messages and tasks in it carry botId.
+/// No stored status: the phase is derived from the ticket, cancelledAt and the newest run.
+/// Row policy: the creator, and Owners/Managers of the employee (employeeId, copied at creation
+/// so no policy has to read bots). Writes are the creator's only.
+model Assignment {
+  id          String    @id @default(cuid())
+  spaceId     String
+  space       Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  botId       String
+  bot         Bot       @relation(fields: [botId], references: [id], onDelete: Cascade)
+  /// The creator.
+  userId      String
+  /// The shared employee the bot is an instance of; a plain id, no foreign key, like Employee.createdByUserId.
+  employeeId  String?
+  threadId    String    @unique
+  thread      Thread    @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  ticketId    String?   @unique
+  ticket      Ticket?   @relation(fields: [ticketId], references: [id], onDelete: SetNull)
+  title       String
+  clientNonce String
+  cancelledAt DateTime?
+  archivedAt  DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([spaceId, clientNonce])
+  @@index([spaceId, botId, archivedAt, updatedAt])
+  @@index([spaceId, userId, updatedAt])
+  @@index([employeeId])
+  @@map("assignments")
 }

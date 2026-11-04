@@ -307,6 +307,7 @@ describe("destroyBot", () => {
         computerExecutionLease: { deleteMany: vi.fn().mockResolvedValue({ count: 0 }) },
         computer: { updateMany: vi.fn().mockResolvedValue({ count: 0 }) },
         $executeRaw: vi.fn().mockResolvedValue(0),
+        thread: { deleteMany: vi.fn().mockResolvedValue({ count: 0 }) },
         botDeletion: { create: vi.fn().mockResolvedValue({}) },
         bot: { delete: vi.fn().mockResolvedValue({}) },
       });
@@ -348,6 +349,7 @@ describe("destroyBot", () => {
 
   it("moves bot memories into shared memory before the cascading delete", async () => {
     const createDeletion = vi.fn().mockResolvedValue({});
+    const deleteThreads = vi.fn().mockResolvedValue({ count: 0 });
     const deleteBot = vi.fn().mockResolvedValue({});
     const executeRaw = vi.fn().mockResolvedValue(1);
     const releaseComputers = vi.fn().mockResolvedValue({ count: 1 });
@@ -373,6 +375,7 @@ describe("destroyBot", () => {
         computerExecutionLease: { deleteMany: vi.fn().mockResolvedValue({ count: 0 }) },
         computer: { updateMany: releaseComputers },
         $executeRaw: executeRaw,
+        thread: { deleteMany: deleteThreads },
         botDeletion: { create: createDeletion },
         bot: { delete: deleteBot },
       }),
@@ -409,6 +412,8 @@ describe("destroyBot", () => {
       { deleteMemories: false },
     );
 
+    // Assignment threads have no botId, so the bot's cascade would not reach them.
+    expect(deleteThreads).toHaveBeenCalledWith({ where: { assignment: { botId: "bot-1" } } });
     expect(transaction).toHaveBeenCalledOnce();
     expect(releaseComputers).toHaveBeenCalledWith({
       where: {
@@ -464,6 +469,7 @@ describe("destroyBot", () => {
           findMany: vi.fn().mockResolvedValue([]),
           deleteMany: vi.fn().mockResolvedValue({ count: 0 }),
         },
+        thread: { deleteMany: vi.fn().mockResolvedValue({ count: 0 }) },
         botDeletion: { create: createDeletion },
         bot: { delete: deleteBot },
       }),
@@ -527,6 +533,7 @@ describe("destroyBot", () => {
         computerExecutionLease: { deleteMany: vi.fn().mockResolvedValue({ count: 0 }) },
         computer: { updateMany: vi.fn().mockResolvedValue({ count: 0 }) },
         $executeRaw: vi.fn().mockResolvedValue(1),
+        thread: { deleteMany: vi.fn().mockResolvedValue({ count: 0 }) },
         botDeletion: { create: vi.fn().mockResolvedValue({}) },
         bot: { delete: vi.fn().mockResolvedValue({}) },
       }),
@@ -667,6 +674,7 @@ describe("destroyBot", () => {
         },
         computer: { updateMany: clearExecution },
         $executeRaw: vi.fn(),
+        thread: { deleteMany: vi.fn().mockResolvedValue({ count: 0 }) },
         botDeletion: { create: vi.fn() },
         bot: { delete: vi.fn() },
       }),
@@ -2463,6 +2471,7 @@ function deletionPrisma(team: { id: string }) {
       },
       computerExecutionLease: { deleteMany: vi.fn().mockResolvedValue({ count: 0 }) },
       computer: { updateMany: vi.fn().mockResolvedValue({ count: 0 }) },
+      thread: { deleteMany: vi.fn().mockResolvedValue({ count: 0 }) },
       botDeletion: { create: vi.fn().mockResolvedValue({}) },
       bot: { delete: vi.fn().mockResolvedValue({}) },
     }),

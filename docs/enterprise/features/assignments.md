@@ -1,6 +1,6 @@
 # Independent assignments per employee
 
-Roadmap Wave 4, item 2. Status: design, nothing built. Today an employee has one chat; two jobs
+Roadmap Wave 4, item 2. Status: design; PR 1 (table, read model, audit) built. Today an employee has one chat; two jobs
 given to it share that thread, its history and its single stream of approvals. This makes each job
 its own addressable unit while the employee, its memory and its tools stay one.
 
@@ -29,10 +29,10 @@ conversation, and Today and Board open the same assignment page. Branch and rewi
 
 ## Design
 ### Data (additive only)
-- New table `assignments`: `id`, `spaceId`, `botId`, `userId` (creator), `threadId` (unique, FK to
+- New table `assignments`: `id`, `spaceId`, `botId`, `userId` (creator), `employeeId` (copied from the bot, nullable), `threadId` (unique, FK to
   `threads`), `ticketId` (nullable, unique), `title`, `clientNonce`, `cancelledAt`, `archivedAt`,
   `createdAt`, `updatedAt`. Unique `(spaceId, clientNonce)` makes create idempotent.
-  Indexes: `(spaceId, botId, archivedAt, updatedAt)` and `(spaceId, userId, updatedAt)`.
+  Indexes: `(spaceId, botId, archivedAt, updatedAt)`, `(spaceId, userId, updatedAt)` and `(employeeId)`.
 - Each assignment owns a new `Thread` with `botId` null, so every "bot's primary thread" lookup keeps
   returning the primary chat and never an assignment. `Run`, `Message`, `Event`, `Task` and
   `SteeringMessage` are unchanged and already carry `botId`.
@@ -132,13 +132,37 @@ Each PR is one feature, tested offline, and mergeable alone.
 8. **Standalone creation (optional).** Create an assignment without a ticket from the employee page
    and from the chat ("make this its own assignment"), after the board flag question below is settled.
 
-## Open questions
-- Should creating an assignment require `TICKET_BOARD_ENABLED`, or stand alone from PR 2?
-  This design assumes tickets drive creation until PR 8 to avoid a second flag.
-- Visibility on shared employees: may a collaborator see an assignment created by another
-  collaborator, or only the creator and managers?
-- Do assignment threads share the employee's chat history for the model (memory and recent
-  context), or start clean with only the brief and memory? The design assumes clean plus memory.
-- Is "Queued" on a dedicated computer acceptable for parallel jobs, or should such employees refuse
-  a second concurrent assignment?
-- Do routine and bot-initiated runs ever belong to an assignment, or only runs a person started?
+## Decisions
+These replace the open questions the first draft carried.
+1. **Assignments stand alone.** `assignments.create` works without `TICKET_BOARD_ENABLED`. A ticket
+   wake also creates one when the board is on, so the essential part of PR 8 moves into PR 2. Only
+   the creation UI stays for later.
+2. **Visibility on shared employees** is the creator, plus the Owners and Managers of the employee
+   (never Collaborators or Viewers). Row-level security enforces it. The row carries a copied
+   `employeeId` so the policy reads `employee_entitlements` and never `bots` or `threads` on a
+   manager's behalf. A manager sees the assignment row (title, bot, ticket link); the thread,
+   messages and runs keep their own policies and stay private to the creator, as
+   `shared-employees.md` requires. Writes are the creator's only.
+3. **An assignment thread starts clean**: the brief plus the employee's memory, not the chat history.
+4. **Dedicated-computer employees show "Queued"**; a second assignment is not refused.
+5. **Routine and bot-initiated runs may belong to an assignment.** Runs, tasks and messages already
+   carry `botId` and any `threadId`, so no column is needed: a routine whose `threadId` is an
+   assignment's thread fires in it. PR 1 makes the routine target checks accept such a thread;
+   attaching a routine to an assignment is a later PR.
+
+## PR 1 notes
+- `threads_owner_chk` demanded exactly one of `botId`, `groupId`, `externalConversationId`. The
+  migration relaxes it to at most one so an assignment thread can have none. Loosening a check
+  cannot break the previous release.
+- Audit of code that reads a thread's `botId` (an assignment thread has none; the owner is
+  `assignment.botId`, and runs, messages and tasks keep their own `botId`):
+  - Changed: MCP approval cards and the connect-then-continue run (an approval raised in an
+    assignment thread must be found and answered), history compaction (the thread is compacted for
+    its employee instead of being skipped), content export (the thread is not treated as another
+    bot's, so its summary and user messages are exported), routine target checks, and bot deletion
+    (deletes the bot's assignment threads, which the cascade would miss).
+  - Safe as is: primary-chat lookups by `botId` (they never return an assignment thread), calls
+    (they require the employee's own one-to-one chat and refuse here), Today, calendar, stuck-work
+    and notifications (they read `run.botId`).
+  - Known gap, for the PR that turns creation on: account export and import cover bot and group
+    threads only, so assignment threads are not yet exported.
