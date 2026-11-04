@@ -229,6 +229,8 @@ describe("dispatchTool live suspension check", () => {
         suspendedAt: true,
         name: true,
         spaceId: true,
+        capabilityMode: true,
+        employeeId: true,
         groupMembers: { select: { groupId: true } },
       },
     });

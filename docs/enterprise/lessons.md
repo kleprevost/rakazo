@@ -18,3 +18,4 @@
 - Row-level security tests must run with `DATABASE_URL` as the non-owner runtime login (`rakazo_app`) and `DATABASE_MIGRATION_URL` as the owner; a superuser URL bypasses RLS and makes isolation tests fail (or worse, pass vacuously). Agents should set both before calling an RLS failure "environmental".
 - Every new protected RPC must be added to `exhaustiveProtectedCalls` in packages/testkit/src/authorization.test.ts, or the testkit typecheck collapses to `never`.
 - Known sandbox-only failures (also fail on main): authorization `models/connect` cases, host-computer process tests, compose installer smoke.
+- Vitest runs from the repo root (`pnpm exec vitest run <path>`), not from a package directory; Postgres tests need `VERIFY_DATABASE=1`, `DATABASE_URL` (runtime login) and `DATABASE_MIGRATION_URL` after `pnpm db:migrate` against your own database. Do not run content-encryption and row-security Postgres files together on one database.

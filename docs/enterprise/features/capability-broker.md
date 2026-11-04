@@ -571,8 +571,8 @@ Still open: whether a team quarantine keys off `Space`, `ChatGroup` or a future 
 whether E3 reads strictly per call or from a sub-second per-run cache (draft: per call).
 
 ## Status
-Build-plan PR 1 (live suspend check at `dispatchTool`, `BrokeredConnector`) and PR 2 (quarantine) are
-implemented; PR 3 is below.
+Build-plan PR 1 (live suspend check at `dispatchTool`, `BrokeredConnector`), PR 2 (quarantine), PR 3
+(evaluator) and PR 4 (grants store and shadow mode) are implemented; PR 3 and PR 4 are below.
 
 PR 2, quarantine (`apps/api/src/bot-quarantine.ts`, migration `20261127120000_quarantines`).
 Choices the design left open:
@@ -615,3 +615,33 @@ Choices the design left open:
 - `recipient_domain` is accepted in grants but no extractor exists yet, so such grants deny until one does.
 - `capabilityMode` (off, shadow, enforce) and `requireGrants` are the caller's: the evaluator always
   evaluates as enforce and returns the outcome.
+
+PR 4, grants store and shadow mode (migration `20261128120000_capability_grants`, `packages/db/src/capability-grants.ts`,
+`apps/api/src/capability-grants.ts`, `packages/adapters/src/capability-shadow.ts`). Nothing is enforced yet.
+Choices the design left open:
+- `capability_grants` holds a bot's rows (`kind` `bot` or `delegation`) and an employee's (`kind` `bot`
+  only, no Space, inherited by every instance). Check constraints pin that shape; RLS follows the Space for
+  a bot's rows, and lets users entitled to an employee read its rows. Revoked rows are kept. `shared_identity`
+  waits for build-plan PR 9. `Bot.capabilityMode` is null (off) or `shadow`; `enforce` arrives with PR 5.
+- Procedures `capabilityGrants.list|set|revoke|setMode`. Decision 1 is checked at write time: an owner may
+  grant `read`/`fetch` scopes, restrict further (ask, deny) and delegate their own credentials (the default
+  for an owner, `principalUserId` is always the caller); any other allow needs an admin or an
+  `ownerGrantable` match; an allow must sit inside the policy `ceiling` and outside `deny`; an employee's
+  grants and `setMode` are admin only; an admin cannot delegate someone else's credentials; an owner cannot
+  revoke an ask or deny row an admin set. A stranger gets not found. At most 200 live rows per target.
+  Events: `capability.grant_set|grant_revoked|mode_changed` (no resource values).
+- Shadow runs when the bot is in `shadow` (or `enforce`) or policy sets `requireGrants`. At `gateToolCall`
+  (after the central-policy check) and, for callers with no run (routine watches), in
+  `BrokeredConnector.execute`, it loads the snapshot (grants, quarantine, policy) and calls `evaluateCall`.
+  It never blocks and swallows its own failures. External calls are evaluated as using the acting user's
+  own credential, so they need a delegation (an owner grant is one). The approval layer is not part of the
+  snapshot yet.
+- Each decision is one `capability.shadow` audit event (existing audit retention): mode, surface, would-be
+  outcome, deciding rule, scopes, classifier basis, `unmapped`, and a compact `layer:rule:scope:effect`
+  trace. Denies, asks and non-read allows are always recorded; read allows once per run (once per ten
+  minutes per bot outside a run). Arguments and resource values are never recorded.
+- The agent connection tools are built in but outside the adapters' `BUILTIN_AGENT_TOOL_NAMES`, so the
+  classifier treats a name as built in when it is in the contract list and has no connector route. A test
+  keeps `BUILTIN_TOOL_NAMES`, the adapter tool lists and the scope table equal.
+- Not done: principal assertions at credential lookups and their architecture test (PR 5 beside enforcement,
+  where a mismatch can be refused), approval layer in the snapshot, and owner/admin UI.

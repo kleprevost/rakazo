@@ -34,6 +34,7 @@ export {
 } from "./bot-secrets.js";
 export * from "./boxd-sandbox.js";
 export * from "./brokered-connector.js";
+export * from "./capability-shadow.js";
 export * from "./browser-emulator.js";
 export * from "./browser-provider-factory.js";
 export * from "./browser-tools.js";

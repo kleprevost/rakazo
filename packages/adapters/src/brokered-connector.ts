@@ -11,12 +11,21 @@ import { connectorKindFromToolName } from "@rakazo/core";
 import type { PrismaClient } from "@rakazo/db";
 import { activeQuarantine, recordAuditEvent } from "@rakazo/db";
 import { getLogger } from "@rakazo/logging";
+import { classifyInputForCall, recordShadowDecision } from "./capability-shadow.js";
 import type { ConnectorRegistry } from "./composio-connector.js";
 import { assertConnectorAllowed } from "./policy-integrations.js";
 import { PolicyDeniedError } from "./policy-runtime.js";
 import { assertToolAllowed, policyBlockedToolMessage } from "./policy-tools.js";
 
-type BotReader = Pick<PrismaClient, "bot" | "quarantine">;
+type BotReader = Pick<PrismaClient, "bot" | "quarantine" | "capabilityGrant">;
+
+type BotState = {
+  blocked: BotBlock | null;
+  name: string;
+  /** Read with the same row, so the shadow check needs no second lookup. */
+  capabilityMode: string | null;
+  employeeId: string | null;
+};
 
 export type BotBlock = "suspended" | "quarantined";
 
@@ -30,10 +39,16 @@ export const botBlockMessage = (blocked: BotBlock) =>
  * Fails closed: a missing bot or a failed read counts as suspended.
  */
 export async function botBlockedNow(
-  prisma: BotReader,
+  prisma: Pick<PrismaClient, "bot" | "quarantine">,
   botId: string | undefined,
-): Promise<{ blocked: BotBlock | null; name: string }> {
-  if (!botId) return { blocked: "suspended", name: "Bot" };
+): Promise<BotState> {
+  const failed: BotState = {
+    blocked: "suspended",
+    name: "Bot",
+    capabilityMode: null,
+    employeeId: null,
+  };
+  if (!botId) return failed;
   try {
     const bot = await prisma.bot.findUnique({
       where: { id: botId },
@@ -41,20 +56,27 @@ export async function botBlockedNow(
         suspendedAt: true,
         name: true,
         spaceId: true,
+        capabilityMode: true,
+        employeeId: true,
         groupMembers: { select: { groupId: true } },
       },
     });
-    if (!bot) return { blocked: "suspended", name: "Bot" };
-    if (bot.suspendedAt) return { blocked: "suspended", name: bot.name };
+    if (!bot) return failed;
+    const state = {
+      name: bot.name,
+      capabilityMode: bot.capabilityMode ?? null,
+      employeeId: bot.employeeId ?? null,
+    };
+    if (bot.suspendedAt) return { ...state, blocked: "suspended" };
     const quarantine = await activeQuarantine(prisma, {
       id: botId,
       spaceId: bot.spaceId,
       groupIds: bot.groupMembers.map((member) => member.groupId),
     });
-    return { blocked: quarantine ? "quarantined" : null, name: bot.name };
+    return { ...state, blocked: quarantine ? "quarantined" : null };
   } catch (error) {
     getLogger().error("suspension check failed", error instanceof Error ? error.message : "error");
-    return { blocked: "suspended", name: "Bot" };
+    return failed;
   }
 }
 
@@ -104,7 +126,8 @@ export class BrokeredConnector implements ConnectorProvider {
   }
 
   private async refusal(call: ConnectorCall, context: AdapterContext): Promise<string | undefined> {
-    const { blocked, name } = await botBlockedNow(this.prisma, context.botId);
+    const state = await botBlockedNow(this.prisma, context.botId);
+    const { blocked, name } = state;
     if (blocked) {
       await this.audit(call, context, name, blocked);
       return botBlockMessage(blocked);
@@ -123,6 +146,28 @@ export class BrokeredConnector implements ConnectorProvider {
       if (!(error instanceof PolicyDeniedError)) throw error;
       await this.audit(call, context, name, "policy");
       return policyBlockedToolMessage(call.tool);
+    }
+    // A run's own tool calls were already evaluated at the gate; this covers the callers that
+    // reach a connector without it (routine watches). Shadow mode records, it never refuses.
+    if (!context.runId && context.botId) {
+      await recordShadowDecision({
+        prisma: this.prisma,
+        bot: {
+          id: context.botId,
+          name,
+          capabilityMode: state.capabilityMode,
+          employeeId: state.employeeId,
+        },
+        spaceId: context.spaceId,
+        userId: context.userId,
+        surface: "connector",
+        call: classifyInputForCall({
+          name: call.tool,
+          args: call.args,
+          route: call.route,
+          appSlug: connectedApp(call, toolName, context),
+        }),
+      });
     }
     return undefined;
   }

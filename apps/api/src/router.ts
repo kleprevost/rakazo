@@ -40,6 +40,7 @@ import { availabilityRoutes } from "./routes/availability.js";
 import { boardsRoutes } from "./routes/boards.js";
 import { botsRoutes } from "./routes/bots.js";
 import { calendarRoutes } from "./routes/calendar.js";
+import { capabilityGrantsRoutes } from "./routes/capability-grants.js";
 import { computerRoutes } from "./routes/computer.js";
 import { computerProviderRoutes } from "./routes/computer-provider.js";
 import { connectionsRoutes } from "./routes/connections.js";
@@ -165,6 +166,7 @@ export function createRouter(deps: RouterDeps) {
     ...accountRoutes(ctx),
     ...adminRoutes(ctx),
     ...employeesRoutes(ctx),
+    ...capabilityGrantsRoutes(ctx),
     ...spacesRoutes(ctx),
     ...modelsRoutes(ctx),
     ...botsRoutes(ctx),

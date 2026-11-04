@@ -579,6 +579,41 @@ model Quarantine {
   @@map("quarantines")
 }
 
+/// What a bot may do: a scope, optionally narrowed to a resource, with an effect and an expiry. A row
+/// belongs to one bot (its own grant, or a delegation by the user whose credentials it uses) or to an
+/// employee, where every instance inherits it. Revoked rows are kept for the record.
+model CapabilityGrant {
+  id              String    @id @default(cuid())
+  botId           String?
+  bot             Bot?      @relation(fields: [botId], references: [id], onDelete: Cascade)
+  employeeId      String?
+  employee        Employee? @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  /// The bot's Space; null on an employee row, which belongs to no Space.
+  spaceId         String?
+  /// "bot" | "delegation"
+  kind            String
+  /// "calendar.read", "mail.*", "ext.acme.read"
+  scope           String
+  /// {kind, match} or null for any resource.
+  resource        Json?
+  /// "allow" | "ask" | "deny"
+  effect          String    @default("allow")
+  /// Delegation: whose credentials or data the bot may use.
+  principalUserId String?
+  createdByUserId String
+  /// "owner" | "admin" | "policy"
+  createdVia      String
+  expiresAt       DateTime?
+  revokedAt       DateTime?
+  revokedReason   String?
+  createdAt       DateTime  @default(now())
+
+  @@index([botId, revokedAt, expiresAt])
+  @@index([employeeId, revokedAt, expiresAt])
+  @@index([principalUserId, revokedAt])
+  @@map("capability_grants")
+}
+
 model SecurityEvent {
   id        String   @id @default(cuid())
   type      String
@@ -792,6 +827,9 @@ model Bot {
   employeeId        String?
   employeeVersionSeen String?
   employee          Employee?         @relation(fields: [employeeId], references: [id], onDelete: SetNull)
+  /// null = off; "shadow" records what the capability broker would decide without changing anything.
+  capabilityMode    String?
+  capabilityGrants  CapabilityGrant[]
   routines         Routine[]
   scratchpadItems   ScratchpadItem[]
   taughtSkills      TaughtSkill[]
@@ -2520,6 +2558,7 @@ model Employee {
   grants            EmployeeGrant[]
   entitlements      EmployeeEntitlement[]
   bots              Bot[]
+  capabilityGrants  CapabilityGrant[]
 
   @@map("employees")
 }
