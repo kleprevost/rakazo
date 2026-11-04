@@ -7,7 +7,13 @@ import type { Policy } from "@rakazo/contracts";
 export function policyRows(policy: Policy): Array<{ key: string; value: string }> {
   const rows: Array<{ key: string; value: string }> = [];
   const walk = (prefix: string, node: unknown) => {
-    if (Array.isArray(node)) rows.push({ key: prefix, value: node.join(", ") });
+    if (Array.isArray(node))
+      rows.push({
+        key: prefix,
+        value: node
+          .map((item) => (item && typeof item === "object" ? Object.values(item).join(" ") : item))
+          .join(", "),
+      });
     else if (node && typeof node === "object")
       for (const [key, child] of Object.entries(node))
         walk(prefix ? `${prefix}.${key}` : key, child);

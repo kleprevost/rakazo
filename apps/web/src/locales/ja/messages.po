@@ -4637,6 +4637,10 @@ msgstr "有効なスキルではありません"
 msgid "Not added: {0}"
 msgstr ""
 
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Not approved"
+msgstr "未承認"
+
 #: src/components/McpServerHealthLine.tsx
 msgid "Not checked yet"
 msgstr "未確認"

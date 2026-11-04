@@ -4637,6 +4637,10 @@ msgstr "Kein gültiger Skill"
 msgid "Not added: {0}"
 msgstr ""
 
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Not approved"
+msgstr "Nicht genehmigt"
+
 #: src/components/McpServerHealthLine.tsx
 msgid "Not checked yet"
 msgstr "Noch nicht geprüft"

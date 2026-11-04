@@ -1,7 +1,9 @@
 import { ORPCError } from "@orpc/server";
 import type { AdapterContext } from "@rakazo/adapter-kit";
-import { observedHealth, toComputerRef } from "@rakazo/adapters";
+import { activePolicy, observedHealth, toComputerRef } from "@rakazo/adapters";
 import type { AdminComputer, AdminComputerDetail, AdminComputerPage } from "@rakazo/contracts";
+import { computerImageCompliance } from "@rakazo/core";
+import type { Prisma } from "@rakazo/db";
 import { runAsSystem } from "@rakazo/db";
 import { requireAdmin } from "./admins.js";
 import type { RouterDeps } from "./router.js";
@@ -21,6 +23,34 @@ const healthFor = (
   observation: Parameters<typeof observedHealth>[0],
   now: Date,
 ): AdminComputer["health"] => (state === "stopped" ? "unknown" : observedHealth(observation, now));
+
+type StoredImage = { imageRef: string | null; imageDigest: string | null };
+
+/** The computer's last known image: the observation when there is one, else what its start asked for. */
+const complianceFor = (
+  computer: StoredImage,
+  observation: StoredImage | null | undefined,
+): AdminComputer["imageCompliance"] => {
+  const known = observation ?? computer;
+  return computerImageCompliance(activePolicy(), {
+    ref: known.imageRef,
+    digest: known.imageDigest,
+  });
+};
+
+/** Computers whose last known image is off the policy's list, in the same terms as `complianceFor`. */
+function notApprovedWhere(): Prisma.ComputerWhereInput {
+  const allow = activePolicy()?.computers?.images?.allow.map((entry) => entry.digest);
+  if (!allow) return { id: { in: [] } };
+  return {
+    OR: [
+      { observation: { is: { imageDigest: { notIn: allow } } } },
+      { observation: { is: { imageDigest: null, imageRef: { not: null } } } },
+      { observation: { is: null }, imageRef: { not: null }, imageDigest: null },
+      { observation: { is: null }, imageDigest: { notIn: allow } },
+    ],
+  };
+}
 
 const system = <T>(what: string, fn: () => Promise<T>) =>
   runAsSystem(`admin computers: ${what}`, fn);
@@ -80,7 +110,7 @@ async function inBatches<T, R>(items: T[], size: number, fn: (item: T) => Promis
 export async function adminComputers(
   deps: ComputersDeps,
   actorId: string,
-  input: { cursor?: string; limit: number },
+  input: { cursor?: string; limit: number; imageCompliance?: "not_approved" },
 ): Promise<AdminComputerPage> {
   await requireAdmin(deps, actorId);
   const rows = await system("list computers", () =>
@@ -92,6 +122,8 @@ export async function adminComputers(
         state: true,
         homeKey: true,
         providerRef: true,
+        imageRef: true,
+        imageDigest: true,
         spaceId: true,
         userId: true,
         runningSince: true,
@@ -99,6 +131,7 @@ export async function adminComputers(
         space: { select: { name: true } },
         bots: { select: { id: true, name: true }, orderBy: { name: "asc" } },
       },
+      ...(input.imageCompliance ? { where: notApprovedWhere() } : {}),
       orderBy: [{ createdAt: "desc" }, { id: "desc" }],
       take: input.limit + 1,
       ...(input.cursor ? { cursor: { id: input.cursor }, skip: 1 } : {}),
@@ -118,7 +151,13 @@ export async function adminComputers(
       }),
       deps.prisma.computerObservation.findMany({
         where: { computerId: { in: page.map((computer) => computer.id) } },
-        select: { computerId: true, observedAt: true, health: true },
+        select: {
+          computerId: true,
+          observedAt: true,
+          health: true,
+          imageRef: true,
+          imageDigest: true,
+        },
       }),
     ]),
   );
@@ -148,6 +187,7 @@ export async function adminComputers(
         bots: computer.bots,
         ...(inspected[index] as Inspected),
         health: healthFor(computer.state, observationById.get(computer.id), now),
+        imageCompliance: complianceFor(computer, observationById.get(computer.id)),
         runningSince: computer.runningSince?.toISOString() ?? null,
         lastActivityAt: last?.toISOString() ?? null,
       };
@@ -184,6 +224,8 @@ export async function adminComputer(
         createdAt: true,
         diskUsedBytes: true,
         diskFreeBytes: true,
+        imageRef: true,
+        imageDigest: true,
         space: { select: { name: true } },
         bots: { select: { id: true, name: true }, orderBy: { name: "asc" } },
         observation: true,
@@ -223,10 +265,11 @@ export async function adminComputer(
     bots: computer.bots,
     ...inspected,
     health: healthFor(computer.state, observation, new Date()),
+    imageCompliance: complianceFor(computer, observation),
     runningSince: computer.runningSince?.toISOString() ?? null,
     lastActivityAt: last?.toISOString() ?? null,
     createdAt: computer.createdAt.toISOString(),
-    imageDigest: observation?.imageDigest ?? null,
+    imageDigest: observation?.imageDigest ?? computer.imageDigest ?? null,
     disk:
       computer.diskUsedBytes !== null && computer.diskFreeBytes !== null
         ? { usedBytes: Number(computer.diskUsedBytes), freeBytes: Number(computer.diskFreeBytes) }

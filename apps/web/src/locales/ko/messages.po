@@ -4637,6 +4637,10 @@ msgstr "올바른 스킬이 아닙니다"
 msgid "Not added: {0}"
 msgstr ""
 
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Not approved"
+msgstr "승인되지 않음"
+
 #: src/components/McpServerHealthLine.tsx
 msgid "Not checked yet"
 msgstr "아직 확인되지 않음"

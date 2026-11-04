@@ -37,6 +37,8 @@ export interface FakeBox {
 
 export class FakeSandboxProvider implements SandboxProvider {
   readonly boxes = new Map<string, FakeBox>();
+  /** Every image a provision asked for, in order. */
+  readonly requestedImages: Array<{ ref: string; digest: string }> = [];
   private readonly terminals = new FakeTerminalGateway();
   private readonly screenServer = new FakeScreenServer();
 
@@ -52,15 +54,16 @@ export class FakeSandboxProvider implements SandboxProvider {
         takeover: true,
         persistentHome: true,
         multiScreen: true,
-        fleet: { inspect: true, usage: true },
+        fleet: { inspect: true, usage: true, imageSelection: true },
       },
     };
   }
 
   async provision(
-    request: { botId: string; homePath: string },
+    request: { botId: string; homePath: string; image?: { ref: string; digest: string } },
     _context: AdapterContext,
   ): Promise<ComputerRef> {
+    if (request.image) this.requestedImages.push(request.image);
     const id = `fake-${request.botId}`;
     const existing = this.boxes.get(id);
     if (existing) {

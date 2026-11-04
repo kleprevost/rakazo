@@ -53,6 +53,7 @@ param azureOpenAiResourceName string
 param azureOpenAiDeploymentNameMap string
 
 param enableEasyAuth bool
+param enableSharedEmployees bool
 
 var webName = '${prefix}-web'
 var apiName = '${prefix}-api'
@@ -74,6 +75,8 @@ var registrySecrets = empty(ghcrToken) ? [] : [
 
 // Easy Auth sign-in mode (docs/enterprise/easy-auth.md).
 var easyAuthEnv = enableEasyAuth ? [{ name: 'AUTH_EASY_AUTH', value: 'true' }] : []
+// Shared AI employees: people add their own instance (docs/enterprise/features/shared-employees.md). API only.
+var sharedEmployeesEnv = enableSharedEmployees ? [{ name: 'SHARED_EMPLOYEES_ENABLED', value: 'true' }] : []
 // Screens and terminals go through the supervisor's proxy on port 7091 (docs/enterprise/aca-vm.md).
 var screenViaSupervisorEnv = [{ name: 'SANDBOX_SCREEN_VIA_SUPERVISOR', value: 'true' }]
 
@@ -120,7 +123,8 @@ var apiEnv = concat(
   empty(policyFile) ? [] : [{ name: 'RAKAZO_POLICY_FILE', value: policyFile }],
   screenViaSupervisorEnv,
   workItemsEnv,
-  easyAuthEnv
+  easyAuthEnv,
+  sharedEmployeesEnv
 )
 
 var apiSecrets = concat(

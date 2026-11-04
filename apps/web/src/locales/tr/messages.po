@@ -4637,6 +4637,10 @@ msgstr "Geçerli bir beceri değil"
 msgid "Not added: {0}"
 msgstr ""
 
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Not approved"
+msgstr "Onaylanmadı"
+
 #: src/components/McpServerHealthLine.tsx
 msgid "Not checked yet"
 msgstr "Henüz kontrol edilmedi"

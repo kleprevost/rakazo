@@ -1,10 +1,11 @@
 import type { AdapterContext, MessagingSurface } from "@rakazo/adapter-kit";
 import type { Policy } from "@rakazo/contracts";
-import type { BotCapability, PolicyDecision } from "@rakazo/core";
+import type { BotCapability, ComputerImage, PolicyDecision } from "@rakazo/core";
 import {
   evaluateAccountExport,
   evaluateBotCapability,
   evaluateBotTool,
+  evaluateComputerImage,
   evaluateComputerKind,
   evaluateHostComputer,
   evaluateMessagingSurface,
@@ -44,6 +45,30 @@ export async function policyDenied(check: () => Promise<void>): Promise<boolean>
 /** Refuse starting a computer on a sandbox kind the policy does not allow. */
 export function assertComputerKindAllowed(kind: string, audience: Audience): Promise<void> {
   return enforce(evaluateComputerKind(activePolicy(), kind), kind, audience);
+}
+
+/**
+ * Refuse starting a computer from a named image the policy does not approve. Records
+ * `computer.image_refused` with the digest only: never the reference, which may hold a registry
+ * path.
+ */
+export async function assertComputerImageAllowed(
+  image: ComputerImage,
+  audience: Audience,
+): Promise<void> {
+  const decision = evaluateComputerImage(activePolicy(), image);
+  if (decision.allowed) return;
+  await recordSecurityEvent({
+    type: "computer.image_refused",
+    userId: audience.userId,
+    spaceId: audience.spaceId,
+    metadata: {
+      rule: decision.rule,
+      surface: audience.surface,
+      digest: image.digest ?? "none",
+    },
+  });
+  throw new PolicyDeniedError(decision.rule, image.digest ?? "image");
 }
 
 /** Refuse pairing, connecting or using the user's own computer. */

@@ -76,6 +76,15 @@ evaluator (`packages/core/src/policy.ts`). **Every section is enforced** except 
     desktop, its websocket connection, and runs reaching the user's computer. The host computer is
     sandbox kind `desktop`, so it must also be listed in `allowProviders` when that list is set.
     `computers.egress` is not enforced yet.
+  - `computers.images.allow`: approved computer images, each `{ digest: "sha256:<64 hex>", tag? }`
+    (the tag is display only). A request that starts a computer from a named image is accepted
+    only if `ref` is pinned to a listed digest (`repo@sha256:...`); with no list, none is
+    accepted. Refusals are `FORBIDDEN` / `{ reason: "policy", rule: "computers.images" }` and
+    record `computer.image_refused` (digest only). The Docker supervisor loads this same file
+    (`RAKAZO_POLICY_FILE`, mount it into the supervisor too) and checks again. The Admin computers
+    page marks a computer whose last known image is not listed, or has no digest, as "Not
+    approved" and can filter to them. The image a computer starts from by default is reported but
+    never blocked. Signature verification is not part of this.
   - `bots`: fleet, helper (`run_subagent`, `spawn_bot`) and routine-creation tools are removed
     from the run's tool set and refused at tool time; enabling "Manage other bots", creating or
     enabling a routine, enabling a routine webhook and rotating a bot webhook secret are refused.

@@ -1,6 +1,7 @@
 import type { SandboxProvider } from "@rakazo/adapter-kit";
+import { setActivePolicy } from "@rakazo/adapters";
 import type { PrismaClient } from "@rakazo/db";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { adminComputer, adminComputers } from "./admin-computers.js";
 import type { RouterDeps } from "./router.js";
 
@@ -57,7 +58,7 @@ const observation = {
   observedAt,
   runtime: "running",
   imageRef: "registry.example/computer:1",
-  imageDigest: `sha256:${"a".repeat(64)}`,
+  imageDigest: `sha256:${"a".repeat(64)}` as string | null,
   isolation: "container",
   restartCount: 2,
   startedAt: new Date("2026-03-02T00:00:00Z"),
@@ -184,6 +185,7 @@ describe("admin computer inventory", () => {
       isolation: "container",
       inspection: "inspected",
       health: "degraded",
+      imageCompliance: null,
       runningSince: "2026-03-02T00:00:00.000Z",
       lastActivityAt: "2026-03-02T01:00:00.000Z",
     });
@@ -215,6 +217,7 @@ describe("admin computer inventory", () => {
       "health",
       "id",
       "image",
+      "imageCompliance",
       "inspection",
       "isolation",
       "kind",
@@ -340,5 +343,61 @@ describe("admin computer detail", () => {
     const { deps } = setup();
     const detail = await adminComputer(deps, "admin", "c-3");
     expect(detail).toMatchObject({ observation: null, health: "unknown", imageDigest: null });
+  });
+});
+
+describe("admin computer image compliance", () => {
+  const approved = `sha256:${"a".repeat(64)}`;
+  afterEach(() => setActivePolicy(undefined));
+
+  it("checks nothing without a policy list", async () => {
+    setActivePolicy({ version: 1, computers: { allowProviders: ["docker"] } });
+    const { deps } = setup();
+    const page = await adminComputers(deps, "admin", { limit: 10 });
+    expect(page.computers.map((computer) => computer.imageCompliance)).toEqual([null, null, null]);
+    expect((await adminComputer(deps, "admin", "c-1")).imageCompliance).toBeNull();
+  });
+
+  it("marks the observed digest approved when listed", async () => {
+    setActivePolicy({ version: 1, computers: { images: { allow: [{ digest: approved }] } } });
+    const { deps } = setup();
+    const page = await adminComputers(deps, "admin", { limit: 10 });
+    expect(page.computers[0]?.imageCompliance).toBe("approved");
+    // No image is known for a computer that was never observed.
+    expect(page.computers[1]?.imageCompliance).toBe("unknown");
+    expect((await adminComputer(deps, "admin", "c-1")).imageCompliance).toBe("approved");
+  });
+
+  it("flags a digest off the list and an image with no digest", async () => {
+    setActivePolicy({
+      version: 1,
+      computers: { images: { allow: [{ digest: `sha256:${"b".repeat(64)}` }] } },
+    });
+    const offList = setup();
+    expect((await adminComputers(offList.deps, "admin", { limit: 10 })).computers[0]).toMatchObject(
+      { imageCompliance: "not_approved" },
+    );
+    const tagOnly = setup({ observed: { imageDigest: null } });
+    expect((await adminComputers(tagOnly.deps, "admin", { limit: 10 })).computers[0]).toMatchObject(
+      { imageCompliance: "not_approved" },
+    );
+  });
+
+  it("filters server-side to not-approved computers, and to none without a list", async () => {
+    setActivePolicy({
+      version: 1,
+      computers: { images: { allow: [{ digest: approved }] } },
+    });
+    const listed = setup();
+    await adminComputers(listed.deps, "admin", { limit: 10, imageCompliance: "not_approved" });
+    expect(listed.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: expect.objectContaining({ OR: expect.any(Array) }) }),
+    );
+    setActivePolicy(undefined);
+    const unlisted = setup();
+    await adminComputers(unlisted.deps, "admin", { limit: 10, imageCompliance: "not_approved" });
+    expect(unlisted.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { id: { in: [] } } }),
+    );
   });
 });

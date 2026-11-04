@@ -574,7 +574,7 @@ whether E3 reads strictly per call or from a sub-second per-run cache (draft: pe
 Build-plan PR 1 (live suspend check at `dispatchTool`, `BrokeredConnector`) and PR 2 (quarantine) are
 implemented; PR 3 is below.
 
-PR 2, quarantine (`apps/api/src/bot-quarantine.ts`, migration `20261126120000_quarantines`).
+PR 2, quarantine (`apps/api/src/bot-quarantine.ts`, migration `20261127120000_quarantines`).
 Choices the design left open:
 - Scopes are `bot`, `space`, `group` (a `ChatGroup`) and `all`. A "team" is a Space, so the
   open question is answered `Space` and `ChatGroup`; an org group can be added as a scope later.

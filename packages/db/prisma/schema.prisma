@@ -790,8 +790,9 @@ model Bot {
   dailyCheckIns Boolean @default(true)
   fleetManagement        Boolean @default(true)
   employeeId        String?
+  employeeVersionSeen String?
   employee          Employee?         @relation(fields: [employeeId], references: [id], onDelete: SetNull)
-  routines          Routine[]
+  routines         Routine[]
   scratchpadItems   ScratchpadItem[]
   taughtSkills      TaughtSkill[]
   memoryDocuments   MemoryDocument[]
@@ -1515,6 +1516,10 @@ model Computer {
   bots                    Bot[]
   executionLeases         ComputerExecutionLease[]
   maintenanceId           String?
+  /// The image the last start asked for by name, pinned to `imageDigest`; null when it took the
+  /// provider's own image. The running digest is in `observation`.
+  imageRef                String?
+  imageDigest             String?
   updates                 ComputerUpdate[]
   homeDeletionNotice      HomeDeletionNotice?
   observation             ComputerObservation?

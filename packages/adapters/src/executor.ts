@@ -93,6 +93,7 @@ import {
 } from "./connection-context.js";
 import { formatCurrentTimeInstruction } from "./current-time.js";
 import { hostedModelProvider, resolveDeploymentModel } from "./deployment-model.js";
+import { resolveEmployeeRun } from "./employee-run.js";
 import type { ExecutorDeps } from "./executor-deps.js";
 import type { FleetRun } from "./fleet-tools.js";
 import { loadBotGroupDirectory, loadGroupContext } from "./group-handoff.js";
@@ -543,7 +544,7 @@ export function createRunExecutor(executorDeps: ExecutorDeps) {
         const channelId = messagingChannelId(sourceBlocks);
         const messagingChannelRun = isMessagingChannelRun(run.trigger, sourceBlocks);
         const [
-          bot,
+          storedBot,
           thread,
           messages,
           peerMessage,
@@ -599,6 +600,11 @@ export function createRunExecutor(executorDeps: ExecutorDeps) {
           loadRunLoginRedactions(deps.prisma, deps.secretStore, run, run.id),
           loadRunCodeRedactions(deps.prisma, deps.secretStore, run, run.id),
         ]);
+        // An employee instance runs its published definition on top of its owner's private state.
+        const employeeRun = storedBot.employeeId
+          ? await resolveEmployeeRun(deps.prisma, storedBot)
+          : null;
+        const bot = employeeRun?.ok ? { ...storedBot, ...employeeRun.composed } : storedBot;
         // Team chat reaches people besides the owner, so their runs get a group channel's limits.
         const teamChatConversationId =
           run.trigger === "messaging" ? thread.externalConversationId : null;
@@ -902,6 +908,11 @@ export function createRunExecutor(executorDeps: ExecutorDeps) {
           : (await botBlockedNow(deps.prisma, bot.id)).blocked;
         if (blocked) {
           await failRunBeforeModel(botBlockMessage(blocked));
+          return;
+        }
+        // An instance whose person lost access, or whose employee is suspended or retired, is kept but inert.
+        if (employeeRun && !employeeRun.ok) {
+          await failRunBeforeModel(employeeRun.message);
           return;
         }
         // A routine or webhook the policy switched off is kept, but never runs.
@@ -1418,7 +1429,7 @@ export function createRunExecutor(executorDeps: ExecutorDeps) {
           tainted: initiallyTainted,
           ownerSettingsRefused: false,
           // A resumed turn replaces this with the baseline its saved prompt was built from.
-          ownInstructionsBaseline: bot.instructions ?? "",
+          ownInstructionsBaseline: storedBot.instructions ?? "",
           earlierAttempt: undefined,
           walletHosts: new Set(),
           handedOff: false,

@@ -4637,6 +4637,10 @@ msgstr "מיומנות לא תקינה"
 msgid "Not added: {0}"
 msgstr ""
 
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Not approved"
+msgstr "לא מאושר"
+
 #: src/components/McpServerHealthLine.tsx
 msgid "Not checked yet"
 msgstr "טרם נבדק"

@@ -158,6 +158,10 @@ az containerapp revision restart -g rakazo-rg -n rakazo-api \
 The policy is read once at startup, so both processes restart. Set `policyFile` to an empty string
 to run without one.
 
+The supervisor on the VM reads the same file (`/data` is mounted into it) for
+`computers.images`: restart it too (`docker compose ... restart supervisor`) after changing the
+approved images, or it keeps checking against the list it started with.
+
 ### Exposing more Foundry deployments
 
 The starter policy (`allowProviders: [azure]`, `allowUserConnections: false`) keeps members off

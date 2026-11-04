@@ -869,6 +869,7 @@ async function buildApp(overrides: CreateAppOverrides): Promise<AppHandles> {
       phoneCallsEnabled: env.phoneCallsEnabled,
       phoneCallRingSeconds: env.phoneCallRingSeconds,
       ticketBoardEnabled,
+      sharedEmployeesEnabled: env.sharedEmployeesEnabled,
       navLinks: env.navLinks,
       adminEmails: env.adminEmails,
       ssoAdminEnabled: Boolean(env.oidc?.adminValues?.length),

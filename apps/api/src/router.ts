@@ -124,6 +124,7 @@ export interface RouterDeps {
   speechSummary?: VoiceDeps["speechSummary"];
   env: {
     ticketBoardEnabled?: boolean;
+    sharedEmployeesEnabled?: boolean;
     navLinks?: NavLink[];
     adminEmails?: string[];
     /** OIDC_ADMIN_VALUES is set, so SSO identities can grant admin. */

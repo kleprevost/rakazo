@@ -31,6 +31,7 @@ export const SECURITY_EVENT_TYPES = [
   "egress.refused",
   "policy.loaded",
   "policy.denied",
+  "computer.image_refused",
   "rate_limit.hit",
   "employee.entitlements_reconciled",
   "employee.shared",
@@ -38,6 +39,7 @@ export const SECURITY_EVENT_TYPES = [
   "employee.version_published",
   "employee.grant_changed",
   "employee.grant_removed",
+  "employee.instance_created",
 ] as const;
 
 export const SecurityEventTypeSchema = z.enum(SECURITY_EVENT_TYPES);

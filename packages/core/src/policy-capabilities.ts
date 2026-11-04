@@ -31,6 +31,41 @@ export function evaluateComputerKind(policy: Policy | undefined, kind: string): 
   return ALLOWED;
 }
 
+/** An image as a provider reports or is asked for it: a reference and, when known, its digest. */
+export type ComputerImage = { ref: string; digest?: string };
+
+const approvedImage = (policy: Policy | undefined, digest: string | undefined) =>
+  digest !== undefined &&
+  Boolean(policy?.computers?.images?.allow.some((entry) => entry.digest === digest));
+
+/**
+ * Whether a request may start a computer from an image it names. Accepted only when the digest is
+ * on `computers.images.allow` and the reference is pinned to that same digest, so a tag cannot
+ * stand in for it. With no list nothing is approved, so an image request is always refused.
+ */
+export function evaluateComputerImage(
+  policy: Policy | undefined,
+  image: ComputerImage,
+): PolicyDecision {
+  return approvedImage(policy, image.digest) && image.ref.endsWith(`@${image.digest}`)
+    ? ALLOWED
+    : { allowed: false, rule: "computers.images" };
+}
+
+/**
+ * How a running computer's image stands against `computers.images`: null when the policy lists no
+ * images (nothing is checked), `unknown` when no image is known yet, and `not_approved` for a
+ * digest off the list or an image with no digest (tag only).
+ */
+export function computerImageCompliance(
+  policy: Policy | undefined,
+  image: { ref?: string | null; digest?: string | null },
+): "approved" | "not_approved" | "unknown" | null {
+  if (!policy?.computers?.images) return null;
+  if (!image.digest && !image.ref) return "unknown";
+  return approvedImage(policy, image.digest ?? undefined) ? "approved" : "not_approved";
+}
+
 /** Whether the user's own computer may be paired, connected or used. */
 export function evaluateHostComputer(policy: Policy | undefined): PolicyDecision {
   return evaluateComputerKind(policy, HOST_COMPUTER_KIND);
