@@ -458,3 +458,21 @@ lock, applies a diff (`diffEntitlements` in `core`) and records
 instances converge without a global loop. Expired grants drop out at the next sign-in or
 revalidation and in an hourly sweep. Nothing calls the employee-level reconcile yet: grant writes
 arrive with PR 3 and must call `reconcileEmployeeEntitlements` after committing.
+
+PR 3 (employee CRUD, versions and in-place Share) adds the `employees.*` procedures (API only, no UI):
+`share` turns the caller's own bot into the first instance of a new employee (version 1 snapshots
+its role and instructions, the caller becomes Owner, the same bot row keeps its thread, memory and
+computer untouched); `list` and `get` return the cards of employees the caller is entitled to, with
+the definition only for Manager and up; `versions.saveDraft|publish|rollback`; and
+`grants.list|set|remove`. Every procedure asks the PR 1 evaluator first (no entitlement answers
+not found, a low role answers forbidden). Writes run as system in one transaction that locks the
+employee row, so two Owners cannot demote each other at once and draft numbers cannot collide.
+Grant writes call `reconcileEmployeeEntitlements` right after commit and are safe to retry; a
+failed reconcile fails the request so the caller repeats it. Owner grants cannot expire, and a
+claim grant cannot be Owner (also in the evaluator). Security events (`employee.shared`,
+`version_saved`, `version_published`, `grant_changed`, `grant_removed`) carry ids only; a directory
+group value is never logged. No `SHARED_EMPLOYEES_ENABLED` flag exists yet: nothing here lets
+another person run an instance, so the flag arrives with PR 4. From PR 2 review: when recording a
+sign-in or revalidation claim fails, the person's stored claim is replaced by "truncated, none"
+(`markDirectoryClaimsStale`) and entitlements are recomputed, so old group membership stops
+conferring access instead of only being logged.

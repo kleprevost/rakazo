@@ -113,7 +113,11 @@ export interface AuthEnv {
    * revalidation and when an Easy Auth token changes. A failure is reported, never fatal.
    */
   onDirectoryClaims?: (userId: string, claims: OidcDirectoryClaims, via: string) => Promise<void>;
-  onDirectoryClaimsError?: (error: unknown) => void;
+  /**
+   * A claim could not be recorded. Stored claims for this person may now be stale, so the
+   * handler must mark them untrusted; logging alone would leave stale group access in place.
+   */
+  onDirectoryClaimsError?: (error: unknown, userId: string) => void | Promise<void>;
 }
 
 type AuthSession = { id: string; userId: string };
@@ -251,7 +255,13 @@ export function createAuth(prisma: PrismaClient, env: AuthEnv) {
     try {
       await env.onDirectoryClaims(userId, claims, via);
     } catch (error) {
-      env.onDirectoryClaimsError?.(error);
+      // The caller must stop trusting what is stored for this person, not only log.
+      try {
+        await env.onDirectoryClaimsError?.(error, userId);
+      } catch (inner) {
+        // Nothing more can be done here; the handler reports its own failure.
+        void inner;
+      }
     }
   };
   const auth = betterAuth({
@@ -869,7 +879,7 @@ export function createAuth(prisma: PrismaClient, env: AuthEnv) {
             prisma,
             onDeferred: (name) => onDeferredSink?.(name),
             onClaims: env.onDirectoryClaims
-              ? (userId, claims) => env.onDirectoryClaims!(userId, claims, "revalidation")
+              ? (userId, claims) => directoryClaims(userId, claims, "revalidation")
               : undefined,
             revokeSessions: async (userId) => {
               const sessions = await internalAdapter.listSessions(userId);

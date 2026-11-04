@@ -177,6 +177,37 @@ describeWithDatabase("API authorization and resource isolation", () => {
     ).toMatchObject({ routineId: own.id, userId: ownerActor.userId });
   });
 
+  it("shares a bot in place without giving anyone else a path to it", async () => {
+    const owner = await signup(app, `share-owner-${stamp}@rakazo.test`, "Owner");
+    const peer = await signup(app, `share-peer-${stamp}@rakazo.test`, "Peer");
+    const ownerActor = await rpc<Actor>(app, owner, "me");
+    const peerActor = await rpc<Actor>(app, peer, "me");
+    const bot = await rpc<Bot>(app, owner, "bots/create", botInput("Shared"), ownerActor.spaceId);
+    // Not the caller's bot: refused before anything is created.
+    await expectDenied(app, peer, "employees/share", { botId: bot.id }, peerActor.spaceId);
+    const { employeeId } = await rpc<{ employeeId: string }>(
+      app,
+      owner,
+      "employees/share",
+      { botId: bot.id },
+      ownerActor.spaceId,
+    );
+    expect(await rpc<unknown[]>(app, peer, "employees/list", {}, peerActor.spaceId)).toEqual([]);
+    for (const [path, body] of [
+      ["employees/get", { employeeId }],
+      ["employees/versions/saveDraft", { employeeId }],
+      ["employees/grants/list", { employeeId }],
+      [
+        "employees/grants/set",
+        { employeeId, subjectKind: "user", subjectValue: peerActor.userId, role: "owner" },
+      ],
+    ] as const)
+      await expectDenied(app, peer, path, body, peerActor.spaceId);
+    // The peer still has no grant, and the owner's bot is still the owner's alone.
+    expect(await db.employeeGrant.count({ where: { employeeId } })).toBe(1);
+    await expectDenied(app, peer, "bots/get", { botId: bot.id }, peerActor.spaceId);
+  });
+
   it("batches routine mentions with the same user, space and archive isolation as per-bot reads", async () => {
     const owner = await signup(app, `routine-mentions-owner-${stamp}@rakazo.test`, "Owner");
     const peer = await signup(app, `routine-mentions-peer-${stamp}@rakazo.test`, "Peer");
@@ -485,6 +516,26 @@ describeWithDatabase("API authorization and resource isolation", () => {
       ["admin/computers/get", { computerId: "missing-computer" }],
       ["admin/policy"],
       ["admin/audit"],
+      ["employees/list"],
+      ["employees/get", { employeeId: "missing-employee" }],
+      ["employees/share", { botId: "missing-bot" }],
+      ["employees/versions/saveDraft", { employeeId: "missing-employee" }],
+      ["employees/versions/publish", { employeeId: "missing-employee", versionId: "missing" }],
+      ["employees/versions/rollback", { employeeId: "missing-employee", versionId: "missing" }],
+      ["employees/grants/list", { employeeId: "missing-employee" }],
+      [
+        "employees/grants/set",
+        {
+          employeeId: "missing-employee",
+          subjectKind: "user",
+          subjectValue: "missing-user",
+          role: "viewer",
+        },
+      ],
+      [
+        "employees/grants/remove",
+        { employeeId: "missing-employee", subjectKind: "user", subjectValue: "missing-user" },
+      ],
       ["roleTemplates/list"],
       ["roleTemplates/hire"],
       ["today/summary"],

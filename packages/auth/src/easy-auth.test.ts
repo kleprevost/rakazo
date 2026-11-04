@@ -452,6 +452,20 @@ describe("Easy Auth sign-in", () => {
     expect(seen[2]![1]).toEqual(["other"]);
   });
 
+  it("hands a failed claim write to the error handler with the person, and still signs in", async () => {
+    const failures: string[] = [];
+    setup({
+      onDirectoryClaims: async () => {
+        throw new Error("database down");
+      },
+      onDirectoryClaimsError: async (_error, userId) => {
+        failures.push(userId);
+      },
+    });
+    expect((await pass({ token: await token() })).session).not.toBeNull();
+    expect(failures).toEqual([rows("user")[0]!.id as string]);
+  });
+
   it("follows the sign-up policy of OIDC sign-in", async () => {
     setup({ signupsEnabled: "false" });
     expect((await pass({ token: await token() })).session).toBeNull();

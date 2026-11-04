@@ -153,6 +153,7 @@ import {
   VoiceInfoSchema,
   VoiceStatusSchema,
 } from "./domain.js";
+import { employeesContract } from "./employees.js";
 import { ComputerCommandSchema, ProductEventSchema } from "./events.js";
 import { Id, IsoDate, ThinkingLevelSchema } from "./ids.js";
 import {
@@ -262,6 +263,7 @@ const spaceName = z.string().trim().min(1).max(60);
 
 export const appContract = {
   admin: adminContract,
+  employees: employeesContract,
   analytics: { screen: oc.input(AnalyticsScreenInput).output(z.object({ ok: z.literal(true) })) },
   aiConsent: {
     status: oc.input(AiConsentQuerySchema).output(AiConsentStatusSchema),
