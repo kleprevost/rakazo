@@ -248,6 +248,143 @@ describeWithDatabase("independent assignments on one employee", () => {
     expect(await db.assignment.count({ where: { clientNonce: `third-${stamp}` } })).toBe(0);
   });
 
+  const steer = (
+    assignment: Created,
+    instruction: string,
+    nonce = `${instruction}-${Math.random()}`,
+  ) =>
+    rpc<{ messageId: string; runId: string }>(app, cookie, "assignments/steer", {
+      assignmentId: assignment.id,
+      text: instruction,
+      clientNonce: nonce,
+    });
+  const steeringFor = (assignment: Created) =>
+    db.steeringMessage.findMany({ where: { message: { threadId: assignment.threadId } } });
+
+  it("queues an instruction for one job only and leaves the other job's instructions intact", async () => {
+    const a = await create(HANG);
+    const b = await create(HANG);
+    await until(
+      async () =>
+        ACTIVE_RUN_STATUSES.includes((await statusOf(a)) as never) &&
+        ACTIVE_RUN_STATUSES.includes((await statusOf(b)) as never),
+    );
+    const runA = (await runsOf(a))[0]!.id;
+    const runB = (await runsOf(b))[0]!.id;
+    const forB = await steer(b, `for-b-${stamp}`);
+    const forA = await steer(a, `for-a-${stamp}`);
+    expect(forA.runId).toBe(runA);
+    expect(forB.runId).toBe(runB);
+
+    const rowsA = await steeringFor(a);
+    const rowsB = await steeringFor(b);
+    expect(rowsA.map((row) => row.messageId)).toEqual([forA.messageId]);
+    expect(rowsB.map((row) => row.messageId)).toEqual([forB.messageId]);
+
+    // Each instruction is in its own conversation only.
+    const snapA = await rpc<Snap>(app, cookie, "threads/get", { assignmentId: a.id });
+    const snapB = await rpc<Snap>(app, cookie, "threads/get", { assignmentId: b.id });
+    const primary = await rpc<Snap>(app, cookie, "threads/get", { botId });
+    expect(text(snapA)).toContain(`for-a-${stamp}`);
+    expect(text(snapA)).not.toContain(`for-b-${stamp}`);
+    expect(text(snapB)).toContain(`for-b-${stamp}`);
+    expect(text(snapB)).not.toContain(`for-a-${stamp}`);
+    expect(text(primary)).not.toContain(`for-a-${stamp}`);
+    expect(text(primary)).not.toContain(`for-b-${stamp}`);
+
+    // Stopping A does not drop B's instruction or end B's run.
+    await rpc(app, cookie, "threads/stop", { assignmentId: a.id });
+    await until(async () => (await statusOf(a)) === "cancelled");
+    expect(ACTIVE_RUN_STATUSES.includes((await statusOf(b)) as never)).toBe(true);
+    expect((await steeringFor(b)).map((row) => row.messageId)).toEqual([forB.messageId]);
+    await rpc(app, cookie, "threads/stop", { assignmentId: b.id });
+  });
+
+  it("holds an instruction for a job waiting on a question until the question is answered", async () => {
+    const asking = await create(ASK);
+    await until(async () => (await statusOf(asking)) === "waiting_input");
+    const runId = (await runsOf(asking))[0]!.id;
+    const queued = await steer(asking, `also-weather-${stamp}`);
+    expect(queued.runId).toBe(runId);
+    // The text is not taken as the answer: the run still waits and the instruction is pending.
+    expect(await statusOf(asking)).toBe("waiting_input");
+    const [row] = await steeringFor(asking);
+    expect(row).toMatchObject({ messageId: queued.messageId, runId, claimedAt: null });
+
+    const waiting = await rpc<Snap>(app, cookie, "threads/get", { assignmentId: asking.id });
+    const card = waiting.messages.find((message) =>
+      message.blocks.some((block) => block.kind === "ask"),
+    );
+    await rpc(app, cookie, "threads/answer", {
+      assignmentId: asking.id,
+      runId,
+      messageId: card!.id,
+      answer: "Paris",
+    });
+    await until(
+      async () =>
+        !ACTIVE_RUN_STATUSES.includes((await statusOf(asking)) as never) &&
+        (await db.steeringMessage.count({
+          where: { message: { threadId: asking.threadId }, claimedAt: null },
+        })) === 0,
+    );
+  });
+
+  it("answers a repeated instruction with the first one", async () => {
+    const job = await create(HANG);
+    await until(async () => ACTIVE_RUN_STATUSES.includes((await statusOf(job)) as never));
+    const first = await steer(job, "tighten the summary", `steer-${stamp}`);
+    const again = await steer(job, "tighten the summary", `steer-${stamp}`);
+    expect(again).toEqual(first);
+    expect(await steeringFor(job)).toHaveLength(1);
+    expect(
+      await db.message.count({ where: { threadId: job.threadId, clientNonce: `steer-${stamp}` } }),
+    ).toBe(1);
+    await rpc(app, cookie, "threads/stop", { assignmentId: job.id });
+  });
+
+  it("starts one continuation when nothing is running, and refuses a stopped or archived job", async () => {
+    const job = await create("say hello");
+    await until(async () => (await statusOf(job)) === "completed");
+    const queued = await steer(job, "now say goodbye");
+    const run = await db.run.findUniqueOrThrow({ where: { id: queued.runId } });
+    expect(run.threadId).toBe(job.threadId);
+    expect(run.trigger).toBe("follow_up");
+    expect(await db.run.count({ where: { threadId: primaryThreadId, id: run.id } })).toBe(0);
+    await until(async () => (await statusOf(job)) === "completed");
+
+    await db.assignment.update({ where: { id: job.id }, data: { archivedAt: new Date() } });
+    const archived = await raw(app, cookie, "assignments/steer", {
+      assignmentId: job.id,
+      text: "again",
+      clientNonce: `again-${stamp}`,
+    });
+    expect(archived.status).toBe(409);
+    await db.assignment.update({
+      where: { id: job.id },
+      data: { archivedAt: null, cancelledAt: new Date() },
+    });
+    const stopped = await raw(app, cookie, "assignments/steer", {
+      assignmentId: job.id,
+      text: "again",
+      clientNonce: `again2-${stamp}`,
+    });
+    expect(stopped.status).toBe(409);
+  });
+
+  it("refuses an instruction for another person's job", async () => {
+    const job = await create(HANG);
+    const other = await signup(app, `assign-steer-${stamp}@rakazo.test`);
+    const res = await raw(app, other, "assignments/steer", {
+      assignmentId: job.id,
+      text: "take over",
+      clientNonce: `other-${stamp}`,
+    });
+    expect(res.status).toBeGreaterThanOrEqual(400);
+    expect(await steeringFor(job)).toHaveLength(0);
+    await rpc(app, cookie, "threads/stop", { assignmentId: job.id });
+  });
+
   it("wakes a ticket's employee in the ticket's own assignment, without the board needing a job first", async () => {
     const ticket = await rpc<{ id: string }>(app, cookie, "tickets/create", {
       title: "Tidy the notes",

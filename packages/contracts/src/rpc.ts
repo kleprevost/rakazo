@@ -21,6 +21,8 @@ import {
   GetAssignmentInput,
   ListAssignmentsInput,
   ListAssignmentsOutput,
+  SteerAssignmentInput,
+  SteerAssignmentOutput,
 } from "./assignments.js";
 import {
   ARTIFACT_DESCRIPTION_MAX_LENGTH,
@@ -949,6 +951,7 @@ export const appContract = {
     create: oc.input(CreateAssignmentInput).output(AssignmentSchema),
     list: oc.input(ListAssignmentsInput).output(ListAssignmentsOutput),
     get: oc.input(GetAssignmentInput).output(AssignmentWorkSchema),
+    steer: oc.input(SteerAssignmentInput).output(SteerAssignmentOutput),
   },
   skills: {
     list: oc.input(botId).output(z.array(TaughtSkillSchema)),

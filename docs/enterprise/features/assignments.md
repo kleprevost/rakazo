@@ -1,6 +1,6 @@
 # Independent assignments per employee
 
-Roadmap Wave 4, item 2. Status: design; PR 1 (table, read model, audit), PR 2 (create, thread targeting, ticket wake) and PR 3 (web and desktop surface) built. Today an employee has one chat; two jobs
+Roadmap Wave 4, item 2. Status: design; PR 1 (table, read model, audit), PR 2 (create, thread targeting, ticket wake) PR 3 (web and desktop surface) and PR 4 (steer) built. Today an employee has one chat; two jobs
 given to it share that thread, its history and its single stream of approvals. This makes each job
 its own addressable unit while the employee, its memory and its tools stay one.
 
@@ -203,3 +203,9 @@ These replace the open questions the first draft carried.
 - The employee panel shows an Assignments tab once the employee has an assignment. Archive and
   search come with PR 5 and PR 6.
 - Mobile is unchanged: Today and Board rows open the employee chat until PR 7.
+
+## PR 4 notes
+- `assignments.steer({ assignmentId, text, clientNonce })` is the creator's own call; a manager who can see the row is refused. It writes one message in the assignment's thread and one pending `SteeringMessage`, in one transaction under the thread lock, so it touches no other thread.
+- Where the instruction goes: the live run of the thread (any trigger except the creation intro, so a ticket run takes it too) reads it on its next turn; a run paused on a question or approval keeps it until the answer resumes the run, and the text is never taken as that answer (a plain send would answer the question). With nothing live, one `follow_up` continuation starts for it through `createPendingSteeringRun`. An archived or stopped assignment is refused; resume is a send.
+- A repeated `clientNonce` returns the first message and run. Claiming, replay after a restart, and requeue after a cancelled run are the existing steering code, unchanged.
+- No web change: the assignment page composer already steers a live run through `threads.send`; `steer` is the explicit call for clients that must not answer a pending question or start a run by accident.
