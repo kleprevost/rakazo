@@ -58,7 +58,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
             <Trans>AI employees</Trans>
           </NavLink>
         ) : null}
-        {can("fleet", "auditor") ? (
+        {can("security", "fleet", "auditor") ? (
           <NavLink to="/admin/computers" className={linkClass}>
             <Trans>Computers</Trans>
           </NavLink>

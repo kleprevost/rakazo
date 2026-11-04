@@ -2493,8 +2493,8 @@ describeWithDatabase("API authorization and resource isolation", () => {
       ["admin/quarantine/list", {}, ["security", "auditor"]],
       ["admin/quarantine/start", { scopeKind: "bot", scopeId: "missing-bot" }, ["security"]],
       ["admin/quarantine/lift", { id: "missing-quarantine" }, ["security"]],
-      ["admin/computers/list", {}, ["fleet", "auditor"]],
-      ["admin/computers/get", { computerId: "missing-computer" }, ["fleet", "auditor"]],
+      ["admin/computers/list", {}, ["security", "fleet", "auditor"]],
+      ["admin/computers/get", { computerId: "missing-computer" }, ["security", "fleet", "auditor"]],
       ["admin/computers/quarantine", { computerIds: ["missing-computer"] }, ["security"]],
       ["admin/computers/release", { computerIds: ["missing-computer"] }, ["security"]],
       [

@@ -182,7 +182,10 @@ it("links the sections and shows Free access only when the deployment sells cred
 });
 
 it.each([
-  ["security", ["/admin", "/admin/users", "/admin/bots", "/admin/policy", "/admin/audit"]],
+  [
+    "security",
+    ["/admin", "/admin/users", "/admin/bots", "/admin/computers", "/admin/policy", "/admin/audit"],
+  ],
   ["fleet", ["/admin", "/admin/computers", "/admin/policy"]],
   [
     "auditor",

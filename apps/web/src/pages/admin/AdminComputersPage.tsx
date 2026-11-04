@@ -121,7 +121,8 @@ function AdminComputers() {
         stopping = (await rpc.admin.computers.quarantine(input)).operationId;
       else await rpc.admin.computers.release(input);
       setSelected(new Set());
-      if (stopping) setOpenOperation(stopping);
+      // The operation sheet is for fleet; security only contains.
+      if (stopping && canRun) setOpenOperation(stopping);
       await Promise.all([computers.refetch(), operations.refetch()]);
     } catch (error) {
       toast.error(errorText(error, t`Could not update`));

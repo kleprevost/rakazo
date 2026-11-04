@@ -120,7 +120,7 @@ export async function adminComputers(
     quarantined?: true;
   },
 ): Promise<AdminComputerPage> {
-  await requireAdminRole(deps, actorId, ["fleet", "auditor"]);
+  await requireAdminRole(deps, actorId, ["security", "fleet", "auditor"]);
   const rows = await system("list computers", () =>
     deps.prisma.computer.findMany({
       select: {
@@ -220,7 +220,7 @@ export async function adminComputer(
   actorId: string,
   computerId: string,
 ): Promise<AdminComputerDetail> {
-  await requireAdminRole(deps, actorId, ["fleet", "auditor"]);
+  await requireAdminRole(deps, actorId, ["security", "fleet", "auditor"]);
   const computer = await system("read computer", () =>
     deps.prisma.computer.findUnique({
       where: { id: computerId },

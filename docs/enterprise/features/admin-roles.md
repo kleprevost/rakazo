@@ -49,7 +49,7 @@ roles; `me.adminRoles` returns them and `me.isAdmin` stays the `platform` role.
 | `admin.bots.suspend`, `.resume` | security |
 | `admin.quarantine.list` | security, auditor |
 | `admin.quarantine.start`, `.lift` | security |
-| `admin.computers.list`, `.get` | fleet, auditor |
+| `admin.computers.list`, `.get` | security, fleet, auditor |
 | `admin.computers.quarantine`, `.release` | security |
 | `admin.computers.operations.create` | fleet |
 | `admin.computers.operations.list`, `.get` | fleet, auditor |
