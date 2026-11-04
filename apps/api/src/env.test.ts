@@ -436,6 +436,20 @@ describe("OIDC environment", () => {
       );
     expect(() => loadEnv({ ...base, OIDC_REVALIDATE_MINUTES: "60" })).toThrow(/requires OIDC/);
   });
+  it("turns group sync on only with a valid interval, OIDC and the groups claim", () => {
+    expect(loadEnv({ ...base, ...oidc }).directorySyncMinutes).toBeUndefined();
+    expect(loadEnv({ ...base, ...oidc, DIRECTORY_SYNC_MINUTES: "60" }).directorySyncMinutes).toBe(
+      60,
+    );
+    for (const value of ["0", "14", "1.5", "hourly"])
+      expect(() => loadEnv({ ...base, ...oidc, DIRECTORY_SYNC_MINUTES: value })).toThrow(
+        /DIRECTORY_SYNC_MINUTES/,
+      );
+    expect(() => loadEnv({ ...base, DIRECTORY_SYNC_MINUTES: "60" })).toThrow(/requires OIDC/);
+    expect(() =>
+      loadEnv({ ...base, ...oidc, OIDC_ACCESS_CLAIM: "roles", DIRECTORY_SYNC_MINUTES: "60" }),
+    ).toThrow(/OIDC_ACCESS_CLAIM=groups/);
+  });
   it("turns the provisioning endpoint on only with a long enough token", () => {
     expect(loadEnv(base).scimBearerToken).toBeUndefined();
     expect(loadEnv({ ...base, SCIM_BEARER_TOKEN: "  " }).scimBearerToken).toBeUndefined();

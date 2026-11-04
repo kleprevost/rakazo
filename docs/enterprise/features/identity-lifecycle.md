@@ -18,8 +18,8 @@ Not linked from the public docs site.
 ## PR sequence
 1. **Deprovision** (this PR): one provider-neutral operation, the admin action, a minimal SCIM 2.0
    Users endpoint, and the per-request check that makes Easy Auth sessions stop.
-2. **Group reconciliation**: refresh `user_directory_claims` from the directory on a schedule
-   instead of only at sign-in, so a removed group takes effect without a sign-in. Design below.
+2. **Group reconciliation** (done): refresh `user_directory_claims` from the directory on a
+   schedule instead of only at sign-in, so a removed group takes effect without a sign-in.
 3. **Hardening**: optional SCIM `Groups` read for diagnostics, a deprovision-on-disable report in
    Admin Audit, and a bulk "deactivate everyone not in the directory" dry run. Only if asked.
 
@@ -73,16 +73,35 @@ Migration `20261211120000_user_deprovision`: `user.deprovisionedAt`, `deprovisio
 The previous release ignores them. Tests: `identity-lifecycle.postgres.test.ts`, `provisioning.test.ts`,
 the acceptance case in `packages/testkit/src/authorization.test.ts`, and the Easy Auth case.
 
-## PR 2 design: group reconciliation
-Today claims change only when a token is read: sign-in, revalidation, Easy Auth token change.
-A person who never signs in again keeps their last groups. Add a worker job per user (Postgres
-claim with a lease, no global loop) that reads the person's group ids from the directory with
-application permissions, then calls `recordDirectoryClaims` (`via: "directory_sync"`). A failed
-read calls `markDirectoryClaimsStale` (fail closed). Provider-neutral interface
-`DirectoryClaimsSource` (`packages/adapter-kit`); the Entra adapter uses Graph `transitiveMemberOf`
-and loads on first use. Config: `DIRECTORY_SYNC_*` through the shared connection settings, off by
-default. Users whose `refreshedAt` is oldest are visited first; a 404 from the directory means
-deprovision (`via: "provisioning"`).
+## PR 2: group reconciliation
+Claims used to change only when a token was read (sign-in, revalidation, Easy Auth). A person who
+never signs in again kept their last groups. With `DIRECTORY_SYNC_MINUTES` (at least 15; unset is
+off) the API reads each person's current groups from the directory and records them with
+`recordDirectoryClaims` (`via: "directory_sync"`), which recomputes their entitlements.
+- **Interface.** `DirectoryClaimsSource.claimsFor({ userId, email })` in `packages/adapter-kit`
+  returns `found` (values, optional `truncated`) or `missing`, and throws when the answer is
+  unknown. The Entra adapter (`graph-directory-claims.ts`, Microsoft Graph REST, no SDK) is loaded
+  by `createDirectoryClaimsSource` with a dynamic `import()` only when sync is configured.
+- **Connection.** It reuses `OIDC_ISSUER`, `OIDC_CLIENT_ID` and `OIDC_CLIENT_SECRET`: no vendor
+  variables. Grant that app registration the application permissions `GroupMember.Read.All` and
+  `User.ReadBasic.All` with admin consent. Needs `OIDC_ACCESS_CLAIM=groups`, because Graph returns
+  group ids; with app roles the claim values are role names and sync is refused at startup.
+- **Match and values.** The person is found by sign-in email (`mail` or `userPrincipalName`);
+  two matches is an error. Transitive security groups only, as in the token's `groups` claim. More
+  than 10,000 groups reports `truncated`, so claim grants fail closed.
+- **Claim and lease.** `claimDueDirectoryClaims` picks people whose `refreshedAt` is older than
+  the interval (stale ones after 10 minutes), skipping deprovisioned accounts, and takes each with
+  a compare-and-set on `user_directory_claims.syncLeaseUntil` (5 minute lease). Every API instance
+  runs the timer; no global loop or queue. Reads run five at a time.
+- **Failure never widens.** Any error (unreachable, throttled, ambiguous, unreadable) calls
+  `markDirectoryClaimsStale`: values become none and `truncated` is set, so claim grants confer
+  nothing until a good read or a sign-in. `missing` records no groups (not truncated).
+- **Where it runs.** In the API process, like SSO revalidation, not in a worker job: it needs the
+  client secret, which the worker never receives (the compose env test enforces this).
+- Migration `20261214120000_directory_sync_lease` adds `user_directory_claims.syncLeaseUntil`
+  (nullable). Tests are offline: a fake source for `directory-sync.postgres.test.ts`, a fake
+  `fetch` for the Graph adapter. Not verified against a real tenant.
+- Not done: a directory 404 does not deprovision (an email change would look the same); SCIM does.
 
 ## Not covered
 - Entra behavior is from documentation and offline tests; not tried against a real tenant.

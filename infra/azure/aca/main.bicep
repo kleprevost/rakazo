@@ -90,6 +90,8 @@ param securityEmails string = ''
 param fleetEmails string = ''
 param auditorEmails string = ''
 param oidcRevalidateMinutes string = '60'
+// Minutes between directory reads of each person's groups; empty is off (docs/enterprise/features/identity-lifecycle.md).
+param directorySyncMinutes string = ''
 param oidcTrustEmail bool = true
 @description('Add Easy Auth (Entra) in front of the web app, anonymous requests allowed. Needs the code that reads AUTH_EASY_AUTH (placeholder name).')
 param enableEasyAuth bool = false
@@ -213,6 +215,7 @@ module apps 'modules/aca-apps.bicep' = {
     supervisorToken: supervisorToken
     oidcClientSecret: oidcClientSecret
     scimBearerToken: scimBearerToken
+    directorySyncMinutes: directorySyncMinutes
     azureOpenAiApiKey: azureOpenAiApiKey
     oidcTenantId: oidcTenantId
     oidcClientId: oidcClientId

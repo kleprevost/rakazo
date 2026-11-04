@@ -99,6 +99,14 @@ within about an hour. Mechanics and failure handling are in
   provisioning cycle (Entra's cycle is about 40 minutes; "Provision on demand" is immediate). See
   [features/identity-lifecycle.md](features/identity-lifecycle.md). Not verified against a real tenant.
 
+## Group sync
+
+With `OIDC_ACCESS_CLAIM=groups`, `DIRECTORY_SYNC_MINUTES=60` makes the API read each person's
+groups from Microsoft Graph, so a removed group stops granting shared-employee access without a
+sign-in. Give the app registration the application permissions `GroupMember.Read.All` and
+`User.ReadBasic.All` and grant admin consent. See
+[features/identity-lifecycle.md](features/identity-lifecycle.md). Not verified against a real tenant.
+
 ## Easy Auth
 
 Behind Azure App Service or Container Apps built-in authentication, browsers can sign in through
