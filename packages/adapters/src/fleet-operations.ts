@@ -11,8 +11,12 @@ import { recordSecurityEvent, runAsSystem, runAsTenant } from "@rakazo/db";
 import { getLogger } from "@rakazo/logging";
 import { scheduleComputerSleep, sleepComputerWithOutcome } from "./computer-idle.js";
 import { ComputerBusyError, provisionComputer } from "./computer-lifecycle.js";
+import type { RecreateResult } from "./fleet-recreate.js";
+import { recreateComputer } from "./fleet-recreate.js";
+import { assertComputerImageAllowed } from "./policy-capabilities.js";
+import { PolicyDeniedError } from "./policy-runtime.js";
 
-export type FleetOperationKind = "hibernate" | "wake";
+export type FleetOperationKind = "hibernate" | "wake" | "recreate";
 
 /** How long a worker owns an item before another may take it, and how often it renews. */
 export const FLEET_CLAIM_MS = 2 * 60_000;
@@ -36,7 +40,17 @@ type RunDeps = EngineDeps & {
   home: AgentHomeStore;
   events: ThreadEvents;
   dataDir?: string;
+  /** How often a recreate checks on its computer update; tests shorten it. */
+  pollMs?: number;
 };
+
+/** The chosen image is not on the policy's approved list. */
+export class FleetImageNotApprovedError extends Error {
+  constructor() {
+    super("That image is not approved");
+    this.name = "FleetImageNotApprovedError";
+  }
+}
 
 export class FleetConflictError extends Error {
   constructor() {
@@ -60,11 +74,27 @@ export async function createFleetOperation(
     actorUserId: string;
     kind: FleetOperationKind;
     computerIds: string[];
+    /** Recreate only: an approved image digest; without one the provider's own image is used. */
+    imageDigest?: string;
     maxParallel?: number;
     haltAfterFailures?: number;
   },
 ): Promise<{ id: string }> {
   const computerIds = [...new Set(input.computerIds)];
+  if (input.imageDigest) {
+    if (input.kind !== "recreate") throw new Error("Only a recreate can name an image");
+    // Refused here so nothing is queued for an image the policy does not approve; the update
+    // checks again before it touches a computer.
+    try {
+      await assertComputerImageAllowed(
+        { ref: `approved@${input.imageDigest}`, digest: input.imageDigest },
+        { userId: input.actorUserId, surface: "computer" },
+      );
+    } catch (error) {
+      if (error instanceof PolicyDeniedError) throw new FleetImageNotApprovedError();
+      throw error;
+    }
+  }
   const maxParallel = Math.min(
     Math.max(1, input.maxParallel ?? FLEET_DEFAULT_PARALLEL),
     FLEET_MAX_PARALLEL,
@@ -85,6 +115,7 @@ export async function createFleetOperation(
         return tx.computerFleetOperation.create({
           data: {
             kind: input.kind,
+            imageDigest: input.imageDigest ?? null,
             actorUserId: input.actorUserId,
             maxParallel,
             haltAfterFailures: Math.max(1, input.haltAfterFailures ?? FLEET_DEFAULT_HALT_AFTER),
@@ -126,6 +157,7 @@ export async function createFleetOperation(
       operation: input.kind,
       operationId: operation.id,
       computers: computerIds.length,
+      ...(input.imageDigest ? { imageDigest: input.imageDigest } : {}),
     },
   });
   await settleFleetOperation(deps, operation.id);
@@ -247,6 +279,7 @@ type Claimed = {
   operationId: string;
   computerId: string;
   kind: FleetOperationKind;
+  imageDigest: string | null;
   actorUserId: string;
 };
 
@@ -315,19 +348,17 @@ async function claimFleetItem(deps: EngineDeps, itemId: string): Promise<Claimed
         operationId: item.operationId,
         computerId: item.computerId,
         kind: item.operation.kind as FleetOperationKind,
+        imageDigest: item.operation.imageDigest,
         actorUserId: item.operation.actorUserId,
       };
     });
   });
 }
 
-type Result = {
-  status: "succeeded" | "failed" | "skipped_unsupported" | "skipped_busy";
-  outcome: string;
-  changed?: boolean;
-};
+type Result = RecreateResult;
 
 async function executeItem(deps: RunDeps, claimed: Claimed, signal: AbortSignal): Promise<Result> {
+  if (claimed.kind === "recreate") return recreateComputer(deps, claimed, signal);
   const computer = await system("read computer", () =>
     deps.prisma.computer.findUnique({
       where: { id: claimed.computerId },
@@ -468,12 +499,36 @@ export async function runFleetItem(deps: RunDeps, itemId: string): Promise<void>
           : "computer.fleet.item.skipped",
     metadata,
   });
-  if (result.changed)
+  if (result.changed) {
+    const before =
+      claimed.kind === "recreate"
+        ? await system("read item before", () =>
+            deps.prisma.computerFleetItem.findUnique({
+              where: { id: itemId },
+              select: { imageDigestBefore: true, homeRevisionBefore: true },
+            }),
+          )
+        : null;
     await recordSecurityEvent({
       ...base,
-      type: claimed.kind === "hibernate" ? "computer.hibernated" : "computer.woken",
-      metadata,
+      type:
+        claimed.kind === "hibernate"
+          ? "computer.hibernated"
+          : claimed.kind === "recreate"
+            ? "computer.recreated"
+            : "computer.woken",
+      metadata:
+        claimed.kind === "recreate"
+          ? {
+              ...metadata,
+              imageDigestBefore: before?.imageDigestBefore ?? null,
+              imageDigestAfter: result.record?.imageDigestAfter ?? null,
+              homeRevisionBefore: before?.homeRevisionBefore ?? null,
+              homeRevisionAfter: result.record?.homeRevisionAfter ?? null,
+            }
+          : metadata,
     });
+  }
   await settleFleetOperation(deps, claimed.operationId);
 }
 

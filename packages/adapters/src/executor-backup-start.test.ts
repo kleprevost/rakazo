@@ -4,6 +4,7 @@ import type * as ComputerLifecycleModule from "./computer-lifecycle.js";
 import { createRunExecutor } from "./executor.js";
 import { OAUTH_RECONNECT_REQUIRED_ERROR, serializeModelSecret } from "./pi-oauth.js";
 import { withModelRoles } from "./testing/model-roles.js";
+import { withRunGates } from "./testing/run-gates.js";
 
 vi.mock("./computer-lifecycle.js", async (importOriginal) => ({
   ...(await importOriginal<typeof ComputerLifecycleModule>()),
@@ -217,7 +218,7 @@ async function runTurn({
   );
   const finalizeRun = vi.fn(async () => ({ continuationRunId: null }));
   const executor = createRunExecutor({
-    prisma,
+    prisma: withRunGates(prisma),
     billingEnabled: false,
     secretStore: {
       load: vi.fn(async (_ciphertext: string, secretId: string) => plaintexts[secretId]),

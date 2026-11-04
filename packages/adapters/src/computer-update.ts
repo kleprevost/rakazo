@@ -16,6 +16,7 @@ import {
   computerSupportsUpdate,
   replaceComputer,
 } from "./computer-lifecycle.js";
+import { toComputerRef } from "./computer-support.js";
 
 type Deps = Parameters<typeof replaceComputer>[0];
 type QueueDeps = Pick<Deps, "prisma" | "jobs"> &
@@ -55,104 +56,136 @@ export async function queueComputerUpdate(
   computerId: string,
   botId: string,
   action: "update" | "recover" = "update",
+  options: {
+    /** Provision the replacement from this approved image; checked again when it runs. */
+    targetImageDigest?: string;
+    /** A replay with the same key returns the first update and queues nothing. */
+    idempotencyKey?: string;
+  } = {},
 ) {
-  const prepared = await deps.prisma.$transaction(async (tx) => {
-    // Mode switches lock this same row before marking a bot as switching.
-    // The following statement then observes their committed reservation.
-    await tx.$queryRaw`SELECT id FROM computers WHERE id = ${computerId} FOR UPDATE`;
-    const computer = await tx.computer.findUniqueOrThrow({ where: { id: computerId } });
-    if (action === "update" && !computerSupportsUpdate(computer.kind))
-      throw new Error("Computer update is not available on this device");
-    // A run bound to this takeover must keep it. Maintenance does not resume that run.
-    if (
-      computer.controlHolder === "user" &&
-      computer.controlBotId === botId &&
-      computer.controlRunId
-    ) {
-      throw new ComputerBusyError();
-    }
-    const idleTakeover = isIdleOwnComputerTakeover(computer, botId);
-    // Holder "none" plus a lease means a provider revoke failed and control may remain.
-    if (computer.controlLeaseId && !idleTakeover) throw new ComputerBusyError();
-
-    let handback: IdleTakeoverHandback | null = null;
-    if (idleTakeover) {
-      const cleared = await tx.computer.updateMany({
-        where: {
-          id: computerId,
-          controlHolder: "user",
-          controlBotId: botId,
-          controlRunId: null,
-          controlLeaseId: computer.controlLeaseId,
-        },
-        data: computer.controlLeaseId
-          ? { controlHolder: "none" }
-          : {
-              controlHolder: "none",
-              controlLeaseExpiresAt: null,
-              controlBotId: null,
-              controlRunId: null,
-            },
-      });
-      // The waiting-run check is this CAS: a run that attached loses the claim with it.
-      if (cleared.count !== 1) throw new ComputerBusyError();
-      handback = {
-        leaseId: computer.controlLeaseId,
-        expiresAt: computer.controlLeaseExpiresAt,
-        providerRef: computer.providerRef,
-        kind: computer.kind,
-        homeKey: computer.homeKey,
-        spaceId: computer.spaceId,
-        userId: computer.userId,
-        botId,
-      };
-    }
-
-    const revokeLeaseId = handback?.leaseId ?? null;
-    const update = await tx.computerUpdate.create({
-      data: {
-        computerId,
-        botId,
-        action,
-        // Stay reserving until the provider release is attempted. Reconciliation gives that
-        // takeover back. revoking is written before the call and is not proof of release.
-        // revoked is written after the provider returns; reconciliation then clears the lease.
-        ...(revokeLeaseId ? { status: "reserving" } : {}),
-      },
-    });
-    const claimed = await tx.computer.updateMany({
-      where: {
-        id: computerId,
-        maintenanceId: null,
-        state: { notIn: ["booting", "suspending"] },
-        controlHolder: { not: "user" },
-        controlLeaseId: revokeLeaseId,
-        executionLeases: { none: { expiresAt: { gt: new Date() } } },
-        bots: {
-          some: { id: botId, archivedAt: null },
-          none: {
-            OR: [
-              { computerSwitching: true },
-              { runs: { some: { status: { in: [...ACTIVE_RUN_STATUSES] } } } },
-            ],
-          },
-        },
-      },
-      data: { maintenanceId: update.id },
-    });
-    if (claimed.count !== 1) throw new ComputerBusyError();
-    await tx.computerUpdate.updateMany({
-      where: { computerId, status: "failed" },
-      data: { status: "dismissed" },
-    });
-    const row = await tx.computerUpdate.findUniqueOrThrow({
-      where: { id: update.id },
+  const replayOf = (key: string) =>
+    deps.prisma.computerUpdate.findUnique({
+      where: { idempotencyKey: key },
       include: {
         computer: { include: { bots: { where: { id: botId }, select: { id: true, name: true } } } },
       },
     });
-    return { row, handback };
+  if (options.idempotencyKey) {
+    const replay = await replayOf(options.idempotencyKey);
+    if (replay) return computerUpdateView(replay);
+  }
+  const prepareOnce = () =>
+    deps.prisma.$transaction(async (tx) => {
+      // Mode switches lock this same row before marking a bot as switching.
+      // The following statement then observes their committed reservation.
+      await tx.$queryRaw`SELECT id FROM computers WHERE id = ${computerId} FOR UPDATE`;
+      const computer = await tx.computer.findUniqueOrThrow({ where: { id: computerId } });
+      if (action === "update" && !computerSupportsUpdate(computer.kind))
+        throw new Error("Computer update is not available on this device");
+      // A run bound to this takeover must keep it. Maintenance does not resume that run.
+      if (
+        computer.controlHolder === "user" &&
+        computer.controlBotId === botId &&
+        computer.controlRunId
+      ) {
+        throw new ComputerBusyError();
+      }
+      const idleTakeover = isIdleOwnComputerTakeover(computer, botId);
+      // Holder "none" plus a lease means a provider revoke failed and control may remain.
+      if (computer.controlLeaseId && !idleTakeover) throw new ComputerBusyError();
+
+      let handback: IdleTakeoverHandback | null = null;
+      if (idleTakeover) {
+        const cleared = await tx.computer.updateMany({
+          where: {
+            id: computerId,
+            controlHolder: "user",
+            controlBotId: botId,
+            controlRunId: null,
+            controlLeaseId: computer.controlLeaseId,
+          },
+          data: computer.controlLeaseId
+            ? { controlHolder: "none" }
+            : {
+                controlHolder: "none",
+                controlLeaseExpiresAt: null,
+                controlBotId: null,
+                controlRunId: null,
+              },
+        });
+        // The waiting-run check is this CAS: a run that attached loses the claim with it.
+        if (cleared.count !== 1) throw new ComputerBusyError();
+        handback = {
+          leaseId: computer.controlLeaseId,
+          expiresAt: computer.controlLeaseExpiresAt,
+          providerRef: computer.providerRef,
+          kind: computer.kind,
+          homeKey: computer.homeKey,
+          spaceId: computer.spaceId,
+          userId: computer.userId,
+          botId,
+        };
+      }
+
+      const revokeLeaseId = handback?.leaseId ?? null;
+      const update = await tx.computerUpdate.create({
+        data: {
+          computerId,
+          botId,
+          action,
+          ...(options.targetImageDigest ? { targetImageDigest: options.targetImageDigest } : {}),
+          ...(options.idempotencyKey ? { idempotencyKey: options.idempotencyKey } : {}),
+          // Stay reserving until the provider release is attempted. Reconciliation gives that
+          // takeover back. revoking is written before the call and is not proof of release.
+          // revoked is written after the provider returns; reconciliation then clears the lease.
+          ...(revokeLeaseId ? { status: "reserving" } : {}),
+        },
+      });
+      const claimed = await tx.computer.updateMany({
+        where: {
+          id: computerId,
+          maintenanceId: null,
+          state: { notIn: ["booting", "suspending"] },
+          controlHolder: { not: "user" },
+          controlLeaseId: revokeLeaseId,
+          executionLeases: { none: { expiresAt: { gt: new Date() } } },
+          bots: {
+            some: { id: botId, archivedAt: null },
+            none: {
+              OR: [
+                { computerSwitching: true },
+                { runs: { some: { status: { in: [...ACTIVE_RUN_STATUSES] } } } },
+              ],
+            },
+          },
+        },
+        data: { maintenanceId: update.id },
+      });
+      if (claimed.count !== 1) throw new ComputerBusyError();
+      await tx.computerUpdate.updateMany({
+        where: { computerId, status: "failed" },
+        data: { status: "dismissed" },
+      });
+      const row = await tx.computerUpdate.findUniqueOrThrow({
+        where: { id: update.id },
+        include: {
+          computer: {
+            include: { bots: { where: { id: botId }, select: { id: true, name: true } } },
+          },
+        },
+      });
+      return { row, handback };
+    });
+  const outcome = await prepareOnce().catch(async (error: unknown) => {
+    // Two claimants raced on one key: the loser returns what the winner queued.
+    const code = error && typeof error === "object" && "code" in error ? error.code : undefined;
+    const winner =
+      options.idempotencyKey && code === "P2002" && (await replayOf(options.idempotencyKey));
+    if (winner) return { winner };
+    throw error;
   });
+  if ("winner" in outcome) return computerUpdateView(outcome.winner);
+  const prepared = outcome;
 
   if (prepared.handback?.leaseId) {
     // Provider release is optional. CreateOS ignores a non-interactive release, and a host
@@ -516,6 +549,44 @@ async function recordTakeoverHandback(
   }
 }
 
+/** `registry/name` from `registry/name:tag` or `registry/name@sha256:...`. */
+export function imageRepository(ref: string): string {
+  const withoutDigest = ref.split("@")[0] ?? ref;
+  const colon = withoutDigest.lastIndexOf(":");
+  return colon > withoutDigest.lastIndexOf("/") ? withoutDigest.slice(0, colon) : withoutDigest;
+}
+
+/**
+ * The approved image as a reference pinned to its digest. Policy approves a digest, so the same
+ * repository the computer already runs from is reused: a digest names the same content wherever
+ * it is pulled. Without a known repository nothing is guessed.
+ */
+async function imageForDigest(
+  deps: Deps,
+  computer: {
+    id: string;
+    imageRef: string | null;
+    homeKey: string;
+    kind: string;
+    providerRef: string | null;
+  },
+  digest: string,
+  context: AdapterContext,
+): Promise<{ ref: string; digest: string }> {
+  let ref = computer.imageRef;
+  if (!ref) {
+    const observed = await deps.prisma.computerObservation.findUnique({
+      where: { computerId: computer.id },
+      select: { imageRef: true },
+    });
+    ref = observed?.imageRef ?? null;
+  }
+  if (!ref && computer.providerRef && deps.sandbox.describe().capabilities.fleet?.inspect)
+    ref = (await deps.sandbox.inspect?.(toComputerRef(computer), context))?.image?.ref ?? null;
+  if (!ref) throw new Error("The image to rebuild from is unknown");
+  return { ref: `${imageRepository(ref)}@${digest}`, digest };
+}
+
 export async function performComputerUpdate(deps: Deps, updateId: string) {
   const claimed = await deps.prisma.computerUpdate.updateMany({
     where: { id: updateId, status: "queued" },
@@ -541,6 +612,16 @@ export async function performComputerUpdate(deps: Deps, updateId: string) {
       select: { userId: true },
     });
     if (!bot) throw new Error("Computer update target is unavailable");
+    const image = update.targetImageDigest
+      ? await imageForDigest(deps, update.computer, update.targetImageDigest, {
+          operationId: updateId,
+          traceId: updateId,
+          botId: update.botId,
+          spaceId: update.computer.spaceId,
+          userId: bot.userId,
+          signal: controller.signal,
+        })
+      : undefined;
     await replaceComputer(
       deps,
       update.computerId,
@@ -562,6 +643,7 @@ export async function performComputerUpdate(deps: Deps, updateId: string) {
         });
         if (result.count !== 1) throw new Error("Computer update interrupted");
       },
+      image ? { image } : undefined,
     );
     await finishUpdate(deps.prisma, updateId, update.computerId, "completed");
   } catch (error) {

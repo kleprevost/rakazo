@@ -1,5 +1,9 @@
 import { ORPCError } from "@orpc/server";
-import { createFleetOperation, FleetConflictError } from "@rakazo/adapters";
+import {
+  createFleetOperation,
+  FleetConflictError,
+  FleetImageNotApprovedError,
+} from "@rakazo/adapters";
 import type { FleetOperation, FleetOperationDetail } from "@rakazo/contracts";
 import { runAsSystem } from "@rakazo/db";
 import { requireAdmin } from "./admins.js";
@@ -16,6 +20,7 @@ const system = <T>(what: string, fn: () => Promise<T>) =>
 type OperationRow = {
   id: string;
   kind: string;
+  imageDigest: string | null;
   status: string;
   createdAt: Date;
   finishedAt: Date | null;
@@ -26,6 +31,7 @@ type OperationRow = {
 const shape = (row: OperationRow, counts: Record<string, number>): FleetOperation => ({
   id: row.id,
   kind: row.kind as FleetOperation["kind"],
+  imageDigest: row.imageDigest,
   status: row.status as FleetOperation["status"],
   createdAt: row.createdAt.toISOString(),
   finishedAt: row.finishedAt?.toISOString() ?? null,
@@ -45,6 +51,8 @@ export async function adminCreateFleetOperation(
   } catch (error) {
     if (error instanceof FleetConflictError)
       throw new ORPCError("CONFLICT", { message: error.message });
+    if (error instanceof FleetImageNotApprovedError)
+      throw new ORPCError("FORBIDDEN", { message: error.message });
     if (error instanceof Error && error.message === "Computer not found")
       throw new ORPCError("NOT_FOUND", { message: error.message });
     throw error;
@@ -118,6 +126,10 @@ export async function adminFleetOperation(
       bots: byId.get(item.computerId)?.bots.map((bot) => bot.name) ?? [],
       status: item.status as FleetOperationDetail["items"][number]["status"],
       outcome: item.outcome,
+      imageDigestBefore: item.imageDigestBefore,
+      imageDigestAfter: item.imageDigestAfter,
+      homeRevisionBefore: item.homeRevisionBefore,
+      homeRevisionAfter: item.homeRevisionAfter,
       finishedAt: item.finishedAt?.toISOString() ?? null,
     })),
   };

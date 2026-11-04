@@ -22,6 +22,7 @@ import type * as FleetToolsModule from "./fleet-tools.js";
 import type { HostComputerRequest } from "./host-computer-protocol.js";
 import { catalogEntries, resolveCatalogCall } from "./lazy-tool-catalog.js";
 import { setActivePolicy } from "./policy-runtime.js";
+import { withRunGates } from "./testing/run-gates.js";
 import type { TurnCheckpoint } from "./turn-checkpoint.js";
 import { serializeTurnCheckpoint } from "./turn-checkpoint.js";
 import type { UserDeviceGateway } from "./user-device-protocol.js";
@@ -468,10 +469,12 @@ function fixture({
     },
     externalEffect,
   };
-  const transactionalPrisma = Object.assign(prisma, {
-    $queryRaw: vi.fn(async () => []),
-    $transaction: async (action: (tx: typeof prisma) => unknown) => action(prisma),
-  });
+  const transactionalPrisma = withRunGates(
+    Object.assign(prisma, {
+      $queryRaw: vi.fn(async () => []),
+      $transaction: async (action: (tx: typeof prisma) => unknown) => action(prisma),
+    }),
+  );
   const pauseRunForInput = vi.fn(async () => {
     run.status = "waiting_input";
     return { continuationRunId: null as string | null };

@@ -1,6 +1,6 @@
 import { oc } from "@orpc/contract";
 import * as z from "zod";
-import { PolicySchema } from "./policy.js";
+import { IMAGE_DIGEST, PolicySchema } from "./policy.js";
 import { SecurityEventMetadataSchema, SecurityEventTypeSchema } from "./security-events.js";
 
 /**
@@ -171,7 +171,7 @@ export const AdminComputerPageSchema = z.object({
 });
 export type AdminComputerPage = z.infer<typeof AdminComputerPageSchema>;
 
-export const FLEET_OPERATION_KINDS = ["hibernate", "wake"] as const;
+export const FLEET_OPERATION_KINDS = ["hibernate", "wake", "recreate"] as const;
 export const FleetOperationKindSchema = z.enum(FLEET_OPERATION_KINDS);
 export const FLEET_MAX_COMPUTERS = 200;
 export const FLEET_MAX_PARALLEL = 10;
@@ -199,6 +199,8 @@ export const FleetItemStatusSchema = z.enum([
 export const FleetOperationInputSchema = z.object({
   kind: FleetOperationKindSchema,
   computerIds: z.array(Id).min(1).max(FLEET_MAX_COMPUTERS),
+  /** Recreate only: an image on the policy's approved list; without one the provider's own image. */
+  imageDigest: z.string().regex(IMAGE_DIGEST).optional(),
   maxParallel: z.number().int().min(1).max(FLEET_MAX_PARALLEL).default(FLEET_DEFAULT_PARALLEL),
   /** Failed items after which the rest are halted. */
   haltAfterFailures: z
@@ -213,6 +215,7 @@ export const FleetOperationInputSchema = z.object({
 export const FleetOperationSchema = z.object({
   id: z.string(),
   kind: FleetOperationKindSchema,
+  imageDigest: z.string().nullable(),
   status: FleetOperationStatusSchema,
   createdAt: z.string(),
   finishedAt: z.string().nullable(),
@@ -230,6 +233,11 @@ export const FleetItemSchema = z.object({
   status: FleetItemStatusSchema,
   /** A short code such as `already_hibernated`; never provider text. */
   outcome: z.string().nullable(),
+  /** Recreate only: the image and saved home revision before and after; null when not known. */
+  imageDigestBefore: z.string().nullable(),
+  imageDigestAfter: z.string().nullable(),
+  homeRevisionBefore: z.string().nullable(),
+  homeRevisionAfter: z.string().nullable(),
   finishedAt: z.string().nullable(),
 });
 
@@ -361,7 +369,7 @@ export const adminContract = {
       )
       .output(AdminComputerPageSchema),
     get: oc.input(z.object({ computerId: Id })).output(AdminComputerDetailSchema),
-    /** Hibernate or wake many computers at a bounded pace. Busy computers are skipped, never forced. */
+    /** Hibernate, wake or recreate many computers at a bounded pace. Busy computers are skipped, never forced. */
     operations: {
       create: oc.input(FleetOperationInputSchema).output(z.object({ id: z.string() })),
       list: oc

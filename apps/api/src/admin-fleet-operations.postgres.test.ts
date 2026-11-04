@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { setActivePolicy } from "@rakazo/adapters";
 import type { PrismaClient } from "@rakazo/db";
 import { asSystem, createDb } from "@rakazo/db";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
@@ -97,6 +98,10 @@ dbTests("admin fleet operations (PostgreSQL)", () => {
         bots: ["Reporter"],
         status: "queued",
         outcome: null,
+        imageDigestBefore: null,
+        imageDigestAfter: null,
+        homeRevisionBefore: null,
+        homeRevisionAfter: null,
         finishedAt: null,
       },
     ]);
@@ -105,6 +110,10 @@ dbTests("admin fleet operations (PostgreSQL)", () => {
       "bots",
       "computerId",
       "finishedAt",
+      "homeRevisionAfter",
+      "homeRevisionBefore",
+      "imageDigestAfter",
+      "imageDigestBefore",
       "outcome",
       "spaceName",
       "status",
@@ -125,6 +134,36 @@ dbTests("admin fleet operations (PostgreSQL)", () => {
     await expect(adminFleetOperation(deps, outsider, id)).rejects.toMatchObject({
       code: "FORBIDDEN",
     });
+  });
+
+  it("recreates only from an approved image and shows the chosen digest", async () => {
+    const approved = `sha256:${"b".repeat(64)}`;
+    const other = `sha256:${"9".repeat(64)}`;
+    setActivePolicy({ version: 1, computers: { images: { allow: [{ digest: approved }] } } });
+    try {
+      await expect(
+        adminCreateFleetOperation(deps, stamp, {
+          kind: "recreate",
+          computerIds: [stamp],
+          imageDigest: other,
+          maxParallel: 3,
+          haltAfterFailures: 2,
+        }),
+      ).rejects.toMatchObject({ code: "FORBIDDEN" });
+      const { id } = await adminCreateFleetOperation(deps, stamp, {
+        kind: "recreate",
+        computerIds: [stamp],
+        imageDigest: approved,
+        maxParallel: 3,
+        haltAfterFailures: 2,
+      });
+      expect(await adminFleetOperation(deps, stamp, id)).toMatchObject({
+        kind: "recreate",
+        imageDigest: approved,
+      });
+    } finally {
+      setActivePolicy(undefined);
+    }
   });
 
   it("refuses an unknown computer and an unknown operation", async () => {

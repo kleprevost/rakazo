@@ -48,6 +48,7 @@ import {
   withRecentTurnImages,
 } from "./run-turn-images.js";
 import { mainRole, withModelRoles } from "./testing/model-roles.js";
+import { withRunGates } from "./testing/run-gates.js";
 import {
   appendToolCompletionAudit,
   toolCompletionAuditPayload,
@@ -56,7 +57,7 @@ import {
 import { parseUpdateBotPatch } from "./update-bot-patch.js";
 
 const createRunExecutor = (deps: Parameters<typeof createExecutor>[0]) =>
-  createExecutor({ ...deps, prisma: withModelRoles(deps.prisma) });
+  createExecutor({ ...deps, prisma: withRunGates(withModelRoles(deps.prisma)) });
 
 describe("bot tool permissions", () => {
   it("describes bounded cross-chat keyword fanout and authorized reads", () => {

@@ -1399,6 +1399,10 @@ msgstr ""
 msgid "Check every"
 msgstr "확인 주기"
 
+#: src/pages/admin/AdminFleetOperations.tsx
+msgid "Check failed"
+msgstr "확인 실패"
+
 #. placeholder {0}: state.detail ?? ""
 #: src/pages/RoutineEditor.tsx
 msgid "Check failed: {0}"
@@ -2712,6 +2716,7 @@ msgstr "일"
 msgid "Decline"
 msgstr "거절"
 
+#: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/model-settings/compatible-model-fields.tsx
 #: src/pages/model-settings/role-model-picker.tsx
 #: src/pages/ModelRoleSettings.tsx
@@ -4757,6 +4762,10 @@ msgstr "나중에"
 msgid "Not reported"
 msgstr ""
 
+#: src/pages/admin/AdminFleetOperations.tsx
+msgid "Not saved, left running"
+msgstr "저장되지 않음, 계속 실행 중"
+
 #: src/pages/shell/agent-import.tsx
 #: src/pages/shell/import-status.ts
 msgid "Not supported in Rakazo"
@@ -5466,6 +5475,10 @@ msgstr ""
 #: src/components/ComputerUpdateProgress.tsx
 msgid "Recovery restores the last saved workspace. Unsaved work may be lost."
 msgstr "복구하면 마지막으로 저장된 작업 공간이 복원됩니다. 저장하지 않은 작업은 손실될 수 있습니다."
+
+#: src/pages/admin/AdminFleetOperations.tsx
+msgid "Recreate"
+msgstr "다시 만들기"
 
 #: src/components/ComputerMaintenanceActions.tsx
 msgid "Recreate a computer that is not working."

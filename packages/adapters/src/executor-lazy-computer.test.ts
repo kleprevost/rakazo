@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type * as ComputerLifecycleModule from "./computer-lifecycle.js";
 import { createRunExecutor } from "./executor.js";
 import * as runMessages from "./run-messages.js";
+import { withRunGates } from "./testing/run-gates.js";
 
 const sink = createTestSink();
 
@@ -271,7 +272,7 @@ async function runRoutine(
     ),
   };
   const executorInput = {
-    prisma: withEmptyModels(prisma),
+    prisma: withEmptyModels(withRunGates(prisma)),
     deploymentModelKey: "fake-deployment-key",
     runtime: { describe: () => ({ capabilities: { scripted: false } }), run: runtimeRun },
     sandbox,

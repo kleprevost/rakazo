@@ -1399,6 +1399,10 @@ msgstr ""
 msgid "Check every"
 msgstr "Проверять каждые"
 
+#: src/pages/admin/AdminFleetOperations.tsx
+msgid "Check failed"
+msgstr "Проверка не пройдена"
+
 #. placeholder {0}: state.detail ?? ""
 #: src/pages/RoutineEditor.tsx
 msgid "Check failed: {0}"
@@ -2712,6 +2716,7 @@ msgstr "дни"
 msgid "Decline"
 msgstr "Отклонить"
 
+#: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/model-settings/compatible-model-fields.tsx
 #: src/pages/model-settings/role-model-picker.tsx
 #: src/pages/ModelRoleSettings.tsx
@@ -4757,6 +4762,10 @@ msgstr "Не сейчас"
 msgid "Not reported"
 msgstr ""
 
+#: src/pages/admin/AdminFleetOperations.tsx
+msgid "Not saved, left running"
+msgstr "Не сохранено, продолжает работать"
+
 #: src/pages/shell/agent-import.tsx
 #: src/pages/shell/import-status.ts
 msgid "Not supported in Rakazo"
@@ -5466,6 +5475,10 @@ msgstr "Восстановление недоступно, пока не зав�
 #: src/components/ComputerUpdateProgress.tsx
 msgid "Recovery restores the last saved workspace. Unsaved work may be lost."
 msgstr "Восстановление возвращает последнее сохраненное рабочее пространство. Несохраненные изменения могут быть потеряны."
+
+#: src/pages/admin/AdminFleetOperations.tsx
+msgid "Recreate"
+msgstr "Пересоздать"
 
 #: src/components/ComputerMaintenanceActions.tsx
 msgid "Recreate a computer that is not working."

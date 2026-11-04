@@ -23,7 +23,8 @@ const POLL_MS = 3_000;
 export function useFleetLabels() {
   const { t } = useLingui();
   return {
-    kind: (kind: FleetOperation["kind"]) => ({ hibernate: t`Hibernate`, wake: t`Wake` })[kind],
+    kind: (kind: FleetOperation["kind"]) =>
+      ({ hibernate: t`Hibernate`, wake: t`Wake`, recreate: t`Recreate` })[kind],
     operation: (status: FleetOperation["status"]) =>
       ({
         queued: t`Queued`,
@@ -31,6 +32,13 @@ export function useFleetLabels() {
         completed: t`Done`,
         completed_with_failures: t`Needs attention`,
       })[status],
+    /** Only the outcomes the status does not already say; null for the rest. */
+    outcome: (outcome: string | null) =>
+      outcome === "failed_checkpoint"
+        ? t`Not saved, left running`
+        : outcome === "failed_verify"
+          ? t`Check failed`
+          : null,
     item: (status: FleetOperationDetail["items"][number]["status"]) =>
       ({
         queued: t`Queued`,
@@ -44,6 +52,8 @@ export function useFleetLabels() {
       })[status],
   };
 }
+
+export const shortDigest = (digest: string) => digest.replace("sha256:", "").slice(0, 12);
 
 const total = (counts: FleetOperation["counts"]) =>
   Object.values(counts).reduce((sum, count) => sum + count, 0);
@@ -163,6 +173,14 @@ function OperationSheet({
                         <Badge variant={item.status === "succeeded" ? "secondary" : "outline"}>
                           {labels.item(item.status)}
                         </Badge>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {labels.outcome(item.outcome)}
+                        {item.imageDigestAfter ? (
+                          <span className="font-mono text-xs">
+                            {shortDigest(item.imageDigestAfter)}
+                          </span>
+                        ) : null}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {item.finishedAt ? formatWhen(item.finishedAt, locale) : null}
