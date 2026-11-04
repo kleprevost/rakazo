@@ -1698,6 +1698,7 @@ describe("answerRunInput", () => {
             threadId: "thread-1",
           }),
         },
+        attempt: { updateMany: vi.fn().mockResolvedValue({ count: 1 }) },
         task: { updateMany: vi.fn().mockResolvedValue({ count: 1 }) },
         thread: { update: vi.fn().mockResolvedValue({ nextEventSeq: 10 }) },
         event: {
@@ -1737,10 +1738,18 @@ describe("answerRunInput", () => {
       data: { prompt: "Selected choice choice-2: Research and one-off tasks" },
     });
 
+    // The intro's own attempt is not an earlier attempt of a retried run, or the owner's
+    // first job would count as a run that may have read outside content.
+    expect(chosen.attempt.updateMany).toHaveBeenCalledWith({
+      where: { runId: "run-1", status: "waiting_input" },
+      data: { status: "intro_answered" },
+    });
+
     const checkIn = await answerIntro("choice-1", {
       trigger: "routine",
       clientNonce: "strategic-initiative:bot-2:1",
     });
+    expect(checkIn.attempt.updateMany).not.toHaveBeenCalled();
     expect(checkIn.run.updateMany).toHaveBeenCalledWith(
       expect.objectContaining({ data: expect.objectContaining({ trigger: "user" }) }),
     );

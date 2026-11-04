@@ -66,6 +66,9 @@ import { withTransactionRetry } from "./transaction-retry.js";
 
 export const STRATEGIC_INITIATIVE_NONCE_PREFIX = "strategic-initiative";
 
+/** Attempt status of a creation intro whose question the user answered. */
+export const INTRO_ANSWERED_ATTEMPT_STATUS = "intro_answered";
+
 /** A one-time answer longer than a saved value may be. Nothing is stored or echoed. */
 export class AnswerTooLongError extends Error {
   constructor() {
@@ -985,6 +988,14 @@ async function commitAnswerRunInput(
     },
   });
   if (queued.count !== 1) return null;
+  // The creation intro only had its question and its own profile, so nothing it did could have
+  // read outside content: its attempt must not make the resumed run look like a retry.
+  if (run.trigger === "created" && resumedTrigger === "user") {
+    await tx.attempt.updateMany({
+      where: { runId: input.runId, status: "waiting_input" },
+      data: { status: INTRO_ANSWERED_ATTEMPT_STATUS },
+    });
+  }
 
   const recordedAnswer = secretAsk ? "" : (selectedChoice?.id ?? approvalAnswer);
   const callId = callIdFromClientNonce(input.clientNonce);
