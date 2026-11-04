@@ -2,6 +2,7 @@ import { oc } from "@orpc/contract";
 import * as z from "zod";
 import {
   CAPABILITY_EFFECTS,
+  CAPABILITY_GRANTED_VIA,
   CapabilityGrantScopeSchema,
   CapabilityResourceSchema,
 } from "./capabilities.js";
@@ -41,6 +42,58 @@ export const CapabilityGrantViewSchema = z.object({
 });
 export type CapabilityGrantView = z.infer<typeof CapabilityGrantViewSchema>;
 
+/** One step of a decision: scope names, ids and rule names only, never arguments or content. */
+export const CapabilityTraceEntrySchema = z.object({
+  layer: z.enum(["quarantine", "ceiling", "principal", "grant", "delegation", "approval"]),
+  rule: z.string(),
+  scope: z.string().optional(),
+  effect: z.enum([...CAPABILITY_EFFECTS, "none"]),
+  source: z.enum(CAPABILITY_GRANTED_VIA).optional(),
+  detail: z.string().optional(),
+  expiresAt: z.string().optional(),
+});
+
+/** Name a tool (with its server, for one that is not built in) or a scope, not both. */
+export const CapabilitySimulateInputSchema = z
+  .object({
+    botId: Id,
+    tool: z.string().trim().min(1).max(100).optional(),
+    server: z.string().trim().min(1).max(100).optional(),
+    scope: CapabilityGrantScopeSchema.optional(),
+    args: z
+      .record(z.string().max(100), z.union([z.string().max(2000), z.number(), z.boolean()]))
+      .refine((args) => Object.keys(args).length <= 20)
+      .optional(),
+  })
+  .refine((input) => (input.tool === undefined) !== (input.scope === undefined), {
+    message: "Name a tool or a scope, not both",
+  });
+
+export const CapabilitySimulationSchema = z.object({
+  outcome: z.enum(CAPABILITY_EFFECTS),
+  rule: z.string().optional(),
+  scopes: z.array(z.string()),
+  /** How the call was classified; absent when a scope was named. */
+  basis: z.string().optional(),
+  unmapped: z.boolean(),
+  mode: CapabilityModeSchema.nullable(),
+  /** Whether the bot is refused what this denies; otherwise the outcome is only recorded. */
+  enforced: z.boolean(),
+  trace: z.array(CapabilityTraceEntrySchema),
+});
+export type CapabilitySimulation = z.infer<typeof CapabilitySimulationSchema>;
+
+/** What `shadow` recorded in the last seven days, so enforcing is a known step. */
+export const CapabilityShadowSummarySchema = z.object({
+  since: IsoDate,
+  allowed: z.number().int(),
+  asked: z.number().int(),
+  denied: z.number().int(),
+  /** The scopes behind the denials and asks, most frequent first. */
+  scopes: z.array(z.object({ scope: z.string(), count: z.number().int() })),
+});
+export type CapabilityShadowSummary = z.infer<typeof CapabilityShadowSummarySchema>;
+
 export const CapabilityGrantSetInputSchema = z
   .object({
     ...target,
@@ -61,9 +114,16 @@ export const capabilityGrantsContract = {
   list: oc.input(z.object(target).refine(oneTarget, ONE_TARGET)).output(
     z.object({
       mode: CapabilityModeSchema.nullable(),
+      /** Whether the broker applies to this bot: its mode is set or central policy requires grants. */
+      active: z.boolean(),
       grants: z.array(CapabilityGrantViewSchema),
+      /** Scopes the caller may grant now, inside the organization's limits. */
+      grantable: z.array(z.string()),
     }),
   ),
+  /** Decides a hypothetical call from the bot's live grants. Runs nothing and changes nothing. */
+  simulate: oc.input(CapabilitySimulateInputSchema).output(CapabilitySimulationSchema),
+  shadowSummary: oc.input(z.object({ botId: Id })).output(CapabilityShadowSummarySchema),
   /**
    * A bot's owner may grant read scopes, restrict further, and delegate their own credentials. A
    * write, send, spend or other non-read scope needs an admin unless central policy lists it as

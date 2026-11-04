@@ -478,6 +478,8 @@ export async function destroyBot(
           memoriesPreserved: !deleteMemories,
         },
       });
+      // An assignment's thread has no botId, so the bot's cascade would leave it behind.
+      await tx.thread.deleteMany({ where: { assignment: { botId: bot.id } } });
       await tx.bot.delete({ where: { id: bot.id } });
       if (webhookSecretId) {
         await tx.secret.deleteMany({

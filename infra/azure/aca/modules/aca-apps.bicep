@@ -45,6 +45,12 @@ param oidcName string
 param oidcAccessClaim string
 param oidcAllowedValues string
 param oidcAdminValues string
+param oidcSecurityValues string
+param oidcFleetValues string
+param oidcAuditorValues string
+param securityEmails string
+param fleetEmails string
+param auditorEmails string
 param oidcRevalidateMinutes string
 param oidcTrustEmail bool
 
@@ -77,6 +83,15 @@ var registrySecrets = empty(ghcrToken) ? [] : [
 var easyAuthEnv = enableEasyAuth ? [{ name: 'AUTH_EASY_AUTH', value: 'true' }] : []
 // Shared AI employees: people add their own instance (docs/enterprise/features/shared-employees.md). API only.
 var sharedEmployeesEnv = enableSharedEmployees ? [{ name: 'SHARED_EMPLOYEES_ENABLED', value: 'true' }] : []
+// Operator roles beyond admin (docs/enterprise/features/admin-roles.md), set only when given. API only.
+var operatorRolesEnv = concat(
+  empty(oidcSecurityValues) ? [] : [{ name: 'OIDC_SECURITY_VALUES', value: oidcSecurityValues }],
+  empty(oidcFleetValues) ? [] : [{ name: 'OIDC_FLEET_VALUES', value: oidcFleetValues }],
+  empty(oidcAuditorValues) ? [] : [{ name: 'OIDC_AUDITOR_VALUES', value: oidcAuditorValues }],
+  empty(securityEmails) ? [] : [{ name: 'RAKAZO_SECURITY_EMAILS', value: securityEmails }],
+  empty(fleetEmails) ? [] : [{ name: 'RAKAZO_FLEET_EMAILS', value: fleetEmails }],
+  empty(auditorEmails) ? [] : [{ name: 'RAKAZO_AUDITOR_EMAILS', value: auditorEmails }]
+)
 // Screens and terminals go through the supervisor's proxy on port 7091 (docs/enterprise/aca-vm.md).
 var screenViaSupervisorEnv = [{ name: 'SANDBOX_SCREEN_VIA_SUPERVISOR', value: 'true' }]
 
@@ -124,7 +139,8 @@ var apiEnv = concat(
   screenViaSupervisorEnv,
   workItemsEnv,
   easyAuthEnv,
-  sharedEmployeesEnv
+  sharedEmployeesEnv,
+  operatorRolesEnv
 )
 
 var apiSecrets = concat(

@@ -205,6 +205,10 @@ msgstr "{count} 年"
 msgid "{days}d ago"
 msgstr "{days} 天前"
 
+#: src/pages/admin/AdminCapabilitiesPage.tsx
+msgid "{denied, plural, one {# call would have been denied in 7 days} other {# calls would have been denied in 7 days}}"
+msgstr "{denied, plural, other {7 天內將有 # 次呼叫被拒絕}}"
+
 #: src/components/markdown-copy.tsx
 msgid "{from}–{to} of {total} rows"
 msgstr "第 {from}–{to} 列，共 {total} 列"
@@ -425,9 +429,21 @@ msgstr "@{0}"
 msgid "/ month"
 msgstr "/ 月"
 
+#: src/components/capabilities/BotAccess.tsx
+msgid "1 day"
+msgstr "1 天"
+
 #: src/components/integrations/space-availability.tsx
 msgid "1 space"
 msgstr ""
+
+#: src/components/capabilities/BotAccess.tsx
+msgid "30 days"
+msgstr "30 天"
+
+#: src/components/capabilities/BotAccess.tsx
+msgid "7 days"
+msgstr "7 天"
 
 #: src/pages/shell/message-cards.tsx
 msgid "A bit of everything"
@@ -455,9 +471,10 @@ msgstr ""
 msgid "About {label}"
 msgstr "關於 {label}"
 
+#: src/components/capabilities/BotAccess.tsx
 #: src/pages/shell/share-employee-dialog.tsx
 msgid "Access"
-msgstr ""
+msgstr "存取權限"
 
 #: src/components/ComputerProviderSettings.tsx
 msgid "Access key ID"
@@ -578,6 +595,10 @@ msgstr "新增觸發器以執行此例行任務。"
 #: src/lib/tts.ts
 msgid "Add a voice provider key and pick a voice in Voice settings."
 msgstr ""
+
+#: src/components/capabilities/BotAccess.tsx
+msgid "Add access"
+msgstr "新增存取權限"
 
 #: src/pages/McpServersOverlay.tsx
 msgid "Add an HTTPS server URL."
@@ -747,6 +768,7 @@ msgid "All time"
 msgstr "不限時間"
 
 #: src/components/ApprovalRulesSettings.tsx
+#: src/components/capabilities/CapabilitySimulator.tsx
 msgid "Allow"
 msgstr "允許"
 
@@ -971,6 +993,7 @@ msgstr "已封存"
 msgid "Archived"
 msgstr "已封存"
 
+#: src/components/capabilities/CapabilitySimulator.tsx
 #: src/pages/McpServersOverlay.tsx
 msgid "Arguments"
 msgstr "參數"
@@ -981,6 +1004,8 @@ msgid "Artifacts"
 msgstr "成品"
 
 #: src/components/ApprovalRulesSettings.tsx
+#: src/components/capabilities/BotAccess.tsx
+#: src/components/capabilities/CapabilitySimulator.tsx
 msgid "Ask"
 msgstr "詢問"
 
@@ -1341,6 +1366,10 @@ msgstr "已取消"
 #: src/pages/ActivityList.tsx
 msgid "Cancelled"
 msgstr "已取消"
+
+#: src/pages/admin/AdminShell.tsx
+msgid "Capabilities"
+msgstr "能力"
 
 #: src/components/vault/kinds.tsx
 msgid "Card"
@@ -2498,7 +2527,10 @@ msgstr "無法測試 MCP 伺服器"
 msgid "Could not transcribe that recording."
 msgstr ""
 
+#: src/components/capabilities/BotAccess.tsx
+#: src/components/capabilities/CapabilitySimulator.tsx
 #: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/admin/AdminCapabilitiesPage.tsx
 #: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/ScratchpadSection.tsx
 msgid "Could not update"
@@ -2850,6 +2882,8 @@ msgid "Denied"
 msgstr "已拒絕"
 
 #: src/components/AskCard.tsx
+#: src/components/capabilities/BotAccess.tsx
+#: src/components/capabilities/CapabilitySimulator.tsx
 #: src/pages/shell/share-employee-dialog.tsx
 msgid "Deny"
 msgstr "拒絕"
@@ -3141,6 +3175,10 @@ msgstr ""
 msgid "Ends {day}"
 msgstr "於 {day} 結束"
 
+#: src/pages/admin/AdminCapabilitiesPage.tsx
+msgid "Enforce"
+msgstr "強制執行"
+
 #: src/components/GitHubStarPrompt.tsx
 msgid "Enjoying Rakazo?"
 msgstr ""
@@ -3278,9 +3316,10 @@ msgstr "展開表格"
 msgid "expired"
 msgstr "已過期"
 
+#: src/components/capabilities/BotAccess.tsx
 #: src/components/vault/VaultItemDetail.tsx
 msgid "Expires"
-msgstr ""
+msgstr "到期"
 
 #: src/components/vault/kinds.tsx
 msgid "Expires {expiry}"
@@ -3513,6 +3552,10 @@ msgstr ""
 #: src/pages/AdminAccessPage.tsx
 msgid "Granting…"
 msgstr ""
+
+#: src/pages/admin/AdminCapabilitiesPage.tsx
+msgid "Grants"
+msgstr "授權"
 
 #: src/lib/identity-display.ts
 #: src/pages/MessagingSettingsPanel.tsx
@@ -4326,6 +4369,7 @@ msgid "Missed call"
 msgstr "未接來電"
 
 #: src/components/ApprovalRulesSettings.tsx
+#: src/pages/admin/AdminCapabilitiesPage.tsx
 msgid "Mode"
 msgstr "模式"
 
@@ -4447,6 +4491,7 @@ msgstr ""
 #: src/components/vault/VaultItemEditor.tsx
 #: src/pages/AccountSettingsOverlay.tsx
 #: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/admin/AdminCapabilitiesPage.tsx
 #: src/pages/Auth.tsx
 #: src/pages/GroupPanel.tsx
 #: src/pages/McpServersOverlay.tsx
@@ -4518,6 +4563,10 @@ msgstr "需要你處理"
 #: src/pages/shell/import-status.ts
 msgid "Needs: {names}"
 msgstr "需要：{names}"
+
+#: src/components/capabilities/BotAccess.tsx
+msgid "Never"
+msgstr "永不"
 
 #: src/components/ApprovalRulesSettings.tsx
 msgid "Never ask"
@@ -4854,6 +4903,10 @@ msgstr "OAuth 連線失敗"
 msgid "OAuth expired"
 msgstr "OAuth 已過期"
 
+#: src/pages/admin/AdminCapabilitiesPage.tsx
+msgid "Off"
+msgstr "關閉"
+
 #: src/components/ComputerDeviceSettings.tsx
 msgid "Offline"
 msgstr ""
@@ -5040,6 +5093,7 @@ msgstr ""
 #: src/components/pages/SharePopover.tsx
 #: src/lib/identity-display.ts
 #: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/admin/AdminCapabilitiesPage.tsx
 #: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/Board.tsx
 #: src/pages/shell/share-employee-dialog.tsx
@@ -5872,6 +5926,11 @@ msgstr "請檢查供應商設定並重新測試。"
 msgid "Revoke"
 msgstr "撤銷授權"
 
+#. placeholder {0}: grant.scope
+#: src/components/capabilities/BotAccess.tsx
+msgid "Revoke {0}"
+msgstr "撤銷 {0}"
+
 #: src/pages/AdminAccessPage.tsx
 msgid "Revoked"
 msgstr ""
@@ -6210,6 +6269,10 @@ msgstr ""
 msgid "Serenity endpoint is required."
 msgstr "請填寫 Serenity 端點。"
 
+#: src/components/capabilities/CapabilitySimulator.tsx
+msgid "Server"
+msgstr "伺服器"
+
 #: src/pages/McpServersOverlay.tsx
 msgid "Server name"
 msgstr "伺服器名稱"
@@ -6257,6 +6320,11 @@ msgstr "設定完成"
 #: src/pages/model-settings/compatible-model-fields.tsx
 msgid "Setup help"
 msgstr "設定說明"
+
+#: src/components/capabilities/CapabilitySimulator.tsx
+#: src/pages/admin/AdminCapabilitiesPage.tsx
+msgid "Shadow"
+msgstr "影子"
 
 #: src/components/ComputerProviderSettings.tsx
 #: src/pages/shell/avatar-studio-popover.tsx
@@ -6393,6 +6461,10 @@ msgstr ""
 #: src/components/integrations/plugin-marketplace.tsx
 msgid "Sign-in cancelled. Try again."
 msgstr ""
+
+#: src/components/capabilities/CapabilitySimulator.tsx
+msgid "Simulate"
+msgstr "模擬"
 
 #: src/components/vault/VaultItemDetail.tsx
 #: src/components/vault/VaultItemEditor.tsx
@@ -7120,6 +7192,10 @@ msgstr "工具參數必須是 JSON"
 msgid "Tool name"
 msgstr "工具名稱"
 
+#: src/components/capabilities/CapabilitySimulator.tsx
+msgid "Tool or scope"
+msgstr "工具或範圍"
+
 #: src/pages/PluginsOverlay.tsx
 #: src/pages/shell/bot-panel.tsx
 msgid "Tools"
@@ -7658,6 +7734,10 @@ msgstr "可使用你的 ChatGPT 或 Claude 方案。"
 #: src/pages/memory-providers/HonchoSettingsForm.tsx
 msgid "Workspace"
 msgstr "工作空間"
+
+#: src/pages/admin/AdminCapabilitiesPage.tsx
+msgid "Would deny"
+msgstr "將拒絕"
 
 #: src/lib/billing.ts
 msgid "year"

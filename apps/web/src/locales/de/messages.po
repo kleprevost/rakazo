@@ -204,6 +204,10 @@ msgstr ""
 msgid "{days}d ago"
 msgstr "vor {days} T."
 
+#: src/pages/admin/AdminCapabilitiesPage.tsx
+msgid "{denied, plural, one {# call would have been denied in 7 days} other {# calls would have been denied in 7 days}}"
+msgstr "{denied, plural, one {# Aufruf wäre in 7 Tagen abgelehnt worden} other {# Aufrufe wären in 7 Tagen abgelehnt worden}}"
+
 #: src/components/markdown-copy.tsx
 msgid "{from}–{to} of {total} rows"
 msgstr "{from}–{to} von {total} Zeilen"
@@ -424,9 +428,21 @@ msgstr "@{0}"
 msgid "/ month"
 msgstr "/ Monat"
 
+#: src/components/capabilities/BotAccess.tsx
+msgid "1 day"
+msgstr "1 Tag"
+
 #: src/components/integrations/space-availability.tsx
 msgid "1 space"
 msgstr ""
+
+#: src/components/capabilities/BotAccess.tsx
+msgid "30 days"
+msgstr "30 Tage"
+
+#: src/components/capabilities/BotAccess.tsx
+msgid "7 days"
+msgstr "7 Tage"
 
 #: src/pages/shell/message-cards.tsx
 msgid "A bit of everything"
@@ -454,9 +470,10 @@ msgstr ""
 msgid "About {label}"
 msgstr "Über {label}"
 
+#: src/components/capabilities/BotAccess.tsx
 #: src/pages/shell/share-employee-dialog.tsx
 msgid "Access"
-msgstr ""
+msgstr "Zugriff"
 
 #: src/components/ComputerProviderSettings.tsx
 msgid "Access key ID"
@@ -577,6 +594,10 @@ msgstr "Füge einen Auslöser für diese Routine hinzu."
 #: src/lib/tts.ts
 msgid "Add a voice provider key and pick a voice in Voice settings."
 msgstr ""
+
+#: src/components/capabilities/BotAccess.tsx
+msgid "Add access"
+msgstr "Zugriff hinzufügen"
 
 #: src/pages/McpServersOverlay.tsx
 msgid "Add an HTTPS server URL."
@@ -746,6 +767,7 @@ msgid "All time"
 msgstr ""
 
 #: src/components/ApprovalRulesSettings.tsx
+#: src/components/capabilities/CapabilitySimulator.tsx
 msgid "Allow"
 msgstr "Erlauben"
 
@@ -970,6 +992,7 @@ msgstr "archiviert"
 msgid "Archived"
 msgstr "Archiviert"
 
+#: src/components/capabilities/CapabilitySimulator.tsx
 #: src/pages/McpServersOverlay.tsx
 msgid "Arguments"
 msgstr "Argumente"
@@ -980,6 +1003,8 @@ msgid "Artifacts"
 msgstr ""
 
 #: src/components/ApprovalRulesSettings.tsx
+#: src/components/capabilities/BotAccess.tsx
+#: src/components/capabilities/CapabilitySimulator.tsx
 msgid "Ask"
 msgstr "Fragen"
 
@@ -1340,6 +1365,10 @@ msgstr "abgebrochen"
 #: src/pages/ActivityList.tsx
 msgid "Cancelled"
 msgstr "Abgebrochen"
+
+#: src/pages/admin/AdminShell.tsx
+msgid "Capabilities"
+msgstr "Fähigkeiten"
 
 #: src/components/vault/kinds.tsx
 msgid "Card"
@@ -2497,7 +2526,10 @@ msgstr "MCP-Server konnte nicht getestet werden"
 msgid "Could not transcribe that recording."
 msgstr ""
 
+#: src/components/capabilities/BotAccess.tsx
+#: src/components/capabilities/CapabilitySimulator.tsx
 #: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/admin/AdminCapabilitiesPage.tsx
 #: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/ScratchpadSection.tsx
 msgid "Could not update"
@@ -2849,6 +2881,8 @@ msgid "Denied"
 msgstr "Abgelehnt"
 
 #: src/components/AskCard.tsx
+#: src/components/capabilities/BotAccess.tsx
+#: src/components/capabilities/CapabilitySimulator.tsx
 #: src/pages/shell/share-employee-dialog.tsx
 msgid "Deny"
 msgstr "Ablehnen"
@@ -3140,6 +3174,10 @@ msgstr ""
 msgid "Ends {day}"
 msgstr ""
 
+#: src/pages/admin/AdminCapabilitiesPage.tsx
+msgid "Enforce"
+msgstr "Erzwingen"
+
 #: src/components/GitHubStarPrompt.tsx
 msgid "Enjoying Rakazo?"
 msgstr ""
@@ -3277,9 +3315,10 @@ msgstr "Tabelle erweitern"
 msgid "expired"
 msgstr "abgelaufen"
 
+#: src/components/capabilities/BotAccess.tsx
 #: src/components/vault/VaultItemDetail.tsx
 msgid "Expires"
-msgstr ""
+msgstr "Läuft ab"
 
 #: src/components/vault/kinds.tsx
 msgid "Expires {expiry}"
@@ -3512,6 +3551,10 @@ msgstr ""
 #: src/pages/AdminAccessPage.tsx
 msgid "Granting…"
 msgstr ""
+
+#: src/pages/admin/AdminCapabilitiesPage.tsx
+msgid "Grants"
+msgstr "Berechtigungen"
 
 #: src/lib/identity-display.ts
 #: src/pages/MessagingSettingsPanel.tsx
@@ -4325,6 +4368,7 @@ msgid "Missed call"
 msgstr "Verpasster Anruf"
 
 #: src/components/ApprovalRulesSettings.tsx
+#: src/pages/admin/AdminCapabilitiesPage.tsx
 msgid "Mode"
 msgstr "Modus"
 
@@ -4446,6 +4490,7 @@ msgstr ""
 #: src/components/vault/VaultItemEditor.tsx
 #: src/pages/AccountSettingsOverlay.tsx
 #: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/admin/AdminCapabilitiesPage.tsx
 #: src/pages/Auth.tsx
 #: src/pages/GroupPanel.tsx
 #: src/pages/McpServersOverlay.tsx
@@ -4517,6 +4562,10 @@ msgstr ""
 #: src/pages/shell/import-status.ts
 msgid "Needs: {names}"
 msgstr "Benötigt: {names}"
+
+#: src/components/capabilities/BotAccess.tsx
+msgid "Never"
+msgstr "Nie"
 
 #: src/components/ApprovalRulesSettings.tsx
 msgid "Never ask"
@@ -4853,6 +4902,10 @@ msgstr "OAuth-Verbindung fehlgeschlagen"
 msgid "OAuth expired"
 msgstr "OAuth abgelaufen"
 
+#: src/pages/admin/AdminCapabilitiesPage.tsx
+msgid "Off"
+msgstr "Aus"
+
 #: src/components/ComputerDeviceSettings.tsx
 msgid "Offline"
 msgstr ""
@@ -5039,6 +5092,7 @@ msgstr ""
 #: src/components/pages/SharePopover.tsx
 #: src/lib/identity-display.ts
 #: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/admin/AdminCapabilitiesPage.tsx
 #: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/Board.tsx
 #: src/pages/shell/share-employee-dialog.tsx
@@ -5871,6 +5925,11 @@ msgstr "Prüfe die Anbietereinstellungen und teste erneut."
 msgid "Revoke"
 msgstr "Widerrufen"
 
+#. placeholder {0}: grant.scope
+#: src/components/capabilities/BotAccess.tsx
+msgid "Revoke {0}"
+msgstr "{0} widerrufen"
+
 #: src/pages/AdminAccessPage.tsx
 msgid "Revoked"
 msgstr ""
@@ -6209,6 +6268,10 @@ msgstr ""
 msgid "Serenity endpoint is required."
 msgstr ""
 
+#: src/components/capabilities/CapabilitySimulator.tsx
+msgid "Server"
+msgstr "Server"
+
 #: src/pages/McpServersOverlay.tsx
 msgid "Server name"
 msgstr "Servername"
@@ -6256,6 +6319,11 @@ msgstr "Einrichtung abgeschlossen"
 #: src/pages/model-settings/compatible-model-fields.tsx
 msgid "Setup help"
 msgstr "Einrichtungshilfe"
+
+#: src/components/capabilities/CapabilitySimulator.tsx
+#: src/pages/admin/AdminCapabilitiesPage.tsx
+msgid "Shadow"
+msgstr "Schatten"
 
 #: src/components/ComputerProviderSettings.tsx
 #: src/pages/shell/avatar-studio-popover.tsx
@@ -6392,6 +6460,10 @@ msgstr ""
 #: src/components/integrations/plugin-marketplace.tsx
 msgid "Sign-in cancelled. Try again."
 msgstr ""
+
+#: src/components/capabilities/CapabilitySimulator.tsx
+msgid "Simulate"
+msgstr "Simulieren"
 
 #: src/components/vault/VaultItemDetail.tsx
 #: src/components/vault/VaultItemEditor.tsx
@@ -7119,6 +7191,10 @@ msgstr "Toolargumente müssen JSON sein"
 msgid "Tool name"
 msgstr "Toolname"
 
+#: src/components/capabilities/CapabilitySimulator.tsx
+msgid "Tool or scope"
+msgstr "Tool oder Scope"
+
 #: src/pages/PluginsOverlay.tsx
 #: src/pages/shell/bot-panel.tsx
 msgid "Tools"
@@ -7657,6 +7733,10 @@ msgstr "Funktioniert mit deinem ChatGPT- oder Claude-Abo."
 #: src/pages/memory-providers/HonchoSettingsForm.tsx
 msgid "Workspace"
 msgstr ""
+
+#: src/pages/admin/AdminCapabilitiesPage.tsx
+msgid "Would deny"
+msgstr "Würde ablehnen"
 
 #: src/lib/billing.ts
 msgid "year"

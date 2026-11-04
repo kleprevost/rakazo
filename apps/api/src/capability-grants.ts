@@ -7,6 +7,7 @@ import type {
   CapabilityResource,
 } from "@rakazo/contracts";
 import {
+  CAPABILITY_DOMAIN_VERBS,
   CAPABILITY_READ_VERBS,
   CapabilityResourceSchema,
   capabilityScopeCovers,
@@ -34,7 +35,7 @@ type Deps = Pick<RouterDeps, "prisma"> & {
   auth: Pick<RouterDeps["auth"], "isSsoAdmin">;
 };
 
-const system = <T>(what: string, fn: () => Promise<T>) =>
+export const system = <T>(what: string, fn: () => Promise<T>) =>
   runAsSystem(`capability grants: ${what}`, fn);
 
 /** More than any bot needs; bounds the snapshot every shadow decision loads. */
@@ -69,7 +70,7 @@ function isReadScope(scope: string): boolean {
   return verb !== "*" && CAPABILITY_READ_VERBS.includes(verb);
 }
 
-async function loadBot(deps: Deps, botId: string) {
+export async function loadBot(deps: Deps, botId: string) {
   const bot = await system("find bot", () =>
     deps.prisma.bot.findUnique({
       where: { id: botId },
@@ -81,7 +82,7 @@ async function loadBot(deps: Deps, botId: string) {
 }
 
 /** The caller's relation to the target. A stranger gets not found, so ids are not probed. */
-async function authorize(deps: Deps, actor: Actor, target: Target, readOnly = false) {
+export async function authorize(deps: Deps, actor: Actor, target: Target, readOnly = false) {
   const admin = await hasAdminRole(deps, actor.userId, "security");
   // An auditor reads any bot's or employee's grants but never changes them.
   const reader = admin || (readOnly && (await hasAdminRole(deps, actor.userId, "auditor")));
@@ -99,11 +100,38 @@ async function authorize(deps: Deps, actor: Actor, target: Target, readOnly = fa
   return { admin, owner, bot, employeeId: null };
 }
 
+/**
+ * Why an allow for this scope may not be written by this author, or null when it may. Only an
+ * allow widens access, so only an allow is held to the organization's limits.
+ */
+function allowProblem(scope: string, admin: boolean): "organization" | "administrator" | null {
+  const org = activePolicy()?.capabilities;
+  if (
+    org?.deny?.some((pattern) => capabilityScopeCovers(pattern, scope)) ||
+    (org?.ceiling && !org.ceiling.some((pattern) => capabilityScopeCovers(pattern, scope)))
+  ) {
+    return "organization";
+  }
+  const ownerMayGrant =
+    isReadScope(scope) ||
+    org?.ownerGrantable?.some((pattern) => capabilityScopeCovers(pattern, scope));
+  return admin || ownerMayGrant ? null : "administrator";
+}
+
+const BUILTIN_SCOPES = Object.entries(CAPABILITY_DOMAIN_VERBS).flatMap(([domain, verbs]) =>
+  verbs.map((verb) => `${domain}.${verb}`),
+);
+
 export async function listCapabilityGrants(
   deps: Deps,
   actor: Actor,
   target: Target,
-): Promise<{ mode: CapabilityMode | null; grants: CapabilityGrantView[] }> {
+): Promise<{
+  mode: CapabilityMode | null;
+  active: boolean;
+  grants: CapabilityGrantView[];
+  grantable: string[];
+}> {
   const access = await authorize(deps, actor, target, true);
   const { bot } = access;
   const rows = await system("list", () =>
@@ -123,12 +151,15 @@ export async function listCapabilityGrants(
         deps.prisma.bot.findUnique({ where: { id: bot.id }, select: { capabilityMode: true } }),
       )
     : null;
+  const current =
+    mode?.capabilityMode === "shadow" || mode?.capabilityMode === "enforce"
+      ? mode.capabilityMode
+      : null;
   return {
-    mode:
-      mode?.capabilityMode === "shadow" || mode?.capabilityMode === "enforce"
-        ? mode.capabilityMode
-        : null,
+    mode: current,
+    active: current !== null || activePolicy()?.capabilities?.requireGrants === true,
     grants: rows.map((row) => view(row, row.employeeId !== null && bot !== null)),
+    grantable: BUILTIN_SCOPES.filter((scope) => allowProblem(scope, access.admin) === null),
   };
 }
 
@@ -155,21 +186,12 @@ export async function setCapabilityGrant(
   if (expiresAt && expiresAt.getTime() <= Date.now()) {
     throw new ORPCError("BAD_REQUEST", { message: "The expiry is in the past" });
   }
-  // Only an allow widens access, so only an allow is held to the organization's limits.
-  if (input.effect === "allow") {
-    const org = activePolicy()?.capabilities;
-    const blocked =
-      org?.deny?.some((pattern) => capabilityScopeCovers(pattern, input.scope)) ||
-      (org?.ceiling && !org.ceiling.some((pattern) => capabilityScopeCovers(pattern, input.scope)));
-    if (blocked) {
-      throw new ORPCError("BAD_REQUEST", { message: "Not allowed by your organization" });
-    }
-    const ownerMayGrant =
-      isReadScope(input.scope) ||
-      org?.ownerGrantable?.some((pattern) => capabilityScopeCovers(pattern, input.scope));
-    if (!admin && !ownerMayGrant) {
-      throw new ORPCError("FORBIDDEN", { message: "This needs an administrator" });
-    }
+  const problem = input.effect === "allow" ? allowProblem(input.scope, admin) : null;
+  if (problem === "organization") {
+    throw new ORPCError("BAD_REQUEST", { message: "Not allowed by your organization" });
+  }
+  if (problem === "administrator") {
+    throw new ORPCError("FORBIDDEN", { message: "This needs an administrator" });
   }
   const createdVia = admin ? "admin" : "owner";
   const data = {

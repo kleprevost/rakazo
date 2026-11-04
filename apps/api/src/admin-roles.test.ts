@@ -97,10 +97,14 @@ const matrix: Array<[string, Array<Exclude<AdminRole, "platform">>, (admin: Admi
     ["fleet"],
     (a) => a.computers.operations.create({ kind: "hibernate", computerIds: ["c-1"] }),
   ],
-  ["computers.operations.list", ["fleet", "auditor"], (a) => a.computers.operations.list({})],
+  [
+    "computers.operations.list",
+    ["security", "fleet", "auditor"],
+    (a) => a.computers.operations.list({}),
+  ],
   [
     "computers.operations.get",
-    ["fleet", "auditor"],
+    ["security", "fleet", "auditor"],
     (a) => a.computers.operations.get({ operationId: "op-1" }),
   ],
   ["policy", ["security", "fleet", "auditor"], (a) => a.policy()],

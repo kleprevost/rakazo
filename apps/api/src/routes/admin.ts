@@ -14,6 +14,7 @@ import {
 } from "../admin-fleet-operations.js";
 import { liftQuarantine, listQuarantines, startQuarantine } from "../bot-quarantine.js";
 import { resumeBot, suspendBot } from "../bot-suspension.js";
+import { adminCapabilities } from "../capability-insight.js";
 import { quarantineComputers, releaseComputers } from "../computer-quarantine.js";
 import type { RouterContext } from "./context.js";
 
@@ -53,6 +54,11 @@ export function adminRoutes(ctx: RouterContext) {
         ),
         lift: authed.admin.quarantine.lift.handler(({ context, input }) =>
           liftQuarantine(deps, context.actor.userId, input.id),
+        ),
+      },
+      capabilities: {
+        list: authed.admin.capabilities.list.handler(({ context, input }) =>
+          adminCapabilities(deps, context.actor.userId, input),
         ),
       },
       computers: {

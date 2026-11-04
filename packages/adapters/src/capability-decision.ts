@@ -1,6 +1,6 @@
 import type { Policy } from "@rakazo/contracts";
-import type { CapabilityCredential, ClassifyInput } from "@rakazo/core";
-import { evaluateCall } from "@rakazo/core";
+import type { CapabilityCredential, CapabilitySnapshot, ClassifyInput } from "@rakazo/core";
+import { evaluateCall, evaluateCapability } from "@rakazo/core";
 import type { PrismaClient } from "@rakazo/db";
 import { activeQuarantineFor, loadBotCapabilityGrants } from "@rakazo/db";
 
@@ -56,22 +56,39 @@ export function credentialFor(
   return { kind: "personal", userId: foreign ? NOT_THE_PRINCIPAL : userId };
 }
 
-/** Load the live rows and decide the call as enforce would. Throws when a read fails. */
-export async function evaluateBotCall(input: DecisionInput) {
-  const { prisma, bot, call } = input;
+async function loadSnapshot(
+  input: Pick<DecisionInput, "prisma" | "bot" | "userId" | "policy">,
+): Promise<CapabilitySnapshot> {
+  const { prisma, bot } = input;
   const [grants, quarantine] = await Promise.all([
     loadBotCapabilityGrants(prisma, bot),
     activeQuarantineFor(prisma, bot.id),
   ]);
+  return {
+    now: new Date(),
+    policy: input.policy,
+    quarantine: quarantine ? { id: quarantine.id } : undefined,
+    principal: { actingUserId: input.userId },
+    grants,
+  };
+}
+
+/** Load the live rows and decide the call as enforce would. Throws when a read fails. */
+export async function evaluateBotCall(input: DecisionInput) {
+  const { call } = input;
   return evaluateCall(
-    {
-      now: new Date(),
-      policy: input.policy,
-      quarantine: quarantine ? { id: quarantine.id } : undefined,
-      principal: { actingUserId: input.userId },
-      grants,
-    },
+    await loadSnapshot(input),
     call,
     credentialFor(call, input.userId, input.connections),
   );
+}
+
+/** The same decision for a scope named directly, with the credential the caller says it uses. */
+export async function evaluateBotScope(
+  input: Omit<DecisionInput, "call"> & { scope: string; personal: boolean },
+) {
+  return evaluateCapability(await loadSnapshot(input), {
+    scopes: [input.scope],
+    credential: input.personal ? { kind: "personal", userId: input.userId } : { kind: "none" },
+  });
 }

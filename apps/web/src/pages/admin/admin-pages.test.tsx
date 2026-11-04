@@ -27,6 +27,13 @@ const api = vi.hoisted(() => ({
   quarantines: vi.fn(),
   quarantineStart: vi.fn(),
   quarantineLift: vi.fn(),
+  capabilityBots: vi.fn(),
+  grants: vi.fn(),
+  shadowSummary: vi.fn(),
+  setMode: vi.fn(),
+  revokeGrant: vi.fn(),
+  setGrant: vi.fn(),
+  simulate: vi.fn(),
   toastError: vi.fn(),
   toastSuccess: vi.fn(),
 }));
@@ -42,6 +49,12 @@ vi.mock("../../lib/rpc", () => ({
         quarantine: api.quarantineComputers,
         release: api.releaseComputers,
       },
+    },
+    capabilityGrants: {
+      setMode: api.setMode,
+      revoke: api.revokeGrant,
+      set: api.setGrant,
+      simulate: api.simulate,
     },
   },
 }));
@@ -62,6 +75,10 @@ vi.mock("../../lib/query", () => {
   });
   const queries = {
     me: plain("me", () => api.me()),
+    capabilityGrants: {
+      list: plain("grants", () => api.grants()),
+      shadowSummary: plain("shadow", () => api.shadowSummary()),
+    },
     admin: {
       overview: plain("overview", () => api.overview()),
       users: { list: paged("users", (input) => api.users(input)) },
@@ -75,6 +92,7 @@ vi.mock("../../lib/query", () => {
         },
       },
       quarantine: { list: plain("quarantines", () => api.quarantines()) },
+      capabilities: { list: paged("capabilities", (input) => api.capabilityBots(input)) },
       policy: plain("policy", () => api.policy()),
       audit: paged("audit", (input) => api.audit(input)),
     },
@@ -103,6 +121,7 @@ vi.mock("@rakazo/ui-web", async (importOriginal) => ({
 
 import { AdminAuditPage } from "./AdminAuditPage";
 import { AdminBotsPage } from "./AdminBotsPage";
+import { AdminCapabilitiesPage } from "./AdminCapabilitiesPage";
 import { AdminComputersPage } from "./AdminComputersPage";
 import { AdminOverviewPage } from "./AdminOverviewPage";
 import { AdminPolicyPage } from "./AdminPolicyPage";
@@ -1182,4 +1201,174 @@ it("offers Quarantine and Release only to roles that may contain, and fleet acti
   expect(buttons(security.host)).not.toContain("Hibernate");
   expect(buttons(security.host)).not.toContain("Terminate");
   await settle();
+});
+
+it("shows the capabilities section only when the broker is in use, to security and auditor roles", async () => {
+  const overview = (capabilityBroker: boolean) => ({
+    modelCredits: false,
+    capabilityBroker,
+    auth: { password: true, sso: false, easyAuth: false },
+    defaultModel: "azure/gpt-x",
+    computerProvider: "kubernetes",
+    policy: { loaded: false, version: null, hash: null },
+    userCount: 1,
+    botCount: 0,
+  });
+  const hasLink = (host: HTMLElement) =>
+    [...host.querySelectorAll("nav a")].some(
+      (a) => a.getAttribute("href") === "/admin/capabilities",
+    );
+  api.overview.mockResolvedValue(overview(false));
+  expect(hasLink((await show(<AdminOverviewPage />)).host)).toBe(false);
+  document.body.innerHTML = "";
+  api.overview.mockResolvedValue(overview(true));
+  expect(hasLink((await show(<AdminOverviewPage />)).host)).toBe(true);
+  document.body.innerHTML = "";
+  api.me.mockResolvedValue({ isAdmin: false, adminRoles: ["fleet"] });
+  expect(hasLink((await show(<AdminOverviewPage />)).host)).toBe(false);
+});
+
+const capabilityBot = {
+  id: "b1",
+  name: "Reporter",
+  ownerEmail: "mia@example.test",
+  spaceName: "Team space",
+  mode: "shadow",
+  grants: 1,
+  wouldDeny: 3,
+};
+const grantList = (overrides: object = {}) => ({
+  mode: "shadow",
+  active: true,
+  grants: [
+    {
+      id: "g1",
+      kind: "bot",
+      scope: "calendar.read",
+      resource: null,
+      effect: "allow",
+      principalUserId: null,
+      createdVia: "admin",
+      createdByUserId: "u1",
+      expiresAt: null,
+      createdAt: "2026-02-01T00:00:00.000Z",
+      inherited: false,
+    },
+  ],
+  grantable: ["calendar.read", "mail.send"],
+  ...overrides,
+});
+
+it("lists bots with mode and shadow denials, and lets security change one bot's mode, grants and simulate a call", async () => {
+  api.me.mockResolvedValue({ isAdmin: false, adminRoles: ["security"] });
+  api.capabilityBots.mockResolvedValue({ bots: [{ ...capabilityBot }], nextCursor: null });
+  api.grants.mockResolvedValue(grantList());
+  api.shadowSummary.mockResolvedValue({
+    since: "2026-02-01T00:00:00.000Z",
+    allowed: 4,
+    asked: 0,
+    denied: 3,
+    scopes: [{ scope: "files.write", count: 3 }],
+  });
+  api.setMode.mockResolvedValue({ ok: true });
+  api.revokeGrant.mockResolvedValue({ ok: true });
+  api.setGrant.mockResolvedValue({});
+  api.simulate.mockResolvedValue({
+    outcome: "deny",
+    rule: "no_grant",
+    scopes: ["files.write"],
+    unmapped: false,
+    mode: "shadow",
+    enforced: false,
+    trace: [{ layer: "grant", rule: "no_grant", scope: "files.write", effect: "deny" }],
+  });
+  const { host } = await show(<AdminCapabilitiesPage />);
+  const row = host.querySelector("tbody tr")!;
+  expect(row.textContent).toContain("Reporter");
+  expect(row.textContent).toContain("Shadow");
+  expect(row.textContent).toContain("3");
+  expect(host.querySelector('[data-testid="capability-simulator"]')).toBeNull();
+
+  await act(async () => row.querySelector("button")?.click());
+  await settle();
+  expect(host.querySelector('[data-testid="capability-shadow-summary"]')?.textContent).toContain(
+    "3 calls would have been denied in 7 days · files.write 3",
+  );
+  expect(host.querySelectorAll('[data-testid="capability-grant"]')).toHaveLength(1);
+
+  const select = (label: string) =>
+    host.querySelector<HTMLSelectElement>(`select[aria-label="${label}"]`)!;
+  const choose = async (element: HTMLSelectElement, value: string) =>
+    act(async () => {
+      Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, "value")?.set?.call(
+        element,
+        value,
+      );
+      element.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+  await choose(select("Mode"), "enforce");
+  await settle();
+  expect(api.setMode).toHaveBeenCalledWith({ botId: "b1", mode: "enforce" });
+  await choose(select("Mode"), "");
+  await settle();
+  expect(api.setMode).toHaveBeenLastCalledWith({ botId: "b1", mode: null });
+
+  await choose(select("Add access"), "mail.send");
+  await settle();
+  expect(api.setGrant).toHaveBeenCalledWith({ botId: "b1", scope: "mail.send", effect: "allow" });
+  await act(async () =>
+    host.querySelector<HTMLButtonElement>('button[aria-label="Revoke calendar.read"]')?.click(),
+  );
+  await settle();
+  expect(api.revokeGrant).toHaveBeenCalledWith({ id: "g1" });
+
+  const type = async (label: string, value: string) =>
+    act(async () => {
+      const input = host.querySelector<HTMLInputElement>(`input[aria-label="${label}"]`)!;
+      Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set?.call(input, value);
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+  await type("Tool or scope", "write_file");
+  await type("Arguments", '{"path": "/notes"}');
+  expect(host.querySelector('input[aria-label="Server"]')).toBeNull();
+  await act(async () =>
+    host
+      .querySelector<HTMLFormElement>("form")
+      ?.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true })),
+  );
+  await settle();
+  expect(api.simulate).toHaveBeenCalledWith({
+    botId: "b1",
+    tool: "write_file",
+    args: { path: "/notes" },
+  });
+  const outcome = host.querySelector('[data-testid="capability-outcome"]')!;
+  expect(outcome.textContent).toContain("Deny");
+  expect(outcome.textContent).toContain("Shadow");
+  expect(outcome.textContent).toContain("grant · no_grant · files.write · deny");
+
+  await type("Tool or scope", "create_event");
+  expect(host.querySelector('input[aria-label="Server"]')).not.toBeNull();
+  await type("Tool or scope", "calendar.read");
+  expect(host.querySelector('input[aria-label="Server"]')).toBeNull();
+  expect(host.querySelector('input[aria-label="Arguments"]')).toBeNull();
+});
+
+it("shows an auditor the grants and simulator but no way to change them", async () => {
+  api.me.mockResolvedValue({ isAdmin: false, adminRoles: ["auditor"] });
+  api.capabilityBots.mockResolvedValue({
+    bots: [{ ...capabilityBot, mode: "enforce" }],
+    nextCursor: null,
+  });
+  api.grants.mockResolvedValue(grantList({ mode: "enforce" }));
+  const { host } = await show(<AdminCapabilitiesPage />);
+  await act(async () => host.querySelector<HTMLButtonElement>("tbody tr button")?.click());
+  await settle();
+  expect(host.querySelector<HTMLSelectElement>('select[aria-label="Mode"]')?.disabled).toBe(true);
+  expect(host.querySelector('select[aria-label="Add access"]')).toBeNull();
+  expect(
+    host.querySelector<HTMLButtonElement>('button[aria-label="Revoke calendar.read"]')?.disabled,
+  ).toBe(true);
+  expect(host.querySelector('[data-testid="capability-simulator"]')).not.toBeNull();
+  expect(host.querySelector('[data-testid="capability-shadow-summary"]')).toBeNull();
 });

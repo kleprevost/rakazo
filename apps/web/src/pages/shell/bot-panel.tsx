@@ -41,6 +41,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Download, Settings, X } from "lucide-react";
 import type { ReactNode } from "react";
 import { Suspense, useEffect, useId, useRef, useState } from "react";
+import { BotAccess } from "../../components/capabilities/BotAccess";
 import { ErrorBoundary, SectionLoadFailed } from "../../components/ErrorBoundary";
 import { InstructionSettings } from "../../components/InstructionSettings";
 import { PagesList } from "../../components/pages/PagesList";
@@ -780,6 +781,7 @@ export function BotSettings({
                 />
               </div>
             </SettingsGroup>
+            <BotAccess botId={bot.id} />
             <InstructionSettings key={bot.id} bot={bot} />
             <SettingsGroup label={t`How other bots see it`} plain>
               <Textarea

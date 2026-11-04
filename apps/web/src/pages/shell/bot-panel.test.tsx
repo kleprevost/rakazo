@@ -95,6 +95,7 @@ vi.mock("@rakazo/ui-web", () => ({
     <div {...props} />
   ),
 }));
+vi.mock("../../components/capabilities/BotAccess", () => ({ BotAccess: () => null }));
 vi.mock("./avatar-studio-popover", () => ({
   AvatarStudioPopover: ({
     value,

@@ -55,7 +55,11 @@ async function threadsForDecision(
       id: input.threadId,
       spaceId: actor.spaceId,
       userId: actor.userId,
-      OR: [{ botId: input.botId }, { group: { members: { some: { botId: input.botId } } } }],
+      OR: [
+        { botId: input.botId },
+        { assignment: { botId: input.botId } },
+        { group: { members: { some: { botId: input.botId } } } },
+      ],
     },
     select: { id: true, botId: true },
   });
@@ -90,7 +94,11 @@ async function threadsForBot(
     where: {
       spaceId: actor.spaceId,
       userId: actor.userId,
-      OR: [{ botId }, { groupId: { not: null }, messages: { some: { botId } } }],
+      OR: [
+        { botId },
+        { assignment: { botId } },
+        { groupId: { not: null }, messages: { some: { botId } } },
+      ],
     },
     select: { id: true, botId: true },
   });
@@ -291,6 +299,7 @@ export async function queueMcpConnectedRun(
       userId: actor.userId,
       OR: [
         { botId: input.botId },
+        { assignment: { botId: input.botId, archivedAt: null } },
         { group: { archivedAt: null, members: { some: { botId: input.botId } } } },
       ],
     },

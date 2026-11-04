@@ -43,8 +43,12 @@ function modelOf(provider: string | null, model: string | null) {
 export async function adminOverview(deps: ConsoleDeps, actorId: string): Promise<AdminOverview> {
   await requireAnyAdminRole(deps, actorId);
   const policy = activePolicy();
-  const [userCount, botCount] = await system("overview counts", () =>
-    Promise.all([deps.prisma.user.count(), deps.prisma.bot.count()]),
+  const [userCount, botCount, moded] = await system("overview counts", () =>
+    Promise.all([
+      deps.prisma.user.count(),
+      deps.prisma.bot.count(),
+      deps.prisma.bot.count({ where: { capabilityMode: { not: null } } }),
+    ]),
   );
   return {
     auth: deps.env.authModes ?? { password: true, sso: false, easyAuth: false },
@@ -56,6 +60,7 @@ export async function adminOverview(deps: ConsoleDeps, actorId: string): Promise
       hash: policy ? (deps.env.policyHash ?? null) : null,
     },
     modelCredits: Boolean(deps.billing?.modelCreditsEnabled),
+    capabilityBroker: Boolean(policy?.capabilities) || moded > 0,
     userCount,
     botCount,
   };
