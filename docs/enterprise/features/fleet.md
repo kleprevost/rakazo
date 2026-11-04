@@ -1,6 +1,6 @@
 # Computer fleet manager (design)
 
-Design; build plan PR 1 (read-only inventory), PR 2 (observation), PR 3 (image governance) and PR 4 (operations engine) are implemented. An Admin page where operators see every bot computer in
+Design; build plan PR 1 (read-only inventory), PR 2 (observation), PR 3 (image governance), PR 4 (operations engine), PR 5 (recreate) and PR 6 (terminate) are implemented. An Admin page where operators see every bot computer in
 the install and act on them, one or in bulk: recreate from an approved image without losing the
 home folder, terminate, quarantine, hibernate, wake. Provider-neutral. It works first with the Docker
 supervisor on the ACA + VM deployment ([aca-vm.md](../aca-vm.md)) and later with the Kubernetes
@@ -446,7 +446,24 @@ ids, outcome code. Never: paths, file names, provider error text, tokens, screen
    no `failed_home_too_large` (a save failure is `failed_checkpoint`), no typed-count confirmation
    (nothing is lost), no Docker opt-in variant. **Acceptance test**
    (`fleet-recreate.postgres.test.ts`). Tests: 3, 4, 8.
-6. **Terminate.** Tests: 15 and busy handling.
+6. **Terminate.** As built: a `terminate` operation kind. Each item queues the same idempotent
+   `ComputerUpdate` as recreate (keyed by the item id) with a new `stopOnly` flag (additive column,
+   default false). `replaceComputer` with `stopOnly` checkpoints the home, destroys the machine,
+   marks the computer `stopped` with no `providerRef`, and starts no replacement, so the next
+   use provisions it again from the saved home. There is no second teardown path. A busy computer
+   is `skipped_busy` and nothing is cancelled (Decision 2); a failed save is `failed_checkpoint` and
+   the computer keeps running; a failure after teardown began is `failed_destroy`; a saved home that
+   reads empty afterwards is `failed_verify`. A replayed item follows the same update and never
+   destroys twice. A computer already stopped with no machine is `succeeded`
+   (`already_terminated`, no event). Audit: the item events plus `computer.terminated` with the
+   home revisions before and after, once per item. The Computers page gains Terminate beside
+   Recreate, behind a confirmation. Deviations: only a running computer is terminated; a
+   hibernated one (stopped machine kept by the provider) is `skipped_unsupported`
+   (`not_running`) because a stopped machine cannot be checkpointed first; no typed-count
+   confirmation (the home is kept); the confirmation names the count only. Tests: 15 and busy
+   handling (`fleet-terminate.postgres.test.ts`: marker and browser profile restored on the next
+   start, failed save destroys nothing, busy skip, replay, already stopped or hibernated, one open
+   operation per computer; admin authorization; web confirmation).
 7. **Quarantine and release.** Flag, gates, Docker `networkIsolation`, optional suspend composition,
    Kubernetes label patch and RBAC change documented. Tests: 9, 10, 11.
 8. **Kubernetes parity and orphans.** `list`, usage, orphan report, AKS notes in `azure-aks.md`.

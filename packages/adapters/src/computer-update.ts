@@ -61,6 +61,8 @@ export async function queueComputerUpdate(
     targetImageDigest?: string;
     /** A replay with the same key returns the first update and queues nothing. */
     idempotencyKey?: string;
+    /** Save the home and destroy the machine without starting a replacement. */
+    stopOnly?: boolean;
   } = {},
 ) {
   const replayOf = (key: string) =>
@@ -135,6 +137,7 @@ export async function queueComputerUpdate(
           action,
           ...(options.targetImageDigest ? { targetImageDigest: options.targetImageDigest } : {}),
           ...(options.idempotencyKey ? { idempotencyKey: options.idempotencyKey } : {}),
+          ...(options.stopOnly ? { stopOnly: true } : {}),
           // Stay reserving until the provider release is attempted. Reconciliation gives that
           // takeover back. revoking is written before the call and is not proof of release.
           // revoked is written after the provider returns; reconciliation then clears the lease.
@@ -622,29 +625,37 @@ export async function performComputerUpdate(deps: Deps, updateId: string) {
           signal: controller.signal,
         })
       : undefined;
-    await replaceComputer(
-      deps,
-      update.computerId,
-      update.action === "recover" ? "recover" : "update",
-      {
-        operationId: updateId,
-        traceId: updateId,
-        botId: update.botId,
-        spaceId: update.computer.spaceId,
-        userId: bot.userId,
-        signal: controller.signal,
-      },
-      "none",
-      async (stage) => {
-        controller.signal.throwIfAborted();
-        const result = await deps.prisma.computerUpdate.updateMany({
-          where: { id: updateId, status: "running" },
-          data: { stage: update.action === "recover" && stage === "saving" ? "preparing" : stage },
-        });
-        if (result.count !== 1) throw new Error("Computer update interrupted");
-      },
-      image ? { image } : undefined,
-    );
+    const context: AdapterContext = {
+      operationId: updateId,
+      traceId: updateId,
+      botId: update.botId,
+      spaceId: update.computer.spaceId,
+      userId: bot.userId,
+      signal: controller.signal,
+    };
+    const mode = update.action === "recover" ? "recover" : "update";
+    const onProgress = async (stage: Exclude<ComputerUpdate["stage"], "preparing">) => {
+      controller.signal.throwIfAborted();
+      const result = await deps.prisma.computerUpdate.updateMany({
+        where: { id: updateId, status: "running" },
+        data: { stage: update.action === "recover" && stage === "saving" ? "preparing" : stage },
+      });
+      if (result.count !== 1) throw new Error("Computer update interrupted");
+    };
+    if (update.stopOnly)
+      await replaceComputer(deps, update.computerId, mode, context, "none", onProgress, {
+        stopOnly: true,
+      });
+    else
+      await replaceComputer(
+        deps,
+        update.computerId,
+        mode,
+        context,
+        "none",
+        onProgress,
+        image ? { image } : undefined,
+      );
     await finishUpdate(deps.prisma, updateId, update.computerId, "completed");
   } catch (error) {
     if (error instanceof SandboxAllowanceUsedError) {

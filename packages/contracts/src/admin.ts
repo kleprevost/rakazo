@@ -171,7 +171,7 @@ export const AdminComputerPageSchema = z.object({
 });
 export type AdminComputerPage = z.infer<typeof AdminComputerPageSchema>;
 
-export const FLEET_OPERATION_KINDS = ["hibernate", "wake", "recreate"] as const;
+export const FLEET_OPERATION_KINDS = ["hibernate", "wake", "recreate", "terminate"] as const;
 export const FleetOperationKindSchema = z.enum(FLEET_OPERATION_KINDS);
 export const FLEET_MAX_COMPUTERS = 200;
 export const FLEET_MAX_PARALLEL = 10;
@@ -369,7 +369,7 @@ export const adminContract = {
       )
       .output(AdminComputerPageSchema),
     get: oc.input(z.object({ computerId: Id })).output(AdminComputerDetailSchema),
-    /** Hibernate, wake or recreate many computers at a bounded pace. Busy computers are skipped, never forced. */
+    /** Hibernate, wake, recreate or terminate many computers at a bounded pace. Busy computers are skipped, never forced. */
     operations: {
       create: oc.input(FleetOperationInputSchema).output(z.object({ id: z.string() })),
       list: oc

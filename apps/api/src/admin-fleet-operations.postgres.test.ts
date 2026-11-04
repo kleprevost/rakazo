@@ -166,6 +166,23 @@ dbTests("admin fleet operations (PostgreSQL)", () => {
     }
   });
 
+  it("terminates for an admin only and records the kind", async () => {
+    const input = {
+      kind: "terminate" as const,
+      computerIds: [stamp],
+      maxParallel: 3,
+      haltAfterFailures: 2,
+    };
+    await expect(adminCreateFleetOperation(deps, `${stamp}-user`, input)).rejects.toMatchObject({
+      code: "FORBIDDEN",
+    });
+    const { id } = await adminCreateFleetOperation(deps, stamp, input);
+    expect(await adminFleetOperation(deps, stamp, id)).toMatchObject({
+      kind: "terminate",
+      imageDigest: null,
+    });
+  });
+
   it("refuses an unknown computer and an unknown operation", async () => {
     await expect(
       adminCreateFleetOperation(deps, stamp, {

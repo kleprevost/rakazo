@@ -986,26 +986,48 @@ export function computerSupportsTerminal(kind: string): boolean {
   );
 }
 
+type ReplaceDeps = {
+  prisma: PrismaClient;
+  sandbox: SandboxProvider;
+  home: AgentHomeStore;
+  jobs: JobPublisher;
+  events: ThreadEvents;
+  dataDir?: string;
+};
+type ReplaceOptions = {
+  handBackIdleTakeover?: boolean;
+  /** Provision the replacement from this image. Refused before anything is touched. */
+  image?: { ref: string; digest: string };
+};
+
+/** With `stopOnly` the old machine is saved and destroyed and no replacement is started. */
 export async function replaceComputer(
-  deps: {
-    prisma: PrismaClient;
-    sandbox: SandboxProvider;
-    home: AgentHomeStore;
-    jobs: JobPublisher;
-    events: ThreadEvents;
-    dataDir?: string;
-  },
+  deps: ReplaceDeps,
+  computerId: string,
+  mode: ComputerReplaceMode,
+  context: AdapterContext,
+  controlHolder: "bot" | "none",
+  onProgress: ComputerUpdateProgress | undefined,
+  options: Omit<ReplaceOptions, "image"> & { stopOnly: true },
+): Promise<null>;
+export async function replaceComputer(
+  deps: ReplaceDeps,
+  computerId: string,
+  mode: ComputerReplaceMode,
+  context: AdapterContext,
+  controlHolder?: "bot" | "none",
+  onProgress?: ComputerUpdateProgress,
+  options?: ReplaceOptions,
+): Promise<ComputerRef>;
+export async function replaceComputer(
+  deps: ReplaceDeps,
   computerId: string,
   mode: ComputerReplaceMode,
   context: AdapterContext,
   controlHolder: "bot" | "none" = "none",
   onProgress?: ComputerUpdateProgress,
-  options?: {
-    handBackIdleTakeover?: boolean;
-    /** Provision the replacement from this image. Refused before anything is touched. */
-    image?: { ref: string; digest: string };
-  },
-): Promise<ComputerRef> {
+  options?: ReplaceOptions & { stopOnly?: boolean },
+): Promise<ComputerRef | null> {
   if (options?.image) {
     // Provisioning checks again, but only after the old machine is gone.
     await assertComputerImageAllowed(options.image, { ...context, surface: "computer" });
@@ -1284,7 +1306,8 @@ export async function replaceComputer(
       },
     });
     if (stopped.count !== 1) throw new ComputerBusyError();
-    await recordComputerRunEnd(deps.prisma, existing, "replaced");
+    await recordComputerRunEnd(deps.prisma, existing, options?.stopOnly ? "stopped" : "replaced");
+    if (options?.stopOnly) return null;
     return provisionComputer(deps, computerId, context, controlHolder, onProgress, options?.image);
   } catch (error) {
     const failedState =

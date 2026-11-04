@@ -149,7 +149,7 @@ export async function recreateComputer(
   return verify(deps, item, context, profiles);
 }
 
-async function waitForUpdate(
+export async function waitForUpdate(
   deps: Pick<Deps, "prisma" | "pollMs">,
   tenant: { spaceId: string; userId: string },
   updateId: string,
