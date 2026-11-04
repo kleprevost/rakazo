@@ -571,7 +571,39 @@ Still open: whether a team quarantine keys off `Space`, `ChatGroup` or a future 
 whether E3 reads strictly per call or from a sub-second per-run cache (draft: per call).
 
 ## Status
-Build-plan PR 3 is implemented as pure logic, not wired into enforcement: the scope taxonomy,
+Build-plan PR 1 (live suspend check at `dispatchTool`, `BrokeredConnector`) and PR 2 (quarantine) are
+implemented; PR 3 is below.
+
+PR 2, quarantine (`apps/api/src/bot-quarantine.ts`, migration `20261127120000_quarantines`).
+Choices the design left open:
+- Scopes are `bot`, `space`, `group` (a `ChatGroup`) and `all`. A "team" is a Space, so the
+  open question is answered `Space` and `ChatGroup`; an org group can be added as a scope later.
+- Procedures `admin.quarantine.list|start|lift` (`requireAdmin`). `reason` is optional (up to 200),
+  so the Admin UI needs no text field; it is recorded when given. No `revokeCredentials` column
+  (Decision 3).
+- Every gate reads the rows live, uncached: run start (`executor.ts`), `dispatchTool` before the
+  handler, `BrokeredConnector.execute` (so routine watches too), the send path, routine wakes
+  (skipped like suspend) and ticket wakes. Membership is read at use time, so a bot added to a
+  quarantined Space or group afterwards is covered. One shared check, `botBlockedNow`, returns
+  `suspended` or `quarantined` and the matching message.
+- Quarantine does not set `suspendedAt`, so resume and lift stay independent and nothing has to
+  remember which bots it suspended. Lifting only ends the quarantine.
+- Starting it writes the row first (gates close at once), then cancels active runs with
+  `cancelBotRuns` (extracted from `suspendBot` and shared). Nothing is deleted or revoked: bot
+  secrets, MCP assignments, webhook secrets and personal connections stay, and the gates make them
+  unusable, so releasing restores full function with no reconfiguration. Inbound webhook deliveries
+  to a quarantined bot are refused in `loadWebhookTarget`. Events: `bot.quarantined` and
+  `bot.released` (metadata: scope kind and id, counts, reason); a blocked call is the existing
+  `tool.call` audit with outcome `denied` and `reason: "quarantined"`.
+- Not done: revoking short-lived OAuth access tokens (no revocation primitive exists for MCP
+  sessions today), stopping the computer (as in suspend, run work and the screen lease are released,
+  the computer follows its idle lifecycle), a model-turn recheck beyond the run-start gate (cancel ends the
+  lease, so a mid-turn worker aborts), the rate-limited `quarantine.blocked` event, and the
+  quarantine control for a Space or chat group in the Admin UI (the procedure supports both).
+- Fleet's computer quarantine is a separate flag on `Computer` (`adminQuarantinedAt`); the bot
+  quarantine uses its own `quarantines` table and the `bot.*` event names, so they do not collide.
+
+PR 3 is implemented as pure logic, not wired into enforcement: the scope taxonomy,
 strict grant and mapping schemas and the policy `capabilities` section (`packages/contracts/src/capabilities.ts`);
 the classifier and built-in table (`packages/core/src/capability-classifier.ts`,
 `capability-builtin-scopes.ts`); and the evaluator with rule trace (`capability-evaluator.ts`:

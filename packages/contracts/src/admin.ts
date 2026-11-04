@@ -12,6 +12,8 @@ const Id = z.string().min(1).max(128);
 
 /** What a run, a send or a delegated request says when the AI employee is suspended. */
 export const BOT_SUSPENDED_MESSAGE = "Suspended by your organization";
+/** The same, when an admin quarantined it (one bot, its Space or chat group, or all bots). */
+export const BOT_QUARANTINED_MESSAGE = "Quarantined by your organization";
 
 /** What a run says when it is refused before the model because the shared employee behind it is unavailable. */
 export const EMPLOYEE_ACCESS_REMOVED_MESSAGE = "Access removed";
@@ -74,6 +76,8 @@ export const AdminBotSchema = z.object({
   archived: z.boolean(),
   /** When an admin suspended it; null when it is active. */
   suspendedAt: z.string().nullable(),
+  /** When a quarantine that covers it started; null when none does. */
+  quarantinedAt: z.string().nullable(),
 });
 export type AdminBot = z.infer<typeof AdminBotSchema>;
 
@@ -225,6 +229,29 @@ export const AdminAuditPageSchema = z.object({
 });
 export type AdminAuditPage = z.infer<typeof AdminAuditPageSchema>;
 
+export const QuarantineScopeKindSchema = z.enum(["bot", "space", "group", "all"]);
+
+export const AdminQuarantineSchema = z.object({
+  id: z.string(),
+  scopeKind: QuarantineScopeKindSchema,
+  scopeId: z.string().nullable(),
+  /** The bot, Space or chat group name; null for everything or when it no longer exists. */
+  scopeName: z.string().nullable(),
+  reason: z.string(),
+  createdAt: z.string(),
+});
+export type AdminQuarantine = z.infer<typeof AdminQuarantineSchema>;
+
+export const AdminQuarantineStartSchema = z
+  .object({
+    scopeKind: QuarantineScopeKindSchema,
+    scopeId: Id.optional(),
+    reason: z.string().trim().max(200).optional(),
+  })
+  .refine((input) => (input.scopeKind === "all") === (input.scopeId === undefined), {
+    message: "scopeId is required for every scope except all",
+  });
+
 export const adminContract = {
   overview: oc.output(AdminOverviewSchema),
   users: {
@@ -239,6 +266,22 @@ export const adminContract = {
       .input(z.object({ botId: Id, reason: z.string().trim().max(200).optional() }))
       .output(z.object({ cancelledRuns: z.number().int() })),
     resume: oc.input(z.object({ botId: Id })).output(z.object({ ok: z.literal(true) })),
+  },
+  /**
+   * Incident stop for one bot, a Space, a chat group or every bot: cancels active runs and blocks
+   * new runs and every tool, connector, MCP, webhook and computer call. Nothing is deleted or
+   * revoked, so releasing restores full function.
+   */
+  quarantine: {
+    list: oc.output(z.object({ quarantines: z.array(AdminQuarantineSchema) })),
+    start: oc.input(AdminQuarantineStartSchema).output(
+      z.object({
+        id: z.string(),
+        bots: z.number().int(),
+        cancelledRuns: z.number().int(),
+      }),
+    ),
+    lift: oc.input(z.object({ id: Id })).output(z.object({ ok: z.literal(true) })),
   },
   /** Every bot computer in the deployment. Read-only; metadata only, never content. */
   computers: {

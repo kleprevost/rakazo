@@ -985,7 +985,7 @@ function connectedComposioConnections(context: AdapterContext): ConnectedConnect
 export function createConnectorStack(
   composio: ComposioProvider | undefined,
   providers: ConnectorProvider[],
-  prisma: Pick<PrismaClient, "bot">,
+  prisma: Pick<PrismaClient, "bot" | "quarantine">,
 ) {
   return {
     composio,

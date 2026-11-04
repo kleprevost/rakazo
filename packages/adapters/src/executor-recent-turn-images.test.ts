@@ -170,7 +170,12 @@ async function runWithModel(
       findUniqueOrThrow: vi.fn(async () => run),
       findFirst: vi.fn(async () => ({
         bot: {
-          findUnique: async () => ({ suspendedAt: null, name: "Assistant" }),
+          findUnique: async () => ({
+            suspendedAt: null,
+            name: "Assistant",
+            spaceId: "space-1",
+            groupMembers: [],
+          }),
           id: run.botId,
           name: "Boris",
           color: "blue",
@@ -191,8 +196,14 @@ async function runWithModel(
         members: [{ bot: { id: run.botId, name: "Boris", description: "" } }],
       })),
     },
+    quarantine: { findFirst: async () => null },
     bot: {
-      findUnique: async () => ({ suspendedAt: null, name: "Assistant" }),
+      findUnique: async () => ({
+        suspendedAt: null,
+        name: "Assistant",
+        spaceId: "space-1",
+        groupMembers: [],
+      }),
       findUniqueOrThrow: vi.fn(async () => ({
         id: run.botId,
         name: "Assistant",

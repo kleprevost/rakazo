@@ -122,7 +122,15 @@ describe("ConnectorRegistry", () => {
 
   it("registers only the providers it is given", async () => {
     const stack = createConnectorStack(undefined, [new StubConnector("first", [tool("a")])], {
-      bot: { findUnique: async () => ({ suspendedAt: null, name: "Bot" }) },
+      bot: {
+        findUnique: async () => ({
+          suspendedAt: null,
+          name: "Bot",
+          spaceId: "space-1",
+          groupMembers: [],
+        }),
+      },
+      quarantine: { findFirst: async () => null },
     } as never);
 
     await expect(stack.connector.discoverTools(context)).resolves.toEqual([

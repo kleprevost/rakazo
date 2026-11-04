@@ -696,6 +696,7 @@ msgstr ""
 
 #: src/components/VaultSettings.tsx
 #: src/pages/admin/AdminAuditPage.tsx
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/PluginsOverlay.tsx
 msgid "All"
 msgstr ""
@@ -5220,9 +5221,23 @@ msgstr "供應商"
 msgid "Pull request"
 msgstr "Pull request"
 
+#: src/pages/admin/AdminBotsPage.tsx
+msgid "Quarantine"
+msgstr "隔離"
+
+#: src/pages/admin/AdminBotsPage.tsx
+msgid "Quarantine all"
+msgstr "全部隔離"
+
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/admin/AdminComputersPage.tsx
 msgid "Quarantined"
 msgstr ""
+
+#. js-lingui-explicit-id
+#: src/lib/run-error.ts
+msgid "Quarantined by your organization"
+msgstr "已被你的組織隔離"
 
 #: src/pages/ActivityList.tsx
 msgid "Queued"
@@ -5411,6 +5426,10 @@ msgstr ""
 #: src/pages/PluginSubmissionsPanel.tsx
 msgid "Rejecting…"
 msgstr ""
+
+#: src/pages/admin/AdminBotsPage.tsx
+msgid "Release"
+msgstr "解除"
 
 #: src/pages/shell/computer-release-actions.tsx
 msgid "Release control"

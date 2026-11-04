@@ -4,7 +4,7 @@ import type {
   ConnectorProvider,
   ConnectorTool,
 } from "@rakazo/adapter-kit";
-import { BOT_SUSPENDED_MESSAGE } from "@rakazo/contracts";
+import { BOT_QUARANTINED_MESSAGE, BOT_SUSPENDED_MESSAGE } from "@rakazo/contracts";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const recorded = vi.hoisted(() => ({ audit: [] as unknown[], security: [] as unknown[] }));
@@ -51,12 +51,18 @@ class StubConnector implements ConnectorProvider {
   }
 }
 
-function setup(suspendedAt: Date | null = null) {
+function setup(suspendedAt: Date | null = null, quarantined = false) {
   const stub = new StubConnector();
-  const findUnique = vi.fn(async () => ({ suspendedAt, name: "Ada" }));
-  const prisma = { bot: { findUnique } };
+  const findUnique = vi.fn(async () => ({
+    suspendedAt,
+    name: "Ada",
+    spaceId: "space-1",
+    groupMembers: [{ groupId: "group-1" }],
+  }));
+  const findFirst = vi.fn(async () => (quarantined ? { id: "q-1", reason: "incident" } : null));
+  const prisma = { bot: { findUnique }, quarantine: { findFirst } };
   const connector = new BrokeredConnector(new ConnectorRegistry([stub]), prisma as never);
-  return { stub, findUnique, connector, prisma };
+  return { stub, findUnique, findFirst, connector, prisma };
 }
 
 const context: AdapterContext = {
@@ -103,9 +109,39 @@ describe("BrokeredConnector", () => {
     expect(findUnique).toHaveBeenCalledTimes(1);
     expect(findUnique).toHaveBeenCalledWith({
       where: { id: "bot-1" },
-      select: { suspendedAt: true, name: true },
+      select: {
+        suspendedAt: true,
+        name: true,
+        spaceId: true,
+        groupMembers: { select: { groupId: true } },
+      },
     });
     expect(recorded.audit).toEqual([]);
+  });
+
+  it("refuses and audits a call once a quarantine covers the bot, by space or group membership", async () => {
+    const { stub, findFirst, connector } = setup(null, true);
+    await expect(run(connector, {})).resolves.toEqual([
+      { type: "error", message: BOT_QUARANTINED_MESSAGE },
+    ]);
+    expect(stub.executed).toEqual([]);
+    expect(findFirst).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          OR: expect.arrayContaining([
+            { scopeKind: "space", scopeId: "space-1" },
+            { scopeKind: "group", scopeId: { in: ["group-1"] } },
+          ]),
+        }),
+      }),
+    );
+    expect(recorded.audit).toEqual([
+      expect.objectContaining({
+        action: "tool.call",
+        outcome: "denied",
+        metadata: { reason: "quarantined" },
+      }),
+    ]);
   });
 
   it("refuses and audits a call from a suspended bot", async () => {
@@ -213,6 +249,14 @@ describe("routine watches through BrokeredConnector", () => {
     const { connector, stub } = setup(new Date());
     await expect(checkRoutineWatch(watchDeps(connector), routine("brain_changed"))).rejects.toThrow(
       BOT_SUSPENDED_MESSAGE,
+    );
+    expect(stub.executed).toEqual([]);
+  });
+
+  it("refuses a quarantined bot's watch", async () => {
+    const { connector, stub } = setup(null, true);
+    await expect(checkRoutineWatch(watchDeps(connector), routine("brain_changed"))).rejects.toThrow(
+      BOT_QUARANTINED_MESSAGE,
     );
     expect(stub.executed).toEqual([]);
   });

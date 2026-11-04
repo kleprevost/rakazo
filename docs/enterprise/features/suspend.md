@@ -67,6 +67,11 @@ one-shot). Cancelled runs are not restored; the user sends the message again.
 - Mobile: deferred. It has no admin surface, and its sends already fail with the server message;
   no cheap status indicator exists for a new state.
 
+## Quarantine
+A stronger stop for incidents lives in [capability-broker.md](./capability-broker.md): it composes
+with suspend (same cancellation primitive, same gates) but is its own state and also refuses inbound
+webhooks; nothing is deleted.
+
 ## Not covered
 - Child bots (`spawn_bot`) are separate AI employees; suspend each one, they are all in the list.
 - Group chats: a message to a group containing a suspended bot creates its run, which fails at
