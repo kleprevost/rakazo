@@ -6,6 +6,7 @@ import type {
   ThreadMessage,
   VoiceStatus,
 } from "@rakazo/contracts";
+import { DEFAULT_NEW_BOT_AVATAR_SET } from "@rakazo/contracts";
 import {
   answerableAskMessageIds,
   channelMessageSender,
@@ -1278,6 +1279,7 @@ function SpaceShell() {
           closeMobileSidebar={() => setMobileSidebarOpen(false)}
           createBot={createBot}
           hire={{ load: () => rpc.roleTemplates.list(), onHire: hireRole }}
+          botAvatarSet={bootstrapMe?.botAvatarSet ?? DEFAULT_NEW_BOT_AVATAR_SET}
           clearOpenThread={() => {
             thread.resetHistory();
             thread.updateSnapshot((current) =>

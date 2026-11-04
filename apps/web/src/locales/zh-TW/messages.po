@@ -1165,6 +1165,10 @@ msgstr "機器人螢幕"
 msgid "Bot screen preview"
 msgstr "機器人螢幕預覽"
 
+#: src/pages/AccountSettingsOverlay.tsx
+msgid "Bot style"
+msgstr ""
+
 #: src/pages/RoutineEditor.tsx
 msgid "Bot's model"
 msgstr "機器人的模型"
@@ -2500,6 +2504,10 @@ msgstr "無法載入此頁面。請再試一次。"
 
 #: src/pages/PaymentWalletSettingsPanel.tsx
 msgid "Couldn't load your wallet"
+msgstr ""
+
+#: src/pages/AccountSettingsOverlay.tsx
+msgid "Couldn't update bot style"
 msgstr ""
 
 #: src/pages/MessagingSettingsPanel.tsx
@@ -4874,6 +4882,7 @@ msgstr ""
 msgid "Organization API key"
 msgstr "組織 API 金鑰"
 
+#: src/pages/AccountSettingsOverlay.tsx
 #: src/pages/shell/avatar-studio-popover.tsx
 msgid "Original"
 msgstr ""
@@ -5215,6 +5224,7 @@ msgstr ""
 msgid "Queued"
 msgstr "排隊中"
 
+#: src/pages/AccountSettingsOverlay.tsx
 #: src/pages/shell/avatar-studio-popover.tsx
 msgid "Rakazo"
 msgstr "Rakazo"
