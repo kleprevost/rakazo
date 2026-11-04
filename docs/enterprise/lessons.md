@@ -15,3 +15,6 @@
 - Sonnet cost so far: ~100-125k tokens per workstream, including the PR.
 - Parallel agents on one feature: give each its own new files (evaluator + assert per area) so merges only conflict on index exports and the status doc.
 - Sub-agents report pre-existing failures without checking `main`; check them yourself (the SSO admin change silently broke 22 router tests).
+- Row-level security tests must run with `DATABASE_URL` as the non-owner runtime login (`rakazo_app`) and `DATABASE_MIGRATION_URL` as the owner; a superuser URL bypasses RLS and makes isolation tests fail (or worse, pass vacuously). Agents should set both before calling an RLS failure "environmental".
+- Every new protected RPC must be added to `exhaustiveProtectedCalls` in packages/testkit/src/authorization.test.ts, or the testkit typecheck collapses to `never`.
+- Known sandbox-only failures (also fail on main): authorization `models/connect` cases, host-computer process tests, compose installer smoke.
