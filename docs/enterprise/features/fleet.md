@@ -1,6 +1,6 @@
 # Computer fleet manager (design)
 
-Design; build plan PR 1 (read-only inventory), PR 2 (observation) and PR 3 (image governance) are implemented. An Admin page where operators see every bot computer in
+Design; build plan PR 1 (read-only inventory), PR 2 (observation), PR 3 (image governance) and PR 4 (operations engine) are implemented. An Admin page where operators see every bot computer in
 the install and act on them, one or in bulk: recreate from an approved image without losing the
 home folder, terminate, quarantine, hibernate, wake. Provider-neutral. It works first with the Docker
 supervisor on the ACA + VM deployment ([aca-vm.md](../aca-vm.md)) and later with the Kubernetes
@@ -391,8 +391,37 @@ ids, outcome code. Never: paths, file names, provider error text, tokens, screen
    later start without one returns the supervisor to its configured image. Tests: 12 (policy schema,
    evaluator, provisioning refusal and audit, supervisor loader and 403, compliance flags and the
    filter against Postgres, web).
-4. **Fleet engine with hibernate and wake.** Operation and item tables, claims, reconciler, audit,
-   operation page, `maxParallel`, halt. Hibernate and wake are the safe first operations. Tests: 5, 6, 7, 13, 14.
+4. **Fleet engine with hibernate and wake.** As built: additive migration `computer_fleet_operations`
+   and `computer_fleet_items` (system-only row security, items keyed by a plain `computerId`) and a
+   partial unique index allowing one `queued|running` item per computer. An operation
+   (`hibernate | wake`, `maxParallel` default 3 and at most 10, `haltAfterFailures` default 2) is
+   created in one transaction; a computer already held by another unfinished item is recorded
+   `skipped_busy` (`operation_in_progress`), so two operations never act on one computer. Items
+   run as `computer.fleet-item` jobs (replace key per item). A worker claims an item with the
+   operation row locked (`FOR UPDATE`), which counts the window and sets a 2 minute `claimId`
+   lease renewed every 30 s, so instances and the worker never exceed `maxParallel` together and
+   unrelated operations never wait. The first item runs alone (canary), then the window is
+   `maxParallel`. Finishing compare-and-sets on `claimId`, then settles: once `haltAfterFailures`
+   items failed the rest become `halted`, and when nothing is left the operation is `completed` or
+   `completed_with_failures`, and the next items are published. The leader-held reconciler
+   re-queues items whose claim expired (hibernate and wake are safe to replay) and marks them
+   `interrupted` after three attempts. Item statuses: `queued | running | succeeded | failed |
+   skipped_unsupported | skipped_busy | halted | interrupted`, with a short outcome code and never
+   provider text. Hibernate reuses the idle-sleep check (`sleepComputerWithOutcome`, the same
+   code path as `sleepComputerIfIdle`, now able to report how it ended): a computer with a live
+   run, execution lease, user control, takeover grace or background work is `skipped_busy` and
+   left running, which is Decision 2 (idle-only; nothing is forced or cancelled). Wake reuses
+   `provisionComputer` with no run and schedules the usual idle sleep afterwards. A computer on
+   another provider than the configured one, or a native desktop, is `skipped_unsupported`. Audit:
+   `computer.fleet.operation.created|completed`, `computer.fleet.item.succeeded|failed|skipped`
+   (one per item transition), and `computer.hibernated|woken` when the state really changed.
+   `admin.computers.operations.create|list|get` are `requireAdmin` procedures; the Computers page
+   gains row selection with Hibernate and Wake, an Operations table that polls while one is
+   unfinished, and a per-computer outcome sheet. Deviations: no cancel or retry yet; there is no
+   `params` or `reason` column (nothing reads them before recreate); a hibernated computer shows
+   as "Hibernated" (state `suspended`). Tests: 5, 6, 7, 13, 14 (Postgres tests for claims,
+   concurrent workers, the window, halt, replay, busy and unsupported items; admin shaping and
+   authorization; web progress states).
 5. **Recreate.** `targetImageDigest`, idempotent `ComputerUpdate`, verification and per-item
    outcomes. **Acceptance test** (below). Tests: 3, 4, 8.
 6. **Terminate.** Tests: 15 and busy handling.

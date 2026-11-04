@@ -419,32 +419,49 @@ export async function touchRunningComputer(
   await deps.sandbox.keepAlive?.(toComputerRef(computer));
 }
 
-export async function sleepComputerIfIdle(
-  deps: {
-    prisma: PrismaClient;
-    sandbox: SandboxProvider;
-    home: AgentHomeStore;
-    jobs: JobPublisher;
-    events: ThreadEvents;
-  },
+/**
+ * How a sleep check ended: the computer was saved and stopped, something still holds it up, the
+ * provider could not save or stop it now (the next check tries again), or it was not running.
+ */
+export type SleepOutcome = "suspended" | "busy" | "deferred" | "not_running";
+
+type SleepDeps = {
+  prisma: PrismaClient;
+  sandbox: SandboxProvider;
+  home: AgentHomeStore;
+  jobs: JobPublisher;
+  events: ThreadEvents;
+};
+
+export async function sleepComputerIfIdle(deps: SleepDeps, computerId: string): Promise<void> {
+  await sleepComputerWithOutcome(deps, computerId);
+}
+
+/**
+ * The same check as `sleepComputerIfIdle`, reporting how it ended. `now` runs it even where idle
+ * sleep is switched off; every test for activity still applies.
+ */
+export async function sleepComputerWithOutcome(
+  deps: SleepDeps,
   computerId: string,
-): Promise<void> {
-  if (!computerIdleSleepEnabled()) return;
+  options: { now?: boolean } = {},
+): Promise<SleepOutcome> {
+  if (!options.now && !computerIdleSleepEnabled()) return "not_running";
   let computer = await loadComputer(deps.prisma, computerId);
-  if (!computer?.providerRef || !mayNeedSleep(computer)) return;
+  if (!computer?.providerRef || !mayNeedSleep(computer)) return "not_running";
   // Native computers have no provisioned runtime to suspend; Electron owns their lifetime.
-  if (computer.kind === "desktop") return;
+  if (computer.kind === "desktop") return "not_running";
 
   if (computer.controlBotId && computer.controlLeaseId && !hasActiveComputerControl(computer)) {
     try {
       await expireComputerControl(deps, computer.id, computer.controlLeaseId);
     } catch (error) {
       scheduleComputerSleep(deps.jobs, computer.id, undefined, rateLimitEnds(error));
-      if (deferSleep(error, computer)) return;
+      if (deferSleep(error, computer)) return "deferred";
       throw error;
     }
     computer = await loadComputer(deps.prisma, computerId);
-    if (!computer?.providerRef || !mayNeedSleep(computer)) return;
+    if (!computer?.providerRef || !mayNeedSleep(computer)) return "not_running";
   }
   if (computer.executionRunId) {
     // A legacy binding a pre-lease release left behind. Both suspension claims below
@@ -452,7 +469,7 @@ export async function sleepComputerIfIdle(
     // computer could never sleep. Runs that may still execute are left to their owner.
     await clearEndedExecutionRunBinding(deps.prisma, computer.id);
     computer = await loadComputer(deps.prisma, computerId);
-    if (!computer?.providerRef || !mayNeedSleep(computer)) return;
+    if (!computer?.providerRef || !mayNeedSleep(computer)) return "not_running";
   }
 
   const ref = toComputerRef(computer);
@@ -502,7 +519,7 @@ export async function sleepComputerIfIdle(
   const runHeld = Boolean(await runHolds());
   const takeoverHeldUntil = runHeld ? null : await graceEndsAt();
   if (!runHeld && !takeoverHeldUntil && (await suspendStoppedComputer(deps, computer, ref, ctx))) {
-    return;
+    return "suspended";
   }
   if (runHeld || takeoverHeldUntil || (await backgroundHolds())) {
     // Recheck when the takeover grace ends so the computer sleeps on time.
@@ -519,7 +536,7 @@ export async function sleepComputerIfIdle(
       )
         throw error;
     }
-    return;
+    return "busy";
   }
 
   const checkpointedAt = new Date();
@@ -537,7 +554,7 @@ export async function sleepComputerIfIdle(
   });
   if (recorded.count !== 1) {
     scheduleComputerSleep(deps.jobs, computerId);
-    return;
+    return "busy";
   }
   const suspensionClaim = {
     id: computerId,
@@ -578,7 +595,7 @@ export async function sleepComputerIfIdle(
         data: { ...(await disk), state: "running" },
       });
       scheduleComputerSleep(deps.jobs, computerId);
-      return;
+      return "deferred";
     }
   } catch (error) {
     if (isSandboxGoneError(error)) {
@@ -598,7 +615,7 @@ export async function sleepComputerIfIdle(
         },
       });
       if (cleared.count === 1) await recordComputerRunEnd(deps.prisma, computer, "gone");
-      return;
+      return "suspended";
     }
     if (isSandboxDamagedError(error)) {
       // Nothing on it can run, so no checkpoint can be taken, now or later. Stop it anyway with
@@ -619,7 +636,7 @@ export async function sleepComputerIfIdle(
       if (deferSleep(error, computer)) {
         if (error instanceof WorkspaceTooLargeError)
           await announceUnsavedHome(deps, computer, error);
-        return;
+        return "deferred";
       }
       throw error;
     }
@@ -646,7 +663,7 @@ export async function sleepComputerIfIdle(
       activeAfterCheckpoint ? undefined : (takeoverAfterCheckpoint ?? undefined),
     );
     if (backgroundAfterCheckpoint) await deps.sandbox.keepAlive?.(ref);
-    return;
+    return "busy";
   }
   if (
     current?.state !== "suspending" ||
@@ -658,7 +675,7 @@ export async function sleepComputerIfIdle(
       data: { ...(await disk), state: "running" },
     });
     scheduleComputerSleep(deps.jobs, computerId);
-    return;
+    return "busy";
   }
 
   try {
@@ -673,7 +690,7 @@ export async function sleepComputerIfIdle(
     scheduleComputerSleep(deps.jobs, computerId, undefined, rateLimitEnds(error));
     if (deferSleep(error, computer)) {
       if (error instanceof WorkspaceTooLargeError) await announceUnsavedHome(deps, computer, error);
-      return;
+      return "deferred";
     }
     throw error;
   }
@@ -694,7 +711,7 @@ export async function sleepComputerIfIdle(
     // A Reset, a stale-claim recovery, or a deletion took the computer while it stopped. The
     // new owner restarts it from the saved revision; there is nothing left for this job to do.
     getLogger().warn("computer.suspend_superseded", { "computer.id": computerId });
-    return;
+    return "deferred";
   }
   const reason = allowanceUsed ? "allowance" : limitReached ? "active_limit" : "idle";
   await recordComputerRunEnd(deps.prisma, computer, reason);
@@ -712,6 +729,7 @@ export async function sleepComputerIfIdle(
       `computer-allowance:${computer.id}:${computer.runningSince?.toISOString() ?? ""}`,
       `${COMPUTER_ALLOWANCE_USED_ERROR} The computer was saved and stopped.`,
     );
+  return "suspended";
 }
 
 /**

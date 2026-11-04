@@ -1214,6 +1214,10 @@ msgstr "עיון בשרתי MCP"
 msgid "Built-in"
 msgstr "מובנה"
 
+#: src/pages/admin/AdminFleetOperations.tsx
+msgid "Busy"
+msgstr "עסוק"
+
 #: src/pages/Calendar.tsx
 #: src/pages/shell/hire-role-dialog.tsx
 #: src/pages/shell/sidebar-header.tsx
@@ -2461,6 +2465,7 @@ msgid "Could not transcribe that recording."
 msgstr ""
 
 #: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/ScratchpadSection.tsx
 msgid "Could not update"
 msgstr "לא ניתן לעדכן"
@@ -2969,6 +2974,7 @@ msgstr "אין חשבון?"
 #: src/lib/ticket-status.ts
 #: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
+#: src/pages/admin/AdminFleetOperations.tsx
 #: src/pages/Calendar.tsx
 #: src/pages/shell/avatar-studio-popover.tsx
 #: src/pages/shell/import-setup-card.tsx
@@ -3274,6 +3280,7 @@ msgstr "נכשל"
 #: src/components/SubagentCard.tsx
 #: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
+#: src/pages/admin/AdminFleetOperations.tsx
 #: src/pages/Calendar.tsx
 msgid "Failed"
 msgstr "נכשל"
@@ -3482,6 +3489,10 @@ msgstr "הגדרות קבוצה"
 msgid "Group updates"
 msgstr "עדכוני קבוצה"
 
+#: src/pages/admin/AdminFleetOperations.tsx
+msgid "Halted"
+msgstr "הופסק"
+
 #: src/components/call/CallCard.tsx
 msgid "Hang up"
 msgstr "ניתוק שיחה"
@@ -3533,6 +3544,14 @@ msgstr "השמעת דוגמה"
 #: src/pages/VoiceSettingsOverlay.tsx
 msgid "Hi, this is how I'll sound when I read replies out loud."
 msgstr "היי, כך אשמע כשאקריא תשובות בקול."
+
+#: src/pages/admin/AdminFleetOperations.tsx
+msgid "Hibernate"
+msgstr "שינה"
+
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Hibernated"
+msgstr "בשינה"
 
 #: src/components/vault/LoginFieldsInput.tsx
 msgid "Hidden"
@@ -3752,6 +3771,10 @@ msgstr "דומיין האינטגרציה"
 #: src/pages/PluginsOverlay.tsx
 msgid "Integrations"
 msgstr "אינטגרציות"
+
+#: src/pages/admin/AdminFleetOperations.tsx
+msgid "Interrupted"
+msgstr "הופסק באמצע"
 
 #: src/pages/RoutineEditor.tsx
 #: src/pages/RoutineSchedule.tsx
@@ -4423,6 +4446,7 @@ msgid "Needs an OAuth client ID"
 msgstr "נדרש מזהה לקוח OAuth"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/admin/AdminFleetOperations.tsx
 #: src/pages/Today.tsx
 msgid "Needs attention"
 msgstr "דורש תשומת לב"
@@ -4900,6 +4924,10 @@ msgstr "OpenClaw או Hermes"
 msgid "Opens your browser's print dialog. Choose Save as PDF as the destination."
 msgstr "פותח את חלון ההדפסה של הדפדפן. בחר/י „שמירה כ-PDF” כיעד."
 
+#: src/pages/admin/AdminFleetOperations.tsx
+msgid "Operations"
+msgstr "פעולות"
+
 #: src/components/SignupSurvey.tsx
 #: src/pages/model-settings/connection-controls.tsx
 #: src/pages/Onboarding.tsx
@@ -5283,6 +5311,7 @@ msgid "Quarantined by your organization"
 msgstr "הועבר להסגר על ידי הארגון שלך"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/admin/AdminFleetOperations.tsx
 msgid "Queued"
 msgstr "בתור"
 
@@ -5832,6 +5861,7 @@ msgstr "פועל"
 #: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
 #: src/pages/admin/AdminComputersPage.tsx
+#: src/pages/admin/AdminFleetOperations.tsx
 #: src/pages/Calendar.tsx
 #: src/pages/RoutineEditor.tsx
 #: src/pages/Today.tsx
@@ -6031,6 +6061,10 @@ msgstr ""
 #: src/pages/shell/chat-header.tsx
 msgid "Select a bot"
 msgstr "בחירת בוט"
+
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Select all"
+msgstr "בחירת הכול"
 
 #: src/pages/memory-providers/ConnectionModeFields.tsx
 msgid "Self-hosted"
@@ -6469,6 +6503,7 @@ msgstr ""
 
 #: src/pages/ActivityList.tsx
 #: src/pages/admin/AdminComputersPage.tsx
+#: src/pages/admin/AdminFleetOperations.tsx
 #: src/pages/Board.tsx
 msgid "Status"
 msgstr "סטטוס"
@@ -7104,6 +7139,10 @@ msgstr ""
 msgid "Unread"
 msgstr "לא נקראו"
 
+#: src/pages/admin/AdminFleetOperations.tsx
+msgid "Unsupported"
+msgstr "לא נתמך"
+
 #. placeholder {0}: pending.file.name
 #: src/pages/shell/use-composer-actions.ts
 msgid "Unsupported file type: {0}"
@@ -7365,6 +7404,7 @@ msgstr "ממתין בתור…"
 msgid "Waiting…"
 msgstr "ממתין…"
 
+#: src/pages/admin/AdminFleetOperations.tsx
 #: src/pages/shell/computer-panel.tsx
 msgid "Wake"
 msgstr "הער"

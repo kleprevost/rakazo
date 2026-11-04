@@ -14,6 +14,9 @@ const api = vi.hoisted(() => ({
   bots: vi.fn(),
   computers: vi.fn(),
   computer: vi.fn(),
+  operations: vi.fn(),
+  operation: vi.fn(),
+  createOperation: vi.fn(),
   policy: vi.fn(),
   audit: vi.fn(),
   endSessions: vi.fn(),
@@ -32,6 +35,7 @@ vi.mock("../../lib/rpc", () => ({
       users: { endSessions: api.endSessions },
       bots: { suspend: api.suspend, resume: api.resume },
       quarantine: { start: api.quarantineStart, lift: api.quarantineLift },
+      computers: { operations: { create: api.createOperation } },
     },
   },
 }));
@@ -59,6 +63,10 @@ vi.mock("../../lib/query", () => {
       computers: {
         list: paged("computers", (input) => api.computers(input)),
         get: plain("computer", () => api.computer()),
+        operations: {
+          list: plain("operations", () => api.operations()),
+          get: plain("operation", () => api.operation()),
+        },
       },
       quarantine: { list: plain("quarantines", () => api.quarantines()) },
       policy: plain("policy", () => api.policy()),
@@ -776,4 +784,117 @@ it("renders policy rules as section.rule rows without budgets", () => {
     { key: "computers.images.allow", value: `sha256:${"a".repeat(64)} 2026.11` },
     { key: "computers.egress.denyDomains", value: "a.test, b.test" },
   ]);
+});
+
+const fleetComputers = {
+  computers: ["c1", "c2"].map((id, index) => ({
+    id,
+    kind: "docker",
+    scope: "team",
+    state: index === 0 ? "running" : "suspended",
+    ownerName: "Mia",
+    ownerEmail: "mia@example.test",
+    spaceName: "Team space",
+    bots: [{ id: `b${id}`, name: index === 0 ? "Reporter" : "Courier" }],
+    image: null,
+    isolation: null,
+    inspection: "not_running",
+    health: "unknown",
+    runningSince: null,
+    lastActivityAt: null,
+  })),
+  nextCursor: null,
+};
+
+it("starts hibernate or wake for the selected computers and shows the operation's progress", async () => {
+  api.computers.mockResolvedValue(fleetComputers);
+  api.operations.mockResolvedValue({ operations: [] });
+  api.createOperation.mockResolvedValue({ id: "op1" });
+  const { host } = await show(<AdminComputersPage />);
+  // No operations yet: nothing about them is on the page, and hibernated reads as such.
+  expect(host.querySelector('[data-testid="fleet-operations"]')).toBeNull();
+  expect(host.textContent).toContain("Hibernated");
+  expect(host.textContent).not.toContain("Wake");
+
+  api.operations.mockResolvedValue({
+    operations: [
+      {
+        id: "op1",
+        kind: "hibernate",
+        status: "running",
+        createdAt: "2026-02-05T00:00:00.000Z",
+        finishedAt: null,
+        maxParallel: 3,
+        haltAfterFailures: 2,
+        counts: { succeeded: 1, running: 1 },
+      },
+    ],
+  });
+  api.operation.mockResolvedValue({
+    ...(await api.operations()).operations[0],
+    items: [
+      {
+        computerId: "c1",
+        spaceName: "Team space",
+        bots: ["Reporter"],
+        status: "succeeded",
+        outcome: "hibernated",
+        finishedAt: "2026-02-05T00:01:00.000Z",
+      },
+      {
+        computerId: "c2",
+        spaceName: "Team space",
+        bots: ["Courier"],
+        status: "skipped_busy",
+        outcome: "busy",
+        finishedAt: "2026-02-05T00:01:00.000Z",
+      },
+    ],
+  });
+  await act(async () => {
+    (host.querySelector('[aria-label="Reporter"] [role="checkbox"]') as HTMLElement).click();
+  });
+  await act(async () => {
+    (host.querySelector('[aria-label="Courier"] [role="checkbox"]') as HTMLElement).click();
+  });
+  const hibernate = [...host.querySelectorAll("button")].find(
+    (button) => button.textContent === "Hibernate",
+  ) as HTMLButtonElement;
+  expect(host.textContent).toContain("Wake");
+  await act(async () => {
+    hibernate.click();
+  });
+  await settle();
+  expect(api.createOperation).toHaveBeenCalledWith({
+    kind: "hibernate",
+    computerIds: ["c1", "c2"],
+  });
+  const row = host.querySelector('[data-testid="fleet-operations"] tbody tr')?.textContent ?? "";
+  for (const part of ["Hibernate", "Running", "1/2"]) expect(row).toContain(part);
+  // The new operation opens with one outcome per computer.
+  const items = [
+    ...document.body.querySelectorAll('[data-testid="fleet-operation-items"] tbody tr'),
+  ].map((item) => item.textContent ?? "");
+  expect(items[0]).toContain("Reporter");
+  expect(items[0]).toContain("Done");
+  expect(items[1]).toContain("Courier");
+  expect(items[1]).toContain("Busy");
+});
+
+it("reports a failure to start an operation and keeps the selection", async () => {
+  api.computers.mockResolvedValue(fleetComputers);
+  api.operations.mockResolvedValue({ operations: [] });
+  api.createOperation.mockRejectedValue(new Error("nope"));
+  const { host } = await show(<AdminComputersPage />);
+  await act(async () => {
+    (host.querySelector('[aria-label="Reporter"] [role="checkbox"]') as HTMLElement).click();
+  });
+  await act(async () => {
+    (
+      [...host.querySelectorAll("button")].find((b) => b.textContent === "Wake") as HTMLElement
+    ).click();
+  });
+  await settle();
+  expect(api.toastError).toHaveBeenCalledWith("nope");
+  expect(host.textContent).toContain("Hibernate");
 });

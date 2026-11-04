@@ -171,6 +171,73 @@ export const AdminComputerPageSchema = z.object({
 });
 export type AdminComputerPage = z.infer<typeof AdminComputerPageSchema>;
 
+export const FLEET_OPERATION_KINDS = ["hibernate", "wake"] as const;
+export const FleetOperationKindSchema = z.enum(FLEET_OPERATION_KINDS);
+export const FLEET_MAX_COMPUTERS = 200;
+export const FLEET_MAX_PARALLEL = 10;
+export const FLEET_DEFAULT_PARALLEL = 3;
+export const FLEET_DEFAULT_HALT_AFTER = 2;
+
+export const FleetOperationStatusSchema = z.enum([
+  "queued",
+  "running",
+  "completed",
+  "completed_with_failures",
+]);
+
+export const FleetItemStatusSchema = z.enum([
+  "queued",
+  "running",
+  "succeeded",
+  "failed",
+  "skipped_unsupported",
+  "skipped_busy",
+  "halted",
+  "interrupted",
+]);
+
+export const FleetOperationInputSchema = z.object({
+  kind: FleetOperationKindSchema,
+  computerIds: z.array(Id).min(1).max(FLEET_MAX_COMPUTERS),
+  maxParallel: z.number().int().min(1).max(FLEET_MAX_PARALLEL).default(FLEET_DEFAULT_PARALLEL),
+  /** Failed items after which the rest are halted. */
+  haltAfterFailures: z
+    .number()
+    .int()
+    .min(1)
+    .max(FLEET_MAX_COMPUTERS)
+    .default(FLEET_DEFAULT_HALT_AFTER),
+});
+
+/** Per-status item counts, so a list row shows progress without the items. */
+export const FleetOperationSchema = z.object({
+  id: z.string(),
+  kind: FleetOperationKindSchema,
+  status: FleetOperationStatusSchema,
+  createdAt: z.string(),
+  finishedAt: z.string().nullable(),
+  maxParallel: z.number().int(),
+  haltAfterFailures: z.number().int(),
+  counts: z.record(FleetItemStatusSchema, z.number().int()),
+});
+export type FleetOperation = z.infer<typeof FleetOperationSchema>;
+
+export const FleetItemSchema = z.object({
+  computerId: z.string(),
+  /** Names for the row; null once the computer is gone. */
+  spaceName: z.string().nullable(),
+  bots: z.array(z.string()),
+  status: FleetItemStatusSchema,
+  /** A short code such as `already_hibernated`; never provider text. */
+  outcome: z.string().nullable(),
+  finishedAt: z.string().nullable(),
+});
+
+export const FleetOperationDetailSchema = FleetOperationSchema.extend({
+  items: z.array(FleetItemSchema),
+});
+export type FleetOperationDetail = z.infer<typeof FleetOperationDetailSchema>;
+
 const SpendRowSchema = z.object({ id: z.string(), label: z.string(), spentUsd: z.number() });
 
 export const AdminPolicyViewSchema = z.object({
@@ -294,6 +361,14 @@ export const adminContract = {
       )
       .output(AdminComputerPageSchema),
     get: oc.input(z.object({ computerId: Id })).output(AdminComputerDetailSchema),
+    /** Hibernate or wake many computers at a bounded pace. Busy computers are skipped, never forced. */
+    operations: {
+      create: oc.input(FleetOperationInputSchema).output(z.object({ id: z.string() })),
+      list: oc
+        .input(z.object({ limit: pageLimit(50, 20) }))
+        .output(z.object({ operations: z.array(FleetOperationSchema) })),
+      get: oc.input(z.object({ operationId: Id })).output(FleetOperationDetailSchema),
+    },
   },
   policy: oc.output(AdminPolicyViewSchema),
   audit: oc.input(AdminAuditInputSchema).output(AdminAuditPageSchema),

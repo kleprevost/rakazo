@@ -7,6 +7,11 @@ import {
   adminPolicy,
   adminUsers,
 } from "../admin-console.js";
+import {
+  adminCreateFleetOperation,
+  adminFleetOperation,
+  adminFleetOperations,
+} from "../admin-fleet-operations.js";
 import { liftQuarantine, listQuarantines, startQuarantine } from "../bot-quarantine.js";
 import { resumeBot, suspendBot } from "../bot-suspension.js";
 import type { RouterContext } from "./context.js";
@@ -56,6 +61,17 @@ export function adminRoutes(ctx: RouterContext) {
         get: authed.admin.computers.get.handler(({ context, input }) =>
           adminComputer(deps, context.actor.userId, input.computerId),
         ),
+        operations: {
+          create: authed.admin.computers.operations.create.handler(({ context, input }) =>
+            adminCreateFleetOperation(deps, context.actor.userId, input),
+          ),
+          list: authed.admin.computers.operations.list.handler(({ context, input }) =>
+            adminFleetOperations(deps, context.actor.userId, input),
+          ),
+          get: authed.admin.computers.operations.get.handler(({ context, input }) =>
+            adminFleetOperation(deps, context.actor.userId, input.operationId),
+          ),
+        },
       },
       policy: authed.admin.policy.handler(({ context }) => adminPolicy(deps, context.actor.userId)),
       audit: authed.admin.audit.handler(({ context, input }) =>

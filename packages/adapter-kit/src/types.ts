@@ -790,6 +790,8 @@ export interface BackgroundJobPayloads {
   "routine.retry": { runId: string };
   "computer.sleep": { computerId: string };
   "computer.update": { updateId: string };
+  /** One computer in an admin fleet operation. */
+  "computer.fleet-item": { itemId: string };
   "computer.control-expire": { computerId: string; leaseId: string };
   "skill.teaching-expire": { skillId: string };
   /** The bot's call rang out: mark it missed if nobody answered. */
