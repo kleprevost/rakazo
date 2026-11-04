@@ -60,6 +60,11 @@ export const SECURITY_EVENT_TYPES = [
   "employee.knowledge_proposed",
   "employee.knowledge_decided",
   "employee.knowledge_changed",
+  "skill.submitted",
+  "skill.decided",
+  "skill.published",
+  "skill.unpublished",
+  "skill.rolled_back",
 ] as const;
 
 export const SecurityEventTypeSchema = z.enum(SECURITY_EVENT_TYPES);

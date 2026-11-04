@@ -2322,6 +2322,10 @@ msgstr "Could not play a test clip"
 msgid "Could not preview plugin"
 msgstr "Could not preview plugin"
 
+#: src/components/teach/SkillDraftCard.tsx
+msgid "Could not publish skill"
+msgstr "Could not publish skill"
+
 #: src/lib/model-connection-preflight.ts
 msgid "Could not reach the model server."
 msgstr "Could not reach the model server."
@@ -5399,6 +5403,7 @@ msgstr "Provider"
 msgid "Providers"
 msgstr "Providers"
 
+#: src/components/teach/SkillDraftCard.tsx
 #: src/pages/shell/share-employee-dialog.tsx
 msgid "Publish"
 msgstr "Publish"
@@ -6724,6 +6729,10 @@ msgstr "Submit"
 #: src/pages/PluginsOverlay.tsx
 msgid "Submit a plugin"
 msgstr "Submit a plugin"
+
+#: src/components/teach/SkillDraftCard.tsx
+msgid "Submitted"
+msgstr "Submitted"
 
 #: src/components/ModelCredits.tsx
 #: src/pages/Paywall.tsx

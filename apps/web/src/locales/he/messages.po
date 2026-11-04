@@ -2322,6 +2322,10 @@ msgstr "לא ניתן להשמיע קטע בדיקה"
 msgid "Could not preview plugin"
 msgstr ""
 
+#: src/components/teach/SkillDraftCard.tsx
+msgid "Could not publish skill"
+msgstr "לא ניתן לפרסם את המיומנות"
+
 #: src/lib/model-connection-preflight.ts
 msgid "Could not reach the model server."
 msgstr "אין גישה לשרת המודל."
@@ -5399,9 +5403,10 @@ msgstr "ספק"
 msgid "Providers"
 msgstr "ספקים"
 
+#: src/components/teach/SkillDraftCard.tsx
 #: src/pages/shell/share-employee-dialog.tsx
 msgid "Publish"
-msgstr ""
+msgstr "פרסם"
 
 #: src/components/CloudAgentCard.tsx
 msgid "Pull request"
@@ -6724,6 +6729,10 @@ msgstr "שליחה"
 #: src/pages/PluginsOverlay.tsx
 msgid "Submit a plugin"
 msgstr ""
+
+#: src/components/teach/SkillDraftCard.tsx
+msgid "Submitted"
+msgstr "הוגש"
 
 #: src/components/ModelCredits.tsx
 #: src/pages/Paywall.tsx

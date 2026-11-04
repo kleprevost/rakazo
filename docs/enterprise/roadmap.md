@@ -60,7 +60,7 @@ are denied; a revoked grant blocks the next call; a fleet operator cannot revoke
    failed, missed. Unchanged checks stay quiet; a source outage differs from a clean check.
 4. **Reviewable shared knowledge.** Source-linked memory proposals with accept (undo) / reject
    (stays dismissed), published to a shared employee; source conversation stays private.
-5. **Publish a taught skill to a pilot group.** Reviewable diff, pinned version, fresh-input test,
+5. **Publish a taught skill to a pilot group** ([design](./features/skill-publishing.md)). Reviewable diff, pinned version, fresh-input test,
    pilot access, rollback. Publishing grants no tool access.
 6. **Primary assistant with visible handoffs.** A nominated bot delegates linked child
    assignments (owner, scoped brief, return destination); each child runs under its own

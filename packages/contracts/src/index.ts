@@ -50,6 +50,7 @@ export * from "./search.js";
 export * from "./security-events.js";
 export * from "./server-headers.js";
 export * from "./settings-scope.js";
+export * from "./skill-publishing.js";
 export * from "./terminal.js";
 export * from "./today.js";
 export * from "./user-devices.js";

@@ -2322,6 +2322,10 @@ msgstr "テスト音声を再生できませんでした"
 msgid "Could not preview plugin"
 msgstr ""
 
+#: src/components/teach/SkillDraftCard.tsx
+msgid "Could not publish skill"
+msgstr "スキルを公開できませんでした"
+
 #: src/lib/model-connection-preflight.ts
 msgid "Could not reach the model server."
 msgstr "モデルサーバーに接続できませんでした。"
@@ -5399,9 +5403,10 @@ msgstr "プロバイダー"
 msgid "Providers"
 msgstr "プロバイダー"
 
+#: src/components/teach/SkillDraftCard.tsx
 #: src/pages/shell/share-employee-dialog.tsx
 msgid "Publish"
-msgstr ""
+msgstr "公開"
 
 #: src/components/CloudAgentCard.tsx
 msgid "Pull request"
@@ -6724,6 +6729,10 @@ msgstr "送信"
 #: src/pages/PluginsOverlay.tsx
 msgid "Submit a plugin"
 msgstr ""
+
+#: src/components/teach/SkillDraftCard.tsx
+msgid "Submitted"
+msgstr "送信済み"
 
 #: src/components/ModelCredits.tsx
 #: src/pages/Paywall.tsx

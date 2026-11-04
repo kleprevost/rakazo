@@ -2322,6 +2322,10 @@ msgstr "无法播放测试片段"
 msgid "Could not preview plugin"
 msgstr "无法预览插件"
 
+#: src/components/teach/SkillDraftCard.tsx
+msgid "Could not publish skill"
+msgstr "无法发布技能"
+
 #: src/lib/model-connection-preflight.ts
 msgid "Could not reach the model server."
 msgstr "无法连接到模型服务器。"
@@ -5399,9 +5403,10 @@ msgstr "提供方"
 msgid "Providers"
 msgstr "提供方"
 
+#: src/components/teach/SkillDraftCard.tsx
 #: src/pages/shell/share-employee-dialog.tsx
 msgid "Publish"
-msgstr ""
+msgstr "发布"
 
 #: src/components/CloudAgentCard.tsx
 msgid "Pull request"
@@ -6724,6 +6729,10 @@ msgstr "提交"
 #: src/pages/PluginsOverlay.tsx
 msgid "Submit a plugin"
 msgstr "提交插件"
+
+#: src/components/teach/SkillDraftCard.tsx
+msgid "Submitted"
+msgstr "已提交"
 
 #: src/components/ModelCredits.tsx
 #: src/pages/Paywall.tsx

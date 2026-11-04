@@ -193,6 +193,7 @@ import {
 import { SearchQueryOutputSchema } from "./search.js";
 import { SecurityEventListInputSchema, SecurityEventSchema } from "./security-events.js";
 import { SettingsScopeSchema, SpaceSettingSchema, settingsScopeInput } from "./settings-scope.js";
+import { skillPublishingContract } from "./skill-publishing.js";
 import { TodaySummarySchema } from "./today.js";
 
 const botId = z.object({ botId: Id });
@@ -292,6 +293,7 @@ const spaceName = z.string().trim().min(1).max(60);
 export const appContract = {
   admin: adminContract,
   employees: employeesContract,
+  skillPublishing: skillPublishingContract,
   capabilityGrants: capabilityGrantsContract,
   analytics: { screen: oc.input(AnalyticsScreenInput).output(z.object({ ok: z.literal(true) })) },
   aiConsent: {

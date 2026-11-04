@@ -2322,6 +2322,10 @@ msgstr "샘플 음성을 재생하지 못했습니다."
 msgid "Could not preview plugin"
 msgstr ""
 
+#: src/components/teach/SkillDraftCard.tsx
+msgid "Could not publish skill"
+msgstr "스킬을 게시하지 못했습니다"
+
 #: src/lib/model-connection-preflight.ts
 msgid "Could not reach the model server."
 msgstr "모델 서버에 연결하지 못했습니다."
@@ -5399,9 +5403,10 @@ msgstr "서비스"
 msgid "Providers"
 msgstr "서비스"
 
+#: src/components/teach/SkillDraftCard.tsx
 #: src/pages/shell/share-employee-dialog.tsx
 msgid "Publish"
-msgstr ""
+msgstr "게시"
 
 #: src/components/CloudAgentCard.tsx
 msgid "Pull request"
@@ -6724,6 +6729,10 @@ msgstr "확인"
 #: src/pages/PluginsOverlay.tsx
 msgid "Submit a plugin"
 msgstr ""
+
+#: src/components/teach/SkillDraftCard.tsx
+msgid "Submitted"
+msgstr "제출됨"
 
 #: src/components/ModelCredits.tsx
 #: src/pages/Paywall.tsx

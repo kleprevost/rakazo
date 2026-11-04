@@ -137,6 +137,7 @@ import {
   policyDenied,
 } from "./policy-capabilities.js";
 import { policyOfferedTools } from "./policy-tools.js";
+import { loadPublishedSkills } from "./published-skills.js";
 import { loadPurchaseRedactions } from "./purchase-service.js";
 import { loadReplyContext, messageToAgentHistoryText } from "./reply-context.js";
 import { backOffRoutineAfterAccountError } from "./routine-backoff.js";
@@ -1519,9 +1520,23 @@ export function createRunExecutor(executorDeps: ExecutorDeps) {
           connectedPlugins.length > 0
             ? `Connected plugins: ${connectedPlugins.map((row) => `${row.displayName} (${row.connectorId}:${row.provider})`).join(", ")}. Prefer those plugin tools over the computer browser or web search when reading app data (repos, releases, mail, calendar, and similar).`
             : "No plugins are connected yet.";
-        const runSavedSkills = nonOwnerChatRun ? [] : savedSkills;
+        // Skills published to this person come with the same invocation as ones they saved. They
+        // add instructions only: the run keeps the runner's own connections and grants.
+        const publishedSkills = nonOwnerChatRun
+          ? []
+          : await loadPublishedSkills(
+              deps.prisma,
+              run.userId,
+              new Set(
+                savedSkills.map((skill) => (skill.name || skill.goal.slice(0, 80)).toLowerCase()),
+              ),
+            );
+        const runSavedSkills = nonOwnerChatRun ? [] : [...savedSkills, ...publishedSkills];
         const runAgentSkills = nonOwnerChatRun ? builtinAgentSkillRecords() : agentSkills;
-        const taughtSkillIndex = runSavedSkills.slice(0, 20);
+        const taughtSkillIndex = [
+          ...(nonOwnerChatRun ? [] : savedSkills.slice(0, 20)),
+          ...publishedSkills,
+        ];
         const taughtSkillsLine =
           taughtSkillIndex.length > 0
             ? `Saved taught skills:\n${taughtSkillIndex

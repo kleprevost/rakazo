@@ -56,6 +56,7 @@ import { pagesRoutes } from "./routes/pages.js";
 import { paymentWalletRoutes } from "./routes/payment-wallet.js";
 import { roleTemplatesRoutes } from "./routes/role-templates.js";
 import { routinesRoutes } from "./routes/routines.js";
+import { skillPublishingRoutes } from "./routes/skill-publishing.js";
 import { spacesRoutes } from "./routes/spaces.js";
 import { threadsRoutes } from "./routes/threads.js";
 import { todayRoutes } from "./routes/today.js";
@@ -171,6 +172,7 @@ export function createRouter(deps: RouterDeps) {
     ...accountRoutes(ctx),
     ...adminRoutes(ctx),
     ...employeesRoutes(ctx),
+    ...skillPublishingRoutes(ctx),
     ...capabilityGrantsRoutes(ctx),
     ...spacesRoutes(ctx),
     ...modelsRoutes(ctx),

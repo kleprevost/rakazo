@@ -49,6 +49,7 @@ export function SkillDraftCard({
   const [savedFields, setSavedFields] = useState(savedSnapshot(block));
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [submitted, setSubmitted] = useState(false);
   const saved = savedFields === JSON.stringify({ name, playbook });
 
   // The fields last loaded from the server, and whether this card has written since. A later
@@ -76,6 +77,7 @@ export function SkillDraftCard({
     try {
       await rpc.skills.updateDraft({ skillId: block.skillId, name, playbook });
       synced.current.wrote = true;
+      setSubmitted(false);
       // A saved skill stays saved with the fields just written.
       if (savedFields !== null) setSavedFields(sent);
       await then(sent);
@@ -94,6 +96,19 @@ export function SkillDraftCard({
       await rpc.skills.save({ skillId: block.skillId, name });
       setSavedFields(sent);
     }, t`Could not save skill`);
+
+  // Only the saved text can be offered, and a later edit makes the next offer a new version.
+  const submitForReview = async () => {
+    setBusy(true);
+    setError(null);
+    try {
+      await rpc.skillPublishing.submit({ skillId: block.skillId });
+      setSubmitted(true);
+    } catch (err) {
+      setError(errorText(err, t`Could not publish skill`));
+    }
+    setBusy(false);
+  };
 
   const testDraft = () => persist(() => rpc.skills.testRun({ skillId: block.skillId }));
 
@@ -192,6 +207,15 @@ export function SkillDraftCard({
         >
           <Trans>Add to routine</Trans>
         </Button>
+        {saved ? (
+          <Button
+            variant="outline"
+            disabled={busy || submitted}
+            onClick={() => void submitForReview()}
+          >
+            {submitted ? <Trans>Submitted</Trans> : <Trans>Publish</Trans>}
+          </Button>
+        ) : null}
       </div>
       {error ? <p className="mt-2 text-xs text-destructive">{error}</p> : null}
     </BuiCard>
