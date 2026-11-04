@@ -22,12 +22,9 @@ const api = vi.hoisted(() => ({
   policy: vi.fn(),
   audit: vi.fn(),
   endSessions: vi.fn(),
-<<<<<<< HEAD
   revokeCredentials: vi.fn(),
-=======
   deprovision: vi.fn(),
   reactivate: vi.fn(),
->>>>>>> origin/main
   suspend: vi.fn(),
   resume: vi.fn(),
   quarantines: vi.fn(),
@@ -47,16 +44,12 @@ const api = vi.hoisted(() => ({
 vi.mock("../../lib/rpc", () => ({
   rpc: {
     admin: {
-<<<<<<< HEAD
-      users: { endSessions: api.endSessions },
       credentials: { revoke: api.revokeCredentials },
-=======
       users: {
         endSessions: api.endSessions,
         deprovision: api.deprovision,
         reactivate: api.reactivate,
       },
->>>>>>> origin/main
       bots: { suspend: api.suspend, resume: api.resume },
       quarantine: { start: api.quarantineStart, lift: api.quarantineLift },
       computers: {
@@ -391,7 +384,7 @@ it("deactivates after a confirming click and offers to reactivate a deactivated 
   const rows = host.querySelectorAll('[data-testid="admin-users"] tbody tr');
   const labels = (row?: Element) =>
     [...(row?.querySelectorAll("button") ?? [])].map((b) => b.textContent);
-  expect(labels(rows[0])).toEqual(["End sessions", "Deactivate"]);
+  expect(labels(rows[0])).toEqual(["End sessions", "Revoke credentials", "Deactivate"]);
   expect(rows[1]?.textContent).toContain("Deactivated");
   expect(labels(rows[1])).toEqual(["Reactivate"]);
 

@@ -90,28 +90,9 @@ function UserRow({
 }) {
   const { t } = useLingui();
   const { can } = useAdminRoles();
-<<<<<<< HEAD
-  const [confirming, setConfirming] = useState(false);
-  const [confirmingCredentials, setConfirmingCredentials] = useState(false);
-  const [busy, setBusy] = useState(false);
-  async function revokeCredentials() {
-    setBusy(true);
-    try {
-      await rpc.admin.credentials.revoke({ userId: user.id });
-      toast.success(t`Credentials revoked`);
-    } catch (error) {
-      toast.error(errorText(error, t`Could not revoke credentials`));
-    } finally {
-      setBusy(false);
-      setConfirmingCredentials(false);
-    }
-  }
-  async function endSessions() {
-=======
-  const [confirming, setConfirming] = useState<"end" | "deactivate" | null>(null);
+  const [confirming, setConfirming] = useState<"end" | "credentials" | "deactivate" | null>(null);
   const [busy, setBusy] = useState(false);
   async function run(action: () => Promise<unknown>, done?: string, failed?: string) {
->>>>>>> origin/main
     setBusy(true);
     try {
       await action();
@@ -125,7 +106,7 @@ function UserRow({
     }
   }
   const confirmable = (
-    kind: "end" | "deactivate",
+    kind: "end" | "credentials" | "deactivate",
     label: string,
     action: () => Promise<unknown>,
     done?: string,
@@ -164,31 +145,6 @@ function UserRow({
         {user.lastSignInAt ? formatWhen(user.lastSignInAt, locale) : null}
       </TableCell>
       <TableCell className="text-end">
-<<<<<<< HEAD
-        {user.isSelf || !can("security") ? null : (
-          <div className="flex justify-end gap-1">
-            <Button
-              variant={confirming ? "destructive" : "ghost"}
-              size="sm"
-              disabled={busy}
-              onClick={() => (confirming ? void endSessions() : setConfirming(true))}
-              onBlur={() => setConfirming(false)}
-            >
-              {confirming ? <Trans>Confirm</Trans> : <Trans>End sessions</Trans>}
-            </Button>
-            <Button
-              variant={confirmingCredentials ? "destructive" : "ghost"}
-              size="sm"
-              disabled={busy}
-              onClick={() =>
-                confirmingCredentials ? void revokeCredentials() : setConfirmingCredentials(true)
-              }
-              onBlur={() => setConfirmingCredentials(false)}
-            >
-              {confirmingCredentials ? <Trans>Confirm</Trans> : <Trans>Revoke credentials</Trans>}
-            </Button>
-          </div>
-=======
         {user.isSelf || !can("security") ? null : user.deprovisionedAt ? (
           <Button
             variant="ghost"
@@ -207,11 +163,17 @@ function UserRow({
               t`Sessions ended`,
               t`Could not end sessions`,
             )}
+            {confirmable(
+              "credentials",
+              t`Revoke credentials`,
+              () => rpc.admin.credentials.revoke({ userId: user.id }),
+              t`Credentials revoked`,
+              t`Could not revoke credentials`,
+            )}
             {confirmable("deactivate", t`Deactivate`, () =>
               rpc.admin.users.deprovision({ userId: user.id }),
             )}
           </>
->>>>>>> origin/main
         )}
       </TableCell>
     </TableRow>
