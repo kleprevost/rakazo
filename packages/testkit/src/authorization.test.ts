@@ -583,6 +583,9 @@ describeWithDatabase("API authorization and resource isolation", () => {
       ["capabilityGrants/set", { botId: "missing-bot", scope: "calendar.read" }],
       ["capabilityGrants/revoke", { id: "missing-grant" }],
       ["capabilityGrants/setMode", { botId: "missing-bot", mode: "shadow" }],
+      ["capabilityGrants/simulate", { botId: "missing-bot", scope: "calendar.read" }],
+      ["capabilityGrants/shadowSummary", { botId: "missing-bot" }],
+      ["admin/capabilities/list"],
       ["roleTemplates/list"],
       ["roleTemplates/hire"],
       ["today/summary"],
@@ -2506,6 +2509,7 @@ describeWithDatabase("API authorization and resource isolation", () => {
       ],
       ["admin/policy", {}, ["security", "fleet", "auditor"]],
       ["admin/audit", {}, ["security", "auditor"]],
+      ["admin/capabilities/list", {}, ["security", "auditor"]],
       ["capabilityGrants/setMode", { botId: "missing-bot", mode: "shadow" }, ["security"]],
       ["capabilityGrants/list", { employeeId: "missing-employee" }, ["security", "auditor"]],
       ["marketplace/submissions", {}, []],
@@ -2542,6 +2546,7 @@ describeWithDatabase("API authorization and resource isolation", () => {
         "admin/users/list",
         "admin/bots/list",
         "admin/quarantine/list",
+        "admin/capabilities/list",
         "admin/computers/list",
       ])
         await expectForbidden(app, cookie, path, {});

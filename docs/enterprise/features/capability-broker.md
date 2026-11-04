@@ -572,7 +572,7 @@ whether E3 reads strictly per call or from a sub-second per-run cache (draft: pe
 
 ## Status
 Build-plan PR 1 (live suspend check at `dispatchTool`, `BrokeredConnector`), PR 2 (quarantine), PR 3
-(evaluator), PR 4 (grants store and shadow mode) and PR 5 (enforce mode) are implemented; PR 3 to PR 5 are below.
+(evaluator), PR 4 (grants store and shadow mode), PR 5 (enforce mode) and PR 6 (owner and admin surfaces) are implemented; PR 3 to PR 6 are below.
 
 PR 2, quarantine (`apps/api/src/bot-quarantine.ts`, migration `20261127120000_quarantines`).
 Choices the design left open:
@@ -685,3 +685,31 @@ Choices the design left open:
   `dispatchTool` covers it).
 - Rollout note: a policy with `requireGrants` denies every non-empty-scope call that has no grant, so
   grant first in `shadow`, read the `capability.shadow` events, then enable `enforce`.
+
+PR 6, owner and admin surfaces (no migration; `apps/api/src/capability-insight.ts`,
+`apps/web/src/components/capabilities/`, `apps/web/src/pages/admin/AdminCapabilitiesPage.tsx`).
+Choices the design left open:
+- The broker is "on" for a bot when its mode is set or policy has `requireGrants` (`capabilityGrants.list`
+  returns `active`); for the deployment when policy has a `capabilities` section (even an empty one) or any bot has a
+  mode (`admin.overview.capabilityBroker`). Everything below is absent otherwise: the owner's Access section,
+  and the admin Capabilities tab. A deployment with neither has no UI entry point; its first mode is set through
+  `capabilityGrants.setMode`, or by adding `capabilities: {}` to policy.
+- Owner, in the bot's Advanced settings: an Access section listing the bot's grants (scope, expiry, Revoke) and a
+  picker of the scopes the owner may grant, with an expiry (1, 7, 30 days, never). `list` returns `grantable`: concrete
+  scopes inside the ceiling that the viewer may allow (read scopes and `ownerGrantable` for an owner, any for
+  an admin). There is no "request" flow: a scope that needs an administrator is not offered, and `set` still refuses
+  it. Owners do not set the mode (PR 4: admins only), so the section shows none.
+- Admin (security writes, auditor reads): `/admin/capabilities` lists bots with mode, live grant count and the calls
+  shadow recorded as denied in seven days (`admin.capabilities.list`). A row opens the bot's mode switch
+  (off, shadow, enforce), the shadow summary ("N calls would have been denied", with the scopes behind them,
+  from `capability.shadow` events: `capabilityGrants.shadowSummary`), its grants with Revoke and an add picker,
+  and the simulator.
+- Simulator `capabilityGrants.simulate` (bot's owner, security, auditor): a tool name (built in, or with a server name
+  as an MCP tool) with optional plain arguments, or a scope. It runs the same `evaluateBotCall` the gate uses over
+  live grants, quarantine and policy, as the bot's owner, and returns outcome, deciding rule, scopes, classifier basis
+  and the trace; `enforced` says whether the bot is refused or only recorded. It runs nothing and writes no
+  audit event, and the arguments are not echoed.
+- Not done: managed-connector calls in the simulator (only built-in and MCP-style names), the smallest-change hint
+  for a deny, the Mappings and Quarantine tabs, the simulator's approval layer (still outside the snapshot), and a
+  mobile surface (mobile has no admin surface; the owner's Access section is web and desktop, and enforcement
+  applies to mobile chats as everywhere).
