@@ -12,7 +12,11 @@ import type { ComputerMode, MessageBlock } from "@rakazo/contracts";
 import { createStreamingRedactor } from "@rakazo/core";
 import { toolEffectIdempotencyKey } from "@rakazo/core/node/approval-effect-key";
 import type { Bot, Computer, effectiveMemoryScope, Run, Task, Thread } from "@rakazo/db";
-import { dropRunTurnCheckpoint, saveRunTurnCheckpoint } from "@rakazo/db";
+import {
+  dropRunTurnCheckpoint,
+  INTRO_ANSWERED_ATTEMPT_STATUS,
+  saveRunTurnCheckpoint,
+} from "@rakazo/db";
 import { getLogger } from "@rakazo/logging";
 import type {
   ApprovalPausedToolResult,
@@ -368,7 +372,7 @@ export async function isRunTainted(ctx: RunContext) {
   const { state } = ctx;
   if (state.tainted) return true;
   state.earlierAttempt ??= ctx.deps.prisma.attempt
-    .count({ where: { runId: ctx.runId } })
+    .count({ where: { runId: ctx.runId, status: { not: INTRO_ANSWERED_ATTEMPT_STATUS } } })
     .then((count) => count > 1);
   if ((await state.earlierAttempt) || (await ctx.trust.receivedOutsideMessage()))
     state.tainted = true;
