@@ -194,6 +194,32 @@ export async function recordDirectoryClaims(
   return result;
 }
 
+/**
+ * Called when the verified claim could not be recorded. The stored values may be out of date
+ * (the person may have left a group), so they are replaced by "truncated, none": claim grants
+ * confer nothing until the next successful sign-in or revalidation records the real claim.
+ */
+export async function markDirectoryClaimsStale(
+  db: Db,
+  userId: string,
+  options: { now?: Date; via?: string } = {},
+): Promise<ReconcileResult> {
+  const now = options.now ?? new Date();
+  const result = await runAsSystem("mark directory claims stale", () =>
+    db.$transaction(async (tx) => {
+      await lockUsers(tx, [userId]);
+      await tx.userDirectoryClaim.upsert({
+        where: { userId },
+        create: { userId, values: [], truncated: true, refreshedAt: now },
+        update: { values: [], truncated: true, refreshedAt: now },
+      });
+      return reconcileUserIn(tx, userId, now);
+    }),
+  );
+  await recordChange({ userId }, result, options.via ?? "claims_unrecorded");
+  return result;
+}
+
 /** Recomputes every entitlement of one employee after its grants changed. */
 export async function reconcileEmployeeEntitlements(
   db: Db,

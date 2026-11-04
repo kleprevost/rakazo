@@ -2,6 +2,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { PrismaClient } from "./client.js";
 import { createDb } from "./client.js";
 import {
+  markDirectoryClaimsStale,
   reconcileEmployeeEntitlements,
   reconcileUserEntitlements,
   recordDirectoryClaims,
@@ -246,6 +247,33 @@ describePostgres("employee entitlement reconcile (PostgreSQL)", () => {
       updated: 0,
       removed: 0,
     });
+  });
+
+  it("stops trusting stored claims when a new claim could not be recorded", async () => {
+    const carolRows = async () =>
+      (await entitlements()).filter((row) => row.startsWith(user("carol")));
+    await grant(employeeId, "claim", "group-stale", "collaborator");
+    await grant(employeeId, "user", user("carol"), "viewer");
+    await recordDirectoryClaims(db, user("carol"), { values: ["group-stale"] });
+    expect(await carolRows()).toEqual([
+      `${user("carol")}:claim:collaborator`,
+      `${user("carol")}:grant:viewer`,
+    ]);
+
+    // The write of the user's newer claim failed: the old group must stop conferring access.
+    const stale = await markDirectoryClaimsStale(db, user("carol"));
+    expect(stale.removed).toBe(1);
+    expect(await carolRows()).toEqual([`${user("carol")}:grant:viewer`]);
+    expect(
+      await sys.userDirectoryClaim.findUnique({ where: { userId: user("carol") } }),
+    ).toMatchObject({
+      values: [],
+      truncated: true,
+    });
+
+    // The next successful sign-in restores the real claim.
+    await recordDirectoryClaims(db, user("carol"), { values: ["group-stale"] });
+    expect(await entitlements()).toContain(`${user("carol")}:claim:collaborator`);
   });
 
   it("still limits tenant reads to the user's own rows and refuses tenant writes", async () => {

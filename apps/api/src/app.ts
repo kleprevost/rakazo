@@ -126,6 +126,7 @@ import {
   IsolationError,
   installAuditEventStore,
   installSecurityEventStore,
+  markDirectoryClaimsStale,
   ProviderTransactionBusyError,
   parsePositiveInteger,
   provisionMessagingIdentity,
@@ -576,7 +577,13 @@ async function buildApp(overrides: CreateAppOverrides): Promise<AppHandles> {
     onEmailError,
     onDirectoryClaims: (userId, claims, via) =>
       recordDirectoryClaims(prisma, userId, claims, { via }).then(() => undefined),
-    onDirectoryClaimsError: (error) => getLogger().error("directory claims not recorded", error),
+    onDirectoryClaimsError: async (error, userId) => {
+      getLogger().error("directory claims not recorded", error);
+      // Stored claims may be stale; make them confer nothing rather than keep old group access.
+      await markDirectoryClaimsStale(prisma, userId).catch((inner) =>
+        getLogger().error("directory claims not marked stale", inner),
+      );
+    },
     afterSignIn:
       email && env.welcomeEmailEnabled
         ? (userId, headers) =>
