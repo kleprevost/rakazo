@@ -2405,6 +2405,10 @@ msgstr "לא ניתן לאפס את הסיסמה"
 msgid "Could not revoke connection"
 msgstr "לא ניתן לבטל את החיבור"
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Could not revoke credentials"
+msgstr ""
+
 #: src/pages/AdminAccessPage.tsx
 msgid "Could not revoke grant"
 msgstr ""
@@ -2678,6 +2682,10 @@ msgstr "פרטי הגישה נשמרו"
 #: src/pages/PluginsOverlay.tsx
 msgid "Credentials are encrypted and never sent to the model."
 msgstr "פרטי הגישה מוצפנים ולעולם לא נשלחים למודל."
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Credentials revoked"
+msgstr ""
 
 #: src/pages/shell/import-status.ts
 msgid "Credentials: {names}"
@@ -5934,6 +5942,10 @@ msgstr "ביטול הרשאה"
 #: src/components/capabilities/BotAccess.tsx
 msgid "Revoke {0}"
 msgstr "ביטול {0}"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Revoke credentials"
+msgstr ""
 
 #: src/pages/AdminAccessPage.tsx
 msgid "Revoked"

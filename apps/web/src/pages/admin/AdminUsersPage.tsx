@@ -78,7 +78,20 @@ function UserRow({ user, locale }: { user: AdminUser; locale: string }) {
   const { t } = useLingui();
   const { can } = useAdminRoles();
   const [confirming, setConfirming] = useState(false);
+  const [confirmingCredentials, setConfirmingCredentials] = useState(false);
   const [busy, setBusy] = useState(false);
+  async function revokeCredentials() {
+    setBusy(true);
+    try {
+      await rpc.admin.credentials.revoke({ userId: user.id });
+      toast.success(t`Credentials revoked`);
+    } catch (error) {
+      toast.error(errorText(error, t`Could not revoke credentials`));
+    } finally {
+      setBusy(false);
+      setConfirmingCredentials(false);
+    }
+  }
   async function endSessions() {
     setBusy(true);
     try {
@@ -114,15 +127,28 @@ function UserRow({ user, locale }: { user: AdminUser; locale: string }) {
       </TableCell>
       <TableCell className="text-end">
         {user.isSelf || !can("security") ? null : (
-          <Button
-            variant={confirming ? "destructive" : "ghost"}
-            size="sm"
-            disabled={busy}
-            onClick={() => (confirming ? void endSessions() : setConfirming(true))}
-            onBlur={() => setConfirming(false)}
-          >
-            {confirming ? <Trans>Confirm</Trans> : <Trans>End sessions</Trans>}
-          </Button>
+          <div className="flex justify-end gap-1">
+            <Button
+              variant={confirming ? "destructive" : "ghost"}
+              size="sm"
+              disabled={busy}
+              onClick={() => (confirming ? void endSessions() : setConfirming(true))}
+              onBlur={() => setConfirming(false)}
+            >
+              {confirming ? <Trans>Confirm</Trans> : <Trans>End sessions</Trans>}
+            </Button>
+            <Button
+              variant={confirmingCredentials ? "destructive" : "ghost"}
+              size="sm"
+              disabled={busy}
+              onClick={() =>
+                confirmingCredentials ? void revokeCredentials() : setConfirmingCredentials(true)
+              }
+              onBlur={() => setConfirmingCredentials(false)}
+            >
+              {confirmingCredentials ? <Trans>Confirm</Trans> : <Trans>Revoke credentials</Trans>}
+            </Button>
+          </div>
         )}
       </TableCell>
     </TableRow>

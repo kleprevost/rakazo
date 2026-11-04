@@ -2405,6 +2405,10 @@ msgstr "비밀번호를 재설정할 수 없습니다"
 msgid "Could not revoke connection"
 msgstr "연결을 해제하지 못했습니다."
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Could not revoke credentials"
+msgstr ""
+
 #: src/pages/AdminAccessPage.tsx
 msgid "Could not revoke grant"
 msgstr ""
@@ -2678,6 +2682,10 @@ msgstr "인증 정보 저장됨"
 #: src/pages/PluginsOverlay.tsx
 msgid "Credentials are encrypted and never sent to the model."
 msgstr "인증 정보는 암호화되며 모델에 전송되지 않습니다."
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Credentials revoked"
+msgstr ""
 
 #: src/pages/shell/import-status.ts
 msgid "Credentials: {names}"
@@ -5934,6 +5942,10 @@ msgstr "연결 해제"
 #: src/components/capabilities/BotAccess.tsx
 msgid "Revoke {0}"
 msgstr "{0} 취소"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Revoke credentials"
+msgstr ""
 
 #: src/pages/AdminAccessPage.tsx
 msgid "Revoked"

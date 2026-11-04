@@ -22,6 +22,7 @@ const api = vi.hoisted(() => ({
   policy: vi.fn(),
   audit: vi.fn(),
   endSessions: vi.fn(),
+  revokeCredentials: vi.fn(),
   suspend: vi.fn(),
   resume: vi.fn(),
   quarantines: vi.fn(),
@@ -42,6 +43,7 @@ vi.mock("../../lib/rpc", () => ({
   rpc: {
     admin: {
       users: { endSessions: api.endSessions },
+      credentials: { revoke: api.revokeCredentials },
       bots: { suspend: api.suspend, resume: api.resume },
       quarantine: { start: api.quarantineStart, lift: api.quarantineLift },
       computers: {
@@ -246,11 +248,13 @@ it("hides the end-sessions action from an auditor but not from security", async 
   const auditor = await show(<AdminUsersPage />);
   expect(auditor.host.textContent).toContain("sam@example.test");
   expect(auditor.host.textContent).not.toContain("End sessions");
+  expect(auditor.host.textContent).not.toContain("Revoke credentials");
 
   document.body.innerHTML = "";
   api.me.mockResolvedValue({ isAdmin: false, adminRoles: ["security"] });
   const security = await show(<AdminUsersPage />);
   expect(security.host.textContent).toContain("End sessions");
+  expect(security.host.textContent).toContain("Revoke credentials");
 });
 
 it("shows the overview: loading, error with retry, and populated", async () => {
@@ -336,6 +340,16 @@ it("shows the users page: empty, error, and populated with the end-sessions acti
   await act(async () => button.click());
   expect(api.endSessions).toHaveBeenCalledWith({ userId: "u2" });
   expect(api.toastSuccess).toHaveBeenCalledWith("Sessions ended");
+
+  // Revoking credentials asks for confirmation the same way.
+  api.revokeCredentials.mockResolvedValue({});
+  const revoke = rows[1]?.querySelectorAll("button")[1] as HTMLButtonElement;
+  expect(revoke.textContent).toBe("Revoke credentials");
+  await act(async () => revoke.click());
+  expect(api.revokeCredentials).not.toHaveBeenCalled();
+  await act(async () => revoke.click());
+  expect(api.revokeCredentials).toHaveBeenCalledWith({ userId: "u2" });
+  expect(api.toastSuccess).toHaveBeenCalledWith("Credentials revoked");
 });
 
 it("pages users with Load more", async () => {

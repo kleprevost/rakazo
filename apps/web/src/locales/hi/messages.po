@@ -2405,6 +2405,10 @@ msgstr "पासवर्ड रीसेट नहीं किया जा �
 msgid "Could not revoke connection"
 msgstr "कनेक्शन रद्द नहीं किया जा सका"
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Could not revoke credentials"
+msgstr ""
+
 #: src/pages/AdminAccessPage.tsx
 msgid "Could not revoke grant"
 msgstr ""
@@ -2678,6 +2682,10 @@ msgstr "क्रेडेंशियल सहेजा गया"
 #: src/pages/PluginsOverlay.tsx
 msgid "Credentials are encrypted and never sent to the model."
 msgstr "क्रेडेंशियल एन्क्रिप्टेड होते हैं और मॉडल को कभी नहीं भेजे जाते।"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Credentials revoked"
+msgstr ""
 
 #: src/pages/shell/import-status.ts
 msgid "Credentials: {names}"
@@ -5934,6 +5942,10 @@ msgstr ""
 #: src/components/capabilities/BotAccess.tsx
 msgid "Revoke {0}"
 msgstr "{0} रद्द करें"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Revoke credentials"
+msgstr ""
 
 #: src/pages/AdminAccessPage.tsx
 msgid "Revoked"

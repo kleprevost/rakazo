@@ -2405,6 +2405,10 @@ msgstr "无法重置密码"
 msgid "Could not revoke connection"
 msgstr "无法撤销连接"
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Could not revoke credentials"
+msgstr ""
+
 #: src/pages/AdminAccessPage.tsx
 msgid "Could not revoke grant"
 msgstr ""
@@ -2678,6 +2682,10 @@ msgstr "凭据已保存"
 #: src/pages/PluginsOverlay.tsx
 msgid "Credentials are encrypted and never sent to the model."
 msgstr "凭据已加密，不会发送给模型。"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Credentials revoked"
+msgstr ""
 
 #: src/pages/shell/import-status.ts
 msgid "Credentials: {names}"
@@ -5934,6 +5942,10 @@ msgstr "撤销"
 #: src/components/capabilities/BotAccess.tsx
 msgid "Revoke {0}"
 msgstr "撤销 {0}"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Revoke credentials"
+msgstr ""
 
 #: src/pages/AdminAccessPage.tsx
 msgid "Revoked"

@@ -2405,6 +2405,10 @@ msgstr "No se pudo restablecer la contraseña"
 msgid "Could not revoke connection"
 msgstr "No se pudo revocar la conexión"
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Could not revoke credentials"
+msgstr ""
+
 #: src/pages/AdminAccessPage.tsx
 msgid "Could not revoke grant"
 msgstr ""
@@ -2678,6 +2682,10 @@ msgstr "Credencial guardada"
 #: src/pages/PluginsOverlay.tsx
 msgid "Credentials are encrypted and never sent to the model."
 msgstr "Las credenciales se cifran y nunca se envían al modelo."
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Credentials revoked"
+msgstr ""
 
 #: src/pages/shell/import-status.ts
 msgid "Credentials: {names}"
@@ -5934,6 +5942,10 @@ msgstr "Revocar"
 #: src/components/capabilities/BotAccess.tsx
 msgid "Revoke {0}"
 msgstr "Revocar {0}"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Revoke credentials"
+msgstr ""
 
 #: src/pages/AdminAccessPage.tsx
 msgid "Revoked"
