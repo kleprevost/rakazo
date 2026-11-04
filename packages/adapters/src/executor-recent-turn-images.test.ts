@@ -3,6 +3,7 @@ import type { MessageBlock } from "@rakazo/contracts";
 import { describe, expect, it, vi } from "vitest";
 import type * as ComputerLifecycleModule from "./computer-lifecycle.js";
 import { createRunExecutor } from "./executor.js";
+import { withRunGates } from "./testing/run-gates.js";
 
 const lifecycleMocks = vi.hoisted(() => ({
   renewComputerExecutionLease: vi.fn(async () => true),
@@ -303,7 +304,7 @@ async function runWithModel(
     await hooks.notificationGate.release.promise;
   });
   const executor = createRunExecutor({
-    prisma,
+    prisma: withRunGates(prisma),
     deploymentModelKey: "fake-deployment-key",
     runtime: { describe: () => ({ capabilities: { scripted } }), run: runtimeRun },
     sandbox: {
