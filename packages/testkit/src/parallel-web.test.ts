@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type * as ComputerLifecycle from "../../adapters/src/computer-lifecycle.js";
 import { parallelMcpFixture } from "../../adapters/src/parallel-web.test-support.js";
 import { resolveRuntimeModel } from "../../adapters/src/pi-runtime-models.js";
+import { withRunGates } from "../../adapters/src/testing/run-gates.js";
 import { startModelEmulator } from "./model-emulator.js";
 
 vi.mock("../../adapters/src/computer-lifecycle.js", async (original) => ({
@@ -36,7 +37,7 @@ function executorFixture(
     trigger: "user",
     leaseFence: 0,
   };
-  const prisma = {
+  const prisma = withRunGates({
     user: { findUnique: vi.fn<() => Promise<{ timezone: string } | null>>(async () => null) },
     run: {
       findUnique: async () => run,
@@ -92,7 +93,7 @@ function executorFixture(
     usageRecord: { createMany: async () => ({ count: 1 }) },
     modelCreditEntry: { findUnique: async () => null },
     $transaction: async (work: (tx: unknown) => Promise<unknown>) => work(prisma),
-  };
+  });
   const finalizeRun = vi.fn(async () => ({ continuationRunId: null }));
   vi.stubEnv("WEB_PROVIDER", "parallel");
   vi.stubEnv("OPENROUTER_API_KEY", "fixture-openrouter-key");
