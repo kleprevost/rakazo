@@ -531,6 +531,7 @@ msgstr "Acties voor {0}"
 msgid "Actions for space"
 msgstr "Acties voor space"
 
+#: src/components/assignments/AssignmentsList.tsx
 #: src/pages/BillingSettingsPanel.tsx
 #: src/pages/RoutineEditor.tsx
 msgid "Active"
@@ -979,6 +980,7 @@ msgstr ""
 msgid "Apps"
 msgstr ""
 
+#: src/pages/Assignment.tsx
 #: src/pages/BotContextMenu.tsx
 msgid "Archive"
 msgstr "Archiveren"
@@ -987,7 +989,9 @@ msgstr "Archiveren"
 msgid "archived"
 msgstr "gearchiveerd"
 
+#: src/components/assignments/AssignmentsList.tsx
 #: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/Assignment.tsx
 #: src/pages/shell/archived-chats.tsx
 msgid "Archived"
 msgstr "Gearchiveerd"
@@ -1330,6 +1334,7 @@ msgstr "Kan afbeeldingen niet lezen"
 #: src/pages/AccountSettingsOverlay.tsx
 #: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/Artifacts.tsx
+#: src/pages/Assignment.tsx
 #: src/pages/KnowledgeSection.tsx
 #: src/pages/McpServersOverlay.tsx
 #: src/pages/model-settings/connection-controls.tsx
@@ -2056,6 +2061,7 @@ msgid "Could not clear conversation"
 msgstr "Gesprek wissen mislukt"
 
 #: src/components/ComputerUpdateProgress.tsx
+#: src/pages/Assignment.tsx
 #: src/pages/Calendar.tsx
 #: src/pages/Employees.tsx
 #: src/pages/Today.tsx
@@ -4450,6 +4456,7 @@ msgstr ""
 msgid "Monthly credits expire at renewal. Top-ups do not expire."
 msgstr ""
 
+#: src/pages/Assignment.tsx
 #: src/pages/PluginsOverlay.tsx
 #: src/pages/shell/message-hover-actions.tsx
 msgid "More"
@@ -5854,6 +5861,7 @@ msgid "Restarts"
 msgstr ""
 
 #: src/components/InstructionSettings.tsx
+#: src/pages/Assignment.tsx
 #: src/pages/shell/archived-chats.tsx
 msgid "Restore"
 msgstr "Herstellen"

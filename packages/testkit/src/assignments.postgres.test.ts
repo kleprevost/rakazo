@@ -385,6 +385,127 @@ describeWithDatabase("independent assignments on one employee", () => {
     await rpc(app, cookie, "threads/stop", { assignmentId: job.id });
   });
 
+  type Row = {
+    id: string;
+    phase: string;
+    cancelledAt: string | null;
+    archivedAt: string | null;
+    runs?: Array<{ id: string; status: string }>;
+    artifacts?: unknown[];
+  };
+  const get = (assignment: Created) =>
+    rpc<Row>(app, cookie, "assignments/get", { assignmentId: assignment.id });
+  const listed = async (state: "active" | "archived") =>
+    (
+      await rpc<{ items: Array<{ id: string }> }>(app, cookie, "assignments/list", {
+        botId,
+        state,
+        limit: 100,
+      })
+    ).items.map((item) => item.id);
+  const live = (assignment: Created) =>
+    statusOf(assignment).then((status) => ACTIVE_RUN_STATUSES.includes(status as never));
+
+  it("cancels one job's live runs and leaves the other job working", async () => {
+    const a = await create(HANG);
+    const b = await create(HANG);
+    await until(async () => (await live(a)) && (await live(b)));
+    const cancelled = await rpc<Row>(app, cookie, "assignments/cancel", { assignmentId: a.id });
+    expect(cancelled.phase).toBe("cancelled");
+    expect(cancelled.cancelledAt).not.toBeNull();
+    await until(async () => (await statusOf(a)) === "cancelled");
+    expect(await live(b)).toBe(true);
+    expect((await get(b)).cancelledAt).toBeNull();
+
+    // Two racing cancels end in one state: the first mark stays.
+    const first = (await get(a)).cancelledAt;
+    await Promise.all([
+      rpc(app, cookie, "assignments/cancel", { assignmentId: a.id }),
+      rpc(app, cookie, "assignments/cancel", { assignmentId: a.id }),
+    ]);
+    expect((await get(a)).cancelledAt).toBe(first);
+    await rpc(app, cookie, "threads/stop", { assignmentId: b.id });
+  });
+
+  it("refuses to archive a job with a live run, then archives and restores it keeping its data", async () => {
+    const job = await create(HANG);
+    await until(() => live(job));
+    const refused = await raw(app, cookie, "assignments/archive", { assignmentId: job.id });
+    expect(refused.status).toBe(409);
+    expect((await get(job)).archivedAt).toBeNull();
+
+    await rpc(app, cookie, "assignments/cancel", { assignmentId: job.id });
+    await until(async () => (await statusOf(job)) === "cancelled");
+    expect(await listed("active")).toContain(job.id);
+
+    const archived = await rpc<Row>(app, cookie, "assignments/archive", { assignmentId: job.id });
+    expect(archived.archivedAt).not.toBeNull();
+    expect(await listed("active")).not.toContain(job.id);
+    expect(await listed("archived")).toContain(job.id);
+    // Transcript, runs and files stay.
+    const kept = await get(job);
+    expect(kept.runs).toHaveLength(1);
+    expect(text(await rpc<Snap>(app, cookie, "threads/get", { assignmentId: job.id }))).toContain(
+      HANG,
+    );
+
+    // Two racing archives end in one state.
+    await Promise.all([
+      rpc(app, cookie, "assignments/archive", { assignmentId: job.id }),
+      rpc(app, cookie, "assignments/archive", { assignmentId: job.id }),
+    ]);
+    expect((await get(job)).archivedAt).toBe(archived.archivedAt);
+
+    const restored = await rpc<Row>(app, cookie, "assignments/unarchive", { assignmentId: job.id });
+    expect(restored.archivedAt).toBeNull();
+    expect(await listed("active")).toContain(job.id);
+  });
+
+  it("resumes a stopped job with a new run in the same thread", async () => {
+    const job = await create(HANG);
+    await until(() => live(job));
+    await rpc(app, cookie, "assignments/cancel", { assignmentId: job.id });
+    await until(async () => (await statusOf(job)) === "cancelled");
+    const before = (await runsOf(job)).map((run) => run.id);
+
+    const sent = await rpc<{ runId: string }>(app, cookie, "threads/send", {
+      assignmentId: job.id,
+      text: "say hello again",
+      clientNonce: `resume-${stamp}`,
+    });
+    expect(before).not.toContain(sent.runId);
+    const row = await db.run.findUniqueOrThrow({ where: { id: sent.runId } });
+    expect(row.threadId).toBe(job.threadId);
+    const resumed = await get(job);
+    expect(resumed.cancelledAt).toBeNull();
+    expect(resumed.runs?.map((run) => run.id)).toEqual(
+      expect.arrayContaining([...before, sent.runId]),
+    );
+    await until(async () => (await statusOf(job)) === "completed");
+
+    // A message to an archived job brings it back.
+    await rpc(app, cookie, "assignments/archive", { assignmentId: job.id });
+    await rpc(app, cookie, "threads/send", {
+      assignmentId: job.id,
+      text: "and once more",
+      clientNonce: `resume2-${stamp}`,
+    });
+    expect((await get(job)).archivedAt).toBeNull();
+    await until(async () => (await statusOf(job)) === "completed");
+  });
+
+  it("refuses to cancel or archive another person's job", async () => {
+    const job = await create("say hello");
+    const other = await signup(app, `assign-cancel-${stamp}@rakazo.test`);
+    for (const action of ["cancel", "archive", "unarchive"]) {
+      const res = await raw(app, other, `assignments/${action}`, { assignmentId: job.id });
+      expect(res.status).toBeGreaterThanOrEqual(400);
+    }
+    const row = await get(job);
+    expect(row.cancelledAt).toBeNull();
+    expect(row.archivedAt).toBeNull();
+  });
+
   it("wakes a ticket's employee in the ticket's own assignment, without the board needing a job first", async () => {
     const ticket = await rpc<{ id: string }>(app, cookie, "tickets/create", {
       title: "Tidy the notes",

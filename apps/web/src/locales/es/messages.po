@@ -531,6 +531,7 @@ msgstr "Acciones para {0}"
 msgid "Actions for space"
 msgstr "Acciones del espacio"
 
+#: src/components/assignments/AssignmentsList.tsx
 #: src/pages/BillingSettingsPanel.tsx
 #: src/pages/RoutineEditor.tsx
 msgid "Active"
@@ -979,6 +980,7 @@ msgstr "Aprobando…"
 msgid "Apps"
 msgstr "Apps"
 
+#: src/pages/Assignment.tsx
 #: src/pages/BotContextMenu.tsx
 msgid "Archive"
 msgstr "Archivar"
@@ -987,7 +989,9 @@ msgstr "Archivar"
 msgid "archived"
 msgstr "archivado"
 
+#: src/components/assignments/AssignmentsList.tsx
 #: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/Assignment.tsx
 #: src/pages/shell/archived-chats.tsx
 msgid "Archived"
 msgstr "Archivado"
@@ -1330,6 +1334,7 @@ msgstr "No puede leer imágenes"
 #: src/pages/AccountSettingsOverlay.tsx
 #: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/Artifacts.tsx
+#: src/pages/Assignment.tsx
 #: src/pages/KnowledgeSection.tsx
 #: src/pages/McpServersOverlay.tsx
 #: src/pages/model-settings/connection-controls.tsx
@@ -2056,6 +2061,7 @@ msgid "Could not clear conversation"
 msgstr "No se pudo borrar la conversación"
 
 #: src/components/ComputerUpdateProgress.tsx
+#: src/pages/Assignment.tsx
 #: src/pages/Calendar.tsx
 #: src/pages/Employees.tsx
 #: src/pages/Today.tsx
@@ -4450,6 +4456,7 @@ msgstr "Créditos mensuales"
 msgid "Monthly credits expire at renewal. Top-ups do not expire."
 msgstr "Los créditos mensuales vencen al renovar. Las recargas no vencen."
 
+#: src/pages/Assignment.tsx
 #: src/pages/PluginsOverlay.tsx
 #: src/pages/shell/message-hover-actions.tsx
 msgid "More"
@@ -5854,6 +5861,7 @@ msgid "Restarts"
 msgstr ""
 
 #: src/components/InstructionSettings.tsx
+#: src/pages/Assignment.tsx
 #: src/pages/shell/archived-chats.tsx
 msgid "Restore"
 msgstr "Restaurar"
