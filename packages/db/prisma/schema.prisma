@@ -1524,6 +1524,14 @@ model ComputerObservation {
   @@map("computer_observations")
 }
 
+/// One row leasing the fleet observer's sweep to a single instance until `claimedUntil`.
+model ComputerObserverLease {
+  id           String   @id
+  claimedUntil DateTime
+
+  @@map("computer_observer_leases")
+}
+
 /// Hosted billing only: a stopped computer whose saved home is due for deletion after its plan
 /// ended or it went unused. `claimId` leases the row to one process while it emails.
 model HomeDeletionNotice {

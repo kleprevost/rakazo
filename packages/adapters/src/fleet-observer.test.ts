@@ -16,10 +16,12 @@ function setup(options: {
   computers?: ReturnType<typeof row>[];
   sandbox?: Record<string, unknown>;
   fleet?: { inspect: boolean };
+  leaseHeld?: boolean;
 }) {
   const upsert = vi.fn(async () => ({}));
   const findMany = vi.fn(async () => options.computers ?? [row("a"), row("b")]);
   const prisma = {
+    $queryRaw: vi.fn(async () => (options.leaseHeld ? [] : [{ id: "fleet-observer" }])),
     computer: { findMany },
     computerObservation: { upsert },
   } as unknown as PrismaClient;
@@ -102,6 +104,13 @@ describe("fleet observer", () => {
     });
     await createFleetObserver({ prisma, sandbox })();
     expect(upsert).toHaveBeenCalledTimes(1);
+  });
+
+  it("does nothing while another instance holds the sweep lease", async () => {
+    const { prisma, sandbox, upsert, findMany } = setup({ leaseHeld: true });
+    await createFleetObserver({ prisma, sandbox })();
+    expect(findMany).not.toHaveBeenCalled();
+    expect(upsert).not.toHaveBeenCalled();
   });
 
   it("waits out its interval between passes", async () => {

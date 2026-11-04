@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import type { PrismaClient } from "@rakazo/db";
 import { asSystem, createDb } from "@rakazo/db";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { FakeSandboxProvider } from "./fake-sandbox.js";
 import { createFleetObserver } from "./fleet-observer.js";
 
@@ -77,6 +77,7 @@ describePostgres("fleet observer (PostgreSQL)", () => {
       },
     });
 
+    await system.computerObserverLease.deleteMany({});
     await createFleetObserver({ prisma: db.prisma, sandbox })();
     const first = await system.computerObservation.findUnique({
       where: { computerId: computer.id },
@@ -95,12 +96,30 @@ describePostgres("fleet observer (PostgreSQL)", () => {
       await system.computerObservation.findUnique({ where: { computerId: stopped.id } }),
     ).toBeNull();
 
+    await system.computerObserverLease.deleteMany({});
     await createFleetObserver({ prisma: db.prisma, sandbox })();
     expect(await system.computerObservation.count({ where: { computerId: computer.id } })).toBe(1);
     const second = await system.computerObservation.findUniqueOrThrow({
       where: { computerId: computer.id },
     });
     expect(second.observedAt.getTime()).toBeGreaterThanOrEqual(first!.observedAt.getTime());
+
+    // Two instances ticking together: one lease, so the provider sees one batch per interval.
+    await system.computerObserverLease.deleteMany({});
+    const inspectMany = vi.fn(async () => new Map());
+    const counted = Object.assign(Object.create(sandbox), { inspectMany });
+    const sweepers = [
+      createFleetObserver({ prisma: db.prisma, sandbox: counted }),
+      createFleetObserver({ prisma: db.prisma, sandbox: counted }),
+    ];
+    await Promise.all(sweepers.map((sweep) => sweep()));
+    expect(inspectMany).toHaveBeenCalledTimes(1);
+    // An expired lease (a crashed holder) is taken over by the next tick.
+    await system.computerObserverLease.updateMany({
+      data: { claimedUntil: new Date(Date.now() - 1000) },
+    });
+    await createFleetObserver({ prisma: db.prisma, sandbox: counted })();
+    expect(inspectMany).toHaveBeenCalledTimes(2);
 
     await system.computer.delete({ where: { id: computer.id } });
     expect(await system.computerObservation.count({ where: { computerId: computer.id } })).toBe(0);

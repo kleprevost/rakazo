@@ -110,6 +110,19 @@ export function createFleetObserver(
     lastRun = now;
     const description = deps.sandbox.describe();
     if (!description.capabilities.fleet?.inspect || !deps.sandbox.inspect) return;
+    // Every instance runs this tick; one lease row lets a single instance sweep per interval. A
+    // holder that dies just lets the lease expire, and a later tick elsewhere takes over.
+    const claimed = await runAsSystem(
+      "fleet observer: claim sweep",
+      () =>
+        deps.prisma.$queryRaw<Array<{ id: string }>>`
+        INSERT INTO "computer_observer_leases" ("id", "claimedUntil")
+        VALUES ('fleet-observer', ${new Date(now + intervalMs)})
+        ON CONFLICT ("id") DO UPDATE SET "claimedUntil" = EXCLUDED."claimedUntil"
+        WHERE "computer_observer_leases"."claimedUntil" <= ${new Date(now)}
+        RETURNING "id"`,
+    );
+    if (claimed.length === 0) return;
     let cursor: string | undefined;
     for (;;) {
       const page: Target[] = await runAsSystem("fleet observer: list computers", () =>
