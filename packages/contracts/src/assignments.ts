@@ -42,6 +42,15 @@ export const AssignmentWorkSchema = AssignmentSchema.extend({
 });
 export type AssignmentWork = z.infer<typeof AssignmentWorkSchema>;
 
+/** `clientNonce` makes a retried create return the first assignment instead of a second one. */
+export const CreateAssignmentInput = z.object({
+  botId: Id,
+  title: z.string().trim().min(1).max(ASSIGNMENT_TITLE_MAX_LENGTH),
+  brief: z.string().trim().min(1).max(ASSIGNMENT_BRIEF_MAX_LENGTH),
+  clientNonce: z.string().min(1).max(200),
+});
+export type CreateAssignmentInput = z.infer<typeof CreateAssignmentInput>;
+
 export const ListAssignmentsInput = z.object({
   botId: Id.optional(),
   state: z.enum(["active", "archived"]).default("active"),
