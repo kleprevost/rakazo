@@ -72,7 +72,9 @@ export async function* exportContent(
   const threadWhere: Prisma.ThreadWhereInput = {
     ...(spaceId ? { spaceId } : {}),
     ...(threadId ? { id: threadId } : {}),
-    ...(botId ? { OR: [{ botId }, { messages: { some: { botId } } }] } : {}),
+    ...(botId
+      ? { OR: [{ botId }, { assignment: { botId } }, { messages: { some: { botId } } }] }
+      : {}),
   };
   for (let cursor = ""; ; ) {
     options.signal?.throwIfAborted();
@@ -86,14 +88,15 @@ export async function* exportContent(
         userId: true,
         botId: true,
         groupId: true,
+        assignment: { select: { botId: true } },
         createdAt: true,
         historyCompactionSummary: true,
       },
     });
-    for (const thread of threads) {
+    for (const { assignment, ...thread } of threads) {
       // In another bot's or a group's thread, only the bot's own messages, and not
       // the thread's summary, which covers everyone's.
-      const foreign = Boolean(botId) && thread.botId !== botId;
+      const foreign = Boolean(botId) && (thread.botId ?? assignment?.botId) !== botId;
       yield {
         type: "thread",
         ...thread,

@@ -265,6 +265,8 @@ function compactionHarness(
     historyCompactionGeneration?: number;
     historyCompactionRetryAfterSeq?: number;
     wasCleared?: boolean;
+    /** An assignment's thread: no botId of its own, owned through its assignment. */
+    assignmentBotId?: string;
     resolveModel?: (scope: {
       userId: string;
       spaceId: string;
@@ -285,7 +287,8 @@ function compactionHarness(
     }));
   const thread = {
     id: "thread-1",
-    botId: "bot-1",
+    botId: options.assignmentBotId ? null : "bot-1",
+    assignment: options.assignmentBotId ? { botId: options.assignmentBotId } : null,
     spaceId: "workspace-1",
     userId: "user-1",
     nextEventSeq: 0,
@@ -572,6 +575,22 @@ describe("compactHistory", () => {
         historyCompactionRetryAfterSeq: null,
       },
     });
+  });
+
+  it("compacts an assignment thread as its employee's conversation", async () => {
+    const harness = compactionHarness({
+      deploymentModelKey: "openrouter-key",
+      assignmentBotId: "bot-1",
+    });
+
+    await compactHistory(harness.deps, "thread-1");
+
+    expect(harness.runtime.run).toHaveBeenCalledOnce();
+    expect(harness.saveMemory).toHaveBeenCalledWith(
+      expect.objectContaining({ botId: "bot-1" }),
+      expect.objectContaining({ spaceId: "workspace-1", botId: "bot-1" }),
+    );
+    expect(harness.prisma.thread.updateMany).toHaveBeenCalled();
   });
 
   it("keeps compaction summaries private so clearing a shared bot cannot expose stale history", async () => {

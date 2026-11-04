@@ -822,6 +822,7 @@ describe("running a routine retry", () => {
         spaceId: "space-1",
         OR: [
           { botId: "bot-1" },
+          { assignment: { botId: "bot-1", archivedAt: null } },
           { group: { archivedAt: null, members: { some: { botId: "bot-1" } } } },
         ],
       },

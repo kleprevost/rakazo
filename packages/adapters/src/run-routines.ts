@@ -154,6 +154,8 @@ export async function wakeRoutine(deps: ExecutorDeps, routineId: string, schedul
           spaceId: routine.spaceId,
           OR: [
             { botId: bot.id },
+            // A routine attached to an assignment fires in that assignment's thread.
+            { assignment: { botId: bot.id, archivedAt: null } },
             {
               group: {
                 archivedAt: null,
@@ -417,6 +419,7 @@ export async function retryRoutineRun(deps: ExecutorDeps, runId: string) {
           spaceId: failed.spaceId,
           OR: [
             { botId: failed.botId },
+            { assignment: { botId: failed.botId, archivedAt: null } },
             {
               group: {
                 archivedAt: null,

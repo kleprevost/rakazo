@@ -15,6 +15,12 @@ import { AgentImportSetupStateInput, AgentImportSetupStateSchema } from "./agent
 import { AiConsentQuerySchema, AiConsentStatusSchema } from "./ai-consent.js";
 import { AnalyticsScreenInput } from "./analytics.js";
 import {
+  AssignmentWorkSchema,
+  GetAssignmentInput,
+  ListAssignmentsInput,
+  ListAssignmentsOutput,
+} from "./assignments.js";
+import {
   ARTIFACT_DESCRIPTION_MAX_LENGTH,
   ARTIFACT_NAME_MAX_LENGTH,
   ATTACHMENT_COUNT_CEILING,
@@ -918,6 +924,10 @@ export const appContract = {
     comment: oc.input(CommentTicketInput).output(TicketCommentSchema),
     comments: oc.input(z.object({ ticketId: Id })).output(z.array(TicketCommentSchema)),
     work: oc.input(z.object({ ticketId: Id })).output(TicketWorkSchema),
+  },
+  assignments: {
+    list: oc.input(ListAssignmentsInput).output(ListAssignmentsOutput),
+    get: oc.input(GetAssignmentInput).output(AssignmentWorkSchema),
   },
   skills: {
     list: oc.input(botId).output(z.array(TaughtSkillSchema)),

@@ -441,6 +441,22 @@ describePostgres("row-level security (PostgreSQL)", () => {
           data: { spaceId: t.spaceId, boardId: board.id, number: 1, title: "t" },
         }),
       );
+      const assignmentThread = await o.thread.create({
+        data: { spaceId: t.spaceId, userId: t.userId },
+      });
+      keep(
+        "assignment",
+        await o.assignment.create({
+          data: {
+            spaceId: t.spaceId,
+            botId: t.botId,
+            userId: t.userId,
+            threadId: assignmentThread.id,
+            title: "job",
+            clientNonce: `rls-${tag}`,
+          },
+        }),
+      );
       keep(
         "ticketComment",
         await o.ticketComment.create({

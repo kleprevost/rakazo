@@ -1,4 +1,4 @@
-import type { TicketWork, WorkItem, WorkPhase } from "@rakazo/contracts";
+import type { TicketWork, WorkArtifact, WorkItem, WorkPhase, WorkRun } from "@rakazo/contracts";
 import { workPhase } from "@rakazo/contracts";
 import { coerceTicketStatus, ensureBoard, toTicketDto } from "./board.js";
 import type { PrismaClient } from "./client.js";
@@ -70,14 +70,19 @@ export async function listWorkItems(
   return phases ? items.filter((item) => phases.includes(item.phase)) : items;
 }
 
-/** One ticket's phase, the runs that worked on it, and the artifacts those runs produced. */
-export async function getTicketWork(
+type WorkRunsWhere = { threadId: string } | { ticketId: string };
+
+/**
+ * The newest runs of a unit of work (a ticket's tasks, or one thread) and the artifacts those
+ * runs produced, newest first.
+ */
+export async function loadWorkRuns(
   prisma: PrismaClient,
   spaceId: string,
-  ticket: { id: string; status: string },
-): Promise<TicketWork> {
+  scope: WorkRunsWhere,
+): Promise<{ runs: WorkRun[]; artifacts: WorkArtifact[] }> {
   const runs = await prisma.run.findMany({
-    where: { spaceId, task: { ticketId: ticket.id } },
+    where: { spaceId, ...("ticketId" in scope ? { task: { ticketId: scope.ticketId } } : scope) },
     orderBy: [{ createdAt: "desc" }, { id: "desc" }],
     take: WORK_RUNS_LIMIT,
     select: {
@@ -105,8 +110,6 @@ export async function getTicketWork(
       })
     : [];
   return {
-    ticketId: ticket.id,
-    phase: workPhase(coerceTicketStatus(ticket.status), runs[0]?.status ?? null),
     runs: runs.map((run) => ({
       ...run,
       createdAt: run.createdAt.toISOString(),
@@ -117,5 +120,20 @@ export async function getTicketWork(
         ? [{ ...artifact, runId: artifact.runId, createdAt: artifact.createdAt.toISOString() }]
         : [],
     ),
+  };
+}
+
+/** One ticket's phase, the runs that worked on it, and the artifacts those runs produced. */
+export async function getTicketWork(
+  prisma: PrismaClient,
+  spaceId: string,
+  ticket: { id: string; status: string },
+): Promise<TicketWork> {
+  const { runs, artifacts } = await loadWorkRuns(prisma, spaceId, { ticketId: ticket.id });
+  return {
+    ticketId: ticket.id,
+    phase: workPhase(coerceTicketStatus(ticket.status), runs[0]?.status ?? null),
+    runs,
+    artifacts,
   };
 }

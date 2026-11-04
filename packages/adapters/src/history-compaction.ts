@@ -227,8 +227,13 @@ export interface CompactHistoryDeps {
 }
 
 export async function compactHistory(deps: CompactHistoryDeps, threadId: string): Promise<void> {
-  const thread = await deps.prisma.thread.findUniqueOrThrow({ where: { id: threadId } });
-  if (!thread.botId) return;
+  const { assignment, ...thread } = await deps.prisma.thread.findUniqueOrThrow({
+    where: { id: threadId },
+    include: { assignment: { select: { botId: true } } },
+  });
+  // An assignment's thread has no botId of its own; its employee speaks in it.
+  const botId = thread.botId ?? assignment?.botId;
+  if (!botId) return;
   const previousCursor = thread.historyCompactedUpToSeq;
   const previousGeneration = thread.historyCompactionGeneration;
   const previousSummary = thread.historyCompactionSummary?.trim() || null;
@@ -302,7 +307,7 @@ export async function compactHistory(deps: CompactHistoryDeps, threadId: string)
   // its current name, including a bot that has since been archived or that relayed a message here.
   const authorBotId = (message: (typeof batch)[number]) =>
     message.role === "bot"
-      ? (message.botId ?? thread.botId!)
+      ? (message.botId ?? botId)
       : message.role === "user"
         ? botMessageContext(message.blocks as MessageBlock[])?.fromBotId
         : undefined;
@@ -359,7 +364,7 @@ export async function compactHistory(deps: CompactHistoryDeps, threadId: string)
     ? await deps.resolveModel({
         userId: thread.userId,
         spaceId: thread.spaceId,
-        botId: thread.botId,
+        botId,
       })
     : deps.deploymentModelConfigured
       ? {
@@ -387,7 +392,7 @@ export async function compactHistory(deps: CompactHistoryDeps, threadId: string)
   let runtimeReportedFailure = false;
   for await (const event of deps.runtime.run(
     {
-      botId: thread.botId,
+      botId,
       threadId,
       runId: `compact:${threadId}:${fromSeqExclusive}`,
       usageOperationKind: "compaction",
@@ -395,7 +400,7 @@ export async function compactHistory(deps: CompactHistoryDeps, threadId: string)
         await recordUsage(deps.prisma, event, {
           spaceId: thread.spaceId,
           userId: thread.userId,
-          botId: thread.botId!,
+          botId,
           operationId: `compact:${threadId}:${fromSeqExclusive}`,
           operationKind: "compaction",
         });
@@ -425,7 +430,7 @@ export async function compactHistory(deps: CompactHistoryDeps, threadId: string)
       await recordUsage(deps.prisma, event, {
         spaceId: thread.spaceId,
         userId: thread.userId,
-        botId: thread.botId,
+        botId,
         operationId: `compact:${threadId}:${fromSeqExclusive}`,
         operationKind: "compaction",
       });
@@ -495,7 +500,7 @@ export async function compactHistory(deps: CompactHistoryDeps, threadId: string)
     traceId: `history-compact:${threadId}`,
     spaceId: thread.spaceId,
     userId: thread.userId,
-    botId: thread.botId,
+    botId,
     signal: new AbortController().signal,
   };
   if (semanticMemory) {
@@ -505,7 +510,7 @@ export async function compactHistory(deps: CompactHistoryDeps, threadId: string)
         {
           content: summary,
           scope: "isolated",
-          botId: thread.botId,
+          botId,
           source: { kind: "history", generation: previousGeneration },
         },
         memoryContext,
@@ -536,7 +541,7 @@ export async function compactHistory(deps: CompactHistoryDeps, threadId: string)
   ) {
     try {
       const removed = await semanticMemory.provider.purgeHistory(
-        { botId: thread.botId, generations: [previousGeneration] },
+        { botId, generations: [previousGeneration] },
         memoryContext,
       );
       if (!removed.ok) {

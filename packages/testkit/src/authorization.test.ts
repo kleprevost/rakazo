@@ -592,6 +592,8 @@ describeWithDatabase("API authorization and resource isolation", () => {
       ["tickets/comment"],
       ["tickets/comments"],
       ["tickets/work"],
+      ["assignments/list"],
+      ["assignments/get", { assignmentId: "missing-assignment" }],
       ["availability/set"],
       ["availability/items"],
       ["availability/chooseForSpace"],
