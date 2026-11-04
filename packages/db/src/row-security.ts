@@ -140,6 +140,8 @@ export const ROW_SECURITY_MODELS: ReadonlySet<string> = new Set([
   "HomeDeletionNotice",
   "ComputerObservation",
   "ComputerObserverLease",
+  "ComputerFleetOperation",
+  "ComputerFleetItem",
   "Board",
   "Ticket",
   "TicketComment",

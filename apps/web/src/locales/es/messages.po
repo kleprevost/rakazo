@@ -1214,6 +1214,10 @@ msgstr "Explorar servidores MCP"
 msgid "Built-in"
 msgstr "Integrado"
 
+#: src/pages/admin/AdminFleetOperations.tsx
+msgid "Busy"
+msgstr "Ocupado"
+
 #: src/pages/Calendar.tsx
 #: src/pages/shell/hire-role-dialog.tsx
 #: src/pages/shell/sidebar-header.tsx
@@ -2461,6 +2465,7 @@ msgid "Could not transcribe that recording."
 msgstr "No se pudo transcribir esa grabación."
 
 #: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/ScratchpadSection.tsx
 msgid "Could not update"
 msgstr "No se pudo actualizar"
@@ -2969,6 +2974,7 @@ msgstr "¿No tienes una cuenta?"
 #: src/lib/ticket-status.ts
 #: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
+#: src/pages/admin/AdminFleetOperations.tsx
 #: src/pages/Calendar.tsx
 #: src/pages/shell/avatar-studio-popover.tsx
 #: src/pages/shell/import-setup-card.tsx
@@ -3274,6 +3280,7 @@ msgstr "fallido"
 #: src/components/SubagentCard.tsx
 #: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
+#: src/pages/admin/AdminFleetOperations.tsx
 #: src/pages/Calendar.tsx
 msgid "Failed"
 msgstr "Falló"
@@ -3482,6 +3489,10 @@ msgstr "Configuración del grupo"
 msgid "Group updates"
 msgstr "Agrupar actualizaciones"
 
+#: src/pages/admin/AdminFleetOperations.tsx
+msgid "Halted"
+msgstr "Detenido"
+
 #: src/components/call/CallCard.tsx
 msgid "Hang up"
 msgstr "Colgar"
@@ -3533,6 +3544,14 @@ msgstr "Escuchar una muestra"
 #: src/pages/VoiceSettingsOverlay.tsx
 msgid "Hi, this is how I'll sound when I read replies out loud."
 msgstr "Hola, así sonaré cuando lea las respuestas en voz alta."
+
+#: src/pages/admin/AdminFleetOperations.tsx
+msgid "Hibernate"
+msgstr "Hibernar"
+
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Hibernated"
+msgstr "Hibernado"
 
 #: src/components/vault/LoginFieldsInput.tsx
 msgid "Hidden"
@@ -3752,6 +3771,10 @@ msgstr "Dominio de la integración"
 #: src/pages/PluginsOverlay.tsx
 msgid "Integrations"
 msgstr "Integraciones"
+
+#: src/pages/admin/AdminFleetOperations.tsx
+msgid "Interrupted"
+msgstr "Interrumpido"
 
 #: src/pages/RoutineEditor.tsx
 #: src/pages/RoutineSchedule.tsx
@@ -4423,6 +4446,7 @@ msgid "Needs an OAuth client ID"
 msgstr "Necesita un ID de cliente OAuth"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/admin/AdminFleetOperations.tsx
 #: src/pages/Today.tsx
 msgid "Needs attention"
 msgstr "Requiere atención"
@@ -4900,6 +4924,10 @@ msgstr "OpenClaw o Hermes"
 msgid "Opens your browser's print dialog. Choose Save as PDF as the destination."
 msgstr "Abre el diálogo de impresión del navegador. Elige Guardar como PDF como destino."
 
+#: src/pages/admin/AdminFleetOperations.tsx
+msgid "Operations"
+msgstr "Operaciones"
+
 #: src/components/SignupSurvey.tsx
 #: src/pages/model-settings/connection-controls.tsx
 #: src/pages/Onboarding.tsx
@@ -5283,6 +5311,7 @@ msgid "Quarantined by your organization"
 msgstr "En cuarentena por tu organización"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/admin/AdminFleetOperations.tsx
 msgid "Queued"
 msgstr "En cola"
 
@@ -5832,6 +5861,7 @@ msgstr "en ejecución"
 #: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
 #: src/pages/admin/AdminComputersPage.tsx
+#: src/pages/admin/AdminFleetOperations.tsx
 #: src/pages/Calendar.tsx
 #: src/pages/RoutineEditor.tsx
 #: src/pages/Today.tsx
@@ -6031,6 +6061,10 @@ msgstr ""
 #: src/pages/shell/chat-header.tsx
 msgid "Select a bot"
 msgstr "Selecciona un bot"
+
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Select all"
+msgstr "Seleccionar todo"
 
 #: src/pages/memory-providers/ConnectionModeFields.tsx
 msgid "Self-hosted"
@@ -6469,6 +6503,7 @@ msgstr ""
 
 #: src/pages/ActivityList.tsx
 #: src/pages/admin/AdminComputersPage.tsx
+#: src/pages/admin/AdminFleetOperations.tsx
 #: src/pages/Board.tsx
 msgid "Status"
 msgstr "Estado"
@@ -7104,6 +7139,10 @@ msgstr ""
 msgid "Unread"
 msgstr "No leídos"
 
+#: src/pages/admin/AdminFleetOperations.tsx
+msgid "Unsupported"
+msgstr "No compatible"
+
 #. placeholder {0}: pending.file.name
 #: src/pages/shell/use-composer-actions.ts
 msgid "Unsupported file type: {0}"
@@ -7365,6 +7404,7 @@ msgstr "Esperando en la cola…"
 msgid "Waiting…"
 msgstr "Esperando…"
 
+#: src/pages/admin/AdminFleetOperations.tsx
 #: src/pages/shell/computer-panel.tsx
 msgid "Wake"
 msgstr "Activar"

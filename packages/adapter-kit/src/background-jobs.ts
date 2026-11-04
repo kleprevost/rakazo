@@ -16,6 +16,7 @@ const payloadSchemas = {
   "routine.retry": z.object({ runId: z.string().min(1) }),
   "computer.update": z.object({ updateId: z.string().min(1) }),
   "computer.sleep": z.object({ computerId: z.string().min(1) }),
+  "computer.fleet-item": z.object({ itemId: z.string().min(1) }),
   "computer.control-expire": z.object({
     computerId: z.string().min(1),
     leaseId: z.string().min(1),
@@ -114,6 +115,15 @@ export function computerSleepJob(computerId: string, availableAt: Date): Backgro
     payload: { computerId },
     availableAt,
     replaceKey: computerSleepJobKey(computerId),
+  };
+}
+
+/** Keyed to the item, so redelivery and republishing collapse into one job. */
+export function fleetItemJob(itemId: string): BackgroundJob {
+  return {
+    name: "computer.fleet-item",
+    payload: { itemId },
+    replaceKey: `computer.fleet-item:${itemId}`,
   };
 }
 

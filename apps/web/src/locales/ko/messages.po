@@ -1214,6 +1214,10 @@ msgstr ""
 msgid "Built-in"
 msgstr "기본 제공"
 
+#: src/pages/admin/AdminFleetOperations.tsx
+msgid "Busy"
+msgstr "사용 중"
+
 #: src/pages/Calendar.tsx
 #: src/pages/shell/hire-role-dialog.tsx
 #: src/pages/shell/sidebar-header.tsx
@@ -2461,6 +2465,7 @@ msgid "Could not transcribe that recording."
 msgstr ""
 
 #: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/ScratchpadSection.tsx
 msgid "Could not update"
 msgstr "업데이트하지 못했습니다."
@@ -2969,6 +2974,7 @@ msgstr "계정이 없나요?"
 #: src/lib/ticket-status.ts
 #: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
+#: src/pages/admin/AdminFleetOperations.tsx
 #: src/pages/Calendar.tsx
 #: src/pages/shell/avatar-studio-popover.tsx
 #: src/pages/shell/import-setup-card.tsx
@@ -3274,6 +3280,7 @@ msgstr "실패"
 #: src/components/SubagentCard.tsx
 #: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
+#: src/pages/admin/AdminFleetOperations.tsx
 #: src/pages/Calendar.tsx
 msgid "Failed"
 msgstr "실패"
@@ -3482,6 +3489,10 @@ msgstr "그룹 설정"
 msgid "Group updates"
 msgstr ""
 
+#: src/pages/admin/AdminFleetOperations.tsx
+msgid "Halted"
+msgstr "중단됨"
+
 #: src/components/call/CallCard.tsx
 msgid "Hang up"
 msgstr "통화 종료"
@@ -3533,6 +3544,14 @@ msgstr "샘플 듣기"
 #: src/pages/VoiceSettingsOverlay.tsx
 msgid "Hi, this is how I'll sound when I read replies out loud."
 msgstr "안녕하세요. 답변을 소리 내어 읽을 때 이런 목소리로 들립니다."
+
+#: src/pages/admin/AdminFleetOperations.tsx
+msgid "Hibernate"
+msgstr "최대 절전"
+
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Hibernated"
+msgstr "최대 절전 상태"
 
 #: src/components/vault/LoginFieldsInput.tsx
 msgid "Hidden"
@@ -3752,6 +3771,10 @@ msgstr ""
 #: src/pages/PluginsOverlay.tsx
 msgid "Integrations"
 msgstr "앱·도구 연동"
+
+#: src/pages/admin/AdminFleetOperations.tsx
+msgid "Interrupted"
+msgstr "중단됨"
 
 #: src/pages/RoutineEditor.tsx
 #: src/pages/RoutineSchedule.tsx
@@ -4423,6 +4446,7 @@ msgid "Needs an OAuth client ID"
 msgstr "OAuth 클라이언트 ID가 필요합니다"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/admin/AdminFleetOperations.tsx
 #: src/pages/Today.tsx
 msgid "Needs attention"
 msgstr "확인 필요"
@@ -4900,6 +4924,10 @@ msgstr "OpenClaw 또는 Hermes"
 msgid "Opens your browser's print dialog. Choose Save as PDF as the destination."
 msgstr "브라우저의 인쇄 대화상자를 엽니다. 대상으로 PDF로 저장을 선택하세요."
 
+#: src/pages/admin/AdminFleetOperations.tsx
+msgid "Operations"
+msgstr "작업"
+
 #: src/components/SignupSurvey.tsx
 #: src/pages/model-settings/connection-controls.tsx
 #: src/pages/Onboarding.tsx
@@ -5283,6 +5311,7 @@ msgid "Quarantined by your organization"
 msgstr "조직에서 격리함"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/admin/AdminFleetOperations.tsx
 msgid "Queued"
 msgstr "대기 중"
 
@@ -5832,6 +5861,7 @@ msgstr "실행 중"
 #: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
 #: src/pages/admin/AdminComputersPage.tsx
+#: src/pages/admin/AdminFleetOperations.tsx
 #: src/pages/Calendar.tsx
 #: src/pages/RoutineEditor.tsx
 #: src/pages/Today.tsx
@@ -6031,6 +6061,10 @@ msgstr ""
 #: src/pages/shell/chat-header.tsx
 msgid "Select a bot"
 msgstr "대화할 Bot을 선택하세요"
+
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Select all"
+msgstr "모두 선택"
 
 #: src/pages/memory-providers/ConnectionModeFields.tsx
 msgid "Self-hosted"
@@ -6469,6 +6503,7 @@ msgstr ""
 
 #: src/pages/ActivityList.tsx
 #: src/pages/admin/AdminComputersPage.tsx
+#: src/pages/admin/AdminFleetOperations.tsx
 #: src/pages/Board.tsx
 msgid "Status"
 msgstr ""
@@ -7104,6 +7139,10 @@ msgstr ""
 msgid "Unread"
 msgstr "읽지 않음"
 
+#: src/pages/admin/AdminFleetOperations.tsx
+msgid "Unsupported"
+msgstr "지원되지 않음"
+
 #. placeholder {0}: pending.file.name
 #: src/pages/shell/use-composer-actions.ts
 msgid "Unsupported file type: {0}"
@@ -7365,6 +7404,7 @@ msgstr "줄에서 기다리는 중…"
 msgid "Waiting…"
 msgstr "기다리는 중…"
 
+#: src/pages/admin/AdminFleetOperations.tsx
 #: src/pages/shell/computer-panel.tsx
 msgid "Wake"
 msgstr "깨우기"

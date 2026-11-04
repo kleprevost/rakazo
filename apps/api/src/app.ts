@@ -89,6 +89,7 @@ import {
   RunStarter,
   reconcileCloudAgents,
   reconcileComputerUpdates,
+  reconcileFleetOperations,
   reconcilePurchases,
   removePiUserSessions,
   resolveDeploymentModel,
@@ -768,6 +769,7 @@ async function buildApp(overrides: CreateAppOverrides): Promise<AppHandles> {
         reconcileAuditLog: createAuditLogReconciler(prisma, auditLogConfig()),
         reconcileIdleComputers: createIdleComputerSweeper({ prisma, jobs }),
         reconcileFleetObservations: createFleetObserver({ prisma, sandbox }),
+        reconcileFleetOperations: () => reconcileFleetOperations({ prisma, jobs }),
       })
     : undefined;
   reconciler?.start();

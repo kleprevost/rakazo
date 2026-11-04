@@ -1553,6 +1553,51 @@ model ComputerObservation {
   @@map("computer_observations")
 }
 
+/// An admin action over many computers (hibernate, wake), with one item per computer. Written
+/// by the API on create and by whichever instance runs an item.
+model ComputerFleetOperation {
+  id                String              @id @default(cuid())
+  /// hibernate | wake
+  kind              String
+  /// queued | running | completed | completed_with_failures
+  status            String              @default("queued")
+  actorUserId       String
+  /// The most items running at once; the first item runs alone.
+  maxParallel       Int
+  /// Failed items that stop the rest from starting.
+  haltAfterFailures Int
+  createdAt         DateTime            @default(now())
+  finishedAt        DateTime?
+  items             ComputerFleetItem[]
+
+  @@index([createdAt])
+  @@map("computer_fleet_operations")
+}
+
+/// One computer in an operation. `computerId` is a plain id so the outcome outlives the computer.
+/// A partial unique index (raw SQL) allows one queued or running item per computer.
+model ComputerFleetItem {
+  id             String                 @id @default(cuid())
+  operationId    String
+  operation      ComputerFleetOperation @relation(fields: [operationId], references: [id], onDelete: Cascade)
+  computerId     String
+  /// queued | running | succeeded | failed | skipped_unsupported | skipped_busy | halted | interrupted
+  status         String                 @default("queued")
+  /// A short code for the outcome; never provider text.
+  outcome        String?
+  attempt        Int                    @default(0)
+  claimId        String?
+  claimExpiresAt DateTime?
+  createdAt      DateTime               @default(now())
+  startedAt      DateTime?
+  finishedAt     DateTime?
+
+  @@unique([operationId, computerId])
+  @@index([status, claimExpiresAt])
+  @@index([computerId])
+  @@map("computer_fleet_items")
+}
+
 /// One row leasing the fleet observer's sweep to a single instance until `claimedUntil`.
 model ComputerObserverLease {
   id           String   @id

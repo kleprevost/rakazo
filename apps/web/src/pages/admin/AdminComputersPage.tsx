@@ -3,6 +3,7 @@ import type { AdminComputer, AdminComputerDetail } from "@rakazo/contracts";
 import {
   Badge,
   Button,
+  Checkbox,
   Sheet,
   SheetContent,
   SheetHeader,
@@ -13,10 +14,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  toast,
 } from "@rakazo/ui-web";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useSpaceQueries } from "../../lib/query";
+import { rpc } from "../../lib/rpc";
+import { errorText } from "../../lib/user-error";
+import { FleetOperations, useFleetLabels, useFleetOperations } from "./AdminFleetOperations";
 import { AdminQuery, LoadMore } from "./AdminQuery";
 import { AdminShell } from "./AdminShell";
 import { formatBytes, formatWhen } from "./format";
@@ -32,8 +37,13 @@ export function AdminComputersPage() {
 }
 
 function AdminComputers() {
-  const { i18n } = useLingui();
+  const { i18n, t } = useLingui();
+  const labels = useFleetLabels();
   const [notApproved, setNotApproved] = useState(false);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [openOperation, setOpenOperation] = useState<string | null>(null);
+  const [starting, setStarting] = useState(false);
+  const operations = useFleetOperations();
   const computers = useInfiniteQuery(
     useSpaceQueries().admin.computers.list.infiniteOptions({
       input: (cursor: string | null) => ({
@@ -47,6 +57,28 @@ function AdminComputers() {
   );
   const rows = computers.data?.pages.flatMap((page) => page.computers) ?? [];
   // Only a policy that lists approved images gives a computer a standing to filter on.
+  const toggle = (id: string) =>
+    setSelected((current) => {
+      const next = new Set(current);
+      if (!next.delete(id)) next.add(id);
+      return next;
+    });
+  async function start(kind: "hibernate" | "wake") {
+    setStarting(true);
+    try {
+      const created = await rpc.admin.computers.operations.create({
+        kind,
+        computerIds: [...selected],
+      });
+      setSelected(new Set());
+      setOpenOperation(created.id);
+      await operations.refetch();
+    } catch (error) {
+      toast.error(errorText(error, t`Could not update`));
+    } finally {
+      setStarting(false);
+    }
+  }
   const governed = notApproved || rows.some((computer) => Boolean(computer.imageCompliance));
   return (
     <>
@@ -61,6 +93,22 @@ function AdminComputers() {
           <Trans>Not approved</Trans>
         </Button>
       ) : null}
+      {selected.size > 0 ? (
+        <div className="mb-3 flex items-center gap-2">
+          <span className="text-muted-foreground tabular-nums">{selected.size}</span>
+          {(["hibernate", "wake"] as const).map((kind) => (
+            <Button
+              key={kind}
+              variant="outline"
+              size="sm"
+              disabled={starting}
+              onClick={() => void start(kind)}
+            >
+              {labels.kind(kind)}
+            </Button>
+          ))}
+        </div>
+      ) : null}
       <AdminQuery
         pending={computers.isPending}
         error={computers.error}
@@ -70,6 +118,15 @@ function AdminComputers() {
         <Table data-testid="admin-computers">
           <TableHeader>
             <TableRow>
+              <TableHead className="w-8">
+                <Checkbox
+                  aria-label={t`Select all`}
+                  checked={rows.length > 0 && rows.every((computer) => selected.has(computer.id))}
+                  onCheckedChange={(checked) =>
+                    setSelected(checked ? new Set(rows.map((computer) => computer.id)) : new Set())
+                  }
+                />
+              </TableHead>
               <TableHead>
                 <Trans>AI employees</Trans>
               </TableHead>
@@ -98,12 +155,24 @@ function AdminComputers() {
           </TableHeader>
           <TableBody>
             {rows.map((computer) => (
-              <ComputerRow key={computer.id} computer={computer} locale={i18n.locale} />
+              <ComputerRow
+                key={computer.id}
+                computer={computer}
+                locale={i18n.locale}
+                selected={selected.has(computer.id)}
+                onToggle={() => toggle(computer.id)}
+              />
             ))}
           </TableBody>
         </Table>
         <LoadMore query={computers} />
       </AdminQuery>
+      <FleetOperations
+        operations={operations.data?.operations ?? []}
+        locale={i18n.locale}
+        openId={openOperation}
+        onOpen={setOpenOperation}
+      />
     </>
   );
 }
@@ -119,7 +188,17 @@ function useHealthLabel() {
     })[health];
 }
 
-function ComputerRow({ computer, locale }: { computer: AdminComputer; locale: string }) {
+function ComputerRow({
+  computer,
+  locale,
+  selected,
+  onToggle,
+}: {
+  computer: AdminComputer;
+  locale: string;
+  selected: boolean;
+  onToggle: () => void;
+}) {
   const { t } = useLingui();
   const [open, setOpen] = useState(false);
   const healthLabel = useHealthLabel();
@@ -130,6 +209,7 @@ function ComputerRow({ computer, locale }: { computer: AdminComputer; locale: st
       booting: t`Starting`,
       running: t`Running`,
       suspending: t`Stopping`,
+      suspended: t`Hibernated`,
       error: t`Error`,
       quarantined: t`Quarantined`,
     }[computer.state] ?? computer.state;
@@ -138,6 +218,9 @@ function ComputerRow({ computer, locale }: { computer: AdminComputer; locale: st
   const reported = (value: string | null) => value ?? (notReported ? t`Not reported` : null);
   return (
     <TableRow aria-label={names ?? computer.id}>
+      <TableCell>
+        <Checkbox aria-label={names ?? computer.id} checked={selected} onCheckedChange={onToggle} />
+      </TableCell>
       <TableCell className="font-medium">
         <Button variant="link" className="h-auto p-0" onClick={() => setOpen(true)}>
           {names}

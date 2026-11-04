@@ -1215,6 +1215,10 @@ msgstr "瀏覽 MCP 伺服器"
 msgid "Built-in"
 msgstr "內建"
 
+#: src/pages/admin/AdminFleetOperations.tsx
+msgid "Busy"
+msgstr "忙碌"
+
 #: src/pages/Calendar.tsx
 #: src/pages/shell/hire-role-dialog.tsx
 #: src/pages/shell/sidebar-header.tsx
@@ -2462,6 +2466,7 @@ msgid "Could not transcribe that recording."
 msgstr ""
 
 #: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/ScratchpadSection.tsx
 msgid "Could not update"
 msgstr "無法更新"
@@ -2970,6 +2975,7 @@ msgstr "還沒有帳號？"
 #: src/lib/ticket-status.ts
 #: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
+#: src/pages/admin/AdminFleetOperations.tsx
 #: src/pages/Calendar.tsx
 #: src/pages/shell/avatar-studio-popover.tsx
 #: src/pages/shell/import-setup-card.tsx
@@ -3275,6 +3281,7 @@ msgstr "失敗"
 #: src/components/SubagentCard.tsx
 #: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
+#: src/pages/admin/AdminFleetOperations.tsx
 #: src/pages/Calendar.tsx
 msgid "Failed"
 msgstr "失敗"
@@ -3483,6 +3490,10 @@ msgstr "群組設定"
 msgid "Group updates"
 msgstr "群組更新"
 
+#: src/pages/admin/AdminFleetOperations.tsx
+msgid "Halted"
+msgstr "已暫停"
+
 #: src/components/call/CallCard.tsx
 msgid "Hang up"
 msgstr "結束通話"
@@ -3534,6 +3545,14 @@ msgstr "試聽"
 #: src/pages/VoiceSettingsOverlay.tsx
 msgid "Hi, this is how I'll sound when I read replies out loud."
 msgstr "你好，這是我朗讀回覆時的聲音。"
+
+#: src/pages/admin/AdminFleetOperations.tsx
+msgid "Hibernate"
+msgstr "休眠"
+
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Hibernated"
+msgstr "已休眠"
 
 #: src/components/vault/LoginFieldsInput.tsx
 msgid "Hidden"
@@ -3753,6 +3772,10 @@ msgstr "整合服務網域"
 #: src/pages/PluginsOverlay.tsx
 msgid "Integrations"
 msgstr "整合"
+
+#: src/pages/admin/AdminFleetOperations.tsx
+msgid "Interrupted"
+msgstr "已中斷"
 
 #: src/pages/RoutineEditor.tsx
 #: src/pages/RoutineSchedule.tsx
@@ -4424,6 +4447,7 @@ msgid "Needs an OAuth client ID"
 msgstr "需要 OAuth 用戶端 ID"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/admin/AdminFleetOperations.tsx
 #: src/pages/Today.tsx
 msgid "Needs attention"
 msgstr "需要處理"
@@ -4901,6 +4925,10 @@ msgstr "OpenClaw 或 Hermes"
 msgid "Opens your browser's print dialog. Choose Save as PDF as the destination."
 msgstr "開啟瀏覽器的列印對話框。目的地請選擇「另存為 PDF」。"
 
+#: src/pages/admin/AdminFleetOperations.tsx
+msgid "Operations"
+msgstr "操作"
+
 #: src/components/SignupSurvey.tsx
 #: src/pages/model-settings/connection-controls.tsx
 #: src/pages/Onboarding.tsx
@@ -5284,6 +5312,7 @@ msgid "Quarantined by your organization"
 msgstr "已被你的組織隔離"
 
 #: src/pages/ActivityList.tsx
+#: src/pages/admin/AdminFleetOperations.tsx
 msgid "Queued"
 msgstr "排隊中"
 
@@ -5833,6 +5862,7 @@ msgstr "執行中"
 #: src/lib/work-phase.ts
 #: src/pages/ActivityList.tsx
 #: src/pages/admin/AdminComputersPage.tsx
+#: src/pages/admin/AdminFleetOperations.tsx
 #: src/pages/Calendar.tsx
 #: src/pages/RoutineEditor.tsx
 #: src/pages/Today.tsx
@@ -6032,6 +6062,10 @@ msgstr ""
 #: src/pages/shell/chat-header.tsx
 msgid "Select a bot"
 msgstr "選擇機器人"
+
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Select all"
+msgstr "全選"
 
 #: src/pages/memory-providers/ConnectionModeFields.tsx
 msgid "Self-hosted"
@@ -6470,6 +6504,7 @@ msgstr ""
 
 #: src/pages/ActivityList.tsx
 #: src/pages/admin/AdminComputersPage.tsx
+#: src/pages/admin/AdminFleetOperations.tsx
 #: src/pages/Board.tsx
 msgid "Status"
 msgstr "狀態"
@@ -7105,6 +7140,10 @@ msgstr ""
 msgid "Unread"
 msgstr "未讀"
 
+#: src/pages/admin/AdminFleetOperations.tsx
+msgid "Unsupported"
+msgstr "不支援"
+
 #. placeholder {0}: pending.file.name
 #: src/pages/shell/use-composer-actions.ts
 msgid "Unsupported file type: {0}"
@@ -7366,6 +7405,7 @@ msgstr "排隊等候…"
 msgid "Waiting…"
 msgstr "等待中…"
 
+#: src/pages/admin/AdminFleetOperations.tsx
 #: src/pages/shell/computer-panel.tsx
 msgid "Wake"
 msgstr "喚醒"

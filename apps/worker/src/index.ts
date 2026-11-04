@@ -72,6 +72,7 @@ import {
   RunWorkerHost,
   reconcileCloudAgents,
   reconcileComputerUpdates,
+  reconcileFleetOperations,
   reconcilePurchases,
   resolveDeploymentModel,
   resolvePiSessionRoot,
@@ -385,6 +386,7 @@ async function main() {
     reconcileHomeStorage: homeStorageSweeper(home),
     reconcileIdleComputers: createIdleComputerSweeper({ prisma, jobs }),
     reconcileFleetObservations: createFleetObserver({ prisma, sandbox }),
+    reconcileFleetOperations: () => reconcileFleetOperations({ prisma, jobs }),
     reconcileDeadJobs: inMemoryJobs ? undefined : createDeadJobPruner(pool),
   });
   let stopHealth: (() => Promise<void>) | undefined;

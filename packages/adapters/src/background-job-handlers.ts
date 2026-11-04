@@ -27,6 +27,7 @@ import { rateLimitEnds, scheduleComputerSleep, sleepComputerIfIdle } from "./com
 import { performComputerUpdate } from "./computer-update.js";
 import type { createRunExecutor } from "./executor.js";
 import type { ExpoPushProvider } from "./expo-push.js";
+import { runFleetItem } from "./fleet-operations.js";
 import { compactHistory } from "./history-compaction.js";
 import type { MemoryProviderResolver } from "./memory-provider-factory.js";
 import { deliverMessagingOutbound, mirrorMessagingOutbound } from "./messaging-delivery.js";
@@ -166,6 +167,11 @@ export function createBackgroundJobHandlers(deps: {
     "computer.update": asOwner(updatedComputer, async ({ updateId }) => {
       await performComputerUpdate(deps, updateId);
     }),
+    // The item acts across Spaces for an admin, so it reads as system and runs each computer's
+    // own work as that computer's tenant.
+    "computer.fleet-item": async ({ itemId }) => {
+      await runFleetItem(deps, itemId);
+    },
     "computer.sleep": asOwner(computer, async (payload) => {
       await sleepComputerIfIdle(deps, payload.computerId);
     }),

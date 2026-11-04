@@ -518,6 +518,12 @@ describeWithDatabase("API authorization and resource isolation", () => {
       ["admin/quarantine/lift", { id: "missing-quarantine" }],
       ["admin/computers/list"],
       ["admin/computers/get", { computerId: "missing-computer" }],
+      [
+        "admin/computers/operations/create",
+        { kind: "hibernate", computerIds: ["missing-computer"] },
+      ],
+      ["admin/computers/operations/list"],
+      ["admin/computers/operations/get", { operationId: "missing-operation" }],
       ["admin/policy"],
       ["admin/audit"],
       ["employees/list"],
@@ -2453,6 +2459,14 @@ describeWithDatabase("API authorization and resource isolation", () => {
       await expectForbidden(app, cookie, "admin/computers/get", { computerId: "missing-computer" });
       await expectForbidden(app, cookie, "admin/quarantine/start", { scopeKind: "all" });
       await expectForbidden(app, cookie, "admin/quarantine/lift", { id: "missing-quarantine" });
+      await expectForbidden(app, cookie, "admin/computers/operations/create", {
+        kind: "hibernate",
+        computerIds: ["missing-computer"],
+      });
+      await expectForbidden(app, cookie, "admin/computers/operations/list", {});
+      await expectForbidden(app, cookie, "admin/computers/operations/get", {
+        operationId: "missing-operation",
+      });
       await expectForbidden(app, cookie, "admin/audit", {});
       await expectForbidden(app, cookie, "admin/users/endSessions", { userId: account.userId });
       await expectForbidden(app, cookie, "updater/status", {});
