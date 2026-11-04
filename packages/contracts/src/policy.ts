@@ -4,6 +4,8 @@ import { CapabilityPolicySchema } from "./capabilities.js";
 const globs = z.array(z.string().min(1).max(256)).max(500);
 const hosts = z.array(z.string().min(1).max(253)).max(500);
 const ids = z.array(z.string().min(1).max(128)).max(500);
+/** An image content digest, the only form an approved image is named by. */
+export const IMAGE_DIGEST = /^sha256:[0-9a-f]{64}$/;
 
 /**
  * Central policy v1: org-wide rules an administrator sets once and no user, bot or space
@@ -38,6 +40,24 @@ export const PolicySchema = z.strictObject({
     .strictObject({
       allowProviders: ids.optional(),
       allowHostComputer: z.boolean().optional(),
+      /**
+       * Approved computer images, by content digest. A computer running any other image is
+       * flagged in the Admin inventory, and a request that names an image is accepted only when
+       * its digest is listed. The supervisor reads the same file and checks again.
+       */
+      images: z
+        .strictObject({
+          allow: z
+            .array(
+              z.strictObject({
+                digest: z.string().regex(IMAGE_DIGEST, "must be sha256:<64 hex characters>"),
+                /** Shown next to the digest; never matched. */
+                tag: z.string().min(1).max(128).optional(),
+              }),
+            )
+            .max(500),
+        })
+        .optional(),
       egress: z
         .strictObject({ allowDomains: hosts.optional(), denyDomains: hosts.optional() })
         .optional(),

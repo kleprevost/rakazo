@@ -179,6 +179,7 @@ export class HostAwareSandbox implements SandboxProvider {
       homePath: string;
       providerRef?: string;
       providerKind?: ComputerRef["kind"];
+      image?: { ref: string; digest: string };
     },
     context: AdapterContext,
   ) {

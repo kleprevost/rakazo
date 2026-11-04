@@ -264,6 +264,8 @@ export interface SandboxCapabilities {
     inspect: boolean;
     /** `inspect()` also fills CPU and memory usage; some providers cannot. */
     usage?: boolean;
+    /** `provision({ image })` starts the computer from the named image instead of the provider's own. */
+    imageSelection?: boolean;
   };
 }
 

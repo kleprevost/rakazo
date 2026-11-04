@@ -29,6 +29,7 @@ export const SECURITY_EVENT_TYPES = [
   "egress.refused",
   "policy.loaded",
   "policy.denied",
+  "computer.image_refused",
   "rate_limit.hit",
   "employee.entitlements_reconciled",
   "employee.shared",

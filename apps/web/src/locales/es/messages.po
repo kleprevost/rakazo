@@ -4636,6 +4636,10 @@ msgstr "No es una habilidad válida"
 msgid "Not added: {0}"
 msgstr "No se agregaron: {0}"
 
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Not approved"
+msgstr "No aprobada"
+
 #: src/components/McpServerHealthLine.tsx
 msgid "Not checked yet"
 msgstr "Aún no comprobado"

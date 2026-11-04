@@ -133,6 +133,12 @@ export interface SandboxProvider {
        * reports it gone instead, so the newer save wins.
        */
       savedAt?: Date;
+      /**
+       * Start from this image, pinned to its digest (`ref` ends in `@digest`). Honored only when
+       * `capabilities.fleet.imageSelection` is true; the caller has already checked it against
+       * central policy, and a provider may check it again.
+       */
+      image?: { ref: string; digest: string };
     },
     context: AdapterContext,
   ): Promise<ComputerRef>;

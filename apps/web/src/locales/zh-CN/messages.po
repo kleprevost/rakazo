@@ -4636,6 +4636,10 @@ msgstr "不是有效的技能"
 msgid "Not added: {0}"
 msgstr "未添加：{0}"
 
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Not approved"
+msgstr "未批准"
+
 #: src/components/McpServerHealthLine.tsx
 msgid "Not checked yet"
 msgstr "尚未检查"
