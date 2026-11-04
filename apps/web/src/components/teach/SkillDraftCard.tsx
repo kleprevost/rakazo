@@ -50,6 +50,7 @@ export function SkillDraftCard({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
+  const [review, setReview] = useState<{ status: string; reason: string | null } | null>(null);
   const saved = savedFields === JSON.stringify({ name, playbook });
 
   // The fields last loaded from the server, and whether this card has written since. A later
@@ -97,6 +98,22 @@ export function SkillDraftCard({
       setSavedFields(sent);
     }, t`Could not save skill`);
 
+  // The latest offer of this skill, so the author sees where it stands.
+  const loadReview = () =>
+    rpc.skillPublishing
+      .mine({})
+      .then((rows) => {
+        const latest = rows
+          .filter((row) => row.sourceSkillId === block.skillId)
+          .sort((a, b) => b.number - a.number)[0];
+        setReview(latest ?? null);
+      })
+      .catch(() => undefined);
+
+  useEffect(() => {
+    if (block.status === "saved") void loadReview();
+  }, [block.skillId, block.status]);
+
   // Only the saved text can be offered, and a later edit makes the next offer a new version.
   const submitForReview = async () => {
     setBusy(true);
@@ -104,6 +121,7 @@ export function SkillDraftCard({
     try {
       await rpc.skillPublishing.submit({ skillId: block.skillId });
       setSubmitted(true);
+      await loadReview();
     } catch (err) {
       setError(errorText(err, t`Could not publish skill`));
     }
@@ -217,6 +235,22 @@ export function SkillDraftCard({
           </Button>
         ) : null}
       </div>
+      {saved && review?.status === "submitted" ? (
+        <p className="mt-2 text-xs text-muted-foreground">
+          <Trans>Waiting for review</Trans>
+        </p>
+      ) : null}
+      {saved && review?.status === "approved" ? (
+        <p className="mt-2 text-xs text-muted-foreground">
+          <Trans>Approved</Trans>
+        </p>
+      ) : null}
+      {saved && review?.status === "rejected" ? (
+        <p className="mt-2 text-xs text-muted-foreground">
+          <Trans>Not approved</Trans>
+          {review.reason ? `: ${review.reason}` : null}
+        </p>
+      ) : null}
       {error ? <p className="mt-2 text-xs text-destructive">{error}</p> : null}
     </BuiCard>
   );

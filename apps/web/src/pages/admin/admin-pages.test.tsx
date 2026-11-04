@@ -196,6 +196,7 @@ it("links the sections and shows Free access only when the deployment sells cred
     "/admin/policy",
     "/admin/audit",
     "/admin/access",
+    "/admin/skills",
     "/admin/plugins",
   ]);
 });

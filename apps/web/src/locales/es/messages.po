@@ -933,6 +933,7 @@ msgid "Apply"
 msgstr "Aplicar"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "Approval boundaries"
 msgstr "Límites de aprobación"
 
@@ -945,6 +946,7 @@ msgstr "Modelo de aprobación"
 msgid "Approvals"
 msgstr "Aprobaciones"
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/MessagingSettingsPanel.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
 #: src/pages/shell/message-cards.tsx
@@ -966,6 +968,7 @@ msgstr "Apruébalo o deniégalo en pantalla."
 msgid "Approve this server to let your agent use its tools."
 msgstr "Aprueba este servidor para que tu agente use sus herramientas."
 
+#: src/components/teach/SkillDraftCard.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
 msgid "Approved"
 msgstr "Aprobado"
@@ -1033,6 +1036,10 @@ msgstr "Adjuntar archivo"
 #: src/pages/shell/chat-shared.ts
 msgid "Attachment"
 msgstr "Archivo adjunto"
+
+#: src/pages/admin/AdminSkillsPage.tsx
+msgid "Audience"
+msgstr "Audiencia"
 
 #: src/pages/admin/AdminShell.tsx
 msgid "Audit log"
@@ -2413,6 +2420,7 @@ msgstr ""
 msgid "Could not run routine"
 msgstr "No se pudo ejecutar la rutina"
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/ExternalConversationSettings.tsx
 #: src/pages/KnowledgeSection.tsx
 #: src/pages/McpServersOverlay.tsx
@@ -3298,6 +3306,10 @@ msgstr "Cada mes"
 msgid "Every week"
 msgstr "Cada semana"
 
+#: src/pages/admin/AdminSkillsPage.tsx
+msgid "Everyone"
+msgstr "Todos"
+
 #: src/pages/PluginsOverlay.tsx
 msgid "Executor token"
 msgstr "Token de Executor"
@@ -3386,6 +3398,7 @@ msgid "Failed."
 msgstr "Falló."
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "Failure handling"
 msgstr "Manejo de fallos"
 
@@ -3561,6 +3574,7 @@ msgid "Grants"
 msgstr "Permisos"
 
 #: src/lib/identity-display.ts
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/MessagingSettingsPanel.tsx
 #: src/pages/shell/chat-header.tsx
 #: src/pages/shell/side-panel.tsx
@@ -3717,6 +3731,7 @@ msgid "How other bots see it"
 msgstr "Cómo lo ven otros bots"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "How to check"
 msgstr "Cómo comprobar"
 
@@ -3808,6 +3823,7 @@ msgid "Input"
 msgstr "Entrada"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "Inputs"
 msgstr "Entradas"
 
@@ -4495,6 +4511,7 @@ msgstr ""
 #: src/pages/AccountSettingsOverlay.tsx
 #: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/admin/AdminCapabilitiesPage.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/Auth.tsx
 #: src/pages/GroupPanel.tsx
 #: src/pages/McpServersOverlay.tsx
@@ -4806,6 +4823,7 @@ msgstr "No es una habilidad válida"
 msgid "Not added: {0}"
 msgstr "No se agregaron: {0}"
 
+#: src/components/teach/SkillDraftCard.tsx
 #: src/pages/admin/AdminComputersPage.tsx
 msgid "Not approved"
 msgstr "No aprobada"
@@ -5247,6 +5265,10 @@ msgstr "Por millón de tokens, entrada / salida"
 msgid "Permissions"
 msgstr "Permisos"
 
+#: src/pages/admin/AdminSkillsPage.tsx
+msgid "Person"
+msgstr "Persona"
+
 #: src/pages/shell/agent-import.tsx
 msgid "Persona"
 msgstr "Personalidad"
@@ -5404,6 +5426,7 @@ msgid "Providers"
 msgstr "Proveedores"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/shell/share-employee-dialog.tsx
 msgid "Publish"
 msgstr "Publicar"
@@ -5466,6 +5489,7 @@ msgstr "Leer respuestas en voz alta"
 msgid "Ready"
 msgstr "Listo"
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
 msgid "Reason"
 msgstr "Motivo"
@@ -5607,6 +5631,7 @@ msgstr ""
 msgid "Registration is closed"
 msgstr "El registro está cerrado"
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
 #: src/pages/shell/share-employee-dialog.tsx
 msgid "Reject"
@@ -5646,6 +5671,7 @@ msgstr "Recargar"
 #: src/components/TrustedLinkSitesSettings.tsx
 #: src/components/vault/LoginFieldsInput.tsx
 #: src/components/vault/VaultItemDetail.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/McpServersOverlay.tsx
 #: src/pages/ModelRoleSettings.tsx
 #: src/pages/PluginsOverlay.tsx
@@ -5948,6 +5974,7 @@ msgstr ""
 msgid "Role for {name}"
 msgstr ""
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/shell/share-employee-dialog.tsx
 msgid "Roll back"
 msgstr ""
@@ -6487,6 +6514,7 @@ msgstr "Habilidad {position}"
 #: src/components/integrations/plugin-marketplace.tsx
 #: src/components/integrations/skills-dialog.tsx
 #: src/components/SidebarFooter.tsx
+#: src/pages/admin/AdminShell.tsx
 #: src/pages/Shell.tsx
 #: src/pages/shell/agent-import.tsx
 #: src/pages/shell/hire-role-dialog.tsx
@@ -6670,6 +6698,7 @@ msgid "Status"
 msgstr "Estado"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "Steps"
 msgstr "Pasos"
 
@@ -7466,6 +7495,10 @@ msgstr "Usa hasta 512 letras, dígitos, _ o -."
 msgid "User"
 msgstr ""
 
+#: src/pages/admin/AdminSkillsPage.tsx
+msgid "User ID"
+msgstr "ID de usuario"
+
 #: src/pages/memory-providers/HonchoSettingsForm.tsx
 msgid "User peer"
 msgstr "Peer del usuario"
@@ -7534,6 +7567,7 @@ msgstr "Verificar y agregar"
 msgid "Verifying…"
 msgstr "Verificando…"
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/Artifacts.tsx
 msgid "Version"
 msgstr "Versión"
@@ -7581,6 +7615,11 @@ msgstr "Espera un momento y vuelve a probar."
 #: src/lib/work-phase.ts
 msgid "Waiting"
 msgstr "En espera"
+
+#: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
+msgid "Waiting for review"
+msgstr "Esperando revisión"
 
 #: src/lib/roster-status.ts
 msgid "Waiting in line…"
@@ -7666,6 +7705,7 @@ msgid "What this bot is for"
 msgstr "Para qué es este bot"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "What to return"
 msgstr "Qué devolver"
 
@@ -7696,6 +7736,7 @@ msgstr "Cuándo ejecutar"
 #: src/components/teach/SkillDraftCard.tsx
 #: src/components/vault/VaultItemDetail.tsx
 #: src/components/vault/VaultItemEditor.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "When to use"
 msgstr "Cuándo usar"
 

@@ -933,6 +933,7 @@ msgid "Apply"
 msgstr "Uygula"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "Approval boundaries"
 msgstr "Onay sınırları"
 
@@ -945,6 +946,7 @@ msgstr "Onay modeli"
 msgid "Approvals"
 msgstr "Onaylar"
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/MessagingSettingsPanel.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
 #: src/pages/shell/message-cards.tsx
@@ -966,6 +968,7 @@ msgstr "Ekranda onayla veya reddet."
 msgid "Approve this server to let your agent use its tools."
 msgstr "Agent'ının bu sunucunun araçlarını kullanabilmesi için sunucuyu onayla."
 
+#: src/components/teach/SkillDraftCard.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
 msgid "Approved"
 msgstr ""
@@ -1033,6 +1036,10 @@ msgstr "Dosya ekle"
 #: src/pages/shell/chat-shared.ts
 msgid "Attachment"
 msgstr "Ek"
+
+#: src/pages/admin/AdminSkillsPage.tsx
+msgid "Audience"
+msgstr "Hedef kitle"
 
 #: src/pages/admin/AdminShell.tsx
 msgid "Audit log"
@@ -2413,6 +2420,7 @@ msgstr ""
 msgid "Could not run routine"
 msgstr ""
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/ExternalConversationSettings.tsx
 #: src/pages/KnowledgeSection.tsx
 #: src/pages/McpServersOverlay.tsx
@@ -3298,6 +3306,10 @@ msgstr "Her ay"
 msgid "Every week"
 msgstr "Her hafta"
 
+#: src/pages/admin/AdminSkillsPage.tsx
+msgid "Everyone"
+msgstr "Herkes"
+
 #: src/pages/PluginsOverlay.tsx
 msgid "Executor token"
 msgstr "Executor belirteci"
@@ -3386,6 +3398,7 @@ msgid "Failed."
 msgstr "Başarısız oldu."
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "Failure handling"
 msgstr "Hata yönetimi"
 
@@ -3561,6 +3574,7 @@ msgid "Grants"
 msgstr "İzinler"
 
 #: src/lib/identity-display.ts
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/MessagingSettingsPanel.tsx
 #: src/pages/shell/chat-header.tsx
 #: src/pages/shell/side-panel.tsx
@@ -3717,6 +3731,7 @@ msgid "How other bots see it"
 msgstr "Diğer botlar onu nasıl görüyor"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "How to check"
 msgstr "Nasıl kontrol edilir"
 
@@ -3808,6 +3823,7 @@ msgid "Input"
 msgstr "Girdi"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "Inputs"
 msgstr "Girdiler"
 
@@ -4495,6 +4511,7 @@ msgstr ""
 #: src/pages/AccountSettingsOverlay.tsx
 #: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/admin/AdminCapabilitiesPage.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/Auth.tsx
 #: src/pages/GroupPanel.tsx
 #: src/pages/McpServersOverlay.tsx
@@ -4806,6 +4823,7 @@ msgstr "Geçerli bir beceri değil"
 msgid "Not added: {0}"
 msgstr ""
 
+#: src/components/teach/SkillDraftCard.tsx
 #: src/pages/admin/AdminComputersPage.tsx
 msgid "Not approved"
 msgstr "Onaylanmadı"
@@ -5247,6 +5265,10 @@ msgstr "Milyon token başına, girdi / çıktı"
 msgid "Permissions"
 msgstr "İzinler"
 
+#: src/pages/admin/AdminSkillsPage.tsx
+msgid "Person"
+msgstr "Kişi"
+
 #: src/pages/shell/agent-import.tsx
 msgid "Persona"
 msgstr "Kişilik"
@@ -5404,6 +5426,7 @@ msgid "Providers"
 msgstr "Sağlayıcılar"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/shell/share-employee-dialog.tsx
 msgid "Publish"
 msgstr "Yayınla"
@@ -5466,6 +5489,7 @@ msgstr "Yanıtları sesli oku"
 msgid "Ready"
 msgstr "Hazır"
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
 msgid "Reason"
 msgstr ""
@@ -5607,6 +5631,7 @@ msgstr ""
 msgid "Registration is closed"
 msgstr "Kayıt kapalı"
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
 #: src/pages/shell/share-employee-dialog.tsx
 msgid "Reject"
@@ -5646,6 +5671,7 @@ msgstr "Yeniden yükle"
 #: src/components/TrustedLinkSitesSettings.tsx
 #: src/components/vault/LoginFieldsInput.tsx
 #: src/components/vault/VaultItemDetail.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/McpServersOverlay.tsx
 #: src/pages/ModelRoleSettings.tsx
 #: src/pages/PluginsOverlay.tsx
@@ -5948,6 +5974,7 @@ msgstr ""
 msgid "Role for {name}"
 msgstr ""
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/shell/share-employee-dialog.tsx
 msgid "Roll back"
 msgstr ""
@@ -6487,6 +6514,7 @@ msgstr "Beceri {position}"
 #: src/components/integrations/plugin-marketplace.tsx
 #: src/components/integrations/skills-dialog.tsx
 #: src/components/SidebarFooter.tsx
+#: src/pages/admin/AdminShell.tsx
 #: src/pages/Shell.tsx
 #: src/pages/shell/agent-import.tsx
 #: src/pages/shell/hire-role-dialog.tsx
@@ -6670,6 +6698,7 @@ msgid "Status"
 msgstr ""
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "Steps"
 msgstr "Adımlar"
 
@@ -7466,6 +7495,10 @@ msgstr ""
 msgid "User"
 msgstr ""
 
+#: src/pages/admin/AdminSkillsPage.tsx
+msgid "User ID"
+msgstr "Kullanıcı kimliği"
+
 #: src/pages/memory-providers/HonchoSettingsForm.tsx
 msgid "User peer"
 msgstr ""
@@ -7534,6 +7567,7 @@ msgstr "Doğrula ve ekle"
 msgid "Verifying…"
 msgstr "Doğrulanıyor…"
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/Artifacts.tsx
 msgid "Version"
 msgstr ""
@@ -7581,6 +7615,11 @@ msgstr "Biraz bekle ve yeniden test et."
 #: src/lib/work-phase.ts
 msgid "Waiting"
 msgstr "Bekliyor"
+
+#: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
+msgid "Waiting for review"
+msgstr "İnceleme bekliyor"
 
 #: src/lib/roster-status.ts
 msgid "Waiting in line…"
@@ -7666,6 +7705,7 @@ msgid "What this bot is for"
 msgstr "Bu botun amacı"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "What to return"
 msgstr "Ne döndürülecek"
 
@@ -7696,6 +7736,7 @@ msgstr "Ne zaman çalışacak"
 #: src/components/teach/SkillDraftCard.tsx
 #: src/components/vault/VaultItemDetail.tsx
 #: src/components/vault/VaultItemEditor.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "When to use"
 msgstr "Ne zaman kullanılır"
 
