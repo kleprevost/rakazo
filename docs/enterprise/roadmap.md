@@ -42,6 +42,36 @@ PoC on Azure Container Apps (web, API) with the Docker supervisor, bot computers
 Deploy the Bicep, run a smoke test, confirm the items listed as unverified in each `docs/enterprise/*.md`
 (Kata handler name, Cilium enforcement of bot egress, Key Vault purge/RBAC, Entra claims, Foundry deployment names).
 
+## Wave 4 (priority order)
+Release gate for cross-user delegation and shared skills: two Entra users add the same Executive
+Assistant; each reads only their approved calendar; writes, sends and the other user's connection
+are denied; a revoked grant blocks the next call; a fleet operator cannot revoke user sessions.
+
+1. **Trust: enforce the broker + split operator permissions.** Grant decisions in live tool
+   execution and credential resolution (broker PR 5+); operator roles so fleet operations and
+   quarantine stop sharing the broad admin gate. Quarantine should also contain the computer
+   (network/stop), not only the application.
+2. **Independent assignments per employee.** Each assignment gets its own conversation, status,
+   run history, approvals and files, built on the work-item read model. Create, search, resume,
+   steer, cancel, archive. Two jobs on one employee stay independently addressable; Today and
+   Board open the same assignment. Branch/rewind later. Fix in the same track: Today shows waiting
+   runs under Working; Board realtime leaves the open ticket's linked work stale.
+3. **Automation receipts and exceptions.** Visible routine outcomes: no change, action needed,
+   failed, missed. Unchanged checks stay quiet; a source outage differs from a clean check.
+4. **Reviewable shared knowledge.** Source-linked memory proposals with accept (undo) / reject
+   (stays dismissed), published to a shared employee; source conversation stays private.
+5. **Publish a taught skill to a pilot group.** Reviewable diff, pinned version, fresh-input test,
+   pilot access, rollback. Publishing grants no tool access.
+6. **Primary assistant with visible handoffs.** A nominated bot delegates linked child
+   assignments (owner, scoped brief, return destination); each child runs under its own
+   authorization; the user gets one consolidated deliverable.
+7. **Release verification.** Images publish `edge` without a test gate; add a fast gate
+   (typecheck + adapters unit) before `edge` moves.
+
+First demo: "Watch the inbox for replies on these three commitments, prepare tomorrow's briefing,
+and ask before sending anything" — monitoring and briefing as separate assignments, quiet on
+unchanged checks, a real exception surfaced in Today, back to the exact draft for approval.
+
 ## Wave 3 backlog
 Epics only; each needs its own design before building. Shared employees is designed in
 [features/shared-employees.md](./features/shared-employees.md).
