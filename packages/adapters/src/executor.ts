@@ -137,6 +137,7 @@ import { modelAcceptsImageInput } from "./model-vision.js";
 import { usesNativeShell } from "./native-shell.js";
 import { paymentWalletConnected } from "./payment-wallets.js";
 import { isRetiredModelCredentialError } from "./pi-oauth.js";
+import { restoreComputerModels } from "./pi-runtime-computer-mode.js";
 import { assertBudgetAvailable } from "./policy-budgets.js";
 import {
   assertHostComputerAllowed,
@@ -146,7 +147,6 @@ import {
 } from "./policy-capabilities.js";
 import { policyOfferedTools } from "./policy-tools.js";
 import { loadPublishedSkills } from "./published-skills.js";
-import { restoreComputerModels } from "./pi-runtime-computer-mode.js";
 import { loadPurchaseRedactions } from "./purchase-service.js";
 import { loadReplyContext, messageToAgentHistoryText } from "./reply-context.js";
 import { backOffRoutineAfterAccountError } from "./routine-backoff.js";
