@@ -209,8 +209,8 @@ describe("ShareEmployeeDialog", () => {
     const api = makeApi("owner", ownerGrants);
     await render(api);
     await choose(byLabel("Role"), "viewer");
-    await type(byLabel("Add people or groups") as HTMLInputElement, "bo");
-    expect(api.people.search).toHaveBeenCalledWith({ employeeId: "emp-1", q: "bo" });
+    await type(byLabel("Add people or groups") as HTMLInputElement, "bob");
+    expect(api.people.search).toHaveBeenCalledWith({ employeeId: "emp-1", q: "bob" });
     await click(button("Bob Lee"));
     expect(api.grants.set).toHaveBeenCalledWith({
       employeeId: "emp-1",

@@ -443,19 +443,23 @@ export async function listGrants(
 }
 
 const PEOPLE_SEARCH_LIMIT = 8;
+/** Short queries match too many people; this keeps the search from listing the directory. */
+export const PEOPLE_SEARCH_MIN_QUERY = 3;
 
 /**
  * People a Manager or Owner can name in a grant, found by part of a name or email. It asks for
  * `manage_grants` and returns identity only, never anything from the person's own space.
  */
 export async function searchPeople(
-  deps: EmployeesDeps,
+  deps: EmployeesDeps & { env?: { sharedEmployeesEnabled?: boolean } },
   actor: Actor,
   input: { employeeId: string; q: string },
 ): Promise<Array<{ userId: string; name: string; email: string }>> {
   await authorize(deps.prisma, actor.userId, input.employeeId, "manage_grants");
+  if (!deps.env?.sharedEmployeesEnabled)
+    throw new ORPCError("FORBIDDEN", { message: "Shared employees are not turned on" });
   const q = input.q.trim();
-  if (q.length < 2) return [];
+  if (q.length < PEOPLE_SEARCH_MIN_QUERY) return [];
   const users = await deps.prisma.user.findMany({
     where: {
       id: { not: actor.userId },

@@ -117,7 +117,7 @@ function Access({ employeeId, api }: { employeeId: string; api: EmployeesApi }) 
   const search = (value: string) => {
     setQuery(value);
     const seq = ++searchSeq.current;
-    if (value.trim().length < 2) return setPeople([]);
+    if (value.trim().length < 3) return setPeople([]);
     api.people
       .search({ employeeId, q: value.trim() })
       .then((found) => {
