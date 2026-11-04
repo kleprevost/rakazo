@@ -195,6 +195,7 @@ describeWithDatabase("API authorization and resource isolation", () => {
     expect(await rpc<unknown[]>(app, peer, "employees/list", {}, peerActor.spaceId)).toEqual([]);
     for (const [path, body] of [
       ["employees/get", { employeeId }],
+      ["employees/people/search", { employeeId, q: "ab" }],
       ["employees/versions/saveDraft", { employeeId }],
       ["employees/grants/list", { employeeId }],
       [
@@ -527,6 +528,7 @@ describeWithDatabase("API authorization and resource isolation", () => {
       ["employees/versions/publish", { employeeId: "missing-employee", versionId: "missing" }],
       ["employees/versions/rollback", { employeeId: "missing-employee", versionId: "missing" }],
       ["employees/grants/list", { employeeId: "missing-employee" }],
+      ["employees/people/search", { employeeId: "missing-employee", q: "ab" }],
       [
         "employees/grants/set",
         {

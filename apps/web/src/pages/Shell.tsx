@@ -905,6 +905,7 @@ function SpaceShell() {
         dialogs={dialogs}
         openChatSettings={openChatSettings}
         navigate={navigate}
+        sharedEmployeesEnabled={bootstrapMe?.sharedEmployeesEnabled === true}
       />
     ) : null;
   const shell = (

@@ -1,4 +1,6 @@
-import type { Bot, BotSection, Group } from "@rakazo/contracts";
+import type { Bot, BotSection, EmployeeRole, Group } from "@rakazo/contracts";
+import { evaluateEmployeeAccess } from "@rakazo/core";
+import { useEffect, useState } from "react";
 import { lazyOverlay } from "../../components/ErrorBoundary";
 import type { createSpaceRpc } from "../../lib/rpc";
 import type { ShellDialogsState } from "./shell-dialogs";
@@ -23,6 +25,7 @@ export function ChatContextMenu({
   dialogs,
   openChatSettings,
   navigate,
+  sharedEmployeesEnabled,
 }: {
   rpc: ReturnType<typeof createSpaceRpc>;
   bot: Bot | undefined;
@@ -35,7 +38,32 @@ export function ChatContextMenu({
   dialogs: ShellDialogsState;
   openChatSettings: (kind: "bot" | "group", id: string) => void;
   navigate: (path: string) => void;
+  /** The deployment lets people share AI employees. */
+  sharedEmployeesEnabled: boolean;
 }) {
+  const [employeeRole, setEmployeeRole] = useState<EmployeeRole | null>(null);
+  const employeeId = bot?.employeeId;
+  useEffect(() => {
+    if (!sharedEmployeesEnabled || !employeeId) return;
+    let live = true;
+    rpc.employees
+      .list()
+      .then((cards) => {
+        if (live) setEmployeeRole(cards.find((card) => card.id === employeeId)?.role ?? null);
+      })
+      .catch(() => undefined);
+    return () => {
+      live = false;
+    };
+  }, [rpc, sharedEmployeesEnabled, employeeId]);
+  // A private bot can always be shared by its owner; a shared one only by people who manage access.
+  const canShare =
+    sharedEmployeesEnabled &&
+    bot !== undefined &&
+    (employeeId
+      ? employeeRole !== null &&
+        evaluateEmployeeAccess({ role: employeeRole, action: "manage_grants" }).allowed
+      : true);
   const chat = bot ?? group;
   if (!chat) return null;
   const target = bot
@@ -108,6 +136,14 @@ export function ChatContextMenu({
           : rpc.groups.archive({ groupId: group!.id });
         void request.then(() => refreshBots(true));
       }}
+      onShare={
+        canShare
+          ? () => {
+              dialogs.setShareTarget(bot!);
+              onClose();
+            }
+          : undefined
+      }
       onDelete={() => {
         if (bot) dialogs.setDeleteTarget(bot);
         else dialogs.setDeleteGroupTarget(group!);

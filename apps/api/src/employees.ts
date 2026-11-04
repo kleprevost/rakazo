@@ -423,7 +423,52 @@ export async function listGrants(
     where: { employeeId },
     orderBy: [{ createdAt: "asc" }, { id: "asc" }],
   });
-  return grants.flatMap((grant) => toGrant(grant));
+  const users = await deps.prisma.user.findMany({
+    where: {
+      id: {
+        in: grants
+          .filter((grant) => grant.subjectKind === "user")
+          .map((grant) => grant.subjectValue),
+      },
+    },
+    select: { id: true, name: true, email: true },
+  });
+  const labels = new Map(users.map((user) => [user.id, user.name || user.email]));
+  return grants.flatMap((grant) =>
+    toGrant(grant).map((entry) => ({
+      ...entry,
+      subjectLabel: entry.subjectKind === "user" ? labels.get(entry.subjectValue) : undefined,
+    })),
+  );
+}
+
+const PEOPLE_SEARCH_LIMIT = 8;
+
+/**
+ * People a Manager or Owner can name in a grant, found by part of a name or email. It asks for
+ * `manage_grants` and returns identity only, never anything from the person's own space.
+ */
+export async function searchPeople(
+  deps: EmployeesDeps,
+  actor: Actor,
+  input: { employeeId: string; q: string },
+): Promise<Array<{ userId: string; name: string; email: string }>> {
+  await authorize(deps.prisma, actor.userId, input.employeeId, "manage_grants");
+  const q = input.q.trim();
+  if (q.length < 2) return [];
+  const users = await deps.prisma.user.findMany({
+    where: {
+      id: { not: actor.userId },
+      OR: [
+        { name: { contains: q, mode: "insensitive" } },
+        { email: { contains: q, mode: "insensitive" } },
+      ],
+    },
+    select: { id: true, name: true, email: true },
+    orderBy: [{ name: "asc" }, { id: "asc" }],
+    take: PEOPLE_SEARCH_LIMIT,
+  });
+  return users.map((user) => ({ userId: user.id, name: user.name, email: user.email }));
 }
 
 function toGrant(grant: {

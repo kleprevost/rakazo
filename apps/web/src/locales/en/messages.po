@@ -444,6 +444,10 @@ msgstr "About {kb} KB of memory no longer reaches the bot."
 msgid "About {label}"
 msgstr "About {label}"
 
+#: src/pages/shell/share-employee-dialog.tsx
+msgid "Access"
+msgstr "Access"
+
 #: src/components/ComputerProviderSettings.tsx
 msgid "Access key ID"
 msgstr "Access key ID"
@@ -603,6 +607,10 @@ msgstr "Add open work"
 #: src/components/PasskeySettings.tsx
 msgid "Add passkey"
 msgstr "Add passkey"
+
+#: src/pages/shell/share-employee-dialog.tsx
+msgid "Add people or groups"
+msgstr "Add people or groups"
 
 #: src/pages/model-settings/providers-section.tsx
 msgid "Add provider"
@@ -1270,6 +1278,7 @@ msgstr "Can't read images"
 #: src/pages/PluginSubmissionsPanel.tsx
 #: src/pages/shell/create-bot-dialog.tsx
 #: src/pages/shell/dialogs.tsx
+#: src/pages/shell/share-employee-dialog.tsx
 #: src/pages/SpaceSettingOverrides.tsx
 msgid "Cancel"
 msgstr "Cancel"
@@ -1580,6 +1589,10 @@ msgstr "Code"
 msgctxt "email sign-in"
 msgid "Code"
 msgstr "Code"
+
+#: src/pages/shell/share-employee-dialog.tsx
+msgid "Collaborator"
+msgstr "Collaborator"
 
 #. placeholder {0}: headerName(group)
 #: src/pages/shell/sidebar-roster.tsx
@@ -2141,6 +2154,7 @@ msgstr "Could not install plugin"
 #: src/components/PasskeySettings.tsx
 #: src/lib/user-devices.ts
 #: src/pages/KnowledgeSection.tsx
+#: src/pages/shell/share-employee-dialog.tsx
 msgid "Could not load"
 msgstr "Could not load"
 
@@ -2334,6 +2348,7 @@ msgstr "Could not run routine"
 #: src/pages/McpServersOverlay.tsx
 #: src/pages/shell/bot-panel.tsx
 #: src/pages/shell/dialogs.tsx
+#: src/pages/shell/share-employee-dialog.tsx
 #: src/pages/shell/use-space-roster.ts
 msgid "Could not save"
 msgstr "Could not save"
@@ -2399,6 +2414,10 @@ msgstr "Could not send reset email"
 #: src/lib/call-session.ts
 msgid "Could not send that"
 msgstr "Could not send that"
+
+#: src/pages/shell/share-employee-dialog.tsx
+msgid "Could not share"
+msgstr "Could not share"
 
 #: src/components/VaultSettings.tsx
 msgid "Could not show the credential"
@@ -2609,6 +2628,10 @@ msgstr "Cron"
 #: src/pages/RoutineSchedule.tsx
 msgid "Cron expression"
 msgstr "Cron expression"
+
+#: src/pages/shell/share-employee-dialog.tsx
+msgid "Current"
+msgstr "Current"
 
 #: src/components/AccountAccess.tsx
 #: src/pages/AccountSettingsOverlay.tsx
@@ -3447,6 +3470,10 @@ msgstr "Granting…"
 msgid "Group"
 msgstr "Group"
 
+#: src/pages/shell/share-employee-dialog.tsx
+msgid "Group {groupValue}"
+msgstr "Group {groupValue}"
+
 #: src/pages/GroupPanel.tsx
 msgid "Group settings"
 msgstr "Group settings"
@@ -4016,6 +4043,10 @@ msgstr "Manage MCP servers"
 msgid "Manage other bots"
 msgstr "Manage other bots"
 
+#: src/pages/shell/share-employee-dialog.tsx
+msgid "Manager"
+msgstr "Manager"
+
 #: src/pages/PluginsOverlay.tsx
 msgid "Manual"
 msgstr "Manual"
@@ -4377,6 +4408,10 @@ msgstr "Name this routine"
 #: src/pages/shell/create-bot-dialog.tsx
 msgid "Name your Bot"
 msgstr "Name your Bot"
+
+#: src/pages/shell/share-employee-dialog.tsx
+msgid "Name, email or group"
+msgstr "Name, email or group"
 
 #: src/lib/roster-status.ts
 msgid "Needs an answer"
@@ -4772,6 +4807,10 @@ msgstr "One-time purchase. Credits do not expire."
 msgid "Only enter a code {codeHost} sent you."
 msgstr "Only enter a code {codeHost} sent you."
 
+#: src/pages/shell/share-employee-dialog.tsx
+msgid "Only managers can change access"
+msgstr "Only managers can change access"
+
 #: src/components/pages/SharePopover.tsx
 msgid "Only you"
 msgstr "Only you"
@@ -4913,6 +4952,7 @@ msgstr "Overview"
 #: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/Board.tsx
+#: src/pages/shell/share-employee-dialog.tsx
 msgid "Owner"
 msgstr "Owner"
 
@@ -5216,6 +5256,10 @@ msgstr "Provider"
 msgid "Providers"
 msgstr "Providers"
 
+#: src/pages/shell/share-employee-dialog.tsx
+msgid "Publish"
+msgstr "Publish"
+
 #: src/components/CloudAgentCard.tsx
 msgid "Pull request"
 msgstr "Pull request"
@@ -5462,6 +5506,10 @@ msgstr "Remove {0}"
 #: src/pages/GroupPanel.tsx
 msgid "Remove {0} from the group"
 msgstr "Remove {0} from the group"
+
+#: src/pages/shell/share-employee-dialog.tsx
+msgid "Remove {name}"
+msgstr "Remove {name}"
 
 #: src/components/vault/VaultItemDetail.tsx
 msgid "Remove {secretName}? Bots will no longer be able to use it."
@@ -5715,8 +5763,17 @@ msgid "Revoked"
 msgstr "Revoked"
 
 #: src/pages/admin/AdminUsersPage.tsx
+#: src/pages/shell/share-employee-dialog.tsx
 msgid "Role"
 msgstr "Role"
+
+#: src/pages/shell/share-employee-dialog.tsx
+msgid "Role for {name}"
+msgstr "Role for {name}"
+
+#: src/pages/shell/share-employee-dialog.tsx
+msgid "Roll back"
+msgstr "Roll back"
 
 #: src/components/ComputerProviderSettings.tsx
 msgid "Root filesystem"
@@ -6094,12 +6151,19 @@ msgstr "Shape {0}"
 
 #: src/components/pages/PagesList.tsx
 #: src/components/pages/SharePopover.tsx
+#: src/pages/BotContextMenu.tsx
+#: src/pages/shell/share-employee-dialog.tsx
 msgid "Share"
 msgstr "Share"
 
 #: src/components/pages/SharePopover.tsx
 msgid "Share “{title}”"
 msgstr "Share “{title}”"
+
+#. placeholder {0}: bot.name
+#: src/pages/shell/share-employee-dialog.tsx
+msgid "Share {0}"
+msgstr "Share {0}"
 
 #: src/components/pages/SharePopover.tsx
 msgid "Share, anyone with the link can view"
@@ -7250,11 +7314,17 @@ msgid "Version"
 msgstr "Version"
 
 #. placeholder {0}: data.policy.version
+#. placeholder {0}: version.number
 #. placeholder {0}: view.version
 #: src/pages/admin/AdminOverviewPage.tsx
 #: src/pages/admin/AdminPolicyPage.tsx
+#: src/pages/shell/share-employee-dialog.tsx
 msgid "Version {0}"
 msgstr "Version {0}"
+
+#: src/pages/shell/share-employee-dialog.tsx
+msgid "Versions"
+msgstr "Versions"
 
 #: src/pages/PluginsOverlay.tsx
 msgid "View all"
@@ -7263,6 +7333,10 @@ msgstr "View all"
 #: src/components/integrations/plugin-marketplace.tsx
 msgid "View source"
 msgstr "View source"
+
+#: src/pages/shell/share-employee-dialog.tsx
+msgid "Viewer"
+msgstr "Viewer"
 
 #: src/pages/settings-nav.ts
 #: src/pages/shell/bot-panel.tsx

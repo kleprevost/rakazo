@@ -7,6 +7,7 @@ import {
   removeGrant,
   rollbackVersion,
   saveDraft,
+  searchPeople,
   setGrant,
   shareBot,
 } from "../employees.js";
@@ -36,6 +37,11 @@ export function employeesRoutes(ctx: RouterContext) {
         ),
         rollback: authed.employees.versions.rollback.handler(({ context, input }) =>
           rollbackVersion(deps, context.actor, input),
+        ),
+      },
+      people: {
+        search: authed.employees.people.search.handler(({ context, input }) =>
+          searchPeople(deps, context.actor, input),
         ),
       },
       grants: {

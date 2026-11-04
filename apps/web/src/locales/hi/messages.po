@@ -444,6 +444,10 @@ msgstr ""
 msgid "About {label}"
 msgstr "{label} के बारे में"
 
+#: src/pages/shell/share-employee-dialog.tsx
+msgid "Access"
+msgstr ""
+
 #: src/components/ComputerProviderSettings.tsx
 msgid "Access key ID"
 msgstr ""
@@ -603,6 +607,10 @@ msgstr "खुला कार्य जोड़ें"
 #: src/components/PasskeySettings.tsx
 msgid "Add passkey"
 msgstr "पासकी जोड़ें"
+
+#: src/pages/shell/share-employee-dialog.tsx
+msgid "Add people or groups"
+msgstr ""
 
 #: src/pages/model-settings/providers-section.tsx
 msgid "Add provider"
@@ -1270,6 +1278,7 @@ msgstr "तस्वीरें नहीं पढ़ सकता"
 #: src/pages/PluginSubmissionsPanel.tsx
 #: src/pages/shell/create-bot-dialog.tsx
 #: src/pages/shell/dialogs.tsx
+#: src/pages/shell/share-employee-dialog.tsx
 #: src/pages/SpaceSettingOverrides.tsx
 msgid "Cancel"
 msgstr "रद्द करें"
@@ -1580,6 +1589,10 @@ msgstr "कोड"
 msgctxt "email sign-in"
 msgid "Code"
 msgstr "कोड"
+
+#: src/pages/shell/share-employee-dialog.tsx
+msgid "Collaborator"
+msgstr ""
 
 #. placeholder {0}: headerName(group)
 #: src/pages/shell/sidebar-roster.tsx
@@ -2141,6 +2154,7 @@ msgstr ""
 #: src/components/PasskeySettings.tsx
 #: src/lib/user-devices.ts
 #: src/pages/KnowledgeSection.tsx
+#: src/pages/shell/share-employee-dialog.tsx
 msgid "Could not load"
 msgstr "लोड नहीं हो सका"
 
@@ -2334,6 +2348,7 @@ msgstr ""
 #: src/pages/McpServersOverlay.tsx
 #: src/pages/shell/bot-panel.tsx
 #: src/pages/shell/dialogs.tsx
+#: src/pages/shell/share-employee-dialog.tsx
 #: src/pages/shell/use-space-roster.ts
 msgid "Could not save"
 msgstr "सहेजा नहीं जा सका"
@@ -2399,6 +2414,10 @@ msgstr "रीसेट ईमेल नहीं भेजा जा सका"
 #: src/lib/call-session.ts
 msgid "Could not send that"
 msgstr "वह भेजा नहीं जा सका"
+
+#: src/pages/shell/share-employee-dialog.tsx
+msgid "Could not share"
+msgstr ""
 
 #: src/components/VaultSettings.tsx
 msgid "Could not show the credential"
@@ -2609,6 +2628,10 @@ msgstr "Cron"
 #: src/pages/RoutineSchedule.tsx
 msgid "Cron expression"
 msgstr "Cron एक्सप्रेशन"
+
+#: src/pages/shell/share-employee-dialog.tsx
+msgid "Current"
+msgstr ""
 
 #: src/components/AccountAccess.tsx
 #: src/pages/AccountSettingsOverlay.tsx
@@ -3447,6 +3470,10 @@ msgstr ""
 msgid "Group"
 msgstr "समूह"
 
+#: src/pages/shell/share-employee-dialog.tsx
+msgid "Group {groupValue}"
+msgstr ""
+
 #: src/pages/GroupPanel.tsx
 msgid "Group settings"
 msgstr "समूह सेटिंग्स"
@@ -4016,6 +4043,10 @@ msgstr "MCP सर्वर प्रबंधित करें"
 msgid "Manage other bots"
 msgstr "अन्य बॉट प्रबंधित करें"
 
+#: src/pages/shell/share-employee-dialog.tsx
+msgid "Manager"
+msgstr ""
+
 #: src/pages/PluginsOverlay.tsx
 msgid "Manual"
 msgstr ""
@@ -4376,6 +4407,10 @@ msgstr ""
 
 #: src/pages/shell/create-bot-dialog.tsx
 msgid "Name your Bot"
+msgstr ""
+
+#: src/pages/shell/share-employee-dialog.tsx
+msgid "Name, email or group"
 msgstr ""
 
 #: src/lib/roster-status.ts
@@ -4772,6 +4807,10 @@ msgstr ""
 msgid "Only enter a code {codeHost} sent you."
 msgstr ""
 
+#: src/pages/shell/share-employee-dialog.tsx
+msgid "Only managers can change access"
+msgstr ""
+
 #: src/components/pages/SharePopover.tsx
 msgid "Only you"
 msgstr "सिर्फ़ आप"
@@ -4913,6 +4952,7 @@ msgstr ""
 #: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/Board.tsx
+#: src/pages/shell/share-employee-dialog.tsx
 msgid "Owner"
 msgstr "मालिक"
 
@@ -5216,6 +5256,10 @@ msgstr "प्रोवाइडर"
 msgid "Providers"
 msgstr "प्रोवाइडर"
 
+#: src/pages/shell/share-employee-dialog.tsx
+msgid "Publish"
+msgstr ""
+
 #: src/components/CloudAgentCard.tsx
 msgid "Pull request"
 msgstr "पुल अनुरोध"
@@ -5461,6 +5505,10 @@ msgstr "{0} हटाएं"
 #. placeholder {0}: bot.name
 #: src/pages/GroupPanel.tsx
 msgid "Remove {0} from the group"
+msgstr ""
+
+#: src/pages/shell/share-employee-dialog.tsx
+msgid "Remove {name}"
 msgstr ""
 
 #: src/components/vault/VaultItemDetail.tsx
@@ -5715,7 +5763,16 @@ msgid "Revoked"
 msgstr ""
 
 #: src/pages/admin/AdminUsersPage.tsx
+#: src/pages/shell/share-employee-dialog.tsx
 msgid "Role"
+msgstr ""
+
+#: src/pages/shell/share-employee-dialog.tsx
+msgid "Role for {name}"
+msgstr ""
+
+#: src/pages/shell/share-employee-dialog.tsx
+msgid "Roll back"
 msgstr ""
 
 #: src/components/ComputerProviderSettings.tsx
@@ -6094,12 +6151,19 @@ msgstr ""
 
 #: src/components/pages/PagesList.tsx
 #: src/components/pages/SharePopover.tsx
+#: src/pages/BotContextMenu.tsx
+#: src/pages/shell/share-employee-dialog.tsx
 msgid "Share"
 msgstr "शेयर करें"
 
 #: src/components/pages/SharePopover.tsx
 msgid "Share “{title}”"
 msgstr "“{title}” शेयर करें"
+
+#. placeholder {0}: bot.name
+#: src/pages/shell/share-employee-dialog.tsx
+msgid "Share {0}"
+msgstr ""
 
 #: src/components/pages/SharePopover.tsx
 msgid "Share, anyone with the link can view"
@@ -7250,10 +7314,16 @@ msgid "Version"
 msgstr ""
 
 #. placeholder {0}: data.policy.version
+#. placeholder {0}: version.number
 #. placeholder {0}: view.version
 #: src/pages/admin/AdminOverviewPage.tsx
 #: src/pages/admin/AdminPolicyPage.tsx
+#: src/pages/shell/share-employee-dialog.tsx
 msgid "Version {0}"
+msgstr ""
+
+#: src/pages/shell/share-employee-dialog.tsx
+msgid "Versions"
 msgstr ""
 
 #: src/pages/PluginsOverlay.tsx
@@ -7262,6 +7332,10 @@ msgstr ""
 
 #: src/components/integrations/plugin-marketplace.tsx
 msgid "View source"
+msgstr ""
+
+#: src/pages/shell/share-employee-dialog.tsx
+msgid "Viewer"
 msgstr ""
 
 #: src/pages/settings-nav.ts
