@@ -68,6 +68,11 @@ msgstr ""
 msgid "{0, plural, one {Switch # bot to the space default?} other {Switch # bots to the space default?}}"
 msgstr ""
 
+#. placeholder {0}: selected.size
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "{0, plural, one {Terminate # computer?} other {Terminate # computers?}}"
+msgstr "{0, plural, one {Завершить # компьютер?} few {Завершить # компьютера?} many {Завершить # компьютеров?} other {Завершить # компьютера?}}"
+
 #. placeholder {0}: Math.ceil(oauth.expiresInSeconds / 60)
 #: src/pages/model-settings/connection-controls.tsx
 #: src/pages/Onboarding.tsx
@@ -1283,6 +1288,7 @@ msgstr "Не может читать изображения"
 #: src/components/teach/TeachComputerOverlay.tsx
 #: src/components/vault/VaultItemDetail.tsx
 #: src/pages/AccountSettingsOverlay.tsx
+#: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/Artifacts.tsx
 #: src/pages/KnowledgeSection.tsx
 #: src/pages/McpServersOverlay.tsx
@@ -6728,6 +6734,10 @@ msgstr "Сообщение Teams"
 #: src/components/ComputerProviderSettings.tsx
 msgid "Template"
 msgstr ""
+
+#: src/pages/admin/AdminFleetOperations.tsx
+msgid "Terminate"
+msgstr "Завершить"
 
 #: src/components/teach/SkillDraftCard.tsx
 msgid "Test"

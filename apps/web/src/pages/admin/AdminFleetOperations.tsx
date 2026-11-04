@@ -24,7 +24,12 @@ export function useFleetLabels() {
   const { t } = useLingui();
   return {
     kind: (kind: FleetOperation["kind"]) =>
-      ({ hibernate: t`Hibernate`, wake: t`Wake`, recreate: t`Recreate` })[kind],
+      ({
+        hibernate: t`Hibernate`,
+        wake: t`Wake`,
+        recreate: t`Recreate`,
+        terminate: t`Terminate`,
+      })[kind],
     operation: (status: FleetOperation["status"]) =>
       ({
         queued: t`Queued`,

@@ -13,10 +13,11 @@ import { scheduleComputerSleep, sleepComputerWithOutcome } from "./computer-idle
 import { ComputerBusyError, provisionComputer } from "./computer-lifecycle.js";
 import type { RecreateResult } from "./fleet-recreate.js";
 import { recreateComputer } from "./fleet-recreate.js";
+import { terminateComputer } from "./fleet-terminate.js";
 import { assertComputerImageAllowed } from "./policy-capabilities.js";
 import { PolicyDeniedError } from "./policy-runtime.js";
 
-export type FleetOperationKind = "hibernate" | "wake" | "recreate";
+export type FleetOperationKind = "hibernate" | "wake" | "recreate" | "terminate";
 
 /** How long a worker owns an item before another may take it, and how often it renews. */
 export const FLEET_CLAIM_MS = 2 * 60_000;
@@ -24,6 +25,12 @@ export const FLEET_HEARTBEAT_MS = 30_000;
 /** An item whose worker died this many times is left `interrupted` instead of run again. */
 export const FLEET_MAX_ATTEMPTS = 3;
 const OPEN = ["queued", "running"];
+const CHANGED_EVENT = {
+  hibernate: "computer.hibernated",
+  wake: "computer.woken",
+  recreate: "computer.recreated",
+  terminate: "computer.terminated",
+} as const;
 const OPERATIONS_PER_PASS = 100;
 
 const system = <T>(what: string, fn: () => Promise<T>) =>
@@ -359,6 +366,7 @@ type Result = RecreateResult;
 
 async function executeItem(deps: RunDeps, claimed: Claimed, signal: AbortSignal): Promise<Result> {
   if (claimed.kind === "recreate") return recreateComputer(deps, claimed, signal);
+  if (claimed.kind === "terminate") return terminateComputer(deps, claimed, signal);
   const computer = await system("read computer", () =>
     deps.prisma.computer.findUnique({
       where: { id: claimed.computerId },
@@ -500,33 +508,31 @@ export async function runFleetItem(deps: RunDeps, itemId: string): Promise<void>
     metadata,
   });
   if (result.changed) {
-    const before =
-      claimed.kind === "recreate"
-        ? await system("read item before", () =>
-            deps.prisma.computerFleetItem.findUnique({
-              where: { id: itemId },
-              select: { imageDigestBefore: true, homeRevisionBefore: true },
-            }),
-          )
-        : null;
+    // Recreate and terminate also say what the home and image were before and after.
+    const recorded = ["recreate", "terminate"].includes(claimed.kind)
+      ? await system("read item before", () =>
+          deps.prisma.computerFleetItem.findUnique({
+            where: { id: itemId },
+            select: { imageDigestBefore: true, homeRevisionBefore: true },
+          }),
+        )
+      : null;
     await recordSecurityEvent({
       ...base,
-      type:
-        claimed.kind === "hibernate"
-          ? "computer.hibernated"
-          : claimed.kind === "recreate"
-            ? "computer.recreated"
-            : "computer.woken",
-      metadata:
-        claimed.kind === "recreate"
-          ? {
-              ...metadata,
-              imageDigestBefore: before?.imageDigestBefore ?? null,
-              imageDigestAfter: result.record?.imageDigestAfter ?? null,
-              homeRevisionBefore: before?.homeRevisionBefore ?? null,
-              homeRevisionAfter: result.record?.homeRevisionAfter ?? null,
-            }
-          : metadata,
+      type: CHANGED_EVENT[claimed.kind],
+      metadata: recorded
+        ? {
+            ...metadata,
+            homeRevisionBefore: recorded.homeRevisionBefore ?? null,
+            homeRevisionAfter: result.record?.homeRevisionAfter ?? null,
+            ...(claimed.kind === "recreate"
+              ? {
+                  imageDigestBefore: recorded.imageDigestBefore ?? null,
+                  imageDigestAfter: result.record?.imageDigestAfter ?? null,
+                }
+              : {}),
+          }
+        : metadata,
     });
   }
   await settleFleetOperation(deps, claimed.operationId);

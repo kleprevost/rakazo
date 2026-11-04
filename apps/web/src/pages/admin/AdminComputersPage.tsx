@@ -1,6 +1,13 @@
-import { Trans, useLingui } from "@lingui/react/macro";
-import type { AdminComputer, AdminComputerDetail } from "@rakazo/contracts";
+import { Plural, Trans, useLingui } from "@lingui/react/macro";
+import type { AdminComputer, AdminComputerDetail, FleetOperation } from "@rakazo/contracts";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
   Badge,
   Button,
   Checkbox,
@@ -50,6 +57,7 @@ function AdminComputers() {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [openOperation, setOpenOperation] = useState<string | null>(null);
   const [starting, setStarting] = useState(false);
+  const [confirmTerminate, setConfirmTerminate] = useState(false);
   const [image, setImage] = useState("");
   const operations = useFleetOperations();
   // The approved images come from the policy, read only once there is something to recreate.
@@ -77,7 +85,7 @@ function AdminComputers() {
       if (!next.delete(id)) next.add(id);
       return next;
     });
-  async function start(kind: "hibernate" | "wake" | "recreate") {
+  async function start(kind: FleetOperation["kind"]) {
     setStarting(true);
     try {
       const created = await rpc.admin.computers.operations.create({
@@ -122,6 +130,14 @@ function AdminComputers() {
               {labels.kind(kind)}
             </Button>
           ))}
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={starting}
+            onClick={() => setConfirmTerminate(true)}
+          >
+            {labels.kind("terminate")}
+          </Button>
           {approved.length > 0 ? (
             <NativeSelect
               aria-label={t`Image`}
@@ -139,6 +155,34 @@ function AdminComputers() {
           ) : null}
         </div>
       ) : null}
+      <AlertDialog open={confirmTerminate} onOpenChange={setConfirmTerminate}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              <Plural
+                value={selected.size}
+                one="Terminate # computer?"
+                other="Terminate # computers?"
+              />
+            </AlertDialogTitle>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>
+              <Trans>Cancel</Trans>
+            </AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              disabled={starting}
+              onClick={() => {
+                setConfirmTerminate(false);
+                void start("terminate");
+              }}
+            >
+              {labels.kind("terminate")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <AdminQuery
         pending={computers.isPending}
         error={computers.error}

@@ -86,6 +86,8 @@ vi.mock("@lingui/react/macro", () => {
   return {
     useLingui: () => ({ t, i18n: { locale: "en" } }),
     Trans: ({ children }: { children: ReactNode }) => children,
+    Plural: ({ value, one, other }: { value: number; one: string; other: string }) =>
+      (value === 1 ? one : other).replace("#", String(value)),
   };
 });
 vi.mock("@rakazo/ui-web", async (importOriginal) => ({
@@ -985,4 +987,38 @@ it("recreates the selected computers from an approved image and shows each outco
   expect(items[0]).toContain("b".repeat(12));
   expect(items[1]).toContain("Failed");
   expect(items[1]).toContain("Not saved, left running");
+});
+
+it("terminates the selected computers only after a confirmation", async () => {
+  api.computers.mockResolvedValue(fleetComputers);
+  api.operations.mockResolvedValue({ operations: [] });
+  api.createOperation.mockResolvedValue({ id: "op3" });
+  const { host } = await show(<AdminComputersPage />);
+  await act(async () => {
+    (host.querySelector('[aria-label="Reporter"] [role="checkbox"]') as HTMLElement).click();
+  });
+  await settle();
+  const button = (name: string, root: ParentNode = host) =>
+    [...root.querySelectorAll("button")].find((b) => b.textContent === name) as HTMLElement;
+  await act(async () => {
+    button("Terminate").click();
+  });
+  await settle();
+  expect(document.body.textContent).toContain("Terminate 1 computer?");
+  expect(api.createOperation).not.toHaveBeenCalled();
+  await act(async () => {
+    button("Cancel", document.body).click();
+  });
+  await settle();
+  expect(api.createOperation).not.toHaveBeenCalled();
+  await act(async () => {
+    button("Terminate").click();
+  });
+  await settle();
+  await act(async () => {
+    const dialog = document.body.querySelector('[role="alertdialog"]') as HTMLElement;
+    button("Terminate", dialog).click();
+  });
+  await settle();
+  expect(api.createOperation).toHaveBeenCalledWith({ kind: "terminate", computerIds: ["c1"] });
 });

@@ -1464,6 +1464,8 @@ model ComputerUpdate {
   targetImageDigest String?
   /// A fleet item's id, so a replayed item finds this update instead of queueing a second one.
   idempotencyKey    String?  @unique
+  /// Terminate: save the home and destroy the machine without starting a replacement.
+  stopOnly          Boolean  @default(false)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
@@ -1562,7 +1564,7 @@ model ComputerObservation {
 /// by the API on create and by whichever instance runs an item.
 model ComputerFleetOperation {
   id                String              @id @default(cuid())
-  /// hibernate | wake | recreate
+  /// hibernate | wake | recreate | terminate
   kind              String
   /// Recreate only: the approved image digest every computer is rebuilt from; null keeps the
   /// provider's own image.
