@@ -2,9 +2,11 @@ import { adminComputer, adminComputers } from "../admin-computers.js";
 import {
   adminAudit,
   adminBots,
+  adminDeprovision,
   adminEndSessions,
   adminOverview,
   adminPolicy,
+  adminReactivate,
   adminUsers,
 } from "../admin-console.js";
 import {
@@ -32,6 +34,12 @@ export function adminRoutes(ctx: RouterContext) {
         ),
         endSessions: authed.admin.users.endSessions.handler(({ context, input }) =>
           adminEndSessions(deps, context.actor.userId, input.userId),
+        ),
+        deprovision: authed.admin.users.deprovision.handler(({ context, input }) =>
+          adminDeprovision(deps, context.actor.userId, input),
+        ),
+        reactivate: authed.admin.users.reactivate.handler(({ context, input }) =>
+          adminReactivate(deps, context.actor.userId, input.userId),
         ),
       },
       bots: {

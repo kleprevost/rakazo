@@ -100,6 +100,17 @@ const counts = (diff: EntitlementDiff): ReconcileResult => ({
 /** Recomputes one user's rows from their claims and every grant that can reach them. */
 async function reconcileUserIn(tx: Tx, userId: string, now: Date): Promise<ReconcileResult> {
   await lockUsers(tx, [userId]);
+  // A deprovisioned account holds nothing; reactivating recomputes it from the grants.
+  const deprovisioned = await tx.user.findFirst({
+    where: { id: userId, deprovisionedAt: { not: null } },
+    select: { id: true },
+  });
+  if (deprovisioned) {
+    const current = await tx.employeeEntitlement.findMany({ where: { userId } });
+    const diff = diffEntitlements(compact(current.map(toRow)), []);
+    await apply(tx, diff);
+    return counts(diff);
+  }
   const claims = await tx.userDirectoryClaim.findUnique({ where: { userId } });
   const values = claims?.values ?? [];
   const truncated = claims?.truncated ?? false;
@@ -272,7 +283,7 @@ export async function reconcileEmployeeEntitlements(
         });
         const claimsOf = new Map(claimRows.map((row) => [row.userId, row]));
         const existing = await tx.user.findMany({
-          where: { id: { in: chunk } },
+          where: { id: { in: chunk }, deprovisionedAt: null },
           select: { id: true },
         });
         const present = new Set(existing.map((row) => row.id));

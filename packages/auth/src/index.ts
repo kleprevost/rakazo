@@ -195,6 +195,8 @@ export function createAuth(prisma: PrismaClient, env: AuthEnv) {
       return emailLocale(null, headers);
     }
   };
+  const isDeprovisioned = async (userId: string) =>
+    (await prisma.user.count({ where: { id: userId, deprovisionedAt: { not: null } } })) > 0;
   if (env.easyAuth && !env.oidc) throw new Error("Easy Auth requires OIDC configuration");
   // Easy Auth sessions hold no refresh token, so revalidation would end them at its first pass.
   if (env.easyAuth && env.oidc?.revalidateMinutes)
@@ -619,6 +621,9 @@ export function createAuth(prisma: PrismaClient, env: AuthEnv) {
                 findSession: async (token: string) => {
                   const session = await findSession(token);
                   if (!session || isMessagingEmail(session.user.email)) return null;
+                  // Read on every request, so a deactivated account stops at once on every path,
+                  // including Easy Auth, which has no revalidation to end its sessions.
+                  if (await isDeprovisioned(session.user.id)) return null;
                   if (session.user.emailVerified) return session;
                   if (env.oidc?.allowSignupBypass) {
                     const accounts = await ctx.context.internalAdapter.findAccounts(
@@ -690,6 +695,12 @@ export function createAuth(prisma: PrismaClient, env: AuthEnv) {
               throw new APIError("FORBIDDEN", {
                 code: "EMAIL_VERIFICATION_REQUIRED",
                 message: "Email verification required",
+              });
+            }
+            if (await isDeprovisioned(user.id)) {
+              throw new APIError("FORBIDDEN", {
+                code: "ACCOUNT_DEACTIVATED",
+                message: "This account is deactivated",
               });
             }
             if (!user.emailVerified && policy.allowlist.length > 0 && !bypassAllowlist) {

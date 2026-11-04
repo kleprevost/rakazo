@@ -60,8 +60,18 @@ export const AdminUserSchema = z.object({
   ssoLinked: z.boolean(),
   lastSignInAt: z.string().nullable(),
   isSelf: z.boolean(),
+  /** When the account was deprovisioned; it cannot sign in until reactivated. */
+  deprovisionedAt: z.string().nullable(),
 });
 export type AdminUser = z.infer<typeof AdminUserSchema>;
+
+export const DeprovisionResultSchema = z.object({
+  endedSessions: z.number().int(),
+  suspendedBots: z.number().int(),
+  cancelledRuns: z.number().int(),
+  revokedGrants: z.number().int(),
+});
+export type DeprovisionResult = z.infer<typeof DeprovisionResultSchema>;
 
 export const AdminUserPageSchema = z.object({
   users: z.array(AdminUserSchema),
@@ -367,6 +377,16 @@ export const adminContract = {
     list: oc.input(AdminPageInputSchema).output(AdminUserPageSchema),
     /** Signs the account out everywhere. Not available on your own account. */
     endSessions: oc.input(z.object({ userId: Id })).output(z.object({ ended: z.number().int() })),
+    /**
+     * Offboards the account: ends its sessions, blocks sign-in, suspends its AI employees, stops
+     * their runs and revokes grants and employee access. Keeps all data. Idempotent. Not
+     * available on your own account.
+     */
+    deprovision: oc
+      .input(z.object({ userId: Id, reason: z.string().trim().max(200).optional() }))
+      .output(DeprovisionResultSchema),
+    /** Allows sign-in again. AI employees stay suspended until an admin resumes them. */
+    reactivate: oc.input(z.object({ userId: Id })).output(z.object({ ok: z.literal(true) })),
   },
   bots: {
     list: oc.input(AdminPageInputSchema).output(AdminBotPageSchema),

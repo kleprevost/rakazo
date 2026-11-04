@@ -11,6 +11,8 @@ import type {
 import { budgetPeriodStart } from "@rakazo/core";
 import { listSecurityEvents, quarantineCovers, recordSecurityEvent, runAsSystem } from "@rakazo/db";
 import { requireAdminRole, requireAnyAdminRole } from "./admins.js";
+import type { LifecycleDeps } from "./identity-lifecycle.js";
+import { deprovisionUser, reactivateUser } from "./identity-lifecycle.js";
 import type { RouterDeps } from "./router.js";
 
 type ConsoleDeps = Pick<RouterDeps, "prisma"> & {
@@ -74,7 +76,14 @@ export async function adminUsers(
   await requireAdminRole(deps, actorId, ["security", "auditor"]);
   const rows = await system("list users", () =>
     deps.prisma.user.findMany({
-      select: { id: true, name: true, email: true, emailVerified: true, createdAt: true },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        emailVerified: true,
+        createdAt: true,
+        deprovisionedAt: true,
+      },
       orderBy: [{ createdAt: "desc" }, { id: "desc" }],
       take: input.limit + 1,
       ...(input.cursor ? { cursor: { id: input.cursor }, skip: 1 } : {}),
@@ -127,6 +136,7 @@ export async function adminUsers(
         ssoLinked: linked.has(user.id),
         lastSignInAt: lastSeen.get(user.id)?.toISOString() ?? null,
         isSelf: user.id === actorId,
+        deprovisionedAt: user.deprovisionedAt?.toISOString() ?? null,
       };
     }),
   );
@@ -156,6 +166,28 @@ export async function adminEndSessions(
     metadata: { via: "admin", adminId: actorId, count: sessions.length },
   });
   return { ended: sessions.length };
+}
+
+/** Offboards one account: sessions, sign-in, AI employees, runs and grants. Keeps the data. */
+export async function adminDeprovision(
+  deps: ConsoleDeps & LifecycleDeps,
+  actorId: string,
+  input: { userId: string; reason?: string },
+) {
+  await requireAdminRole(deps, actorId, "security");
+  if (input.userId === actorId)
+    throw new ORPCError("BAD_REQUEST", { message: "You cannot deprovision your own account" });
+  return deprovisionUser(deps, { via: "admin", adminId: actorId }, input);
+}
+
+export async function adminReactivate(
+  deps: ConsoleDeps & LifecycleDeps,
+  actorId: string,
+  userId: string,
+): Promise<{ ok: true }> {
+  await requireAdminRole(deps, actorId, "security");
+  await reactivateUser(deps, { via: "admin", adminId: actorId }, userId);
+  return { ok: true };
 }
 
 export async function adminBots(
