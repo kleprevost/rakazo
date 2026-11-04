@@ -98,7 +98,7 @@ export async function authorize(
 const parseStatus = (value: string) =>
   value === "draft" || value === "retired" ? value : ("published" as const);
 
-async function lockEmployee(tx: Prisma.TransactionClient, employeeId: string) {
+export async function lockEmployee(tx: Prisma.TransactionClient, employeeId: string) {
   await tx.$queryRaw(Prisma.sql`SELECT id FROM employees WHERE id = ${employeeId} FOR UPDATE`);
 }
 

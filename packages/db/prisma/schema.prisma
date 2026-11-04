@@ -26,6 +26,7 @@ model User {
   directoryClaim       UserDirectoryClaim?
   employeeEntitlements EmployeeEntitlement[]
   employeeAccessRequests EmployeeAccessRequest[]
+  employeeKnowledgeProposals EmployeeKnowledgeProposal[]
   pages         Page[]
   id                          String                       @id
   name                        String
@@ -2535,6 +2536,8 @@ model Employee {
   grants            EmployeeGrant[]
   entitlements      EmployeeEntitlement[]
   accessRequests    EmployeeAccessRequest[]
+  knowledge         EmployeeKnowledge[]
+  knowledgeProposals EmployeeKnowledgeProposal[]
   bots              Bot[]
 
   @@map("employees")
@@ -2630,4 +2633,62 @@ model EmployeeAccessRequest {
   @@index([employeeId, status])
   @@index([requesterUserId])
   @@map("employee_access_requests")
+}
+
+/// Approved shared knowledge of an employee: read-only to instances, written only through the
+/// approval workflow or a direct edit by an Owner or Manager.
+model EmployeeKnowledge {
+  id         String   @id @default(cuid())
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  path       String
+  content    String
+  revision   Int      @default(1)
+  /// "approved" | "retired"
+  state      String   @default("approved")
+  approvedBy String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  revisions  EmployeeKnowledgeRevision[]
+
+  @@unique([employeeId, path])
+  @@map("employee_knowledge")
+}
+
+model EmployeeKnowledgeRevision {
+  id          String            @id @default(cuid())
+  knowledgeId String
+  knowledge   EmployeeKnowledge @relation(fields: [knowledgeId], references: [id], onDelete: Cascade)
+  revision    Int
+  content     String
+  approvedBy  String
+  createdAt   DateTime          @default(now())
+
+  @@unique([knowledgeId, revision])
+  @@map("employee_knowledge_revisions")
+}
+
+/// A note a person chose to offer. The text is copied at proposal time; there is no pointer to
+/// the private memory it came from. At most one pending proposal per person, employee and path
+/// (partial unique index in SQL).
+model EmployeeKnowledgeProposal {
+  id               String    @id @default(cuid())
+  employeeId       String
+  employee         Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  proposedByUserId String?
+  proposedBy       User?     @relation(fields: [proposedByUserId], references: [id], onDelete: SetNull)
+  path             String
+  proposedContent  String
+  /// The approved revision the text was written against; null when the path was new.
+  baseRevision     Int?
+  /// "pending" | "approved" | "rejected" | "withdrawn"
+  status           String    @default("pending")
+  decidedBy        String?
+  decidedAt        DateTime?
+  reason           String?
+  createdAt        DateTime  @default(now())
+
+  @@index([employeeId, status])
+  @@index([proposedByUserId])
+  @@map("employee_knowledge_proposals")
 }

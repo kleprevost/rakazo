@@ -916,6 +916,7 @@ msgstr "승인"
 msgid "Approve"
 msgstr "승인"
 
+#. placeholder {0}: proposal.path
 #. placeholder {0}: request.requesterName
 #: src/pages/shell/share-employee-dialog.tsx
 msgid "Approve {0}"
@@ -5523,11 +5524,14 @@ msgid "Registration is closed"
 msgstr "가입이 마감되었습니다"
 
 #: src/pages/PluginSubmissionsPanel.tsx
+#: src/pages/shell/share-employee-dialog.tsx
 msgid "Reject"
 msgstr ""
 
+#. placeholder {0}: proposal.path
 #. placeholder {0}: rejecting?.name
 #: src/pages/PluginSubmissionsPanel.tsx
+#: src/pages/shell/share-employee-dialog.tsx
 msgid "Reject {0}"
 msgstr ""
 
@@ -5791,6 +5795,11 @@ msgstr ""
 #: src/pages/Calendar.tsx
 msgid "Resume"
 msgstr "재개"
+
+#. placeholder {0}: entry.path
+#: src/pages/shell/share-employee-dialog.tsx
+msgid "Retire {0}"
+msgstr ""
 
 #: src/components/AccountAccess.tsx
 #: src/components/integrations/plugin-marketplace.tsx
@@ -6643,6 +6652,14 @@ msgstr "내 AI로 구독"
 msgid "Subscription required"
 msgstr ""
 
+#: src/pages/KnowledgeSection.tsx
+msgid "Suggest to team"
+msgstr ""
+
+#: src/pages/KnowledgeSection.tsx
+msgid "Suggested"
+msgstr ""
+
 #: src/lib/cron.ts
 msgid "Sunday"
 msgstr "일요일"
@@ -6720,6 +6737,10 @@ msgstr "팀 공용"
 #: src/pages/shell/computer-view.tsx
 msgid "Team Computer"
 msgstr "팀 컴퓨터"
+
+#: src/pages/shell/share-employee-dialog.tsx
+msgid "Team knowledge"
+msgstr ""
 
 #: src/pages/RoutineEditor.tsx
 msgid "Teams message"

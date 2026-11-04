@@ -6,6 +6,16 @@ import {
 } from "../employee-directory.js";
 import { addInstance } from "../employee-instances.js";
 import {
+  decideProposal,
+  listKnowledge,
+  listOwnProposals,
+  listProposals,
+  proposeKnowledge,
+  retireKnowledge,
+  setKnowledge,
+  withdrawProposal,
+} from "../employee-knowledge.js";
+import {
   getEmployee,
   listEmployees,
   listGrants,
@@ -47,6 +57,34 @@ export function employeesRoutes(ctx: RouterContext) {
         decide: authed.employees.requests.decide.handler(({ context, input }) =>
           decideRequest(deps, context.actor, input),
         ),
+      },
+      knowledge: {
+        list: authed.employees.knowledge.list.handler(({ context, input }) =>
+          listKnowledge(deps, context.actor, input),
+        ),
+        propose: authed.employees.knowledge.propose.handler(({ context, input }) =>
+          proposeKnowledge(deps, context.actor, input),
+        ),
+        set: authed.employees.knowledge.set.handler(({ context, input }) =>
+          setKnowledge(deps, context.actor, input),
+        ),
+        retire: authed.employees.knowledge.retire.handler(({ context, input }) =>
+          retireKnowledge(deps, context.actor, input),
+        ),
+        proposals: {
+          list: authed.employees.knowledge.proposals.list.handler(({ context, input }) =>
+            listProposals(deps, context.actor, input),
+          ),
+          mine: authed.employees.knowledge.proposals.mine.handler(({ context, input }) =>
+            listOwnProposals(deps, context.actor, input),
+          ),
+          decide: authed.employees.knowledge.proposals.decide.handler(({ context, input }) =>
+            decideProposal(deps, context.actor, input),
+          ),
+          withdraw: authed.employees.knowledge.proposals.withdraw.handler(({ context, input }) =>
+            withdrawProposal(deps, context.actor, input),
+          ),
+        },
       },
       versions: {
         saveDraft: authed.employees.versions.saveDraft.handler(({ context, input }) =>

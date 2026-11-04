@@ -4,6 +4,8 @@ import type {
   EmployeeAccessRequest,
   EmployeeDetail,
   EmployeeGrant,
+  EmployeeKnowledge,
+  EmployeeKnowledgeProposal,
   EmployeeRole,
 } from "@rakazo/contracts";
 import type { ReactNode } from "react";
@@ -106,6 +108,14 @@ function makeApi(
     requests: {
       list: vi.fn(async () => [] as EmployeeAccessRequest[]),
       decide: vi.fn(async () => ({ ok: true as const })),
+    },
+    knowledge: {
+      list: vi.fn(async () => [] as EmployeeKnowledge[]),
+      retire: vi.fn(async () => ({ ok: true as const })),
+      proposals: {
+        list: vi.fn(async () => [] as EmployeeKnowledgeProposal[]),
+        decide: vi.fn(async () => ({ ok: true as const })),
+      },
     },
     versions: {
       publish: vi.fn(async () => detail(role).employee),
@@ -241,6 +251,65 @@ describe("ShareEmployeeDialog", () => {
       const api = makeApi("collaborator", ownerGrants);
       await render(api);
       expect(api.requests.list).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("team knowledge", () => {
+    const proposal: EmployeeKnowledgeProposal = {
+      id: "prop-1",
+      path: "refunds.md",
+      content: "Refund in 14 days.",
+      currentContent: null,
+      stale: false,
+      createdAt: "2026-11-01T00:00:00.000Z",
+    };
+
+    it("shows nothing when there is no knowledge or proposal", async () => {
+      await render(makeApi("owner", ownerGrants));
+      expect(byLabel("Team knowledge")).toBeUndefined();
+    });
+
+    it("shows the submitted text and approves or rejects it", async () => {
+      const api = makeApi("manager", ownerGrants);
+      api.knowledge.proposals.list.mockResolvedValue([proposal]);
+      await render(api);
+      expect(byLabel("Team knowledge")?.textContent).toContain("Refund in 14 days.");
+      await click(byLabel("Approve refunds.md"));
+      expect(api.knowledge.proposals.decide).toHaveBeenCalledWith({
+        employeeId: "emp-1",
+        proposalId: "prop-1",
+        decision: "approve",
+      });
+      await click(byLabel("Reject refunds.md"));
+      expect(api.knowledge.proposals.decide).toHaveBeenLastCalledWith({
+        employeeId: "emp-1",
+        proposalId: "prop-1",
+        decision: "reject",
+      });
+    });
+
+    it("does not offer to approve text that is out of date", async () => {
+      const api = makeApi("manager", ownerGrants);
+      api.knowledge.proposals.list.mockResolvedValue([{ ...proposal, stale: true }]);
+      await render(api);
+      expect((byLabel("Approve refunds.md") as HTMLButtonElement).disabled).toBe(true);
+    });
+
+    it("retires approved knowledge", async () => {
+      const api = makeApi("owner", ownerGrants);
+      api.knowledge.list.mockResolvedValue([
+        { path: "policy.md", content: "x", revision: 2, updatedAt: "2026-11-01T00:00:00.000Z" },
+      ]);
+      await render(api);
+      await click(byLabel("Retire policy.md"));
+      expect(api.knowledge.retire).toHaveBeenCalledWith({ employeeId: "emp-1", path: "policy.md" });
+    });
+
+    it("does not read knowledge for someone who cannot manage access", async () => {
+      const api = makeApi("collaborator", ownerGrants);
+      await render(api);
+      expect(api.knowledge.list).not.toHaveBeenCalled();
+      expect(api.knowledge.proposals.list).not.toHaveBeenCalled();
     });
   });
 

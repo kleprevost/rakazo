@@ -916,6 +916,7 @@ msgstr "审批"
 msgid "Approve"
 msgstr "批准"
 
+#. placeholder {0}: proposal.path
 #. placeholder {0}: request.requesterName
 #: src/pages/shell/share-employee-dialog.tsx
 msgid "Approve {0}"
@@ -5523,11 +5524,14 @@ msgid "Registration is closed"
 msgstr "注册已关闭"
 
 #: src/pages/PluginSubmissionsPanel.tsx
+#: src/pages/shell/share-employee-dialog.tsx
 msgid "Reject"
 msgstr "拒绝"
 
+#. placeholder {0}: proposal.path
 #. placeholder {0}: rejecting?.name
 #: src/pages/PluginSubmissionsPanel.tsx
+#: src/pages/shell/share-employee-dialog.tsx
 msgid "Reject {0}"
 msgstr "拒绝 {0}"
 
@@ -5791,6 +5795,11 @@ msgstr ""
 #: src/pages/Calendar.tsx
 msgid "Resume"
 msgstr "恢复"
+
+#. placeholder {0}: entry.path
+#: src/pages/shell/share-employee-dialog.tsx
+msgid "Retire {0}"
+msgstr ""
 
 #: src/components/AccountAccess.tsx
 #: src/components/integrations/plugin-marketplace.tsx
@@ -6643,6 +6652,14 @@ msgstr "使用自己的 AI 订阅"
 msgid "Subscription required"
 msgstr "需要订阅"
 
+#: src/pages/KnowledgeSection.tsx
+msgid "Suggest to team"
+msgstr ""
+
+#: src/pages/KnowledgeSection.tsx
+msgid "Suggested"
+msgstr ""
+
 #: src/lib/cron.ts
 msgid "Sunday"
 msgstr "周日"
@@ -6720,6 +6737,10 @@ msgstr "团队"
 #: src/pages/shell/computer-view.tsx
 msgid "Team Computer"
 msgstr "团队电脑"
+
+#: src/pages/shell/share-employee-dialog.tsx
+msgid "Team knowledge"
+msgstr ""
 
 #: src/pages/RoutineEditor.tsx
 msgid "Teams message"
