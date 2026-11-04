@@ -38,13 +38,15 @@ import {
 } from "@rakazo/core";
 import type { ThreadEvents } from "@rakazo/db";
 import {
-  availableInSpace,
+  credentialOwner,
   effectiveMemoryScope,
   isPartialReplyClientNonce,
   isTooManyDatabaseConnections,
   loadRunHistoryMessages,
   loadRunTurnCheckpoint,
   parseComputerMode,
+  principalAvailable,
+  principalOf,
   RunHistoryWriteError,
   readRunTimingFields,
   recordUsage,
@@ -249,7 +251,7 @@ async function verbatimMcpServersForRun(
     where: {
       verbatimResults: true,
       enabled: true,
-      ...availableInSpace(scope),
+      ...principalAvailable(principalOf(scope), scope.spaceId),
       AND: [{ OR: [{ allBots: true }, { assignments: { some: { botId: scope.botId } } }] }],
     },
     select: { id: true, slug: true },
@@ -572,7 +574,7 @@ export function createRunExecutor(executorDeps: ExecutorDeps) {
             : Promise.resolve(undefined),
           deps.prisma.task.findUniqueOrThrow({ where: { id: run.taskId } }),
           deps.prisma.connection.findMany({
-            where: { userId: run.userId, spaceId: run.spaceId },
+            where: { ...credentialOwner(principalOf(run)), spaceId: run.spaceId },
             select: {
               id: true,
               connectorId: true,

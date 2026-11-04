@@ -1,5 +1,6 @@
 import type { SettingsScope } from "@rakazo/contracts";
 import type { PrismaClient } from "./client.js";
+import { credentialOwner, principalOf } from "./credential-principal.js";
 import { newestCredentialOrder } from "./model-credentials.js";
 import { settingsTarget } from "./space-settings.js";
 
@@ -178,7 +179,7 @@ export function findNewestUserVoiceCredential(
   provider: string,
 ) {
   return prisma.userVoiceCredential.findFirst({
-    where: { userId, provider },
+    where: { ...credentialOwner(principalOf({ userId })), provider },
     orderBy: newestVoiceCredentialOrder,
   });
 }

@@ -9,7 +9,14 @@ import {
 } from "@rakazo/contracts";
 import { isSecretAskBlock } from "@rakazo/core";
 import type { PrismaClient, RunSecretWriter } from "@rakazo/db";
-import { runCodeKind, runLoginKind, runSecretKind, withTransactionRetry } from "@rakazo/db";
+import {
+  ownedCredential,
+  principalOf,
+  runCodeKind,
+  runLoginKind,
+  runSecretKind,
+  withTransactionRetry,
+} from "@rakazo/db";
 import type { ApprovalPausedToolResult } from "./approval-effect.js";
 import { internalTerminatingResult, resolveDuplicateEffectGate } from "./approval-effect.js";
 import { encodeRunCode, encodeRunLogin, prepareBotSecret } from "./bot-secrets.js";
@@ -88,13 +95,12 @@ export async function reconcileManagedConnection(
   context: AdapterContext,
   connectionId: string,
 ): Promise<"connected" | "pending" | "missing"> {
-  const row = await prisma.connection.findFirst({
-    where: {
-      id: connectionId,
-      spaceId: run.spaceId,
-      userId: run.userId,
-    },
-  });
+  const row = await ownedCredential(
+    principalOf(run),
+    "connection",
+    await prisma.connection.findFirst({ where: { id: connectionId, spaceId: run.spaceId } }),
+    { spaceId: run.spaceId },
+  );
   if (!row) return "missing";
   if (row.status === "connected") return "connected";
   if (row.status !== "pending") return "missing";
@@ -263,14 +269,14 @@ export async function tryCompleteConnectionWithCode(
   connectionId: string,
   code: string,
 ): Promise<{ connected: boolean; error?: string }> {
-  const row = await prisma.connection.findFirst({
-    where: {
-      id: connectionId,
-      spaceId: run.spaceId,
-      userId: run.userId,
-      status: { in: ["pending", "connected"] },
-    },
-  });
+  const row = await ownedCredential(
+    principalOf(run),
+    "connection",
+    await prisma.connection.findFirst({
+      where: { id: connectionId, spaceId: run.spaceId, status: { in: ["pending", "connected"] } },
+    }),
+    { spaceId: run.spaceId },
+  );
   if (!row) return { connected: false };
   // Already finished on a prior attempt; do not resubmit the OTP.
   if (row.status === "connected") return { connected: true };

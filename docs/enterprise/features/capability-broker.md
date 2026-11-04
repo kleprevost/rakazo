@@ -716,3 +716,26 @@ Choices the design left open:
   for a deny, the Mappings and Quarantine tabs, the simulator's approval layer (still outside the snapshot), and a
   mobile surface (mobile has no admin surface; the owner's Access section is web and desktop, and enforcement
   applies to mobile chats as everywhere).
+
+Credential principal assertions (no migration; `packages/db/src/credential-principal.ts`). Closes the PR 5
+deviation above, ahead of shared employees:
+- Every credential lookup in the adapters and the db package takes the run's acting requester as a `RunPrincipal`
+  (`principalOf(context | run)`) and builds its owner filter with `credentialOwner`, `principalAvailable` or
+  `principalItemSecret`. Covered: MCP servers and their secrets (connector discovery and execute, OAuth begin,
+  complete, refresh and disconnect, installed connectors), managed-integration connections (run start, routine
+  watches, reconcile and code completion), the vault (`vaultFields`), per-user model and voice connections, and
+  the run's verbatim-result server list.
+- A lookup by an id that may be model- or client-supplied (a connection id, an MCP server id, a model connection
+  id) fetches by id and checks the row with `ownedCredential`: another user's row is refused, fail closed, and
+  recorded as `capability.denied` with rule `principal_mismatch`, surface `credential`, the credential kind and id
+  (ids only). Where row security already hides the row from the session, the lookup returns nothing and records
+  nothing.
+- Credentials belong to one user and nothing is shared between users, so "explicitly shared" has no path yet. The
+  shared-identity path is not built: a principal that names `sharedIdentityId` is refused by `credentialOwner`.
+- `credential-principal.architecture.test.ts` fails the build when a find, count, update or delete on a credential
+  table (connection, MCP server, MCP OAuth session, vault, bot secret, model and voice connection) sits in a
+  function that does not route through the module, or when `availableInSpace` or `itemSecretIn` is used outside it.
+  A lookup that resolves no credential (reference counts, health writes, expiry sweeps) is marked
+  `credential-lookup: exempt (<reason>)`.
+- Not done: the owner-facing API routes (`apps/api/src/routes`) still filter on the signed-in actor's id, which is
+  the acting requester there; they are not on the principal path.

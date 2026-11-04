@@ -17,6 +17,8 @@ import type { Prisma, PrismaClient, ThreadEvents } from "@rakazo/db";
 import {
   appendEventInTransaction,
   createThreadMessageInTransaction,
+  credentialOwner,
+  principalOf,
   runAsSystem,
 } from "@rakazo/db";
 import { getLogger } from "@rakazo/logging";
@@ -35,7 +37,7 @@ export async function callRequestRefusal(
 ): Promise<string | null> {
   if (input.groupChat) return "Calls work in a one-to-one chat only. Send a message instead.";
   const voice = await prisma.userVoiceCredential.findFirst({
-    where: { userId: input.userId },
+    where: credentialOwner(principalOf(input)),
     select: { id: true },
   });
   if (!voice) {
