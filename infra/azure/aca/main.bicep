@@ -83,6 +83,8 @@ param oidcRevalidateMinutes string = '60'
 param oidcTrustEmail bool = true
 @description('Add Easy Auth (Entra) in front of the web app, anonymous requests allowed. Needs the code that reads AUTH_EASY_AUTH (placeholder name).')
 param enableEasyAuth bool = false
+@description('Let people add their own instance of an AI employee shared with them (SHARED_EMPLOYEES_ENABLED on the API).')
+param enableSharedEmployees bool = false
 
 // Foundry (docs/enterprise/inference.md).
 param piDefaultModel string
@@ -214,6 +216,7 @@ module apps 'modules/aca-apps.bicep' = {
     azureOpenAiResourceName: azureOpenAiResourceName
     azureOpenAiDeploymentNameMap: azureOpenAiDeploymentNameMap
     enableEasyAuth: enableEasyAuth
+    enableSharedEmployees: enableSharedEmployees
   }
 }
 

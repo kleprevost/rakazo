@@ -476,3 +476,23 @@ another person run an instance, so the flag arrives with PR 4. From PR 2 review:
 sign-in or revalidation claim fails, the person's stored claim is replaced by "truncated, none"
 (`markDirectoryClaimsStale`) and entitlements are recomputed, so old group membership stops
 conferring access instead of only being logged.
+
+PR 4 (instances and run composition) adds `employees.addInstance` and the `SHARED_EMPLOYEES_ENABLED`
+flag (API only, off by default; passed through the Compose files and the ACA `enableSharedEmployees`
+parameter). A person who may `use` an employee gets one ordinary bot in their own space, created in
+one transaction with `employeeId` set, `crossSpaceCommunication` off and memory `isolated`; repeating
+the call, or racing it, returns the same bot. The order is entitlement first (strangers see not
+found, Viewers forbidden), then an existing instance (returned even with the flag off, so the Owner's
+shared bot is unaffected), then the flag. At every run start the executor (`resolveEmployeeRun`)
+re-checks `use` from the materialized entitlements together with the suspend and retired state, and
+fails the run before the model with a plain message ("Access removed", "This employee is suspended",
+"This employee is no longer available"); the instance and its data stay and run again if access
+returns. A run is then composed from the current published version (so a publish or rollback applies
+on the next run, recorded in the new `bots.employeeVersionSeen`): role replaces the description,
+`version.instructions` comes first and the bot's own `instructions` follow as the personal note (a
+note that is only a copy of a published definition, as on a bot shared in place, is dropped).
+`capabilityPolicy.disabledBuiltinTools` only adds to the tools the person's bot has switched off, and
+`modelPolicy` (`modelProvider`, `modelId`, `thinkingLevel`) applies only where the bot chose no model.
+Not in this PR: `skills` are recorded on versions but not resolved at run time (there is no shared
+skill store yet), approved shared knowledge (PR 7), the employee-level suspend action and
+`instanceKind` (PR 9), and any UI.

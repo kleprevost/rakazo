@@ -132,6 +132,13 @@ export const employeesContract = {
   share: oc
     .input(z.object({ botId: Id, name: Name.optional() }))
     .output(z.object({ employeeId: Id })),
+  /**
+   * Gives the caller their own working copy of an employee they may use: a bot in their own space
+   * that follows the current version. Repeating it returns the same bot.
+   */
+  addInstance: oc
+    .input(z.object({ employeeId: Id }))
+    .output(z.object({ botId: Id, created: z.boolean() })),
   versions: {
     /** Edits the open draft, or opens the next one from the current version. */
     saveDraft: oc.input(EmployeeDraftInputSchema).output(EmployeeVersionSchema),

@@ -54,6 +54,16 @@ describe("loadEnv", () => {
       expect(loadEnv({ ...base, TICKET_BOARD_ENABLED: value }).ticketBoardEnabled).toBe(false);
     expect(loadEnv({ ...base, TICKET_BOARD_ENABLED: "true" }).ticketBoardEnabled).toBe(true);
   });
+  it("keeps shared employees off unless explicitly enabled", () => {
+    expect(loadEnv(base).sharedEmployeesEnabled).toBe(false);
+    for (const value of ["false", "1", ""])
+      expect(loadEnv({ ...base, SHARED_EMPLOYEES_ENABLED: value }).sharedEmployeesEnabled).toBe(
+        false,
+      );
+    expect(loadEnv({ ...base, SHARED_EMPLOYEES_ENABLED: "true" }).sharedEmployeesEnabled).toBe(
+      true,
+    );
+  });
   it("loads operator menu links and refuses to start on a bad value", () => {
     expect(loadEnv(base).navLinks).toEqual([]);
     expect(

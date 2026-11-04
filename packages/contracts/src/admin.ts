@@ -12,6 +12,11 @@ const Id = z.string().min(1).max(128);
 
 /** What a run, a send or a delegated request says when the AI employee is suspended. */
 export const BOT_SUSPENDED_MESSAGE = "Suspended by your organization";
+
+/** What a run says when it is refused before the model because the shared employee behind it is unavailable. */
+export const EMPLOYEE_ACCESS_REMOVED_MESSAGE = "Access removed";
+export const EMPLOYEE_SUSPENDED_MESSAGE = "This employee is suspended";
+export const EMPLOYEE_UNAVAILABLE_MESSAGE = "This employee is no longer available";
 const pageLimit = (max: number, fallback: number) =>
   z.number().int().min(1).max(max).default(fallback);
 
