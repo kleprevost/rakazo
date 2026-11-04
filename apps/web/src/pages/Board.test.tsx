@@ -327,8 +327,16 @@ it("saves only edits and refreshes comments for the open ticket", async () => {
     );
     await settle();
     const calls = api.tickets.comments.mock.calls.length;
+    const workCalls = api.tickets.work.mock.calls.length;
     await act(async () => live.event("ticket-2"));
     expect(api.tickets.comments).toHaveBeenCalledTimes(calls);
+    expect(api.tickets.work).toHaveBeenCalledTimes(workCalls);
+    api.tickets.work.mockResolvedValue({
+      ticketId: "ticket-1",
+      phase: "running",
+      runs: [],
+      artifacts: [],
+    });
     api.tickets.comments.mockResolvedValue([{ id: "comment-2", body: "Bot progress" }]);
     api.tickets.list.mockResolvedValue({
       tickets: [ticket("Ship", "ticket-1", "doing", "RAK-1", "bot-2", "Details")],
@@ -338,6 +346,8 @@ it("saves only edits and refreshes comments for the open ticket", async () => {
     expect(page.container.querySelector('[data-testid="ticket-comments"]')?.textContent).toContain(
       "Bot progress",
     );
+    // The linked work is read again too, so its runs and outputs do not wait for a reload.
+    expect(api.tickets.work.mock.calls.length).toBeGreaterThan(workCalls);
     const input = page.container.querySelector("input")!;
     await act(async () => {
       Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!.call(
