@@ -933,6 +933,7 @@ msgid "Apply"
 msgstr "Toepassen"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "Approval boundaries"
 msgstr "Goedkeuringsgrenzen"
 
@@ -945,6 +946,7 @@ msgstr "Goedkeuringsmodel"
 msgid "Approvals"
 msgstr "Goedkeuringen"
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/MessagingSettingsPanel.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
 #: src/pages/shell/message-cards.tsx
@@ -966,6 +968,7 @@ msgstr "Keur het goed of weiger het op het scherm."
 msgid "Approve this server to let your agent use its tools."
 msgstr "Keur deze server goed zodat je agent zijn tools kan gebruiken."
 
+#: src/components/teach/SkillDraftCard.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
 msgid "Approved"
 msgstr ""
@@ -1033,6 +1036,10 @@ msgstr "Bestand bijvoegen"
 #: src/pages/shell/chat-shared.ts
 msgid "Attachment"
 msgstr "Bijlage"
+
+#: src/pages/admin/AdminSkillsPage.tsx
+msgid "Audience"
+msgstr "Doelgroep"
 
 #: src/pages/admin/AdminShell.tsx
 msgid "Audit log"
@@ -2413,6 +2420,7 @@ msgstr ""
 msgid "Could not run routine"
 msgstr "Routine uitvoeren mislukt"
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/ExternalConversationSettings.tsx
 #: src/pages/KnowledgeSection.tsx
 #: src/pages/McpServersOverlay.tsx
@@ -3310,6 +3318,10 @@ msgstr "Elke maand"
 msgid "Every week"
 msgstr "Elke week"
 
+#: src/pages/admin/AdminSkillsPage.tsx
+msgid "Everyone"
+msgstr "Iedereen"
+
 #: src/pages/PluginsOverlay.tsx
 msgid "Executor token"
 msgstr "Executor-token"
@@ -3398,6 +3410,7 @@ msgid "Failed."
 msgstr "Mislukt."
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "Failure handling"
 msgstr "Foutafhandeling"
 
@@ -3573,6 +3586,7 @@ msgid "Grants"
 msgstr "Rechten"
 
 #: src/lib/identity-display.ts
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/MessagingSettingsPanel.tsx
 #: src/pages/shell/chat-header.tsx
 #: src/pages/shell/side-panel.tsx
@@ -3729,6 +3743,7 @@ msgid "How other bots see it"
 msgstr "Hoe andere bots deze zien"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "How to check"
 msgstr "Hoe te controleren"
 
@@ -3820,6 +3835,7 @@ msgid "Input"
 msgstr "Invoer"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "Inputs"
 msgstr "Invoer"
 
@@ -4507,6 +4523,7 @@ msgstr ""
 #: src/pages/AccountSettingsOverlay.tsx
 #: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/admin/AdminCapabilitiesPage.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/Auth.tsx
 #: src/pages/GroupPanel.tsx
 #: src/pages/McpServersOverlay.tsx
@@ -4818,6 +4835,7 @@ msgstr "Geen geldige skill"
 msgid "Not added: {0}"
 msgstr ""
 
+#: src/components/teach/SkillDraftCard.tsx
 #: src/pages/admin/AdminComputersPage.tsx
 msgid "Not approved"
 msgstr "Niet goedgekeurd"
@@ -5259,6 +5277,10 @@ msgstr "Per miljoen tokens, invoer / uitvoer"
 msgid "Permissions"
 msgstr "Machtigingen"
 
+#: src/pages/admin/AdminSkillsPage.tsx
+msgid "Person"
+msgstr "Persoon"
+
 #: src/pages/shell/agent-import.tsx
 msgid "Persona"
 msgstr "Persona"
@@ -5416,6 +5438,7 @@ msgid "Providers"
 msgstr "Aanbieders"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/shell/share-employee-dialog.tsx
 msgid "Publish"
 msgstr "Publiceren"
@@ -5482,6 +5505,7 @@ msgstr "Antwoorden hardop voorlezen"
 msgid "Ready"
 msgstr "Klaar"
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
 msgid "Reason"
 msgstr ""
@@ -5623,6 +5647,7 @@ msgstr ""
 msgid "Registration is closed"
 msgstr "Registratie is gesloten"
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
 #: src/pages/shell/share-employee-dialog.tsx
 msgid "Reject"
@@ -5662,6 +5687,7 @@ msgstr "Herladen"
 #: src/components/TrustedLinkSitesSettings.tsx
 #: src/components/vault/LoginFieldsInput.tsx
 #: src/components/vault/VaultItemDetail.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/McpServersOverlay.tsx
 #: src/pages/ModelRoleSettings.tsx
 #: src/pages/PluginsOverlay.tsx
@@ -5964,6 +5990,7 @@ msgstr ""
 msgid "Role for {name}"
 msgstr ""
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/shell/share-employee-dialog.tsx
 msgid "Roll back"
 msgstr ""
@@ -6503,6 +6530,7 @@ msgstr "Skill {position}"
 #: src/components/integrations/plugin-marketplace.tsx
 #: src/components/integrations/skills-dialog.tsx
 #: src/components/SidebarFooter.tsx
+#: src/pages/admin/AdminShell.tsx
 #: src/pages/Shell.tsx
 #: src/pages/shell/agent-import.tsx
 #: src/pages/shell/hire-role-dialog.tsx
@@ -6686,6 +6714,7 @@ msgid "Status"
 msgstr "Status"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "Steps"
 msgstr "Stappen"
 
@@ -7486,6 +7515,10 @@ msgstr "Gebruik maximaal 512 letters, cijfers, _ of -."
 msgid "User"
 msgstr ""
 
+#: src/pages/admin/AdminSkillsPage.tsx
+msgid "User ID"
+msgstr "Gebruikers-ID"
+
 #: src/pages/memory-providers/HonchoSettingsForm.tsx
 msgid "User peer"
 msgstr ""
@@ -7554,6 +7587,7 @@ msgstr "Verifiëren en toevoegen"
 msgid "Verifying…"
 msgstr "Bezig met verifiëren…"
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/Artifacts.tsx
 msgid "Version"
 msgstr "Versie"
@@ -7601,6 +7635,11 @@ msgstr "Wacht even en test daarna opnieuw."
 #: src/lib/work-phase.ts
 msgid "Waiting"
 msgstr "Wachtend"
+
+#: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
+msgid "Waiting for review"
+msgstr "Wacht op beoordeling"
 
 #: src/lib/roster-status.ts
 msgid "Waiting in line…"
@@ -7686,6 +7725,7 @@ msgid "What this bot is for"
 msgstr "Waarvoor deze bot is"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "What to return"
 msgstr "Wat teruggeven"
 
@@ -7716,6 +7756,7 @@ msgstr "Wanneer uitvoeren"
 #: src/components/teach/SkillDraftCard.tsx
 #: src/components/vault/VaultItemDetail.tsx
 #: src/components/vault/VaultItemEditor.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "When to use"
 msgstr "Wanneer gebruiken"
 

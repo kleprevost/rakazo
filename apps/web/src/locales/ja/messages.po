@@ -933,6 +933,7 @@ msgid "Apply"
 msgstr "適用"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "Approval boundaries"
 msgstr "承認の範囲"
 
@@ -945,6 +946,7 @@ msgstr "承認モデル"
 msgid "Approvals"
 msgstr "承認"
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/MessagingSettingsPanel.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
 #: src/pages/shell/message-cards.tsx
@@ -966,6 +968,7 @@ msgstr "画面で承認または拒否してください。"
 msgid "Approve this server to let your agent use its tools."
 msgstr "このサーバーを承認すると、エージェントがそのツールを使用できるようになります。"
 
+#: src/components/teach/SkillDraftCard.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
 msgid "Approved"
 msgstr ""
@@ -1033,6 +1036,10 @@ msgstr "ファイルを添付"
 #: src/pages/shell/chat-shared.ts
 msgid "Attachment"
 msgstr "添付ファイル"
+
+#: src/pages/admin/AdminSkillsPage.tsx
+msgid "Audience"
+msgstr "対象"
 
 #: src/pages/admin/AdminShell.tsx
 msgid "Audit log"
@@ -2413,6 +2420,7 @@ msgstr ""
 msgid "Could not run routine"
 msgstr "ルーティンを実行できませんでした"
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/ExternalConversationSettings.tsx
 #: src/pages/KnowledgeSection.tsx
 #: src/pages/McpServersOverlay.tsx
@@ -3310,6 +3318,10 @@ msgstr "毎月"
 msgid "Every week"
 msgstr "毎週"
 
+#: src/pages/admin/AdminSkillsPage.tsx
+msgid "Everyone"
+msgstr "全員"
+
 #: src/pages/PluginsOverlay.tsx
 msgid "Executor token"
 msgstr "実行トークン"
@@ -3398,6 +3410,7 @@ msgid "Failed."
 msgstr "失敗しました。"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "Failure handling"
 msgstr "失敗時の対応"
 
@@ -3573,6 +3586,7 @@ msgid "Grants"
 msgstr "権限"
 
 #: src/lib/identity-display.ts
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/MessagingSettingsPanel.tsx
 #: src/pages/shell/chat-header.tsx
 #: src/pages/shell/side-panel.tsx
@@ -3729,6 +3743,7 @@ msgid "How other bots see it"
 msgstr "他のボットからの見え方"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "How to check"
 msgstr "確認方法"
 
@@ -3820,6 +3835,7 @@ msgid "Input"
 msgstr "入力"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "Inputs"
 msgstr "入力"
 
@@ -4507,6 +4523,7 @@ msgstr ""
 #: src/pages/AccountSettingsOverlay.tsx
 #: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/admin/AdminCapabilitiesPage.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/Auth.tsx
 #: src/pages/GroupPanel.tsx
 #: src/pages/McpServersOverlay.tsx
@@ -4818,6 +4835,7 @@ msgstr "有効なスキルではありません"
 msgid "Not added: {0}"
 msgstr ""
 
+#: src/components/teach/SkillDraftCard.tsx
 #: src/pages/admin/AdminComputersPage.tsx
 msgid "Not approved"
 msgstr "未承認"
@@ -5259,6 +5277,10 @@ msgstr "100万トークンあたり、入力 / 出力"
 msgid "Permissions"
 msgstr "権限"
 
+#: src/pages/admin/AdminSkillsPage.tsx
+msgid "Person"
+msgstr "個人"
+
 #: src/pages/shell/agent-import.tsx
 msgid "Persona"
 msgstr "ペルソナ"
@@ -5416,6 +5438,7 @@ msgid "Providers"
 msgstr "プロバイダー"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/shell/share-employee-dialog.tsx
 msgid "Publish"
 msgstr "公開"
@@ -5482,6 +5505,7 @@ msgstr "返信を読み上げる"
 msgid "Ready"
 msgstr "準備完了"
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
 msgid "Reason"
 msgstr ""
@@ -5623,6 +5647,7 @@ msgstr ""
 msgid "Registration is closed"
 msgstr "新規登録は締め切られています"
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
 #: src/pages/shell/share-employee-dialog.tsx
 msgid "Reject"
@@ -5662,6 +5687,7 @@ msgstr "再読み込み"
 #: src/components/TrustedLinkSitesSettings.tsx
 #: src/components/vault/LoginFieldsInput.tsx
 #: src/components/vault/VaultItemDetail.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/McpServersOverlay.tsx
 #: src/pages/ModelRoleSettings.tsx
 #: src/pages/PluginsOverlay.tsx
@@ -5964,6 +5990,7 @@ msgstr ""
 msgid "Role for {name}"
 msgstr ""
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/shell/share-employee-dialog.tsx
 msgid "Roll back"
 msgstr ""
@@ -6503,6 +6530,7 @@ msgstr "スキル {position}"
 #: src/components/integrations/plugin-marketplace.tsx
 #: src/components/integrations/skills-dialog.tsx
 #: src/components/SidebarFooter.tsx
+#: src/pages/admin/AdminShell.tsx
 #: src/pages/Shell.tsx
 #: src/pages/shell/agent-import.tsx
 #: src/pages/shell/hire-role-dialog.tsx
@@ -6686,6 +6714,7 @@ msgid "Status"
 msgstr "ステータス"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "Steps"
 msgstr "手順"
 
@@ -7486,6 +7515,10 @@ msgstr "英数字、_、-のみで512文字以内で入力してください。"
 msgid "User"
 msgstr ""
 
+#: src/pages/admin/AdminSkillsPage.tsx
+msgid "User ID"
+msgstr "ユーザーID"
+
 #: src/pages/memory-providers/HonchoSettingsForm.tsx
 msgid "User peer"
 msgstr "ユーザーピア"
@@ -7554,6 +7587,7 @@ msgstr "確認して追加"
 msgid "Verifying…"
 msgstr "確認中…"
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/Artifacts.tsx
 msgid "Version"
 msgstr "バージョン"
@@ -7601,6 +7635,11 @@ msgstr "しばらく待ってから再度テストしてください。"
 #: src/lib/work-phase.ts
 msgid "Waiting"
 msgstr "待機中"
+
+#: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
+msgid "Waiting for review"
+msgstr "レビュー待ち"
 
 #: src/lib/roster-status.ts
 msgid "Waiting in line…"
@@ -7686,6 +7725,7 @@ msgid "What this bot is for"
 msgstr "このボットの用途"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "What to return"
 msgstr "返す内容"
 
@@ -7716,6 +7756,7 @@ msgstr "実行タイミング"
 #: src/components/teach/SkillDraftCard.tsx
 #: src/components/vault/VaultItemDetail.tsx
 #: src/components/vault/VaultItemEditor.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "When to use"
 msgstr "使用するタイミング"
 

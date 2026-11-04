@@ -61,7 +61,7 @@ All additive, row-level security in the same migration, system-only writes after
 
 Web and desktop: a saved draft skill card shows **Publish**, which submits for review (teaching is
 not available on mobile, so there is no mobile entry point and nothing to degrade). Review and
-audience management are API-first in PR 1 (`skillPublishing.*`), with an admin screen in PR 2.
+audience management are in Admin, Skills (platform role only, PR 2); the author's card shows where the latest offer stands.
 
 ## PR sequence
 

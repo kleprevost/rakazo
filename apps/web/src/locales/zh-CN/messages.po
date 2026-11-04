@@ -933,6 +933,7 @@ msgid "Apply"
 msgstr "应用"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "Approval boundaries"
 msgstr "审批边界"
 
@@ -945,6 +946,7 @@ msgstr "审批模型"
 msgid "Approvals"
 msgstr "审批"
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/MessagingSettingsPanel.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
 #: src/pages/shell/message-cards.tsx
@@ -966,6 +968,7 @@ msgstr "请在屏幕上批准或拒绝。"
 msgid "Approve this server to let your agent use its tools."
 msgstr "批准此服务器后，Agent 才能使用它的工具。"
 
+#: src/components/teach/SkillDraftCard.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
 msgid "Approved"
 msgstr "已批准"
@@ -1033,6 +1036,10 @@ msgstr "附加文件"
 #: src/pages/shell/chat-shared.ts
 msgid "Attachment"
 msgstr "附件"
+
+#: src/pages/admin/AdminSkillsPage.tsx
+msgid "Audience"
+msgstr "受众"
 
 #: src/pages/admin/AdminShell.tsx
 msgid "Audit log"
@@ -2413,6 +2420,7 @@ msgstr ""
 msgid "Could not run routine"
 msgstr "无法运行例行任务"
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/ExternalConversationSettings.tsx
 #: src/pages/KnowledgeSection.tsx
 #: src/pages/McpServersOverlay.tsx
@@ -3310,6 +3318,10 @@ msgstr "每月"
 msgid "Every week"
 msgstr "每周"
 
+#: src/pages/admin/AdminSkillsPage.tsx
+msgid "Everyone"
+msgstr "所有人"
+
 #: src/pages/PluginsOverlay.tsx
 msgid "Executor token"
 msgstr "Executor 令牌"
@@ -3398,6 +3410,7 @@ msgid "Failed."
 msgstr "失败。"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "Failure handling"
 msgstr "失败处理"
 
@@ -3573,6 +3586,7 @@ msgid "Grants"
 msgstr "授权"
 
 #: src/lib/identity-display.ts
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/MessagingSettingsPanel.tsx
 #: src/pages/shell/chat-header.tsx
 #: src/pages/shell/side-panel.tsx
@@ -3729,6 +3743,7 @@ msgid "How other bots see it"
 msgstr "其他机器人如何了解它"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "How to check"
 msgstr "如何检查"
 
@@ -3820,6 +3835,7 @@ msgid "Input"
 msgstr "输入"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "Inputs"
 msgstr "输入"
 
@@ -4507,6 +4523,7 @@ msgstr ""
 #: src/pages/AccountSettingsOverlay.tsx
 #: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/admin/AdminCapabilitiesPage.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/Auth.tsx
 #: src/pages/GroupPanel.tsx
 #: src/pages/McpServersOverlay.tsx
@@ -4818,6 +4835,7 @@ msgstr "不是有效的技能"
 msgid "Not added: {0}"
 msgstr "未添加：{0}"
 
+#: src/components/teach/SkillDraftCard.tsx
 #: src/pages/admin/AdminComputersPage.tsx
 msgid "Not approved"
 msgstr "未批准"
@@ -5259,6 +5277,10 @@ msgstr "每百万 token，输入 / 输出"
 msgid "Permissions"
 msgstr "权限"
 
+#: src/pages/admin/AdminSkillsPage.tsx
+msgid "Person"
+msgstr "个人"
+
 #: src/pages/shell/agent-import.tsx
 msgid "Persona"
 msgstr "人设"
@@ -5416,6 +5438,7 @@ msgid "Providers"
 msgstr "提供方"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/shell/share-employee-dialog.tsx
 msgid "Publish"
 msgstr "发布"
@@ -5482,6 +5505,7 @@ msgstr "朗读回复"
 msgid "Ready"
 msgstr "就绪"
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
 msgid "Reason"
 msgstr "原因"
@@ -5623,6 +5647,7 @@ msgstr ""
 msgid "Registration is closed"
 msgstr "注册已关闭"
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
 #: src/pages/shell/share-employee-dialog.tsx
 msgid "Reject"
@@ -5662,6 +5687,7 @@ msgstr "重新加载"
 #: src/components/TrustedLinkSitesSettings.tsx
 #: src/components/vault/LoginFieldsInput.tsx
 #: src/components/vault/VaultItemDetail.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/McpServersOverlay.tsx
 #: src/pages/ModelRoleSettings.tsx
 #: src/pages/PluginsOverlay.tsx
@@ -5964,6 +5990,7 @@ msgstr ""
 msgid "Role for {name}"
 msgstr ""
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/shell/share-employee-dialog.tsx
 msgid "Roll back"
 msgstr ""
@@ -6503,6 +6530,7 @@ msgstr "技能 {position}"
 #: src/components/integrations/plugin-marketplace.tsx
 #: src/components/integrations/skills-dialog.tsx
 #: src/components/SidebarFooter.tsx
+#: src/pages/admin/AdminShell.tsx
 #: src/pages/Shell.tsx
 #: src/pages/shell/agent-import.tsx
 #: src/pages/shell/hire-role-dialog.tsx
@@ -6686,6 +6714,7 @@ msgid "Status"
 msgstr "状态"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "Steps"
 msgstr "步骤"
 
@@ -7486,6 +7515,10 @@ msgstr "最多 512 个字母、数字、_ 或 -。"
 msgid "User"
 msgstr ""
 
+#: src/pages/admin/AdminSkillsPage.tsx
+msgid "User ID"
+msgstr "用户 ID"
+
 #: src/pages/memory-providers/HonchoSettingsForm.tsx
 msgid "User peer"
 msgstr "用户 peer"
@@ -7554,6 +7587,7 @@ msgstr "校验并添加"
 msgid "Verifying…"
 msgstr "正在校验…"
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/Artifacts.tsx
 msgid "Version"
 msgstr "版本"
@@ -7601,6 +7635,11 @@ msgstr "请稍候并重新测试。"
 #: src/lib/work-phase.ts
 msgid "Waiting"
 msgstr "等待中"
+
+#: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
+msgid "Waiting for review"
+msgstr "等待审核"
 
 #: src/lib/roster-status.ts
 msgid "Waiting in line…"
@@ -7686,6 +7725,7 @@ msgid "What this bot is for"
 msgstr "这个 Bot 是做什么的"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "What to return"
 msgstr "返回什么"
 
@@ -7716,6 +7756,7 @@ msgstr "何时运行"
 #: src/components/teach/SkillDraftCard.tsx
 #: src/components/vault/VaultItemDetail.tsx
 #: src/components/vault/VaultItemEditor.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "When to use"
 msgstr "何时使用"
 

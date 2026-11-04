@@ -84,6 +84,11 @@ export function AdminShell({ children }: { children: ReactNode }) {
           </NavLink>
         ) : null}
         {can() ? (
+          <NavLink to="/admin/skills" className={linkClass}>
+            <Trans>Skills</Trans>
+          </NavLink>
+        ) : null}
+        {can() ? (
           <NavLink to="/admin/plugins" className={linkClass}>
             <Trans>Plugin submissions</Trans>
           </NavLink>
