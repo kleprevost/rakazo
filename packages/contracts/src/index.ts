@@ -15,6 +15,7 @@ export * from "./bot-settings-layout.js";
 export * from "./builtin-tools.js";
 export * from "./calendar.js";
 export * from "./capabilities.js";
+export * from "./capability-grants.js";
 export * from "./client-build.js";
 export * from "./cloudflare-ai-gateway.js";
 export * from "./connector-errors.js";

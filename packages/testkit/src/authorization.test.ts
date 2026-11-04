@@ -555,6 +555,10 @@ describeWithDatabase("API authorization and resource isolation", () => {
         "employees/grants/remove",
         { employeeId: "missing-employee", subjectKind: "user", subjectValue: "missing-user" },
       ],
+      ["capabilityGrants/list", { botId: "missing-bot" }],
+      ["capabilityGrants/set", { botId: "missing-bot", scope: "calendar.read" }],
+      ["capabilityGrants/revoke", { id: "missing-grant" }],
+      ["capabilityGrants/setMode", { botId: "missing-bot", mode: "shadow" }],
       ["roleTemplates/list"],
       ["roleTemplates/hire"],
       ["today/summary"],
@@ -2475,6 +2479,13 @@ describeWithDatabase("API authorization and resource isolation", () => {
         operationId: "missing-operation",
       });
       await expectForbidden(app, cookie, "admin/audit", {});
+      await expectForbidden(app, cookie, "capabilityGrants/setMode", {
+        botId: "missing-bot",
+        mode: "shadow",
+      });
+      await expectForbidden(app, cookie, "capabilityGrants/list", {
+        employeeId: "missing-employee",
+      });
       await expectForbidden(app, cookie, "admin/users/endSessions", { userId: account.userId });
       await expectForbidden(app, cookie, "updater/status", {});
       await expectForbidden(app, cookie, "updater/check", {});

@@ -49,6 +49,7 @@ import {
 } from "./auto-review.js";
 import { reviewWithBackups } from "./auto-review-backups.js";
 import { RAKAZO_DOCS_URLS } from "./builtin-skills.js";
+import { classifyInputForTool, recordShadowDecision } from "./capability-shadow.js";
 import type { ExecutorDeps } from "./executor-deps.js";
 import { findConnectedModelCredential } from "./model-selection.js";
 import { paidRequestEffect } from "./paid-request.js";
@@ -194,6 +195,24 @@ export async function gateToolCall(
   const policyAlwaysAsk = policyAlwaysAsks(policyToolIds);
   const connectorProviders = ctx.tools.connectedPlugins.map((plugin) => plugin.provider);
   const connectorKind = connectorKindFromToolName(approvalName, connectorProviders);
+  // Shadow mode: record what the capability broker would decide here. Never changes the outcome.
+  await recordShadowDecision({
+    prisma: deps.prisma,
+    bot: ctx.bot,
+    spaceId: run.spaceId,
+    userId: run.userId,
+    runId,
+    threadId: ctx.thread.id,
+    surface: "gate",
+    call: classifyInputForTool({
+      name,
+      args,
+      route: connectorCall.route,
+      tool: connectorTool,
+      appSlug: connectorKind,
+      batchActions: batch ? [...batch.actions, ...(batch.complete ? [] : [undefined])] : undefined,
+    }),
+  });
   // paid_request with only a purchase id sends the request its approval already named.
   const sendsToSite =
     SITE_SENDING_TOOLS.has(name) && (name === "web_fetch" || args.url !== undefined);

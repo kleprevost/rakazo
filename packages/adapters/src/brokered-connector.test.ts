@@ -113,6 +113,8 @@ describe("BrokeredConnector", () => {
         suspendedAt: true,
         name: true,
         spaceId: true,
+        capabilityMode: true,
+        employeeId: true,
         groupMembers: { select: { groupId: true } },
       },
     });
@@ -268,5 +270,79 @@ describe("routine watches through BrokeredConnector", () => {
       /blocked by your organization/,
     );
     expect(stub.executed).toEqual([]);
+  });
+});
+
+describe("shadow mode through BrokeredConnector", () => {
+  function shadowSetup(capabilityMode: string | null, grants: unknown[] = []) {
+    const stub = new StubConnector();
+    const prisma = {
+      bot: {
+        findUnique: vi.fn(async () => ({
+          suspendedAt: null,
+          name: "Ada",
+          spaceId: "space-1",
+          capabilityMode,
+          employeeId: null,
+          groupMembers: [],
+        })),
+      },
+      quarantine: { findFirst: async () => null },
+      capabilityGrant: { findMany: vi.fn(async () => grants) },
+    };
+    return {
+      stub,
+      prisma,
+      connector: new BrokeredConnector(new ConnectorRegistry([stub]), prisma as never),
+    };
+  }
+  const watchContext: AdapterContext = { ...context, runId: undefined };
+  const shadowEvents = () =>
+    recorded.audit.filter((event) => (event as { action: string }).action === "capability.shadow");
+
+  it("records what a routine watch call would be decided and still runs it", async () => {
+    const { stub, connector } = shadowSetup("shadow");
+    await expect(
+      run(
+        connector,
+        {
+          args: { secret: "ARG-VALUE" },
+          route: { connectorId: "installed", toolName: "gmail_list", catalogGroup: "acme" },
+        },
+        watchContext,
+      ),
+    ).resolves.toEqual([{ type: "result", data: { ok: true } }]);
+    expect(stub.executed).toHaveLength(1);
+    expect(shadowEvents()).toEqual([
+      expect.objectContaining({
+        outcome: "success",
+        metadata: expect.objectContaining({
+          mode: "shadow",
+          surface: "connector",
+          decision: "deny",
+          rule: "no_grant",
+          scopes: "ext.acme.admin",
+          unmapped: true,
+        }),
+      }),
+    ]);
+    expect(JSON.stringify(recorded.audit)).not.toContain("ARG-VALUE");
+  });
+
+  it("records nothing when the broker is off, or for a run the gate already decided", async () => {
+    const off = shadowSetup(null);
+    await run(off.connector, {}, watchContext);
+    expect(off.prisma.capabilityGrant.findMany).not.toHaveBeenCalled();
+    const inRun = shadowSetup("shadow");
+    await run(inRun.connector, {});
+    expect(inRun.prisma.capabilityGrant.findMany).not.toHaveBeenCalled();
+    expect(shadowEvents()).toEqual([]);
+  });
+
+  it("does not record a call it refuses for policy", async () => {
+    const { connector } = shadowSetup("shadow");
+    setActivePolicy({ version: 1, tools: { deny: ["gmail_*"] } });
+    await run(connector, {}, watchContext);
+    expect(shadowEvents()).toEqual([]);
   });
 });
