@@ -18,6 +18,7 @@ import {
   createThreadMessageInTransaction,
   IsolationError,
   lockOwnedGroup,
+  resumeAssignment,
   touchGroupUpdatedAt,
 } from "@rakazo/db";
 import { getLogger } from "@rakazo/logging";
@@ -121,7 +122,7 @@ export async function sendThread(
   const deployment = setup.hasDeployment
     ? { provider: deps.env.defaultProvider, model: deps.env.defaultModel }
     : null;
-  return sendThreadMessage(
+  const sent = await sendThreadMessage(
     {
       ...deps,
       maxAttachmentsPerMessage: deps.env.maxAttachmentsPerMessage,
@@ -148,6 +149,11 @@ export async function sendThread(
     }
     throw error;
   });
+  // A message to a stopped or archived assignment resumes it in the same thread.
+  if (input.assignmentId && !isStopMessage(input)) {
+    await resumeAssignment(deps.prisma, actor, input.assignmentId);
+  }
+  return sent;
 }
 
 export function threadsRoutes(ctx: RouterContext) {

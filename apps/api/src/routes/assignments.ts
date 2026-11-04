@@ -1,15 +1,22 @@
 import { ORPCError } from "@orpc/server";
 import { MODEL_REQUIRED_SEND_ERROR } from "@rakazo/core";
 import {
+  archiveAssignment,
   createAssignment,
   getAssignment,
   getAssignmentWork,
   IsolationError,
   listAssignments,
+  unarchiveAssignment,
 } from "@rakazo/db";
 import { assertBotNotSuspended } from "../bot-suspension.js";
 import { assertTeachingSendAllowed } from "../taught-skills.js";
-import { resolveThreadTarget, steerThreadMessage } from "../thread-target.js";
+import {
+  cancelThreadRuns,
+  finishThreadStop,
+  resolveThreadTarget,
+  steerThreadMessage,
+} from "../thread-target.js";
 import type { RouterContext } from "./context.js";
 import { botsRunOwnModels, modelSetup } from "./shared.js";
 import { sendThread } from "./threads.js";
@@ -71,6 +78,41 @@ export function assignmentsRoutes(ctx: RouterContext) {
         await assertTeachingSendAllowed(deps.prisma, actor.spaceId, target.botId);
         await assertBotNotSuspended(deps.prisma, target.botId);
         return steerThreadMessage(deps, actor, target, input);
+      }),
+      cancel: authed.assignments.cancel.handler(async ({ context, input }) => {
+        const { actor } = context;
+        const target = await resolveThreadTarget(deps.prisma, actor, {
+          assignmentId: input.assignmentId,
+        });
+        // The thread's live runs stop and the mark is set in one commit. The mark only goes on
+        // an unmarked row, so racing cancels end in one state; the stop is the existing one.
+        const stop = await deps.prisma.$transaction(async (tx) => {
+          const stopped = await cancelThreadRuns(actor, target)(tx);
+          await tx.assignment.updateMany({
+            where: {
+              id: input.assignmentId,
+              spaceId: actor.spaceId,
+              userId: actor.userId,
+              cancelledAt: null,
+            },
+            data: { cancelledAt: new Date() },
+          });
+          return stopped;
+        });
+        await finishThreadStop(deps, actor, target, stop);
+        return getAssignment(deps.prisma, actor, input.assignmentId);
+      }),
+      archive: authed.assignments.archive.handler(async ({ context, input }) => {
+        const { actor } = context;
+        const result = await archiveAssignment(deps.prisma, actor, input.assignmentId);
+        if (result === "live") {
+          throw new ORPCError("CONFLICT", { message: "Stop the job before archiving it." });
+        }
+        return getAssignment(deps.prisma, actor, input.assignmentId);
+      }),
+      unarchive: authed.assignments.unarchive.handler(async ({ context, input }) => {
+        await unarchiveAssignment(deps.prisma, context.actor, input.assignmentId);
+        return getAssignment(deps.prisma, context.actor, input.assignmentId);
       }),
     },
   };

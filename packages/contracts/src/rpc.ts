@@ -952,6 +952,9 @@ export const appContract = {
     list: oc.input(ListAssignmentsInput).output(ListAssignmentsOutput),
     get: oc.input(GetAssignmentInput).output(AssignmentWorkSchema),
     steer: oc.input(SteerAssignmentInput).output(SteerAssignmentOutput),
+    cancel: oc.input(GetAssignmentInput).output(AssignmentSchema),
+    archive: oc.input(GetAssignmentInput).output(AssignmentSchema),
+    unarchive: oc.input(GetAssignmentInput).output(AssignmentSchema),
   },
   skills: {
     list: oc.input(botId).output(z.array(TaughtSkillSchema)),
