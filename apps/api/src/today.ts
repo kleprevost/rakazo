@@ -161,6 +161,89 @@ async function supersededKeys(prisma: PrismaClient, actor: Actor, failed: RunRow
   return superseded;
 }
 
+/**
+ * Routine firings that did not complete cleanly and have no failed run to show: a check that
+ * could not reach its source, or a scheduled firing that did not run. Like a failed run, one
+ * stays for the failure window until a later firing of the same routine finished cleanly, and
+ * one entry stands for each routine.
+ */
+async function routineExceptions(
+  prisma: PrismaClient,
+  actor: Actor,
+  since: Date,
+): Promise<TodayAttention[]> {
+  const scope = { spaceId: actor.spaceId, userId: actor.userId };
+  const rows = await prisma.routineReceipt.findMany({
+    where: {
+      ...scope,
+      outcome: { in: ["failed", "missed"] },
+      createdAt: { gte: since },
+      // A failed run is already listed as a failed routine.
+      OR: [{ runId: null }, { run: { status: { not: "failed" } } }],
+      routine: { bot: { archivedAt: null } },
+    },
+    include: {
+      routine: {
+        select: {
+          name: true,
+          bot: { select: { name: true } },
+          thread: { select: { groupId: true } },
+        },
+      },
+    },
+    orderBy: [{ scheduledFor: "desc" }, { id: "desc" }],
+    take: FAILED_LIMIT * 2,
+  });
+  const newest = new Map<string, (typeof rows)[number]>();
+  for (const row of rows) if (!newest.has(row.routineId)) newest.set(row.routineId, row);
+  if (newest.size === 0) return [];
+  const clean = await prisma.routineReceipt.findMany({
+    where: {
+      ...scope,
+      routineId: { in: [...newest.keys()] },
+      outcome: { in: ["no_change", "action_needed"] },
+      scheduledFor: { gte: since },
+    },
+    select: { routineId: true, scheduledFor: true },
+  });
+  const recovered = new Set(
+    clean
+      .filter((row) => row.scheduledFor > newest.get(row.routineId)!.scheduledFor)
+      .map((row) => row.routineId),
+  );
+  return [...newest.values()]
+    .filter((row) => !recovered.has(row.routineId))
+    .slice(0, FAILED_LIMIT)
+    .map((row) => ({
+      kind: "routine_exception" as const,
+      key: `receipt:${row.id}`,
+      runId: row.runId,
+      botId: row.botId,
+      botName: row.routine.bot.name,
+      groupId: row.routine.thread?.groupId ?? null,
+      routineId: row.routineId,
+      title: row.routine.name,
+      at: row.scheduledFor.toISOString(),
+      outcome: row.outcome as "failed" | "missed",
+      error: row.detail,
+    }));
+}
+
+/** Completed routine runs that checked and found nothing stay out of the done list. */
+async function quietRunIds(prisma: PrismaClient, actor: Actor, runIds: string[]) {
+  if (runIds.length === 0) return new Set<string>();
+  const rows = await prisma.routineReceipt.findMany({
+    where: {
+      spaceId: actor.spaceId,
+      userId: actor.userId,
+      outcome: "no_change",
+      runId: { in: runIds },
+    },
+    select: { runId: true },
+  });
+  return new Set(rows.flatMap((row) => (row.runId ? [row.runId] : [])));
+}
+
 async function artifactsByRun(prisma: PrismaClient, actor: Actor, runIds: string[]) {
   const byRun = new Map<string, TodayArtifact[]>();
   if (runIds.length === 0) return byRun;
@@ -269,10 +352,16 @@ export async function todaySummary(
   ]);
 
   const waitingInput = active.filter((row) => row.status === "waiting_input");
-  const [asks, superseded, completedArtifacts] = await Promise.all([
+  const [asks, superseded, completedArtifacts, exceptions, quiet] = await Promise.all([
     pendingAsks(prisma, waitingInput),
     supersededKeys(prisma, actor, failedRaw),
     artifactsByRun(
+      prisma,
+      actor,
+      completedRaw.map((row) => row.id),
+    ),
+    routineExceptions(prisma, actor, failedSince),
+    quietRunIds(
       prisma,
       actor,
       completedRaw.map((row) => row.id),
@@ -324,8 +413,12 @@ export async function todaySummary(
     );
   }
 
+  attention.push(...exceptions);
+
   const completedAll = completedRaw.filter(
-    (row) => AUTONOMOUS_TRIGGERS.includes(row.trigger) || completedArtifacts.has(row.id),
+    (row) =>
+      !quiet.has(row.id) &&
+      (AUTONOMOUS_TRIGGERS.includes(row.trigger) || completedArtifacts.has(row.id)),
   );
   const completed = completedAll.slice(0, COMPLETED_LIMIT);
   const working = active.filter((row) =>

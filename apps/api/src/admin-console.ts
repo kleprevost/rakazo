@@ -10,7 +10,7 @@ import type {
 } from "@rakazo/contracts";
 import { budgetPeriodStart } from "@rakazo/core";
 import { listSecurityEvents, quarantineCovers, recordSecurityEvent, runAsSystem } from "@rakazo/db";
-import { requireAdmin } from "./admins.js";
+import { requireAdminRole, requireAnyAdminRole } from "./admins.js";
 import type { RouterDeps } from "./router.js";
 
 type ConsoleDeps = Pick<RouterDeps, "prisma"> & {
@@ -18,6 +18,8 @@ type ConsoleDeps = Pick<RouterDeps, "prisma"> & {
     RouterDeps["env"],
     | "adminEmails"
     | "ssoAdminEnabled"
+    | "operatorEmails"
+    | "ssoOperatorRolesEnabled"
     | "defaultProvider"
     | "defaultModel"
     | "sandboxProvider"
@@ -39,7 +41,7 @@ function modelOf(provider: string | null, model: string | null) {
 }
 
 export async function adminOverview(deps: ConsoleDeps, actorId: string): Promise<AdminOverview> {
-  await requireAdmin(deps, actorId);
+  await requireAnyAdminRole(deps, actorId);
   const policy = activePolicy();
   const [userCount, botCount] = await system("overview counts", () =>
     Promise.all([deps.prisma.user.count(), deps.prisma.bot.count()]),
@@ -64,7 +66,7 @@ export async function adminUsers(
   actorId: string,
   input: { cursor?: string; limit: number },
 ): Promise<AdminUserPage> {
-  await requireAdmin(deps, actorId);
+  await requireAdminRole(deps, actorId, ["security", "auditor"]);
   const rows = await system("list users", () =>
     deps.prisma.user.findMany({
       select: { id: true, name: true, email: true, emailVerified: true, createdAt: true },
@@ -132,7 +134,7 @@ export async function adminEndSessions(
   actorId: string,
   userId: string,
 ): Promise<{ ended: number }> {
-  await requireAdmin(deps, actorId);
+  await requireAdminRole(deps, actorId, "security");
   if (userId === actorId)
     throw new ORPCError("BAD_REQUEST", { message: "Use sign out for your own account" });
   const target = await system("find user", () =>
@@ -157,7 +159,7 @@ export async function adminBots(
   input: { cursor?: string; limit: number },
   now = new Date(),
 ): Promise<AdminBotPage> {
-  await requireAdmin(deps, actorId);
+  await requireAdminRole(deps, actorId, ["security", "auditor"]);
   const rows = await system("list bots", () =>
     deps.prisma.bot.findMany({
       select: {
@@ -246,7 +248,7 @@ export async function adminPolicy(
   actorId: string,
   now = new Date(),
 ): Promise<AdminPolicyView> {
-  await requireAdmin(deps, actorId);
+  await requireAdminRole(deps, actorId, ["security", "fleet", "auditor"]);
   const policy = activePolicy();
   const since = budgetPeriodStart(now);
   const where = { createdAt: { gte: since } };
@@ -333,7 +335,7 @@ export async function adminAudit(
   actorId: string,
   input: AdminAuditInput,
 ): Promise<AdminAuditPage> {
-  await requireAdmin(deps, actorId);
+  await requireAdminRole(deps, actorId, ["security", "auditor"]);
   const empty: AdminAuditPage = { events: [], nextCursor: null };
   let userId: string | undefined;
   if (input.user?.trim()) {

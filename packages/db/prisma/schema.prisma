@@ -26,6 +26,7 @@ model User {
   directoryClaim       UserDirectoryClaim?
   employeeEntitlements EmployeeEntitlement[]
   employeeAccessRequests EmployeeAccessRequest[]
+  employeeKnowledgeProposals EmployeeKnowledgeProposal[]
   pages         Page[]
   id                          String                       @id
   name                        String
@@ -435,6 +436,7 @@ model Space {
   tasks                       Task[]
   runs                        Run[]
   routines                    Routine[]
+  routineReceipts             RoutineReceipt[]
   scratchpadItems             ScratchpadItem[]
   taughtSkills                TaughtSkill[]
   agentSkills                 AgentSkill[]
@@ -1082,6 +1084,7 @@ model Run {
   effects              ExternalEffect[]
   steeringMessages     SteeringMessage[]
   externalMessage      ExternalMessage?
+  routineReceipt       RoutineReceipt?
 
   @@unique([spaceId, clientNonce])
   @@index([status, wakeAt])
@@ -1287,10 +1290,34 @@ model Routine {
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
   runs           Run[]
+  receipts       RoutineReceipt[]
 
   @@index([active, nextRunAt])
   @@index([spaceId, botId])
   @@map("routines")
+}
+
+/// What one firing of a routine came to: no_change, action_needed, failed or missed.
+/// Written by the worker from structured signals (run status, watch result, tool errors).
+model RoutineReceipt {
+  id           String   @id @default(cuid())
+  spaceId      String
+  space        Space    @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  userId       String
+  botId        String
+  routineId    String
+  routine      Routine  @relation(fields: [routineId], references: [id], onDelete: Cascade)
+  /// The run this firing started; null for a check that started none (quiet, failed, missed).
+  runId        String?  @unique
+  run          Run?     @relation(fields: [runId], references: [id], onDelete: SetNull)
+  scheduledFor DateTime
+  outcome      String
+  detail       String?
+  createdAt    DateTime @default(now())
+
+  @@unique([routineId, scheduledFor])
+  @@index([spaceId, userId, createdAt])
+  @@map("routine_receipts")
 }
 
 model ScratchpadItem {
@@ -2583,6 +2610,8 @@ model Employee {
   grants            EmployeeGrant[]
   entitlements      EmployeeEntitlement[]
   accessRequests    EmployeeAccessRequest[]
+  knowledge         EmployeeKnowledge[]
+  knowledgeProposals EmployeeKnowledgeProposal[]
   bots              Bot[]
   capabilityGrants  CapabilityGrant[]
 
@@ -2679,4 +2708,62 @@ model EmployeeAccessRequest {
   @@index([employeeId, status])
   @@index([requesterUserId])
   @@map("employee_access_requests")
+}
+
+/// Approved shared knowledge of an employee: read-only to instances, written only through the
+/// approval workflow or a direct edit by an Owner or Manager.
+model EmployeeKnowledge {
+  id         String   @id @default(cuid())
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  path       String
+  content    String
+  revision   Int      @default(1)
+  /// "approved" | "retired"
+  state      String   @default("approved")
+  approvedBy String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  revisions  EmployeeKnowledgeRevision[]
+
+  @@unique([employeeId, path])
+  @@map("employee_knowledge")
+}
+
+model EmployeeKnowledgeRevision {
+  id          String            @id @default(cuid())
+  knowledgeId String
+  knowledge   EmployeeKnowledge @relation(fields: [knowledgeId], references: [id], onDelete: Cascade)
+  revision    Int
+  content     String
+  approvedBy  String
+  createdAt   DateTime          @default(now())
+
+  @@unique([knowledgeId, revision])
+  @@map("employee_knowledge_revisions")
+}
+
+/// A note a person chose to offer. The text is copied at proposal time; there is no pointer to
+/// the private memory it came from. At most one pending proposal per person, employee and path
+/// (partial unique index in SQL).
+model EmployeeKnowledgeProposal {
+  id               String    @id @default(cuid())
+  employeeId       String
+  employee         Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  proposedByUserId String?
+  proposedBy       User?     @relation(fields: [proposedByUserId], references: [id], onDelete: SetNull)
+  path             String
+  proposedContent  String
+  /// The approved revision the text was written against; null when the path was new.
+  baseRevision     Int?
+  /// "pending" | "approved" | "rejected" | "withdrawn"
+  status           String    @default("pending")
+  decidedBy        String?
+  decidedAt        DateTime?
+  reason           String?
+  createdAt        DateTime  @default(now())
+
+  @@index([employeeId, status])
+  @@index([proposedByUserId])
+  @@map("employee_knowledge_proposals")
 }

@@ -18,6 +18,7 @@ import { rpc } from "../../lib/rpc";
 import { errorText } from "../../lib/user-error";
 import { AdminQuery, LoadMore } from "./AdminQuery";
 import { AdminShell } from "./AdminShell";
+import { useAdminRoles } from "./admin-roles";
 import { formatWhen } from "./format";
 
 const PAGE_SIZE = 50;
@@ -75,6 +76,7 @@ function AdminUsers() {
 
 function UserRow({ user, locale }: { user: AdminUser; locale: string }) {
   const { t } = useLingui();
+  const { can } = useAdminRoles();
   const [confirming, setConfirming] = useState(false);
   const [busy, setBusy] = useState(false);
   async function endSessions() {
@@ -111,7 +113,7 @@ function UserRow({ user, locale }: { user: AdminUser; locale: string }) {
         {user.lastSignInAt ? formatWhen(user.lastSignInAt, locale) : null}
       </TableCell>
       <TableCell className="text-end">
-        {user.isSelf ? null : (
+        {user.isSelf || !can("security") ? null : (
           <Button
             variant={confirming ? "destructive" : "ghost"}
             size="sm"

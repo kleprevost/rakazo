@@ -38,6 +38,7 @@ import {
   clearRoutineBackoff,
   modelAccountRefusal,
 } from "./routine-backoff.js";
+import { recordRoutineRunReceipt } from "./routine-receipts.js";
 import type { RunContext } from "./run-context.js";
 import { persistTurnCheckpoint } from "./run-context.js";
 import { renewRunLease, requeueComputerRun } from "./run-lifecycle.js";
@@ -609,6 +610,7 @@ async function stopStuckToolLoop(ctx: RunContext, toolName: string) {
   ctx.stopHeartbeatAfterCompletion();
   if (run.trigger === "routine" && run.routineId) {
     await clearRoutineBackoff(deps, run.routineId);
+    await recordRoutineRunReceipt(deps.prisma, run, { status: "failed", error: stuckText });
   }
   if (stopped.continuationRunId) {
     await deps.jobs
@@ -840,6 +842,11 @@ export async function completeRun(ctx: RunContext) {
   ctx.stopHeartbeatAfterCompletion();
   if (run.trigger === "routine" && run.routineId) {
     await clearRoutineBackoff(deps, run.routineId);
+    // Saying nothing is the model's explicit quiet decision; any text or progress message is news.
+    await recordRoutineRunReceipt(deps.prisma, run, {
+      status: "completed",
+      replied: Boolean(text) || reply.publishedMidTurnUserMessage,
+    });
   }
   const { screenRelease } = ctx.state.computerUse;
   if (screenRelease) screenRelease.keepWarm = true;
@@ -960,6 +967,7 @@ export async function failRun(
     ...(partialReply.length > 0 ? { partialReply } : {}),
   });
   if (!failed) return;
+  await recordRoutineRunReceipt(deps.prisma, run, { status: "failed", error: message });
   if (
     error instanceof TransientModelError ||
     error instanceof ModelAccountError ||

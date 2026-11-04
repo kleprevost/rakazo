@@ -18,6 +18,7 @@ import { rpc } from "../../lib/rpc";
 import { errorText } from "../../lib/user-error";
 import { AdminQuery, LoadMore } from "./AdminQuery";
 import { AdminShell } from "./AdminShell";
+import { useAdminRoles } from "./admin-roles";
 import { formatUsd, formatWhen } from "./format";
 
 const PAGE_SIZE = 50;
@@ -91,6 +92,7 @@ function AdminBots() {
 /** The quarantines in force, each with Release, and the control that quarantines every bot. */
 function Quarantines({ items, onChanged }: { items: AdminQuarantine[]; onChanged: () => void }) {
   const { t } = useLingui();
+  const canChange = useAdminRoles().can("security");
   const [confirming, setConfirming] = useState(false);
   const [busy, setBusy] = useState(false);
   async function run(change: () => Promise<unknown>) {
@@ -114,18 +116,20 @@ function Quarantines({ items, onChanged }: { items: AdminQuarantine[]; onChanged
             {item.scopeKind === "all" ? t`All` : (item.scopeName ?? item.scopeId)}
           </span>
           <span className="text-muted-foreground">{item.reason}</span>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="ms-auto"
-            disabled={busy}
-            onClick={() => void run(() => rpc.admin.quarantine.lift({ id: item.id }))}
-          >
-            <Trans>Release</Trans>
-          </Button>
+          {canChange ? (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="ms-auto"
+              disabled={busy}
+              onClick={() => void run(() => rpc.admin.quarantine.lift({ id: item.id }))}
+            >
+              <Trans>Release</Trans>
+            </Button>
+          ) : null}
         </div>
       ))}
-      {items.some((item) => item.scopeKind === "all") ? null : (
+      {!canChange || items.some((item) => item.scopeKind === "all") ? null : (
         <Button
           variant={confirming ? "destructive" : "outline"}
           size="sm"
@@ -155,6 +159,7 @@ function BotRow({
   onChanged: () => void;
 }) {
   const { t } = useLingui();
+  const canChange = useAdminRoles().can("security");
   const [confirming, setConfirming] = useState(false);
   const [busy, setBusy] = useState(false);
   const [confirmingQuarantine, setConfirmingQuarantine] = useState(false);
@@ -211,22 +216,24 @@ function BotRow({
       </TableCell>
       <TableCell className="text-end">{formatUsd(bot.monthlySpendUsd, locale)}</TableCell>
       <TableCell className="text-end">
-        <Button
-          variant={confirming ? "destructive" : "ghost"}
-          size="sm"
-          disabled={busy}
-          onClick={() => (bot.suspendedAt || confirming ? void toggle() : setConfirming(true))}
-          onBlur={() => setConfirming(false)}
-        >
-          {bot.suspendedAt ? (
-            <Trans>Resume</Trans>
-          ) : confirming ? (
-            <Trans>Confirm</Trans>
-          ) : (
-            <Trans>Suspend</Trans>
-          )}
-        </Button>
-        {bot.quarantinedAt ? null : (
+        {canChange ? (
+          <Button
+            variant={confirming ? "destructive" : "ghost"}
+            size="sm"
+            disabled={busy}
+            onClick={() => (bot.suspendedAt || confirming ? void toggle() : setConfirming(true))}
+            onBlur={() => setConfirming(false)}
+          >
+            {bot.suspendedAt ? (
+              <Trans>Resume</Trans>
+            ) : confirming ? (
+              <Trans>Confirm</Trans>
+            ) : (
+              <Trans>Suspend</Trans>
+            )}
+          </Button>
+        ) : null}
+        {!canChange || bot.quarantinedAt ? null : (
           <Button
             variant={confirmingQuarantine ? "destructive" : "ghost"}
             size="sm"

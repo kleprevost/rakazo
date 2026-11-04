@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { composeEmployeeBot } from "./employee-run.js";
+import {
+  composeEmployeeBot,
+  EMPLOYEE_KNOWLEDGE_PROMPT_MAX_CHARS,
+  formatEmployeeKnowledge,
+} from "./employee-run.js";
 
 const bot = {
   description: "own description",
@@ -64,5 +68,32 @@ describe("composeEmployeeBot", () => {
       crossSpaceCommunication: false,
       memoryScope: "isolated",
     });
+  });
+
+  it("places approved knowledge after the definition and before the personal note", () => {
+    const composed = composeEmployeeBot(
+      { ...bot, instructions: "Call me Sam." },
+      version,
+      [],
+      [
+        { path: "b.md", content: "Second." },
+        { path: "a.md", content: "First." },
+      ],
+    );
+    const text = composed.instructions;
+    expect(text.indexOf("### a.md")).toBeLessThan(text.indexOf("### b.md"));
+    expect(text.indexOf(version.instructions)).toBeLessThan(text.indexOf("### a.md"));
+    expect(text.indexOf("### b.md")).toBeLessThan(text.indexOf("Call me Sam."));
+  });
+
+  it("adds nothing without knowledge and skips a document that does not fit whole", () => {
+    expect(formatEmployeeKnowledge([])).toBe("");
+    const big = "x".repeat(EMPLOYEE_KNOWLEDGE_PROMPT_MAX_CHARS);
+    const out = formatEmployeeKnowledge([
+      { path: "big.md", content: big },
+      { path: "small.md", content: "Fits." },
+    ]);
+    expect(out).toContain("Fits.");
+    expect(out).not.toContain("xxxx");
   });
 });

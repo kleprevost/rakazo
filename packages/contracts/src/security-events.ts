@@ -54,8 +54,12 @@ export const SECURITY_EVENT_TYPES = [
   "capability.grant_set",
   "capability.grant_revoked",
   "capability.mode_changed",
+  "capability.denied",
   "employee.access_requested",
   "employee.access_decided",
+  "employee.knowledge_proposed",
+  "employee.knowledge_decided",
+  "employee.knowledge_changed",
 ] as const;
 
 export const SecurityEventTypeSchema = z.enum(SECURITY_EVENT_TYPES);

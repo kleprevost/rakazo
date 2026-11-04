@@ -18,6 +18,7 @@ import { SettingsSectionHeading } from "../components/SettingsSectionHeading";
 import { downloadArtifactBytes } from "../lib/artifact-open";
 import { useSpaceQueries } from "../lib/query";
 import { useSpaceRpc } from "../lib/space-rpc";
+import { errorText } from "../lib/user-error";
 
 const NO_DOCS: MemoryDocument[] = [];
 const NO_SKILLS: AgentSkillCatalogEntry[] = [];
@@ -32,10 +33,18 @@ function rowClass(open: boolean): string {
  * Bot memory. Skills belong to the person in a space, not to one bot, so they live in
  * the Skills dialog; memory shared across bots lives in the Memory settings overlay.
  */
-export function KnowledgeSection({ botId }: { botId: string }) {
+export function KnowledgeSection({
+  botId,
+  employeeId,
+}: {
+  botId: string;
+  /** Set on an instance of a shared employee: its notes can be offered to the team. */
+  employeeId?: string | null;
+}) {
   return (
     <MemoryDocumentList
       key={botId}
+      employeeId={employeeId ?? undefined}
       input={{ botId, scope: "bot" }}
       testId="bot-knowledge-memory"
       compact
@@ -67,7 +76,9 @@ function MemoryDocumentList({
   input,
   testId,
   compact = false,
+  employeeId,
 }: {
+  employeeId?: string;
   input: { botId?: string; scope: "bot" | "user" };
   testId: string;
   compact?: boolean;
@@ -107,6 +118,7 @@ function MemoryDocumentList({
   const [actionError, setError] = useState<string | null>(null);
   const error = actionError ?? (listQuery.isError ? t`Could not load` : null);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [suggestedId, setSuggestedId] = useState<string | null>(null);
 
   async function setDocs(update: (current: MemoryDocument[]) => MemoryDocument[]) {
     await writeSaved(queryClient, list.queryKey, (current) => update(current ?? []));
@@ -120,6 +132,7 @@ function MemoryDocumentList({
     setDraft(doc.content);
     setError(null);
     setConfirmingDelete(false);
+    setSuggestedId(null);
   }
 
   function closeDoc() {
@@ -142,6 +155,21 @@ function MemoryDocumentList({
       closeDoc();
     } catch {
       setError(t`Could not remove`);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  /** Offers the text shown in the editor, as edited, to the team's reviewers. */
+  async function suggest(doc: MemoryDocument) {
+    if (busy || !employeeId || !draft.trim()) return;
+    setBusy(true);
+    setError(null);
+    try {
+      await rpc.employees.knowledge.propose({ employeeId, path: doc.path, content: draft });
+      setSuggestedId(doc.id);
+    } catch (err) {
+      setError(errorText(err, t`Could not save`));
     } finally {
       setBusy(false);
     }
@@ -284,6 +312,21 @@ function MemoryDocumentList({
                     >
                       <Trans>Cancel</Trans>
                     </Button>
+                    {employeeId ? (
+                      <Button
+                        variant="ghost"
+                        type="button"
+                        disabled={busy || suggestedId === doc.id || !draft.trim()}
+                        onClick={() => void suggest(doc)}
+                        size="sm"
+                      >
+                        {suggestedId === doc.id ? (
+                          <Trans>Suggested</Trans>
+                        ) : (
+                          <Trans>Suggest to team</Trans>
+                        )}
+                      </Button>
+                    ) : null}
                     {isDeletableMemoryDocument(doc.path) ? (
                       <Button
                         variant="ghost"

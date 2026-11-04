@@ -19,6 +19,7 @@ import { protectedComputerLifecycleRefusal } from "./desktop-command-guard.js";
 import type { ExecutorDeps } from "./executor-deps.js";
 import { routineRunModelPin } from "./model-selection.js";
 import { findPendingRoutineTick, routineTimerNonce } from "./routine-coalescing.js";
+import { recordRoutineReceipt, skippedOccurrences } from "./routine-receipts.js";
 import { tickRoutineWatch } from "./routine-watch.js";
 import { isUniqueViolation } from "./run-messages.js";
 import { notifyRun } from "./run-notifications.js";
@@ -143,6 +144,11 @@ export async function wakeRoutine(deps: ExecutorDeps, routineId: string, schedul
       where: { id: routine.id, active: true, nextRunAt: scheduledAt },
       data: { nextRunAt: next, ...(next ? {} : { active: false }) },
     });
+    if (moved.count === 1) {
+      for (const at of [scheduledAt, ...skippedOccurrences(routine, scheduledAt, next)]) {
+        await recordRoutineReceipt(deps.prisma, routine, { scheduledFor: at, outcome: "missed" });
+      }
+    }
     if (moved.count === 1 && next) await deps.jobs.enqueue(routineWakeupJob(routine.id, next));
     return;
   }
@@ -291,6 +297,12 @@ export async function wakeRoutine(deps: ExecutorDeps, routineId: string, schedul
       "run.id": claimed.id,
       error: sanitizedError(error),
     });
+  }
+  // Occurrences that came due while nothing was running were skipped by this catch-up.
+  if (routine.watch == null) {
+    for (const at of skippedOccurrences(routine, scheduledAt, nextRunAt)) {
+      await recordRoutineReceipt(deps.prisma, routine, { scheduledFor: at, outcome: "missed" });
+    }
   }
   if (claimed.coalesced) {
     getLogger().info("routine.coalesced", {

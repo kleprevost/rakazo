@@ -493,6 +493,10 @@ msgid "Account menu for {name}"
 msgstr "Account menu for {name}"
 
 #: src/pages/Calendar.tsx
+msgid "Action needed"
+msgstr "Action needed"
+
+#: src/pages/Calendar.tsx
 msgid "Actions"
 msgstr "Actions"
 
@@ -926,6 +930,7 @@ msgstr "Approvals"
 msgid "Approve"
 msgstr "Approve"
 
+#. placeholder {0}: proposal.path
 #. placeholder {0}: request.requesterName
 #: src/pages/shell/share-employee-dialog.tsx
 msgid "Approve {0}"
@@ -4310,6 +4315,11 @@ msgstr "minute"
 msgid "minutes"
 msgstr "minutes"
 
+#: src/pages/Calendar.tsx
+#: src/pages/Today.tsx
+msgid "Missed"
+msgstr "Missed"
+
 #: src/components/call/VoiceChatCard.tsx
 msgid "Missed call"
 msgstr "Missed call"
@@ -4627,6 +4637,10 @@ msgstr "No bots"
 #: src/pages/shell/bot-picker.tsx
 msgid "No bots match"
 msgstr "No bots match"
+
+#: src/pages/Calendar.tsx
+msgid "No change"
+msgstr "No change"
 
 #: src/pages/Employees.tsx
 msgid "No employees yet"
@@ -5535,11 +5549,14 @@ msgid "Registration is closed"
 msgstr "Registration is closed"
 
 #: src/pages/PluginSubmissionsPanel.tsx
+#: src/pages/shell/share-employee-dialog.tsx
 msgid "Reject"
 msgstr "Reject"
 
+#. placeholder {0}: proposal.path
 #. placeholder {0}: rejecting?.name
 #: src/pages/PluginSubmissionsPanel.tsx
+#: src/pages/shell/share-employee-dialog.tsx
 msgid "Reject {0}"
 msgstr "Reject {0}"
 
@@ -5804,6 +5821,11 @@ msgstr "Restricted"
 #: src/pages/Calendar.tsx
 msgid "Resume"
 msgstr "Resume"
+
+#. placeholder {0}: entry.path
+#: src/pages/shell/share-employee-dialog.tsx
+msgid "Retire {0}"
+msgstr "Retire {0}"
 
 #: src/components/AccountAccess.tsx
 #: src/components/integrations/plugin-marketplace.tsx
@@ -6656,6 +6678,14 @@ msgstr "Subscribe with your own AI"
 msgid "Subscription required"
 msgstr "Subscription required"
 
+#: src/pages/KnowledgeSection.tsx
+msgid "Suggest to team"
+msgstr "Suggest to team"
+
+#: src/pages/KnowledgeSection.tsx
+msgid "Suggested"
+msgstr "Suggested"
+
 #: src/lib/cron.ts
 msgid "Sunday"
 msgstr "Sunday"
@@ -6733,6 +6763,10 @@ msgstr "Team"
 #: src/pages/shell/computer-view.tsx
 msgid "Team Computer"
 msgstr "Team Computer"
+
+#: src/pages/shell/share-employee-dialog.tsx
+msgid "Team knowledge"
+msgstr "Team knowledge"
 
 #: src/pages/RoutineEditor.tsx
 msgid "Teams message"

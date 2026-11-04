@@ -152,7 +152,8 @@ export function CalendarView({
     };
     for (const run of range.past) {
       const routine = routines.get(run.routineId);
-      if (routine) add({ key: run.runId, at: new Date(run.at), routine, run });
+      if (routine)
+        add({ key: run.runId ?? `${run.routineId}:${run.at}`, at: new Date(run.at), routine, run });
     }
     for (const occurrence of range.upcoming) {
       const routine = routines.get(occurrence.routineId);
@@ -233,6 +234,12 @@ function OutcomeLabel({ outcome }: { outcome: CalendarOutcome }) {
       return <Trans>Skipped</Trans>;
     case "running":
       return <Trans>Running</Trans>;
+    case "no_change":
+      return <Trans>No change</Trans>;
+    case "action_needed":
+      return <Trans>Action needed</Trans>;
+    case "missed":
+      return <Trans>Missed</Trans>;
   }
 }
 
@@ -249,7 +256,13 @@ function ItemRow({ item, onError }: { item: Item; onError: (message: string) => 
         <time dateTime={item.at.toISOString()} className="block text-xs text-muted-foreground">
           {item.at.toLocaleTimeString(i18n.locale || "en", { hour: "numeric", minute: "2-digit" })}
           {run ? (
-            <span className={run.outcome === "failed" ? "text-destructive" : undefined}>
+            <span
+              className={
+                run.outcome === "failed" || run.outcome === "missed"
+                  ? "text-destructive"
+                  : undefined
+              }
+            >
               {" · "}
               <OutcomeLabel outcome={run.outcome} />
             </span>

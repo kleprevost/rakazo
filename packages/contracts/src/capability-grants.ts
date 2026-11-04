@@ -7,8 +7,11 @@ import {
 } from "./capabilities.js";
 import { Id, IsoDate } from "./ids.js";
 
-/** `shadow` records what the broker would decide and changes nothing. Off is `null`. */
-export const CAPABILITY_MODES = ["shadow"] as const;
+/**
+ * `shadow` records what the broker would decide and changes nothing; `enforce` refuses what it
+ * would deny. Off is `null`.
+ */
+export const CAPABILITY_MODES = ["shadow", "enforce"] as const;
 export const CapabilityModeSchema = z.enum(CAPABILITY_MODES);
 export type CapabilityMode = z.infer<typeof CapabilityModeSchema>;
 
@@ -71,7 +74,7 @@ export const capabilityGrantsContract = {
   revoke: oc
     .input(z.object({ id: Id, reason: z.string().trim().max(200).optional() }))
     .output(z.object({ ok: z.literal(true) })),
-  /** Admins only: turn shadow recording on or off for one bot. */
+  /** Admins only: set the broker mode (off, shadow or enforce) for one bot. */
   setMode: oc
     .input(z.object({ botId: Id, mode: CapabilityModeSchema.nullable() }))
     .output(z.object({ ok: z.literal(true) })),

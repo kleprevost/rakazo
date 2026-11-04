@@ -494,6 +494,10 @@ msgid "Account menu for {name}"
 msgstr "{name} 的帳號選單"
 
 #: src/pages/Calendar.tsx
+msgid "Action needed"
+msgstr "需要處理"
+
+#: src/pages/Calendar.tsx
 msgid "Actions"
 msgstr "操作"
 
@@ -927,6 +931,7 @@ msgstr "核准"
 msgid "Approve"
 msgstr "核准"
 
+#. placeholder {0}: proposal.path
 #. placeholder {0}: request.requesterName
 #: src/pages/shell/share-employee-dialog.tsx
 msgid "Approve {0}"
@@ -4311,6 +4316,11 @@ msgstr "分鐘"
 msgid "minutes"
 msgstr "分鐘"
 
+#: src/pages/Calendar.tsx
+#: src/pages/Today.tsx
+msgid "Missed"
+msgstr "已錯過"
+
 #: src/components/call/VoiceChatCard.tsx
 msgid "Missed call"
 msgstr "未接來電"
@@ -4628,6 +4638,10 @@ msgstr ""
 #: src/pages/shell/bot-picker.tsx
 msgid "No bots match"
 msgstr "沒有符合的機器人"
+
+#: src/pages/Calendar.tsx
+msgid "No change"
+msgstr "無變化"
 
 #: src/pages/Employees.tsx
 msgid "No employees yet"
@@ -5536,11 +5550,14 @@ msgid "Registration is closed"
 msgstr "註冊已關閉"
 
 #: src/pages/PluginSubmissionsPanel.tsx
+#: src/pages/shell/share-employee-dialog.tsx
 msgid "Reject"
 msgstr ""
 
+#. placeholder {0}: proposal.path
 #. placeholder {0}: rejecting?.name
 #: src/pages/PluginSubmissionsPanel.tsx
+#: src/pages/shell/share-employee-dialog.tsx
 msgid "Reject {0}"
 msgstr ""
 
@@ -5805,6 +5822,11 @@ msgstr ""
 #: src/pages/Calendar.tsx
 msgid "Resume"
 msgstr "恢復"
+
+#. placeholder {0}: entry.path
+#: src/pages/shell/share-employee-dialog.tsx
+msgid "Retire {0}"
+msgstr ""
 
 #: src/components/AccountAccess.tsx
 #: src/components/integrations/plugin-marketplace.tsx
@@ -6657,6 +6679,14 @@ msgstr "使用自己的 AI 訂閱"
 msgid "Subscription required"
 msgstr "需要訂閱"
 
+#: src/pages/KnowledgeSection.tsx
+msgid "Suggest to team"
+msgstr ""
+
+#: src/pages/KnowledgeSection.tsx
+msgid "Suggested"
+msgstr ""
+
 #: src/lib/cron.ts
 msgid "Sunday"
 msgstr "週日"
@@ -6734,6 +6764,10 @@ msgstr "團隊"
 #: src/pages/shell/computer-view.tsx
 msgid "Team Computer"
 msgstr "團隊電腦"
+
+#: src/pages/shell/share-employee-dialog.tsx
+msgid "Team knowledge"
+msgstr ""
 
 #: src/pages/RoutineEditor.tsx
 msgid "Teams message"

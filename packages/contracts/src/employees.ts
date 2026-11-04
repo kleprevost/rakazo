@@ -131,6 +131,47 @@ export const EmployeeAccessRequestSchema = z.object({
 });
 export type EmployeeAccessRequest = z.infer<typeof EmployeeAccessRequestSchema>;
 
+/** Shared knowledge is plain text under a relative path, like a memory document. */
+export const EMPLOYEE_KNOWLEDGE_CONTENT_MAX = 20_000;
+export const EmployeeKnowledgePathSchema = z
+  .string()
+  .trim()
+  .min(1)
+  .max(200)
+  .refine((path) => !path.startsWith("/") && !path.split("/").some((part) => part === ".."), {
+    message: "Use a relative path",
+  });
+export const EmployeeKnowledgeContentSchema = z.string().min(1).max(EMPLOYEE_KNOWLEDGE_CONTENT_MAX);
+
+export const EmployeeKnowledgeSchema = z.object({
+  path: z.string(),
+  content: z.string(),
+  revision: z.number().int(),
+  updatedAt: IsoDate,
+});
+export type EmployeeKnowledge = z.infer<typeof EmployeeKnowledgeSchema>;
+
+/**
+ * A pending proposal as a reviewer sees it: the submitted text, the approved text it would
+ * replace, and whether that text has changed since. The proposer is not named.
+ */
+export const EmployeeKnowledgeProposalSchema = z.object({
+  id: Id,
+  path: z.string(),
+  content: z.string(),
+  currentContent: z.string().nullable(),
+  stale: z.boolean(),
+  createdAt: IsoDate,
+});
+export type EmployeeKnowledgeProposal = z.infer<typeof EmployeeKnowledgeProposalSchema>;
+
+/** The caller's own open proposal. */
+export const EmployeeOwnProposalSchema = z.object({
+  id: Id,
+  path: z.string(),
+  createdAt: IsoDate,
+});
+
 export const EmployeeDraftInputSchema = z.object({
   employeeId: Id,
   role: z.string().max(2_000).optional(),
@@ -193,6 +234,58 @@ export const employeesContract = {
     publish: oc.input(z.object({ employeeId: Id, versionId: Id })).output(EmployeeCardSchema),
     /** Points the employee back at an earlier published version. */
     rollback: oc.input(z.object({ employeeId: Id, versionId: Id })).output(EmployeeCardSchema),
+  },
+  knowledge: {
+    /** Approved shared knowledge, for anyone who may use the employee. */
+    list: oc.input(z.object({ employeeId: Id })).output(z.array(EmployeeKnowledgeSchema)),
+    /**
+     * Offers text to the reviewers. The text is copied as submitted; nothing links it to the
+     * private note it came from. Text that looks like a credential is refused.
+     */
+    propose: oc
+      .input(
+        z.object({
+          employeeId: Id,
+          path: EmployeeKnowledgePathSchema,
+          content: EmployeeKnowledgeContentSchema,
+        }),
+      )
+      .output(z.object({ ok: z.literal(true) })),
+    /** Writes approved knowledge directly. Owners and Managers only. */
+    set: oc
+      .input(
+        z.object({
+          employeeId: Id,
+          path: EmployeeKnowledgePathSchema,
+          content: EmployeeKnowledgeContentSchema,
+          /** The revision the editor loaded; omit for a new path. */
+          expectedRevision: z.number().int().optional(),
+        }),
+      )
+      .output(EmployeeKnowledgeSchema),
+    /** Takes a path out of the prompt from the next run. Owners and Managers only. */
+    retire: oc
+      .input(z.object({ employeeId: Id, path: EmployeeKnowledgePathSchema }))
+      .output(z.object({ ok: z.literal(true) })),
+    proposals: {
+      /** Pending proposals, for Owners and Managers. */
+      list: oc.input(z.object({ employeeId: Id })).output(z.array(EmployeeKnowledgeProposalSchema)),
+      /** The caller's own pending proposals. */
+      mine: oc.input(z.object({ employeeId: Id })).output(z.array(EmployeeOwnProposalSchema)),
+      decide: oc
+        .input(
+          z.object({
+            employeeId: Id,
+            proposalId: Id,
+            decision: z.enum(["approve", "reject"]),
+            reason: z.string().max(500).optional(),
+          }),
+        )
+        .output(z.object({ ok: z.literal(true) })),
+      withdraw: oc
+        .input(z.object({ employeeId: Id, proposalId: Id }))
+        .output(z.object({ ok: z.literal(true) })),
+    },
   },
   /** People a Manager or Owner can name in a grant. Identity only. */
   people: {

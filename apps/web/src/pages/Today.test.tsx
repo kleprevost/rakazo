@@ -207,6 +207,67 @@ it("lists every section with links to the work behind each row", async () => {
   expect(container.textContent).toContain("504: request timed out");
 });
 
+it("lists a run waiting on the user under Needs attention, never under Working", async () => {
+  const waitingRun = (runId: string, status: "waiting_input" | "waiting_takeover") => ({
+    ...bot,
+    runId,
+    status,
+    trigger: "user" as const,
+    title: `Paused ${runId}`,
+    routineId: null,
+    at,
+    artifacts: [],
+  });
+  rpc.today.summary.mockResolvedValue({
+    ...populated,
+    counts: { ...populated.counts, attention: 1 },
+    attention: populated.attention.slice(0, 1),
+    active: [
+      ...populated.active,
+      waitingRun("run-ask", "waiting_input"),
+      waitingRun("run-takeover", "waiting_takeover"),
+    ],
+  });
+  const container = await mount();
+  await vi.waitFor(() => expect(container.querySelector('[data-testid="today"]')).not.toBeNull());
+  const section = (title: string) =>
+    [...container.querySelectorAll("section")].find((el) =>
+      el.querySelector("h2")?.textContent?.startsWith(title),
+    );
+  const working = section("Working");
+  expect(working?.textContent).toContain("Summarize the inbox");
+  expect(working?.textContent).not.toContain("Paused");
+  // The run with a card is listed once, as its card; the takeover has none and joins the section.
+  const attention = section("Needs attention");
+  expect(attention?.querySelector("h2")?.textContent).toBe("Needs attention 2");
+  expect(attention?.textContent).toContain("Paused run-takeover");
+  expect(attention?.textContent).not.toContain("Paused run-ask");
+});
+
+it("lists a failed check and a missed run as exceptions that open the chat", async () => {
+  const exception = {
+    ...bot,
+    kind: "routine_exception" as const,
+    runId: null,
+    routineId: "routine-9",
+    at,
+    error: null,
+  };
+  rpc.today.summary.mockResolvedValue({
+    ...empty,
+    counts: { ...empty.counts, attention: 2 },
+    attention: [
+      { ...exception, key: "receipt:r1", title: "Release watch", outcome: "failed", error: "503" },
+      { ...exception, key: "receipt:r2", title: "Weekly report", outcome: "missed" },
+    ],
+  });
+  const container = await mount();
+  await vi.waitFor(() => expect(container.querySelector('[data-testid="today"]')).not.toBeNull());
+  expect(container.textContent).toContain("503");
+  expect(container.textContent).toContain("Weekly report · Missed");
+  expect(container.querySelectorAll("button")).toHaveLength(0);
+});
+
 it("never offers a decision for an approval, only a way into its chat", async () => {
   rpc.today.summary.mockResolvedValue(populated);
   const container = await mount();

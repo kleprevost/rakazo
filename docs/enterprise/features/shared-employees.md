@@ -527,3 +527,27 @@ non-empty. The existing needs-attention mechanism is per bot and per run, so it 
 request that belongs to an employee, not to anyone's bot; a Today item for Owners and Managers is the
 natural follow-up. Not in this PR: a request note, withdrawing a request, choosing the granted role,
 and mobile (the native list and sheet arrive with the mobile follow-up).
+
+PR 7 (shared knowledge and proposals) adds three tables (`employee_knowledge`, its revisions, and
+`employee_knowledge_proposals`; additive, row-level security in the same migration: anyone entitled
+reads approved knowledge, Owners and Managers read revisions and every proposal, a proposer reads their
+own, all writes are system after the role check) and `employees.knowledge.*`: `list` (approved, for
+Collaborator and up), `propose`, `set` and `retire` (Owner and Manager), and
+`proposals.list|mine|decide|withdraw`. A proposal stores only the submitted text and the approved
+revision it was written against; nothing points to the private note. Reviewers get the text, the
+approved text it replaces and a stale flag, never the proposer. Approving writes the next revision
+under the employee lock and is refused when the approved text moved since the proposal (reject, and
+the person offers it again); only Owners and Managers decide, so a Collaborator never approves their
+own text. At each run start `resolveEmployeeRun` reads approved knowledge and places it between the
+published instructions and the person's own note, framed as reference notes, whole documents in path
+order up to 24,000 characters, so a retirement or edit applies on the next run. UI: "Suggest to team"
+on an open note of an instance bot (the editor text is what is sent), and a "Team knowledge" section in
+the Share dialog for Owners and Managers, shown only when there is something to review or retire.
+Security events `employee.knowledge_proposed|decided|changed` carry ids only.
+
+Deviations from the build plan: the credential scan is the existing deterministic `looksLikeCredential`
+shapes and it blocks (on propose, direct edit and again on approve) instead of only advising reviewers;
+the optional model-assisted PII check and the diff view are not built (reviewers see both texts' data
+through `currentContent`, rendered as the submitted text only); proposer identity is never returned, so
+the open "show proposer" setting is not needed yet. Not in this PR: a direct-edit and withdraw UI,
+approved-knowledge revision history UI, and mobile.

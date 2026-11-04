@@ -65,6 +65,13 @@ describeWithDatabase("API authorization and resource isolation", () => {
       agentRuntime: "scripted",
       wakeupDriver: "memory",
       signupsEnabled: "true",
+      // Operator roles: accounts are created per test, with these emails and a verified address.
+      adminEmails: [`role-platform-${stamp}@rakazo.test`],
+      operatorEmails: {
+        security: [`role-security-${stamp}@rakazo.test`],
+        fleet: [`role-fleet-${stamp}@rakazo.test`],
+        auditor: [`role-auditor-${stamp}@rakazo.test`],
+      },
       // Board procedures answer 404 before the session check while the board is off.
       ticketBoardEnabled: true,
       composio: new ComposioConnector({ client: new FakeComposioClient() }),
@@ -538,6 +545,23 @@ describeWithDatabase("API authorization and resource isolation", () => {
       [
         "employees/requests/decide",
         { employeeId: "missing-employee", requestId: "missing", decision: "deny" },
+      ],
+      ["employees/knowledge/list", { employeeId: "missing-employee" }],
+      [
+        "employees/knowledge/propose",
+        { employeeId: "missing-employee", path: "a.md", content: "x" },
+      ],
+      ["employees/knowledge/set", { employeeId: "missing-employee", path: "a.md", content: "x" }],
+      ["employees/knowledge/retire", { employeeId: "missing-employee", path: "a.md" }],
+      ["employees/knowledge/proposals/list", { employeeId: "missing-employee" }],
+      ["employees/knowledge/proposals/mine", { employeeId: "missing-employee" }],
+      [
+        "employees/knowledge/proposals/decide",
+        { employeeId: "missing-employee", proposalId: "missing", decision: "reject" },
+      ],
+      [
+        "employees/knowledge/proposals/withdraw",
+        { employeeId: "missing-employee", proposalId: "x" },
       ],
       ["employees/versions/saveDraft", { employeeId: "missing-employee" }],
       ["employees/versions/publish", { employeeId: "missing-employee", versionId: "missing" }],
@@ -2445,6 +2469,60 @@ describeWithDatabase("API authorization and resource isolation", () => {
     expect(
       (await app.request("/api/audit-events/export", { headers: { cookie: owner } })).status,
     ).toBe(403);
+  });
+
+  it("splits operator permissions by role and denies the rest with FORBIDDEN", async () => {
+    const cookies: Record<string, string> = {};
+    for (const role of ["platform", "security", "fleet", "auditor"] as const) {
+      const email = `role-${role}-${stamp}@rakazo.test`;
+      cookies[role] = await signup(app, email, `Role ${role}`);
+      await db.user.update({ where: { email }, data: { emailVerified: true } });
+      const me = await rpc<{ isAdmin: boolean; adminRoles: string[] }>(app, cookies[role]!, "me");
+      expect(me.adminRoles).toEqual([role]);
+      expect(me.isAdmin).toBe(role === "platform");
+    }
+    const unverified = await signup(app, `role-security-unverified-${stamp}@rakazo.test`, "Other");
+    expect((await rpc<{ adminRoles: string[] }>(app, unverified, "me")).adminRoles).toEqual([]);
+    const calls: Array<[string, unknown, string[]]> = [
+      ["admin/overview", {}, ["security", "fleet", "auditor"]],
+      ["admin/users/list", {}, ["security", "auditor"]],
+      ["admin/users/endSessions", { userId: "missing-user" }, ["security"]],
+      ["admin/bots/list", {}, ["security", "auditor"]],
+      ["admin/bots/suspend", { botId: "missing-bot" }, ["security"]],
+      ["admin/bots/resume", { botId: "missing-bot" }, ["security"]],
+      ["admin/quarantine/list", {}, ["security", "auditor"]],
+      ["admin/quarantine/start", { scopeKind: "bot", scopeId: "missing-bot" }, ["security"]],
+      ["admin/quarantine/lift", { id: "missing-quarantine" }, ["security"]],
+      ["admin/computers/list", {}, ["fleet", "auditor"]],
+      ["admin/computers/get", { computerId: "missing-computer" }, ["fleet", "auditor"]],
+      [
+        "admin/computers/operations/create",
+        { kind: "hibernate", computerIds: ["missing-computer"] },
+        ["fleet"],
+      ],
+      ["admin/computers/operations/list", {}, ["fleet", "auditor"]],
+      [
+        "admin/computers/operations/get",
+        { operationId: "missing-operation" },
+        ["fleet", "auditor"],
+      ],
+      ["admin/policy", {}, ["security", "fleet", "auditor"]],
+      ["admin/audit", {}, ["security", "auditor"]],
+      ["capabilityGrants/setMode", { botId: "missing-bot", mode: "shadow" }, ["security"]],
+      ["capabilityGrants/list", { employeeId: "missing-employee" }, ["security", "auditor"]],
+      ["marketplace/submissions", {}, []],
+    ];
+    for (const [procedure, body, allowed] of calls) {
+      for (const [role, cookie] of Object.entries(cookies)) {
+        if (role === "platform" || allowed.includes(role)) {
+          const response = await raw(app, cookie, procedure, body);
+          expect(response.status, `${procedure} as ${role}`).not.toBe(403);
+        } else {
+          await expectForbidden(app, cookie, procedure, body);
+        }
+      }
+      await expectForbidden(app, unverified, procedure, body);
+    }
   });
 
   it("denies server administration to every app account, including a stored former owner", async () => {

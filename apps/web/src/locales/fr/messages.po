@@ -493,6 +493,10 @@ msgid "Account menu for {name}"
 msgstr "Menu du compte de {name}"
 
 #: src/pages/Calendar.tsx
+msgid "Action needed"
+msgstr "Action requise"
+
+#: src/pages/Calendar.tsx
 msgid "Actions"
 msgstr "Actions"
 
@@ -926,6 +930,7 @@ msgstr "Approbations"
 msgid "Approve"
 msgstr "Approuver"
 
+#. placeholder {0}: proposal.path
 #. placeholder {0}: request.requesterName
 #: src/pages/shell/share-employee-dialog.tsx
 msgid "Approve {0}"
@@ -4310,6 +4315,11 @@ msgstr "minute"
 msgid "minutes"
 msgstr "minutes"
 
+#: src/pages/Calendar.tsx
+#: src/pages/Today.tsx
+msgid "Missed"
+msgstr "Manqué"
+
 #: src/components/call/VoiceChatCard.tsx
 msgid "Missed call"
 msgstr "Appel manqué"
@@ -4627,6 +4637,10 @@ msgstr ""
 #: src/pages/shell/bot-picker.tsx
 msgid "No bots match"
 msgstr "Aucun bot ne correspond"
+
+#: src/pages/Calendar.tsx
+msgid "No change"
+msgstr "Aucun changement"
 
 #: src/pages/Employees.tsx
 msgid "No employees yet"
@@ -5535,11 +5549,14 @@ msgid "Registration is closed"
 msgstr "Les inscriptions sont fermées"
 
 #: src/pages/PluginSubmissionsPanel.tsx
+#: src/pages/shell/share-employee-dialog.tsx
 msgid "Reject"
 msgstr ""
 
+#. placeholder {0}: proposal.path
 #. placeholder {0}: rejecting?.name
 #: src/pages/PluginSubmissionsPanel.tsx
+#: src/pages/shell/share-employee-dialog.tsx
 msgid "Reject {0}"
 msgstr ""
 
@@ -5804,6 +5821,11 @@ msgstr ""
 #: src/pages/Calendar.tsx
 msgid "Resume"
 msgstr "Reprendre"
+
+#. placeholder {0}: entry.path
+#: src/pages/shell/share-employee-dialog.tsx
+msgid "Retire {0}"
+msgstr ""
 
 #: src/components/AccountAccess.tsx
 #: src/components/integrations/plugin-marketplace.tsx
@@ -6656,6 +6678,14 @@ msgstr "S’abonner avec votre propre IA"
 msgid "Subscription required"
 msgstr ""
 
+#: src/pages/KnowledgeSection.tsx
+msgid "Suggest to team"
+msgstr ""
+
+#: src/pages/KnowledgeSection.tsx
+msgid "Suggested"
+msgstr ""
+
 #: src/lib/cron.ts
 msgid "Sunday"
 msgstr "dimanche"
@@ -6733,6 +6763,10 @@ msgstr "Équipe"
 #: src/pages/shell/computer-view.tsx
 msgid "Team Computer"
 msgstr "Ordinateur d'équipe"
+
+#: src/pages/shell/share-employee-dialog.tsx
+msgid "Team knowledge"
+msgstr ""
 
 #: src/pages/RoutineEditor.tsx
 msgid "Teams message"

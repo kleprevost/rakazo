@@ -2,7 +2,7 @@ import { ORPCError } from "@orpc/server";
 import type { AdminQuarantine } from "@rakazo/contracts";
 import { QuarantineScopeKindSchema } from "@rakazo/contracts";
 import { recordSecurityEvent, runAsSystem } from "@rakazo/db";
-import { requireAdmin } from "./admins.js";
+import { requireAdminRole } from "./admins.js";
 import type { SuspensionDeps } from "./bot-suspension.js";
 import { cancelBotRuns, finishCancelledRuns } from "./bot-suspension.js";
 import {
@@ -71,7 +71,7 @@ export async function startQuarantine(
   cancelledRuns: number;
   computers: number;
 }> {
-  await requireAdmin(deps, actorId);
+  await requireAdminRole(deps, actorId, "security");
   const scope: Scope = {
     scopeKind: input.scopeKind,
     scopeId: input.scopeKind === "all" ? null : (input.scopeId ?? null),
@@ -133,7 +133,7 @@ export async function liftQuarantine(
   actorId: string,
   id: string,
 ): Promise<{ ok: true }> {
-  await requireAdmin(deps, actorId);
+  await requireAdminRole(deps, actorId, "security");
   const row = await system("find", () =>
     deps.prisma.quarantine.findUnique({
       where: { id },
@@ -168,7 +168,7 @@ export async function listQuarantines(
   deps: SuspensionDeps,
   actorId: string,
 ): Promise<{ quarantines: AdminQuarantine[] }> {
-  await requireAdmin(deps, actorId);
+  await requireAdminRole(deps, actorId, ["security", "auditor"]);
   return system("list", async () => {
     const rows = await deps.prisma.quarantine.findMany({
       where: { liftedAt: null },

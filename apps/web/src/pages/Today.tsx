@@ -8,7 +8,7 @@ import type {
   TodayWorkItem,
 } from "@rakazo/contracts";
 import { TODAY_WORK_PHASES } from "@rakazo/contracts";
-import { isRetryableError } from "@rakazo/core";
+import { isRetryableError, isRunWaitingOnUser } from "@rakazo/core";
 import { Button, buttonVariants, SectionHeading } from "@rakazo/ui-web";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ChevronLeft } from "lucide-react";
@@ -75,6 +75,12 @@ export function TodayPage() {
 export function TodayView({ summary }: { summary: TodaySummary }) {
   const { attention, active, completed, upcoming, work } = summary;
   const phaseLabels = useWorkPhaseLabels();
+  // A run paused on the user is theirs to act on, not the bot's work in progress. One with a card
+  // is already listed as attention; the rest (such as a computer takeover) join that section.
+  const askedRuns = new Set(attention.map((item) => item.runId));
+  const waiting = active.filter((run) => isRunWaitingOnUser(run.status));
+  const unasked = waiting.filter((run) => !askedRuns.has(run.runId));
+  const working = active.filter((run) => !isRunWaitingOnUser(run.status));
   if (
     !attention.length &&
     !active.length &&
@@ -90,16 +96,22 @@ export function TodayView({ summary }: { summary: TodaySummary }) {
   }
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 p-4" data-testid="today">
-      {attention.length ? (
-        <Section title={<Trans>Needs attention</Trans>} count={summary.counts.attention}>
+      {attention.length || unasked.length ? (
+        <Section
+          title={<Trans>Needs attention</Trans>}
+          count={summary.counts.attention + unasked.length}
+        >
           {attention.map((item) => (
             <AttentionRow key={item.key} item={item} />
           ))}
+          {unasked.map((run) => (
+            <RunRow key={run.runId} run={run} />
+          ))}
         </Section>
       ) : null}
-      {active.length ? (
-        <Section title={<Trans>Working</Trans>} count={active.length}>
-          {active.map((run) => (
+      {working.length ? (
+        <Section title={<Trans>Working</Trans>} count={working.length}>
+          {working.map((run) => (
             <RunRow key={run.runId} run={run} />
           ))}
         </Section>
@@ -244,14 +256,30 @@ function AttentionRow({ item }: { item: TodayAttention }) {
     }
   };
   const detail =
-    item.kind === "approval" || item.kind === "question" ? item.text : (item.error ?? item.title);
+    item.kind === "approval" || item.kind === "question"
+      ? item.text
+      : item.kind === "routine_exception" && item.outcome === "missed"
+        ? item.title
+        : (item.error ?? item.title);
   return (
     <li className="py-2 text-sm">
       <div className="flex items-baseline gap-2">
         <Link to={chatPath(item)} className="min-w-0 flex-1 hover:underline">
           <span className="font-medium">{item.botName}</span>{" "}
-          <span className={item.kind.startsWith("failed") ? "text-destructive" : undefined}>
+          <span
+            className={
+              item.kind.startsWith("failed") || item.kind === "routine_exception"
+                ? "text-destructive"
+                : undefined
+            }
+          >
             {detail}
+            {item.kind === "routine_exception" && item.outcome === "missed" ? (
+              <>
+                {" · "}
+                <Trans>Missed</Trans>
+              </>
+            ) : null}
           </span>
         </Link>
         <span className="shrink-0 text-xs text-muted-foreground">

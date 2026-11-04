@@ -65,13 +65,13 @@ export function BoardPage() {
   useEffect(() => {
     let currentController: AbortController | undefined;
     let active = true;
-    // Live events refresh the board and any open ticket's comments.
-    const refreshComments = (ticketId?: string) =>
-      void queryClient.invalidateQueries({
-        queryKey: ticketId
-          ? queries.tickets.comments.queryKey({ input: { ticketId } })
-          : queries.tickets.comments.key(),
-      });
+    // Live events refresh the board and any open ticket's comments and linked work.
+    const refreshTicket = (ticketId?: string) => {
+      for (const query of [queries.tickets.comments, queries.tickets.work])
+        void queryClient.invalidateQueries({
+          queryKey: ticketId ? query.queryKey({ input: { ticketId } }) : query.key(),
+        });
+    };
     let cancelRetry: (() => void) | undefined;
     void (async () => {
       while (active) {
@@ -85,11 +85,11 @@ export function BoardPage() {
           if (!active) return;
           await fetchFresh(queryClient, ticketsOptions);
           if (!active) return;
-          refreshComments();
+          refreshTicket();
           setError("");
           for await (const event of stream) {
             if (!active) return;
-            refreshComments(event.ticketId);
+            refreshTicket(event.ticketId);
             await fetchFresh(queryClient, ticketsOptions);
           }
         } catch (cause) {

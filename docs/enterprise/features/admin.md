@@ -8,7 +8,9 @@ Admins reach it from the account menu ("Admin"); everyone else never sees the en
 ## What existed
 - `isAdmin` / `requireAdmin` (`apps/api/src/admins.ts`): a verified email on
   `RAKAZO_ADMIN_EMAILS`, or a verified SSO identity carrying an `OIDC_ADMIN_VALUES` value.
-  `me.isAdmin` tells the web app.
+  `me.isAdmin` tells the web app. Operator roles now split this gate; see
+  [admin-roles.md](admin-roles.md). Wherever this page says "admin", read the `platform` role,
+  or the role the procedure map there lists.
 - Pages `/admin/access` (free access grants) and `/admin/plugins` (plugin submissions), each a
   standalone page with no navigation to it.
 - `GET /api/audit-events/export` and `audit.events`: the organization audit log, readable by

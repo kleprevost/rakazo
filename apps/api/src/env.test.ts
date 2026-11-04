@@ -405,6 +405,26 @@ describe("OIDC environment", () => {
       adminValues: ["Rakazo.Admin"],
     });
   });
+  it("reads operator role lists from the environment", () => {
+    expect(loadEnv(base).operatorEmails).toEqual({ security: [], fleet: [], auditor: [] });
+    expect(
+      loadEnv({
+        ...base,
+        ...oidc,
+        RAKAZO_SECURITY_EMAILS: "Sec@Example.test, other@example.test",
+        RAKAZO_FLEET_EMAILS: "fleet@example.test",
+        OIDC_FLEET_VALUES: "Rakazo.Fleet",
+        OIDC_AUDITOR_VALUES: "Rakazo.Auditor",
+      }),
+    ).toMatchObject({
+      operatorEmails: {
+        security: ["sec@example.test", "other@example.test"],
+        fleet: ["fleet@example.test"],
+        auditor: [],
+      },
+      oidc: { roleValues: { security: [], fleet: ["Rakazo.Fleet"], auditor: ["Rakazo.Auditor"] } },
+    });
+  });
   it("keeps SSO revalidation off unless a valid interval is set", () => {
     expect(loadEnv({ ...base, ...oidc }).oidc?.revalidateMinutes).toBeUndefined();
     expect(loadEnv({ ...base, ...oidc, OIDC_REVALIDATE_MINUTES: "60" }).oidc).toMatchObject({

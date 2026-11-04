@@ -12,12 +12,15 @@ import {
   transientRunEventsWhere,
 } from "@rakazo/db";
 import { getLogger } from "@rakazo/logging";
-import { requireAdmin } from "./admins.js";
+import { requireAdminRole } from "./admins.js";
 import type { RouterDeps } from "./router.js";
 import { finishThreadStop } from "./thread-target.js";
 
 export type SuspensionDeps = Pick<RouterDeps, "prisma" | "events" | "jobs" | "sandbox"> & {
-  env: Pick<RouterDeps["env"], "adminEmails" | "ssoAdminEnabled">;
+  env: Pick<
+    RouterDeps["env"],
+    "adminEmails" | "ssoAdminEnabled" | "operatorEmails" | "ssoOperatorRolesEnabled"
+  >;
   auth: Pick<RouterDeps["auth"], "isSsoAdmin">;
 };
 
@@ -158,7 +161,7 @@ export async function suspendBot(
   actorId: string,
   input: { botId: string; reason?: string },
 ): Promise<{ cancelledRuns: number }> {
-  await requireAdmin(deps, actorId);
+  await requireAdminRole(deps, actorId, "security");
   const now = new Date();
   const { bot, cancelled } = await system("suspend", async () => {
     const bot = await deps.prisma.bot.findUnique({
@@ -196,7 +199,7 @@ export async function resumeBot(
   actorId: string,
   botId: string,
 ): Promise<{ ok: true }> {
-  await requireAdmin(deps, actorId);
+  await requireAdminRole(deps, actorId, "security");
   const bot = await system("resume", async () => {
     const found = await deps.prisma.bot.findUnique({
       where: { id: botId },

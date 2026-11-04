@@ -181,6 +181,56 @@ it("links the sections and shows Free access only when the deployment sells cred
   ]);
 });
 
+it.each([
+  ["security", ["/admin", "/admin/users", "/admin/bots", "/admin/policy", "/admin/audit"]],
+  ["fleet", ["/admin", "/admin/computers", "/admin/policy"]],
+  [
+    "auditor",
+    ["/admin", "/admin/users", "/admin/bots", "/admin/computers", "/admin/policy", "/admin/audit"],
+  ],
+])("shows a %s operator only the sections the role allows", async (role, expected) => {
+  api.me.mockResolvedValue({ isAdmin: false, adminRoles: [role] });
+  api.overview.mockResolvedValue({
+    modelCredits: true,
+    auth: { password: true, sso: false, easyAuth: false },
+    defaultModel: "azure/gpt-x",
+    computerProvider: "kubernetes",
+    policy: { loaded: false, version: null, hash: null },
+    userCount: 1,
+    botCount: 0,
+  });
+  const { host } = await show(<AdminOverviewPage />);
+  const links = [...host.querySelectorAll("nav a")].map((a) => a.getAttribute("href"));
+  expect(links).toEqual(expected);
+});
+
+it("hides the end-sessions action from an auditor but not from security", async () => {
+  api.users.mockResolvedValue({
+    users: [
+      {
+        id: "u2",
+        name: "Sam",
+        email: "sam@example.test",
+        createdAt: "2026-01-01T00:00:00.000Z",
+        adminVia: null,
+        ssoLinked: false,
+        lastSignInAt: null,
+        isSelf: false,
+      },
+    ],
+    nextCursor: null,
+  });
+  api.me.mockResolvedValue({ isAdmin: false, adminRoles: ["auditor"] });
+  const auditor = await show(<AdminUsersPage />);
+  expect(auditor.host.textContent).toContain("sam@example.test");
+  expect(auditor.host.textContent).not.toContain("End sessions");
+
+  document.body.innerHTML = "";
+  api.me.mockResolvedValue({ isAdmin: false, adminRoles: ["security"] });
+  const security = await show(<AdminUsersPage />);
+  expect(security.host.textContent).toContain("End sessions");
+});
+
 it("shows the overview: loading, error with retry, and populated", async () => {
   api.overview.mockImplementation(never);
   const loading = await show(<AdminOverviewPage />);
