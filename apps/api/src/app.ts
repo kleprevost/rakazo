@@ -875,6 +875,10 @@ async function buildApp(overrides: CreateAppOverrides): Promise<AppHandles> {
       navLinks: env.navLinks,
       adminEmails: env.adminEmails,
       ssoAdminEnabled: Boolean(env.oidc?.adminValues?.length),
+      operatorEmails: env.operatorEmails,
+      ssoOperatorRolesEnabled: Object.values(env.oidc?.roleValues ?? {}).some(
+        (values) => values?.length,
+      ),
       authModes: {
         password: env.passwordAuth !== false,
         sso: Boolean(env.oidc),

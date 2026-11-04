@@ -1,6 +1,7 @@
 import * as z from "zod";
 import { WorkPhaseSchema } from "./board.js";
 import { Id, IsoDate, RunStatus } from "./ids.js";
+import { RoutineReceiptOutcomeSchema } from "./routine-receipts.js";
 import { RunTriggerSchema } from "./runs.js";
 
 /** Where the Today read model looks back: finished work and failures that still need a look. */
@@ -59,6 +60,21 @@ export const TodayAttentionSchema = z.discriminatedUnion("kind", [
   AttentionBase.extend({
     kind: z.literal("failed_routine"),
     routineId: Id,
+    error: z.string().nullable(),
+  }),
+  /**
+   * A routine firing that did not complete cleanly and has no failed run to show: a check that
+   * could not reach its source, or a scheduled firing that did not run.
+   */
+  TodayBotRef.extend({
+    kind: z.literal("routine_exception"),
+    key: z.string(),
+    /** The run that checked, when there was one (a silent run whose tool failed). */
+    runId: Id.nullable(),
+    routineId: Id,
+    title: z.string(),
+    at: IsoDate,
+    outcome: RoutineReceiptOutcomeSchema.extract(["failed", "missed"]),
     error: z.string().nullable(),
   }),
 ]);

@@ -117,8 +117,33 @@ export async function calendarRange(
     : [];
   const replyByRun = new Map(replies.map((m) => [`${m.runId}:${m.threadId}`, m.id]));
 
+  // Each firing's receipt: for a run, how it came out; for a check that started none, the firing.
+  const receipts = ids.length
+    ? await prisma.routineReceipt.findMany({
+        where: {
+          ...scope,
+          routineId: { in: ids },
+          OR: [
+            { runId: { in: pastRuns.map((run) => run.id) } },
+            { runId: null, scheduledFor: { gte: from, lt: to } },
+          ],
+        },
+        select: { routineId: true, runId: true, scheduledFor: true, outcome: true },
+        orderBy: [{ scheduledFor: "desc" }, { id: "desc" }],
+        take: CALENDAR_MAX_PAST_RUNS + 1,
+      })
+    : [];
+  if (receipts.length > CALENDAR_MAX_PAST_RUNS) truncated = true;
+  const receiptByRun = new Map(
+    receipts.flatMap((r) => (r.runId ? [[r.runId, r.outcome as CalendarOutcome] as const] : [])),
+  );
+  const checks = receipts.slice(0, CALENDAR_MAX_PAST_RUNS).filter((r) => !r.runId);
+
   const upcoming: CalendarOccurrence[] = [];
-  const hasRun = new Set(pastRuns.map((run) => run.routineId));
+  const hasRun = new Set([
+    ...pastRuns.map((run) => run.routineId),
+    ...checks.map((r) => r.routineId),
+  ]);
   const grid: CalendarRoutine[] = [];
   const unscheduled: CalendarRoutine[] = [];
   for (const row of rows) {
@@ -161,16 +186,27 @@ export async function calendarRange(
     routines: grid,
     unscheduled,
     upcoming,
-    past: pastRuns
-      .filter((run): run is typeof run & { routineId: string } => run.routineId !== null)
-      .map((run) => ({
-        routineId: run.routineId,
-        runId: run.id,
-        at: run.createdAt.toISOString(),
-        outcome: outcome(run.status),
-        messageId: replyByRun.get(`${run.id}:${run.threadId}`) ?? null,
-      }))
-      .reverse(),
+    past: [
+      ...pastRuns
+        .filter((run): run is typeof run & { routineId: string } => run.routineId !== null)
+        .map((run) => ({
+          routineId: run.routineId,
+          runId: run.id as string | null,
+          at: run.createdAt.toISOString(),
+          // A finished run's receipt says more than its status; a running one has none yet.
+          outcome: receiptByRun.get(run.id) ?? outcome(run.status),
+          messageId: replyByRun.get(`${run.id}:${run.threadId}`) ?? null,
+        })),
+      ...checks.map((check) => ({
+        routineId: check.routineId,
+        runId: null,
+        at: check.scheduledFor.toISOString(),
+        outcome: check.outcome as CalendarOutcome,
+        messageId: null,
+      })),
+    ]
+      .reverse()
+      .sort((a, b) => a.at.localeCompare(b.at)),
     truncated,
   };
 }

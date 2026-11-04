@@ -60,7 +60,8 @@ amount; add it only if you need an interactive shell.
    CI at the tag you deploy (default `edge`). If the packages are private, set `ghcrUsername` and
    `ghcrToken` (read:packages); both ACA and the VM then log in to GHCR. The fork publishes both
    images (linux/amd64) from `.github/workflows/fork-images.yml` on every push to `main`, tagged
-   `sha-<commit>` and `edge`. It is the fork's only CI: the maintainer disables the upstream
+   `sha-<commit>` and `edge`. Every main commit gets a `sha-` tag; `edge` only moves after the test
+   gate passes. It is the fork's only CI: the maintainer disables the upstream
    workflows in the GitHub Actions UI instead of editing them.
 4. Azure CLI with Bicep, an SSH key pair (`ssh-keygen -t ed25519`; only the public key is used, to
    satisfy the VM's login requirement), and a resource group in a region with `Standard_D8s_v5`
@@ -177,6 +178,15 @@ the apps with `deployVm=false` and restart api and worker; see
 requests allowed, same app registration and client secret as OIDC) and sets `AUTH_EASY_AUTH=true` on
 web and api (see [easy-auth.md](./easy-auth.md); it cannot be combined with `OIDC_REVALIDATE_MINUTES`). The
 Easy Auth redirect URI must be registered as above.
+
+## Operator roles (optional)
+
+`oidcAdminValues` grants the `platform` admin role. To give people a narrower role
+([admin-roles.md](./features/admin-roles.md)), set `oidcSecurityValues`, `oidcFleetValues` and
+`oidcAuditorValues` (token values, like `oidcAdminValues`) and, for accounts matched by verified
+email instead, `securityEmails`, `fleetEmails` and `auditorEmails` (comma-separated). Each defaults to
+empty and is passed to the api only when set (`OIDC_<ROLE>_VALUES`, `RAKAZO_<ROLE>_EMAILS`). The
+worker does not read them.
 
 ## Smoke test
 

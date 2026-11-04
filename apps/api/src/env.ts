@@ -77,6 +77,8 @@ export interface AppEnv {
   /** Verified accounts that review plugin submissions, add stdio MCP servers, and grant access
    * (RAKAZO_ADMIN_EMAILS), lowercased. */
   adminEmails: string[];
+  /** Accounts holding a narrower operator role (RAKAZO_SECURITY_EMAILS, _FLEET_, _AUDITOR_), lowercased. */
+  operatorEmails: Record<"security" | "fleet" | "auditor", string[]>;
   phoneCallsEnabled: boolean;
   phoneCallRingSeconds: number;
   phoneCallCooldownMinutes: number;
@@ -239,6 +241,11 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): AppEnv {
           accessClaim: optional(source.OIDC_ACCESS_CLAIM) ?? "groups",
           allowedValues: list(source.OIDC_ALLOWED_VALUES),
           adminValues: list(source.OIDC_ADMIN_VALUES),
+          roleValues: {
+            security: list(source.OIDC_SECURITY_VALUES),
+            fleet: list(source.OIDC_FLEET_VALUES),
+            auditor: list(source.OIDC_AUDITOR_VALUES),
+          },
           revalidateMinutes: revalidate ? Number(revalidate) : undefined,
           trustEmail: source.OIDC_TRUST_EMAIL === "true",
         }
@@ -281,6 +288,11 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): AppEnv {
     userDevicesEnabled: source.USER_DEVICES_ENABLED !== "false",
     navLinks: parseNavLinks(source.RAKAZO_NAV_LINKS),
     adminEmails: list(source.RAKAZO_ADMIN_EMAILS).map((email) => email.toLowerCase()),
+    operatorEmails: {
+      security: lowerList(source.RAKAZO_SECURITY_EMAILS),
+      fleet: lowerList(source.RAKAZO_FLEET_EMAILS),
+      auditor: lowerList(source.RAKAZO_AUDITOR_EMAILS),
+    },
     ...phoneCallSettings(source),
     maxUploadSizeBytes: uploadSizeFromEnv(source),
     maxAttachmentsPerMessage: attachmentCountFromEnv(source),
@@ -419,6 +431,10 @@ function voiceSummaryMinCharsFromEnv(value: string | undefined): number | undefi
 function optional(value: string | undefined): string | undefined {
   const trimmed = value?.trim();
   return trimmed || undefined;
+}
+
+function lowerList(value: string | undefined): string[] {
+  return list(value).map((item) => item.toLowerCase());
 }
 
 function list(value: string | undefined): string[] {

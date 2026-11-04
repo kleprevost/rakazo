@@ -6,12 +6,17 @@ import type {
   ConnectorTool,
   ManagedConnectorProvider,
 } from "@rakazo/adapter-kit";
-import { BOT_QUARANTINED_MESSAGE, BOT_SUSPENDED_MESSAGE } from "@rakazo/contracts";
+import {
+  BOT_QUARANTINED_MESSAGE,
+  BOT_SUSPENDED_MESSAGE,
+  CAPABILITY_DENIED_MESSAGE,
+} from "@rakazo/contracts";
 import { connectorKindFromToolName } from "@rakazo/core";
 import type { PrismaClient } from "@rakazo/db";
 import { activeQuarantine, recordAuditEvent } from "@rakazo/db";
 import { getLogger } from "@rakazo/logging";
-import { classifyInputForCall, recordShadowDecision } from "./capability-shadow.js";
+import { capabilityGate } from "./capability-enforce.js";
+import { classifyInputForCall } from "./capability-shadow.js";
 import type { ConnectorRegistry } from "./composio-connector.js";
 import { assertConnectorAllowed } from "./policy-integrations.js";
 import { PolicyDeniedError } from "./policy-runtime.js";
@@ -147,10 +152,10 @@ export class BrokeredConnector implements ConnectorProvider {
       await this.audit(call, context, name, "policy");
       return policyBlockedToolMessage(call.tool);
     }
-    // A run's own tool calls were already evaluated at the gate; this covers the callers that
-    // reach a connector without it (routine watches). Shadow mode records, it never refuses.
+    // A run's own tool calls were evaluated at the gate and are rechecked before the effect; this
+    // covers the callers that reach a connector without either (routine watches).
     if (!context.runId && context.botId) {
-      await recordShadowDecision({
+      const verdict = await capabilityGate({
         prisma: this.prisma,
         bot: {
           id: context.botId,
@@ -161,13 +166,20 @@ export class BrokeredConnector implements ConnectorProvider {
         spaceId: context.spaceId,
         userId: context.userId,
         surface: "connector",
+        connections: context.connectedConnections,
         call: classifyInputForCall({
           name: call.tool,
           args: call.args,
           route: call.route,
           appSlug: connectedApp(call, toolName, context),
+          connectionId: call.connectionId,
         }),
       });
+      // A watch has no one to ask, so an ask is a refusal.
+      if (verdict.outcome !== "allow") {
+        await this.audit(call, context, name, "capability");
+        return CAPABILITY_DENIED_MESSAGE;
+      }
     }
     return undefined;
   }

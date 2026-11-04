@@ -14,9 +14,10 @@ import {
 } from "../admin-fleet-operations.js";
 import { liftQuarantine, listQuarantines, startQuarantine } from "../bot-quarantine.js";
 import { resumeBot, suspendBot } from "../bot-suspension.js";
+import { adminCapabilities } from "../capability-insight.js";
 import type { RouterContext } from "./context.js";
 
-/** The deployment admin console. Each handler checks `requireAdmin` before reading anything. */
+/** The deployment admin console. Each handler checks `requireAdminRole` before reading anything. */
 export function adminRoutes(ctx: RouterContext) {
   const { deps, authed } = ctx;
   return {
@@ -52,6 +53,11 @@ export function adminRoutes(ctx: RouterContext) {
         ),
         lift: authed.admin.quarantine.lift.handler(({ context, input }) =>
           liftQuarantine(deps, context.actor.userId, input.id),
+        ),
+      },
+      capabilities: {
+        list: authed.admin.capabilities.list.handler(({ context, input }) =>
+          adminCapabilities(deps, context.actor.userId, input),
         ),
       },
       computers: {

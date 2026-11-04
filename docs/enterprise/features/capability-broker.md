@@ -572,7 +572,7 @@ whether E3 reads strictly per call or from a sub-second per-run cache (draft: pe
 
 ## Status
 Build-plan PR 1 (live suspend check at `dispatchTool`, `BrokeredConnector`), PR 2 (quarantine), PR 3
-(evaluator) and PR 4 (grants store and shadow mode) are implemented; PR 3 and PR 4 are below.
+(evaluator), PR 4 (grants store and shadow mode), PR 5 (enforce mode) and PR 6 (owner and admin surfaces) are implemented; PR 3 to PR 6 are below.
 
 PR 2, quarantine (`apps/api/src/bot-quarantine.ts`, migration `20261127120000_quarantines`).
 Choices the design left open:
@@ -645,3 +645,71 @@ Choices the design left open:
   keeps `BUILTIN_TOOL_NAMES`, the adapter tool lists and the scope table equal.
 - Not done: principal assertions at credential lookups and their architecture test (PR 5 beside enforcement,
   where a mismatch can be refused), approval layer in the snapshot, and owner/admin UI.
+
+PR 5, enforce mode (`packages/adapters/src/capability-enforce.ts`, `capability-decision.ts`; no migration:
+`Bot.capabilityMode` is a string, now `enforce` as well as `shadow`). Admin mappings and the
+annotation rules already classified calls in PR 3, so this PR only turns the decision into a control.
+Choices the design left open:
+- Enforcing means `Bot.capabilityMode = enforce` or policy `capabilities.requireGrants: true`. Policy
+  replaces the bot's mode, so a bot in `shadow` under `requireGrants` is enforced and records no
+  `capability.shadow` events (PR 4 recorded them in that case). Off and shadow behave as before.
+- E2: `gateToolCall` decides right after the central-policy check. `deny` returns "Not permitted for
+  this bot" before any approval card or effect; `ask` makes the approval mandatory (the same path as
+  policy `alwaysAsk`, so a saved "Always allow" cannot lift it). Unmapped tools take the `ext.<slug>`
+  fallback and so need a grant; there is no implicit allow.
+- E3: `dispatchTool` re-evaluates the classified call (carried on `ToolCall.capability`) after the
+  approval wait, reading the mode, quarantine, grants and policy live. Revocation, expiry, a quarantine
+  or a mode switched on mid-run therefore refuse an already-approved call. `ask` is already answered
+  there, so only `deny` stops it.
+- E4: `BrokeredConnector.execute` enforces for callers with no run (routine watches). A watch cannot
+  ask, so an `ask` is a refusal. A run's connector call is covered by E2 and E3 instead.
+- Fail closed: a failed read or evaluator error under enforcement is a denial with rule
+  `evaluation_failed`. Shadow keeps swallowing its own failures.
+- Denials are `capability.denied` SecurityEvents (user, Space, bot id, surface `gate|recheck|connector`,
+  deciding rule, scopes) and a `tool.call` audit with `reason: "capability"`. No arguments, resources
+  or content.
+- Principal check: a connector call that names a connected account outside the acting requester's own
+  (a model-supplied connection id) is evaluated with a foreign credential and denied
+  `principal_mismatch`. The connector registry already refuses an account outside the context; this
+  puts the refusal in the broker's trace. The release-gate Postgres test
+  (`apps/api/src/capability-broker.postgres.test.ts`) runs two users of one employee, each with
+  `calendar.read` only: own-connection reads succeed, writes and sends are denied, the other user's
+  connection is denied, and the next call after a revoke is denied.
+- Not done (deviation from the PR 5 line and the PR 4 note): the principal assertions at every
+  credential lookup and their architecture test. Lookups already filter on the run's user id, and
+  rewiring MCP, managed-integration and vault lookups to assert a `RunPrincipal` touches code that
+  shared employees (PR 9) will change; half-wiring it here would not be a guarantee. It moves to PR 9.
+  Also not done: the approval layer in the snapshot (an approval "block" rule still acts in the
+  existing engine), `capabilityMode` in the owner/admin UI (PR 6), the `runStart` E1 and model-turn E7
+  checks, and the recheck of a connector call made by a run inside `BrokeredConnector` (E3 at
+  `dispatchTool` covers it).
+- Rollout note: a policy with `requireGrants` denies every non-empty-scope call that has no grant, so
+  grant first in `shadow`, read the `capability.shadow` events, then enable `enforce`.
+
+PR 6, owner and admin surfaces (no migration; `apps/api/src/capability-insight.ts`,
+`apps/web/src/components/capabilities/`, `apps/web/src/pages/admin/AdminCapabilitiesPage.tsx`).
+Choices the design left open:
+- The broker is "on" for a bot when its mode is set or policy has `requireGrants` (`capabilityGrants.list`
+  returns `active`); for the deployment when policy has a `capabilities` section (even an empty one) or any bot has a
+  mode (`admin.overview.capabilityBroker`). Everything below is absent otherwise: the owner's Access section,
+  and the admin Capabilities tab. A deployment with neither has no UI entry point; its first mode is set through
+  `capabilityGrants.setMode`, or by adding `capabilities: {}` to policy.
+- Owner, in the bot's Advanced settings: an Access section listing the bot's grants (scope, expiry, Revoke) and a
+  picker of the scopes the owner may grant, with an expiry (1, 7, 30 days, never). `list` returns `grantable`: concrete
+  scopes inside the ceiling that the viewer may allow (read scopes and `ownerGrantable` for an owner, any for
+  an admin). There is no "request" flow: a scope that needs an administrator is not offered, and `set` still refuses
+  it. Owners do not set the mode (PR 4: admins only), so the section shows none.
+- Admin (security writes, auditor reads): `/admin/capabilities` lists bots with mode, live grant count and the calls
+  shadow recorded as denied in seven days (`admin.capabilities.list`). A row opens the bot's mode switch
+  (off, shadow, enforce), the shadow summary ("N calls would have been denied", with the scopes behind them,
+  from `capability.shadow` events: `capabilityGrants.shadowSummary`), its grants with Revoke and an add picker,
+  and the simulator.
+- Simulator `capabilityGrants.simulate` (bot's owner, security, auditor): a tool name (built in, or with a server name
+  as an MCP tool) with optional plain arguments, or a scope. It runs the same `evaluateBotCall` the gate uses over
+  live grants, quarantine and policy, as the bot's owner, and returns outcome, deciding rule, scopes, classifier basis
+  and the trace; `enforced` says whether the bot is refused or only recorded. It runs nothing and writes no
+  audit event, and the arguments are not echoed.
+- Not done: managed-connector calls in the simulator (only built-in and MCP-style names), the smallest-change hint
+  for a deny, the Mappings and Quarantine tabs, the simulator's approval layer (still outside the snapshot), and a
+  mobile surface (mobile has no admin surface; the owner's Access section is web and desktop, and enforcement
+  applies to mobile chats as everywhere).

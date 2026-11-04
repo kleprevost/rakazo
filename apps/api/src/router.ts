@@ -131,6 +131,10 @@ export interface RouterDeps {
     adminEmails?: string[];
     /** OIDC_ADMIN_VALUES is set, so SSO identities can grant admin. */
     ssoAdminEnabled?: boolean;
+    /** RAKAZO_SECURITY_EMAILS, RAKAZO_FLEET_EMAILS, RAKAZO_AUDITOR_EMAILS (lowercased). */
+    operatorEmails?: Partial<Record<"security" | "fleet" | "auditor", string[]>>;
+    /** An OIDC_SECURITY/FLEET/AUDITOR_VALUES list is set, so SSO identities can hold those roles. */
+    ssoOperatorRolesEnabled?: boolean;
     /** Sign-in methods this deployment accepts, for the admin overview. */
     authModes?: { password: boolean; sso: boolean; easyAuth: boolean };
     /** SHA-256 of the loaded policy file, for the admin overview. */

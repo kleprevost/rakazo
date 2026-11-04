@@ -24,6 +24,11 @@ import {
   setCapabilityGrant,
   setCapabilityMode,
 } from "./capability-grants.js";
+import {
+  adminCapabilities,
+  capabilityShadowSummary,
+  simulateCapability,
+} from "./capability-insight.js";
 
 const databaseUrl = process.env.DATABASE_URL;
 const enabled = process.env.VERIFY_DATABASE === "1" && Boolean(databaseUrl);
@@ -421,5 +426,102 @@ describe.skipIf(!enabled)("capability grants (PostgreSQL, runtime role)", () => 
     });
     expect(events[2]?.metadata).toMatchObject({ scopes: "ext.cal.write", source: "mcp" });
     expect(JSON.stringify(events.map((e) => e.metadata))).not.toContain("SECRET");
+  });
+
+  it("tells the viewer whether the broker applies and which scopes they may grant", async () => {
+    expect(await list("owner")).toMatchObject({ mode: null, active: false });
+    setActivePolicy({ version: 1, capabilities: { requireGrants: true } });
+    expect((await list("owner")).active).toBe(true);
+    setActivePolicy({
+      version: 1,
+      capabilities: { ownerGrantable: ["files.write"], deny: ["spend.*"] },
+    });
+    const owner = (await list("owner")).grantable;
+    expect(owner).toEqual(expect.arrayContaining(["calendar.read", "web.fetch", "files.write"]));
+    expect(owner).not.toEqual(expect.arrayContaining(["mail.send", "spend.purchase"]));
+    const admin = (await list("admin")).grantable;
+    expect(admin).toEqual(expect.arrayContaining(["mail.send", "files.write"]));
+    expect(admin).not.toContain("spend.purchase");
+  });
+
+  it("simulates a call from the live grants, as the gate decides it, and runs and records nothing", async () => {
+    await set("owner", { scope: "web.fetch" });
+    const simulate = (name: Name, input: Record<string, unknown>) =>
+      as(name, (actor) =>
+        simulateCapability(deps(), actor, { botId: botIds.owner, ...input } as never),
+      );
+    const allowed = await simulate("owner", {
+      tool: "web_fetch",
+      args: { url: "https://x.example/SECRET" },
+    });
+    expect(allowed).toMatchObject({ outcome: "allow", scopes: ["web.fetch"], enforced: false });
+    const denied = await simulate("admin", { tool: "write_file", args: { path: "/SECRET" } });
+    expect(denied).toMatchObject({ outcome: "deny", rule: "no_grant", scopes: ["files.write"] });
+    expect(denied.trace[0]).toMatchObject({ layer: "grant", effect: "deny" });
+    expect(await simulate("owner", { scope: "calendar.read" })).toMatchObject({
+      outcome: "deny",
+      rule: "no_grant",
+    });
+    expect(await simulate("owner", { scope: "web.fetch" })).toMatchObject({ outcome: "allow" });
+    const external = await simulate("owner", { tool: "create_event", server: "cal" });
+    expect(external).toMatchObject({ outcome: "deny", scopes: ["ext.cal.admin"], unmapped: true });
+    expect(JSON.stringify([allowed, denied, external])).not.toContain("SECRET");
+    // Enforced bots say so; the answer is the same decision either way.
+    await as("admin", (a) =>
+      setCapabilityMode(deps(), a, { botId: botIds.owner, mode: "enforce" }),
+    );
+    expect(await simulate("owner", { scope: "web.fetch" })).toMatchObject({
+      mode: "enforce",
+      enforced: true,
+    });
+    expect(await code(simulate("owner", { tool: "create_event" }))).toBe("BAD_REQUEST");
+    expect(await code(simulate("peer", { scope: "web.fetch" }))).toBe("NOT_FOUND");
+    expect(
+      await system.auditEvent.count({
+        where: { organizationId, action: { in: ["capability.shadow", "tool.call"] } },
+      }),
+    ).toBe(0);
+  });
+
+  it("summarizes the last week of shadow decisions and lists bots for the admin", async () => {
+    await as("admin", (a) => setCapabilityMode(deps(), a, { botId: botIds.owner, mode: "shadow" }));
+    await set("owner", { scope: "web.fetch" });
+    const common = {
+      prisma,
+      bot: { id: botIds.owner, name: "owner bot", employeeId, capabilityMode: "shadow" },
+      spaceId: actors.owner.spaceId,
+      userId: actors.owner.userId,
+      surface: "gate" as const,
+    };
+    await as("owner", async () => {
+      for (const name of ["web_fetch", "write_file", "write_file"]) {
+        await recordShadowDecision({
+          ...common,
+          call: classifyInputForTool({ name, args: { url: "https://x.example", path: "/p" } }),
+        });
+      }
+    });
+    const summary = await as("owner", (a) =>
+      capabilityShadowSummary(deps(), a, { botId: botIds.owner }),
+    );
+    expect(summary).toMatchObject({
+      allowed: 1,
+      asked: 0,
+      denied: 2,
+      scopes: [{ scope: "files.write", count: 2 }],
+    });
+    expect(
+      await code(as("peer", (a) => capabilityShadowSummary(deps(), a, { botId: botIds.owner }))),
+    ).toBe("NOT_FOUND");
+    const page = await adminCapabilities(deps(), actors.admin.userId, { limit: 100 });
+    expect(page.bots.find((bot) => bot.id === botIds.owner)).toMatchObject({
+      mode: "shadow",
+      grants: 1,
+      wouldDeny: 2,
+      ownerEmail: actors.owner.email,
+    });
+    expect(await code(adminCapabilities(deps(), actors.owner.userId, { limit: 10 }))).toBe(
+      "FORBIDDEN",
+    );
   });
 });

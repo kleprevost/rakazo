@@ -1,5 +1,6 @@
 import { oc } from "@orpc/contract";
 import * as z from "zod";
+import { CapabilityModeSchema } from "./capability-grants.js";
 import { IMAGE_DIGEST, PolicySchema } from "./policy.js";
 import { SecurityEventMetadataSchema, SecurityEventTypeSchema } from "./security-events.js";
 
@@ -14,6 +15,9 @@ const Id = z.string().min(1).max(128);
 export const BOT_SUSPENDED_MESSAGE = "Suspended by your organization";
 /** The same, when an admin quarantined it (one bot, its Space or chat group, or all bots). */
 export const BOT_QUARANTINED_MESSAGE = "Quarantined by your organization";
+
+/** What a bot is told when the capability broker refuses a call. */
+export const CAPABILITY_DENIED_MESSAGE = "Not permitted for this bot";
 
 /** What a run says when it is refused before the model because the shared employee behind it is unavailable. */
 export const EMPLOYEE_ACCESS_REMOVED_MESSAGE = "Access removed";
@@ -34,6 +38,8 @@ export const AdminOverviewSchema = z.object({
   }),
   /** Whether the Free access page applies (the deployment sells model credits). */
   modelCredits: z.boolean(),
+  /** Whether the capability broker is in use: central policy has a capabilities section or a bot has a mode. */
+  capabilityBroker: z.boolean(),
   userCount: z.number().int(),
   botCount: z.number().int(),
 });
@@ -86,6 +92,25 @@ export const AdminBotPageSchema = z.object({
   nextCursor: z.string().nullable(),
 });
 export type AdminBotPage = z.infer<typeof AdminBotPageSchema>;
+
+export const AdminCapabilityBotSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  ownerEmail: z.string().nullable(),
+  spaceName: z.string().nullable(),
+  mode: CapabilityModeSchema.nullable(),
+  /** Its own live grants (an employee's inherited ones are not counted). */
+  grants: z.number().int(),
+  /** Calls `shadow` recorded as denied in the last seven days. */
+  wouldDeny: z.number().int(),
+});
+export type AdminCapabilityBot = z.infer<typeof AdminCapabilityBotSchema>;
+
+export const AdminCapabilityPageSchema = z.object({
+  bots: z.array(AdminCapabilityBotSchema),
+  nextCursor: z.string().nullable(),
+});
+export type AdminCapabilityPage = z.infer<typeof AdminCapabilityPageSchema>;
 
 export const AdminComputerSchema = z.object({
   id: z.string(),
@@ -357,6 +382,10 @@ export const adminContract = {
       }),
     ),
     lift: oc.input(z.object({ id: Id })).output(z.object({ ok: z.literal(true) })),
+  },
+  /** Every bot with its broker mode and grant count; per-bot grants, mode and the simulator are `capabilityGrants`. */
+  capabilities: {
+    list: oc.input(AdminPageInputSchema).output(AdminCapabilityPageSchema),
   },
   /** Every bot computer in the deployment. Read-only; metadata only, never content. */
   computers: {

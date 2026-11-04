@@ -38,6 +38,7 @@ import {
 } from "./AdminFleetOperations";
 import { AdminQuery, LoadMore } from "./AdminQuery";
 import { AdminShell } from "./AdminShell";
+import { useAdminRoles } from "./admin-roles";
 import { formatBytes, formatWhen } from "./format";
 
 const PAGE_SIZE = 50;
@@ -53,6 +54,7 @@ export function AdminComputersPage() {
 function AdminComputers() {
   const { i18n, t } = useLingui();
   const labels = useFleetLabels();
+  const canRun = useAdminRoles().can("fleet");
   const [notApproved, setNotApproved] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [openOperation, setOpenOperation] = useState<string | null>(null);
@@ -193,13 +195,17 @@ function AdminComputers() {
           <TableHeader>
             <TableRow>
               <TableHead className="w-8">
-                <Checkbox
-                  aria-label={t`Select all`}
-                  checked={rows.length > 0 && rows.every((computer) => selected.has(computer.id))}
-                  onCheckedChange={(checked) =>
-                    setSelected(checked ? new Set(rows.map((computer) => computer.id)) : new Set())
-                  }
-                />
+                {canRun ? (
+                  <Checkbox
+                    aria-label={t`Select all`}
+                    checked={rows.length > 0 && rows.every((computer) => selected.has(computer.id))}
+                    onCheckedChange={(checked) =>
+                      setSelected(
+                        checked ? new Set(rows.map((computer) => computer.id)) : new Set(),
+                      )
+                    }
+                  />
+                ) : null}
               </TableHead>
               <TableHead>
                 <Trans>AI employees</Trans>
@@ -233,7 +239,7 @@ function AdminComputers() {
                 key={computer.id}
                 computer={computer}
                 locale={i18n.locale}
-                selected={selected.has(computer.id)}
+                selected={canRun ? selected.has(computer.id) : null}
                 onToggle={() => toggle(computer.id)}
               />
             ))}
@@ -270,7 +276,8 @@ function ComputerRow({
 }: {
   computer: AdminComputer;
   locale: string;
-  selected: boolean;
+  /** Null when the viewer cannot run fleet operations. */
+  selected: boolean | null;
   onToggle: () => void;
 }) {
   const { t } = useLingui();
@@ -293,7 +300,13 @@ function ComputerRow({
   return (
     <TableRow aria-label={names ?? computer.id}>
       <TableCell>
-        <Checkbox aria-label={names ?? computer.id} checked={selected} onCheckedChange={onToggle} />
+        {selected === null ? null : (
+          <Checkbox
+            aria-label={names ?? computer.id}
+            checked={selected}
+            onCheckedChange={onToggle}
+          />
+        )}
       </TableCell>
       <TableCell className="font-medium">
         <Button variant="link" className="h-auto p-0" onClick={() => setOpen(true)}>

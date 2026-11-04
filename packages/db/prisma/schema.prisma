@@ -436,6 +436,7 @@ model Space {
   tasks                       Task[]
   runs                        Run[]
   routines                    Routine[]
+  routineReceipts             RoutineReceipt[]
   scratchpadItems             ScratchpadItem[]
   taughtSkills                TaughtSkill[]
   agentSkills                 AgentSkill[]
@@ -1087,6 +1088,7 @@ model Run {
   effects              ExternalEffect[]
   steeringMessages     SteeringMessage[]
   externalMessage      ExternalMessage?
+  routineReceipt       RoutineReceipt?
 
   @@unique([spaceId, clientNonce])
   @@index([status, wakeAt])
@@ -1292,10 +1294,34 @@ model Routine {
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
   runs           Run[]
+  receipts       RoutineReceipt[]
 
   @@index([active, nextRunAt])
   @@index([spaceId, botId])
   @@map("routines")
+}
+
+/// What one firing of a routine came to: no_change, action_needed, failed or missed.
+/// Written by the worker from structured signals (run status, watch result, tool errors).
+model RoutineReceipt {
+  id           String   @id @default(cuid())
+  spaceId      String
+  space        Space    @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  userId       String
+  botId        String
+  routineId    String
+  routine      Routine  @relation(fields: [routineId], references: [id], onDelete: Cascade)
+  /// The run this firing started; null for a check that started none (quiet, failed, missed).
+  runId        String?  @unique
+  run          Run?     @relation(fields: [runId], references: [id], onDelete: SetNull)
+  scheduledFor DateTime
+  outcome      String
+  detail       String?
+  createdAt    DateTime @default(now())
+
+  @@unique([routineId, scheduledFor])
+  @@index([spaceId, userId, createdAt])
+  @@map("routine_receipts")
 }
 
 model ScratchpadItem {

@@ -30,6 +30,7 @@ import { resolveBotWorkspaceCwd, teamBotWorkspaceDirectory } from "./computer-su
 import { connectedContext, selectRunConnections } from "./connection-context.js";
 import { nativeShellCommandArgv, usesNativeShell } from "./native-shell.js";
 import { loadPurchaseRedactions } from "./purchase-service.js";
+import { recordRoutineReceipt } from "./routine-receipts.js";
 
 /**
  * The checker behind a routine's "when something changes" trigger. It never
@@ -752,6 +753,11 @@ export async function tickRoutineWatch(
       },
     });
     if (paused.count === 1) {
+      await recordRoutineReceipt(deps.prisma, routine, {
+        scheduledFor: scheduledAt,
+        outcome: "failed",
+        detail: reason,
+      });
       await deps.jobs.cancel(routineJobKey(routine.id)).catch(() => undefined);
       await postRoutineWatchMessage(deps, {
         spaceId: routine.spaceId,
@@ -779,6 +785,10 @@ export async function tickRoutineWatch(
     data: { nextRunAt, watchState: outcome.state },
   });
   if (claimed.count !== 1) return { run: false };
+  await recordRoutineReceipt(deps.prisma, routine, {
+    scheduledFor: scheduledAt,
+    outcome: "no_change",
+  });
   if (watch.loud) {
     await postRoutineWatchMessage(deps, {
       spaceId: routine.spaceId,

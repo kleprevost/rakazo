@@ -63,6 +63,7 @@ const securityEvents = [
   },
 ];
 
+let botsWithMode = 0;
 const bots = [
   {
     id: "bot-1",
@@ -129,7 +130,8 @@ function setup(options: { ssoAdmins?: string[] } = {}) {
       ],
     },
     bot: {
-      count: async () => bots.length,
+      count: async (args?: { where?: { capabilityMode?: unknown } }) =>
+        args?.where?.capabilityMode ? botsWithMode : bots.length,
       findMany: async ({ where, take }: IdFilter) =>
         bots.filter((bot) => !where?.id || where.id.in.includes(bot.id)).slice(0, take),
     },
@@ -240,9 +242,21 @@ describe("admin console data", () => {
       computerProvider: "kubernetes",
       policy: { loaded: true, version: 1, hash: "abc123" },
       modelCredits: false,
+      capabilityBroker: false,
       userCount: 3,
       botCount: 2,
     });
+  });
+
+  it("reports the capability broker in use from policy or from any bot's mode", async () => {
+    const { client } = setup();
+    expect((await client("admin").overview()).capabilityBroker).toBe(false);
+    setActivePolicy({ version: 1, capabilities: {} });
+    expect((await client("admin").overview()).capabilityBroker).toBe(true);
+    setActivePolicy(undefined);
+    botsWithMode = 1;
+    expect((await client("admin").overview()).capabilityBroker).toBe(true);
+    botsWithMode = 0;
   });
 
   it("reports no policy as not loaded", async () => {

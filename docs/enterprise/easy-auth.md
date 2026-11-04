@@ -45,6 +45,9 @@ OIDC_ADMIN_VALUES=Rakazo.Admin
 OIDC_TRUST_EMAIL=true
 ```
 
+The narrower operator roles work the same way: add `OIDC_SECURITY_VALUES`, `OIDC_FLEET_VALUES`
+or `OIDC_AUDITOR_VALUES` (see [admin roles](features/admin-roles.md)).
+
 `OIDC_ISSUER` and `OIDC_CLIENT_ID` must name the same app registration Easy Auth uses; the token's
 audience is checked against the client ID. The client secret stays required because mobile and
 desktop still sign in with the built-in OIDC flow and need it. `AUTH_EASY_AUTH` cannot be combined
@@ -67,7 +70,8 @@ read (RPC, streams, HTTP routes and the auth handler all see the result).
   A denied identity gets no session, its bound session is ended, and its stored ID token is
   cleared so it stops granting admin.
 - **Admin.** The verified ID token is stored (sealed) on the account whenever it changes, so
-  `OIDC_ADMIN_VALUES` follow the token the platform currently forwards.
+  `OIDC_ADMIN_VALUES` (and the security, fleet and auditor values) follow the token the platform
+  currently forwards.
 - **Different person.** If the verified subject differs from the one the session was created for,
   the old session is ended and a new one is created.
 - **Identity gone.** A session created from Easy Auth is bound to it. A browser request that no

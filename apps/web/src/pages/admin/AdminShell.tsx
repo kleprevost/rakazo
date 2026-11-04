@@ -7,6 +7,7 @@ import { Link, Navigate, NavLink } from "react-router-dom";
 import { PageLoading } from "../../components/PageLoading";
 import { useSpaceQueries } from "../../lib/query";
 import { WindowChrome } from "../WindowChrome";
+import { useAdminRoles } from "./admin-roles";
 
 const linkClass = ({ isActive }: { isActive: boolean }) =>
   `shrink-0 rounded-md px-3 py-1.5 text-sm ${
@@ -23,7 +24,8 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const { t } = useLingui();
   const queries = useSpaceQueries();
   const me = useQuery(queries.me.queryOptions());
-  const isAdmin = me.data?.isAdmin === true;
+  const { roles, can } = useAdminRoles();
+  const isAdmin = roles.length > 0;
   const overview = useQuery({ ...queries.admin.overview.queryOptions(), enabled: isAdmin });
   if (me.isPending) return <PageLoading />;
   if (!isAdmin) return <Navigate to="/app" replace />;
@@ -46,29 +48,46 @@ export function AdminShell({ children }: { children: ReactNode }) {
         <NavLink to="/admin" end className={linkClass}>
           <Trans>Overview</Trans>
         </NavLink>
-        <NavLink to="/admin/users" className={linkClass}>
-          <Trans>Users</Trans>
-        </NavLink>
-        <NavLink to="/admin/bots" className={linkClass}>
-          <Trans>AI employees</Trans>
-        </NavLink>
-        <NavLink to="/admin/computers" className={linkClass}>
-          <Trans>Computers</Trans>
-        </NavLink>
-        <NavLink to="/admin/policy" className={linkClass}>
-          <Trans>Policy</Trans>
-        </NavLink>
-        <NavLink to="/admin/audit" className={linkClass}>
-          <Trans>Audit log</Trans>
-        </NavLink>
-        {overview.data?.modelCredits ? (
+        {can("security", "auditor") ? (
+          <NavLink to="/admin/users" className={linkClass}>
+            <Trans>Users</Trans>
+          </NavLink>
+        ) : null}
+        {can("security", "auditor") ? (
+          <NavLink to="/admin/bots" className={linkClass}>
+            <Trans>AI employees</Trans>
+          </NavLink>
+        ) : null}
+        {can("security", "auditor") && overview.data?.capabilityBroker ? (
+          <NavLink to="/admin/capabilities" className={linkClass}>
+            <Trans>Capabilities</Trans>
+          </NavLink>
+        ) : null}
+        {can("fleet", "auditor") ? (
+          <NavLink to="/admin/computers" className={linkClass}>
+            <Trans>Computers</Trans>
+          </NavLink>
+        ) : null}
+        {can("security", "fleet", "auditor") ? (
+          <NavLink to="/admin/policy" className={linkClass}>
+            <Trans>Policy</Trans>
+          </NavLink>
+        ) : null}
+        {can("security", "auditor") ? (
+          <NavLink to="/admin/audit" className={linkClass}>
+            <Trans>Audit log</Trans>
+          </NavLink>
+        ) : null}
+        {can() && overview.data?.modelCredits ? (
           <NavLink to="/admin/access" className={linkClass}>
             <Trans>Free access</Trans>
           </NavLink>
         ) : null}
-        <NavLink to="/admin/plugins" className={linkClass}>
-          <Trans>Plugin submissions</Trans>
-        </NavLink>
+        {can() ? (
+          <NavLink to="/admin/plugins" className={linkClass}>
+            <Trans>Plugin submissions</Trans>
+          </NavLink>
+        ) : null}
       </nav>
       <main className="min-h-0 flex-1 overflow-y-auto">
         <div className="mx-auto max-w-4xl space-y-6 px-4 py-6">{children}</div>

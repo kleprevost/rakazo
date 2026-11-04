@@ -38,7 +38,7 @@ import {
 } from "@rakazo/db";
 import { getLogger } from "@rakazo/logging";
 import { createAccessGrant, listAccessGrants, revokeAccessGrant } from "../access-grants.js";
-import { requireAdmin } from "../admins.js";
+import { requireAdminRole } from "../admins.js";
 import { aiConsentStatus, allowAiConsent } from "../ai-consent.js";
 import type { BillingService } from "../billing.js";
 import { firstModelConnectAnalytics } from "../model-connect-analytics.js";
@@ -603,7 +603,7 @@ function requireBilling(deps: RouterDeps): BillingService {
 }
 
 async function requireGrantAdmin(deps: RouterDeps, actor: Actor) {
-  await requireAdmin(deps, actor.userId);
+  await requireAdminRole(deps, actor.userId, "platform");
   if (!deps.billing?.modelCreditsEnabled)
     throw new ORPCError("NOT_FOUND", { message: "Model credits are not enabled" });
 }
