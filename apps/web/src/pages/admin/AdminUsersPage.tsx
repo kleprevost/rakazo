@@ -65,7 +65,12 @@ function AdminUsers() {
         </TableHeader>
         <TableBody>
           {rows.map((user) => (
-            <UserRow key={user.id} user={user} locale={i18n.locale} />
+            <UserRow
+              key={user.id}
+              user={user}
+              locale={i18n.locale}
+              onChanged={() => void users.refetch()}
+            />
           ))}
         </TableBody>
       </Table>
@@ -74,9 +79,18 @@ function AdminUsers() {
   );
 }
 
-function UserRow({ user, locale }: { user: AdminUser; locale: string }) {
+function UserRow({
+  user,
+  locale,
+  onChanged,
+}: {
+  user: AdminUser;
+  locale: string;
+  onChanged: () => void;
+}) {
   const { t } = useLingui();
   const { can } = useAdminRoles();
+<<<<<<< HEAD
   const [confirming, setConfirming] = useState(false);
   const [confirmingCredentials, setConfirmingCredentials] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -93,17 +107,40 @@ function UserRow({ user, locale }: { user: AdminUser; locale: string }) {
     }
   }
   async function endSessions() {
+=======
+  const [confirming, setConfirming] = useState<"end" | "deactivate" | null>(null);
+  const [busy, setBusy] = useState(false);
+  async function run(action: () => Promise<unknown>, done?: string, failed?: string) {
+>>>>>>> origin/main
     setBusy(true);
     try {
-      await rpc.admin.users.endSessions({ userId: user.id });
-      toast.success(t`Sessions ended`);
+      await action();
+      if (done) toast.success(done);
+      onChanged();
     } catch (error) {
-      toast.error(errorText(error, t`Could not end sessions`));
+      toast.error(errorText(error, failed ?? t`Could not update account`));
     } finally {
       setBusy(false);
-      setConfirming(false);
+      setConfirming(null);
     }
   }
+  const confirmable = (
+    kind: "end" | "deactivate",
+    label: string,
+    action: () => Promise<unknown>,
+    done?: string,
+    failed?: string,
+  ) => (
+    <Button
+      variant={confirming === kind ? "destructive" : "ghost"}
+      size="sm"
+      disabled={busy}
+      onClick={() => (confirming === kind ? void run(action, done, failed) : setConfirming(kind))}
+      onBlur={() => setConfirming(null)}
+    >
+      {confirming === kind ? <Trans>Confirm</Trans> : label}
+    </Button>
+  );
   return (
     <TableRow aria-label={user.email}>
       <TableCell className="min-w-0">
@@ -120,12 +157,14 @@ function UserRow({ user, locale }: { user: AdminUser; locale: string }) {
             <Badge variant="outline">{t`Member`}</Badge>
           )}
           {user.ssoLinked ? <Badge variant="outline">{t`SSO`}</Badge> : null}
+          {user.deprovisionedAt ? <Badge variant="destructive">{t`Deactivated`}</Badge> : null}
         </div>
       </TableCell>
       <TableCell className="text-muted-foreground">
         {user.lastSignInAt ? formatWhen(user.lastSignInAt, locale) : null}
       </TableCell>
       <TableCell className="text-end">
+<<<<<<< HEAD
         {user.isSelf || !can("security") ? null : (
           <div className="flex justify-end gap-1">
             <Button
@@ -149,6 +188,30 @@ function UserRow({ user, locale }: { user: AdminUser; locale: string }) {
               {confirmingCredentials ? <Trans>Confirm</Trans> : <Trans>Revoke credentials</Trans>}
             </Button>
           </div>
+=======
+        {user.isSelf || !can("security") ? null : user.deprovisionedAt ? (
+          <Button
+            variant="ghost"
+            size="sm"
+            disabled={busy}
+            onClick={() => void run(() => rpc.admin.users.reactivate({ userId: user.id }))}
+          >
+            <Trans>Reactivate</Trans>
+          </Button>
+        ) : (
+          <>
+            {confirmable(
+              "end",
+              t`End sessions`,
+              () => rpc.admin.users.endSessions({ userId: user.id }),
+              t`Sessions ended`,
+              t`Could not end sessions`,
+            )}
+            {confirmable("deactivate", t`Deactivate`, () =>
+              rpc.admin.users.deprovision({ userId: user.id }),
+            )}
+          </>
+>>>>>>> origin/main
         )}
       </TableCell>
     </TableRow>

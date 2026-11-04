@@ -115,8 +115,8 @@ function setup(
           ? [credential]
           : [],
       ),
-      findFirst: vi.fn(async ({ where }: { where: { id?: string; userId: string } }) =>
-        !options.credits && where.userId === owner.userId && where.id === credential.id
+      findFirst: vi.fn(async ({ where }: { where: { id?: string } }) =>
+        !options.credits && where.id === credential.id
           ? { ...credential, userPreferences: [] }
           : null,
       ),
@@ -538,8 +538,8 @@ describe("role-based model settings API", () => {
   it("lists the same model on two connections, each validated on its own", async () => {
     const { call, prisma, roles } = setup();
     const connections = ["credential-personal", "credential-work"];
-    const findFirst = vi.fn(async ({ where }: { where: { id: string; userId: string } }) =>
-      connections.includes(where.id) && where.userId === owner.userId
+    const findFirst = vi.fn(async ({ where }: { where: { id: string } }) =>
+      connections.includes(where.id)
         ? {
             id: where.id,
             userId: owner.userId,

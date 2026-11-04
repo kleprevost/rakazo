@@ -933,6 +933,7 @@ msgid "Apply"
 msgstr "Anwenden"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "Approval boundaries"
 msgstr "Bestätigungsgrenzen"
 
@@ -945,6 +946,7 @@ msgstr "Freigabemodell"
 msgid "Approvals"
 msgstr "Freigaben"
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/MessagingSettingsPanel.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
 #: src/pages/shell/message-cards.tsx
@@ -966,6 +968,7 @@ msgstr "Genehmige oder lehne es auf dem Bildschirm ab."
 msgid "Approve this server to let your agent use its tools."
 msgstr "Genehmige diesen Server, damit dein Agent seine Tools verwenden kann."
 
+#: src/components/teach/SkillDraftCard.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
 msgid "Approved"
 msgstr ""
@@ -1033,6 +1036,10 @@ msgstr "Datei anhängen"
 #: src/pages/shell/chat-shared.ts
 msgid "Attachment"
 msgstr "Anhang"
+
+#: src/pages/admin/AdminSkillsPage.tsx
+msgid "Audience"
+msgstr "Zielgruppe"
 
 #: src/pages/admin/AdminShell.tsx
 msgid "Audit log"
@@ -2417,6 +2424,7 @@ msgstr ""
 msgid "Could not run routine"
 msgstr ""
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/ExternalConversationSettings.tsx
 #: src/pages/KnowledgeSection.tsx
 #: src/pages/McpServersOverlay.tsx
@@ -2542,6 +2550,10 @@ msgstr ""
 #: src/pages/ScratchpadSection.tsx
 msgid "Could not update"
 msgstr "Aktualisierung fehlgeschlagen"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Could not update account"
+msgstr "Konto konnte nicht aktualisiert werden"
 
 #: src/components/ModelCredits.tsx
 msgid "Could not update billing"
@@ -2770,6 +2782,14 @@ msgstr ""
 #: src/lib/cron.ts
 msgid "days"
 msgstr "Tage"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Deactivate"
+msgstr "Deaktivieren"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Deactivated"
+msgstr "Deaktiviert"
 
 #: src/components/call/IncomingCall.tsx
 #: src/pages/MessagingSettingsPanel.tsx
@@ -3306,6 +3326,10 @@ msgstr "Jeden Monat"
 msgid "Every week"
 msgstr "Jede Woche"
 
+#: src/pages/admin/AdminSkillsPage.tsx
+msgid "Everyone"
+msgstr "Alle"
+
 #: src/pages/PluginsOverlay.tsx
 msgid "Executor token"
 msgstr "Executor-Token"
@@ -3394,6 +3418,7 @@ msgid "Failed."
 msgstr "Fehlgeschlagen."
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "Failure handling"
 msgstr "Fehlerbehandlung"
 
@@ -3569,6 +3594,7 @@ msgid "Grants"
 msgstr "Berechtigungen"
 
 #: src/lib/identity-display.ts
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/MessagingSettingsPanel.tsx
 #: src/pages/shell/chat-header.tsx
 #: src/pages/shell/side-panel.tsx
@@ -3725,6 +3751,7 @@ msgid "How other bots see it"
 msgstr "So sehen andere Bots ihn"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "How to check"
 msgstr "So wird geprüft"
 
@@ -3816,6 +3843,7 @@ msgid "Input"
 msgstr "Eingabe"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "Inputs"
 msgstr "Eingaben"
 
@@ -4503,6 +4531,7 @@ msgstr ""
 #: src/pages/AccountSettingsOverlay.tsx
 #: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/admin/AdminCapabilitiesPage.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/Auth.tsx
 #: src/pages/GroupPanel.tsx
 #: src/pages/McpServersOverlay.tsx
@@ -4814,6 +4843,7 @@ msgstr "Kein gültiger Skill"
 msgid "Not added: {0}"
 msgstr ""
 
+#: src/components/teach/SkillDraftCard.tsx
 #: src/pages/admin/AdminComputersPage.tsx
 msgid "Not approved"
 msgstr "Nicht genehmigt"
@@ -5255,6 +5285,10 @@ msgstr "Pro Million Token, Eingabe / Ausgabe"
 msgid "Permissions"
 msgstr "Berechtigungen"
 
+#: src/pages/admin/AdminSkillsPage.tsx
+msgid "Person"
+msgstr "Person"
+
 #: src/pages/shell/agent-import.tsx
 msgid "Persona"
 msgstr "Persona"
@@ -5412,6 +5446,7 @@ msgid "Providers"
 msgstr "Anbieter"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/shell/share-employee-dialog.tsx
 msgid "Publish"
 msgstr "Veröffentlichen"
@@ -5466,6 +5501,10 @@ msgstr "Reagieren"
 msgid "Reactions"
 msgstr "Reaktionen"
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Reactivate"
+msgstr "Reaktivieren"
+
 #: src/pages/shell/bot-panel.tsx
 msgid "Read replies aloud"
 msgstr "Antworten vorlesen"
@@ -5474,6 +5513,7 @@ msgstr "Antworten vorlesen"
 msgid "Ready"
 msgstr "Bereit"
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
 msgid "Reason"
 msgstr ""
@@ -5615,6 +5655,7 @@ msgstr ""
 msgid "Registration is closed"
 msgstr "Registrierung ist geschlossen"
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
 #: src/pages/shell/share-employee-dialog.tsx
 msgid "Reject"
@@ -5654,6 +5695,7 @@ msgstr "Neu laden"
 #: src/components/TrustedLinkSitesSettings.tsx
 #: src/components/vault/LoginFieldsInput.tsx
 #: src/components/vault/VaultItemDetail.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/McpServersOverlay.tsx
 #: src/pages/ModelRoleSettings.tsx
 #: src/pages/PluginsOverlay.tsx
@@ -5960,6 +6002,7 @@ msgstr ""
 msgid "Role for {name}"
 msgstr ""
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/shell/share-employee-dialog.tsx
 msgid "Roll back"
 msgstr ""
@@ -6499,6 +6542,7 @@ msgstr "Skill {position}"
 #: src/components/integrations/plugin-marketplace.tsx
 #: src/components/integrations/skills-dialog.tsx
 #: src/components/SidebarFooter.tsx
+#: src/pages/admin/AdminShell.tsx
 #: src/pages/Shell.tsx
 #: src/pages/shell/agent-import.tsx
 #: src/pages/shell/hire-role-dialog.tsx
@@ -6682,6 +6726,7 @@ msgid "Status"
 msgstr ""
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "Steps"
 msgstr "Schritte"
 
@@ -6985,6 +7030,10 @@ msgstr "Denkmodus"
 #: src/pages/ModelRoleSettings.tsx
 msgid "Thinking: {0}"
 msgstr "Denken: {0}"
+
+#: src/lib/user-error.ts
+msgid "This account is deactivated"
+msgstr "Dieses Konto ist deaktiviert"
 
 #: src/lib/user-error.ts
 msgid "This app needs its own sign-in setup to connect."
@@ -7478,6 +7527,10 @@ msgstr ""
 msgid "User"
 msgstr ""
 
+#: src/pages/admin/AdminSkillsPage.tsx
+msgid "User ID"
+msgstr "Benutzer-ID"
+
 #: src/pages/memory-providers/HonchoSettingsForm.tsx
 msgid "User peer"
 msgstr ""
@@ -7546,6 +7599,7 @@ msgstr "Prüfen und hinzufügen"
 msgid "Verifying…"
 msgstr "Wird geprüft…"
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/Artifacts.tsx
 msgid "Version"
 msgstr ""
@@ -7593,6 +7647,11 @@ msgstr "Warte kurz und teste erneut."
 #: src/lib/work-phase.ts
 msgid "Waiting"
 msgstr "Wartend"
+
+#: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
+msgid "Waiting for review"
+msgstr "Wartet auf Prüfung"
 
 #: src/lib/roster-status.ts
 msgid "Waiting in line…"
@@ -7678,6 +7737,7 @@ msgid "What this bot is for"
 msgstr "Wofür dieser Bot gedacht ist"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "What to return"
 msgstr "Was zurückgegeben werden soll"
 
@@ -7708,6 +7768,7 @@ msgstr "Ausführungszeit"
 #: src/components/teach/SkillDraftCard.tsx
 #: src/components/vault/VaultItemDetail.tsx
 #: src/components/vault/VaultItemEditor.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "When to use"
 msgstr "Einsatzzeitpunkt"
 

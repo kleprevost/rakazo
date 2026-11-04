@@ -60,17 +60,25 @@ export async function cancelBotRuns(
   tx: Transaction,
   botIds: string[] | null,
   now: Date,
+  /** Also cancels this person's runs on bots that are not in `botIds`. */
+  alsoUserId?: string,
 ): Promise<CancelledRuns> {
   const active = await tx.run.findMany({
     where: {
-      ...(botIds ? { botId: { in: botIds } } : {}),
+      ...(botIds
+        ? { OR: [{ botId: { in: botIds } }, ...(alsoUserId ? [{ userId: alsoUserId }] : [])] }
+        : {}),
       status: { in: [...ACTIVE_RUN_STATUSES] },
     },
     select: { id: true, botId: true, taskId: true, userId: true, spaceId: true, threadId: true },
   });
   const cancelled = await cancelRunsInTransaction(tx, active, now);
   const runIds = cancelled.map((run) => run.id);
-  await tx.steeringMessage.deleteMany({ where: botIds ? { botId: { in: botIds } } : {} });
+  await tx.steeringMessage.deleteMany({
+    where: botIds
+      ? { OR: [{ botId: { in: botIds } }, ...(alsoUserId ? [{ userId: alsoUserId }] : [])] }
+      : {},
+  });
   // Snapshot teardown coordinates before commit: a worker may release them right after.
   const leases = runIds.length
     ? await tx.computerExecutionLease.findMany({
@@ -118,7 +126,7 @@ export async function cancelBotRuns(
 
 /** After commit: wakes subscribers, cancels the jobs and tears down the runs' computer work. */
 export async function finishCancelledRuns(
-  deps: SuspensionDeps,
+  deps: Pick<RouterDeps, "prisma" | "events" | "jobs" | "sandbox">,
   cancelled: CancelledRuns,
 ): Promise<void> {
   await system("tear down", async () => {

@@ -78,6 +78,8 @@ const matrix: Array<[string, Array<Exclude<AdminRole, "platform">>, (admin: Admi
   ["overview", ["security", "fleet", "auditor"], (a) => a.overview()],
   ["users.list", ["security", "auditor"], (a) => a.users.list({ limit: 10 })],
   ["users.endSessions", ["security"], (a) => a.users.endSessions({ userId: "member" })],
+  ["users.deprovision", ["security"], (a) => a.users.deprovision({ userId: "member" })],
+  ["users.reactivate", ["security"], (a) => a.users.reactivate({ userId: "member" })],
   ["bots.list", ["security", "auditor"], (a) => a.bots.list({ limit: 10 })],
   ["bots.suspend", ["security"], (a) => a.bots.suspend({ botId: "bot-1" })],
   ["bots.resume", ["security"], (a) => a.bots.resume({ botId: "bot-1" })],

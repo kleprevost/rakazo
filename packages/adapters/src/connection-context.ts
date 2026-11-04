@@ -1,5 +1,6 @@
 import type { AdapterContext } from "@rakazo/adapter-kit";
 import type { PrismaClient } from "@rakazo/db";
+import { credentialOwner, principalOf } from "@rakazo/db";
 import type { PluginConnectionRow } from "./composio-connector.js";
 import { planLiveConnectionSync } from "./composio-connector.js";
 import type { ExecutorDeps } from "./executor-deps.js";
@@ -80,7 +81,7 @@ export async function persistLivePluginConnections(
     await prisma.connection.updateMany({
       where: {
         id: { in: sync.connectIds },
-        userId: owner.userId,
+        ...credentialOwner(principalOf(owner)),
         spaceId: owner.spaceId,
       },
       data: { status: "connected" },
@@ -93,7 +94,7 @@ export async function persistLivePluginConnections(
     await prisma.connection.updateMany({
       where: {
         id: { in: sync.revokeIds },
-        userId: owner.userId,
+        ...credentialOwner(principalOf(owner)),
         spaceId: owner.spaceId,
       },
       data: { status: "revoked" },

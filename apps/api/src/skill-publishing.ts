@@ -151,6 +151,7 @@ export async function listSubmissions(deps: Deps, actor: Actor): Promise<SkillSu
   return rows.map((row) => ({
     versionId: row.id,
     skillId: row.skillId,
+    sourceSkillId: row.sourceSkillId,
     number: row.number,
     name: row.name,
     status: statusOf(row.status),

@@ -8,6 +8,7 @@ import { AdminCapabilitiesPage } from "./AdminCapabilitiesPage";
 import { AdminComputersPage } from "./AdminComputersPage";
 import { AdminOverviewPage } from "./AdminOverviewPage";
 import { AdminPolicyPage } from "./AdminPolicyPage";
+import { AdminSkillsPage } from "./AdminSkillsPage";
 import { AdminUsersPage } from "./AdminUsersPage";
 
 /** Everything under `/admin`. `access` and `plugins` keep the paths they had before the section. */
@@ -22,6 +23,7 @@ export function AdminRoutes() {
       <Route path="policy" element={<AdminPolicyPage />} />
       <Route path="audit" element={<AdminAuditPage />} />
       <Route path="access" element={<AdminAccessPage />} />
+      <Route path="skills" element={<AdminSkillsPage />} />
       <Route path="plugins" element={<AdminPluginsPage />} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>

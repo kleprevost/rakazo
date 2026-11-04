@@ -28,7 +28,14 @@ import {
 } from "@rakazo/contracts";
 import { readBoundedResponseBytes } from "@rakazo/core";
 import type { Prisma, PrismaClient } from "@rakazo/db";
-import { availableInSpace, itemSecretIn, runAsSystem } from "@rakazo/db";
+import {
+  credentialOwner,
+  ownedCredential,
+  principalAvailable,
+  principalItemSecret,
+  principalOf,
+  runAsSystem,
+} from "@rakazo/db";
 import { getLogger } from "@rakazo/logging";
 import { sanitizeConnectorError } from "./connector-safety.js";
 import { MCP_DYNAMIC_REGISTRATION_UNSUPPORTED, needsMcpOAuthClient } from "./mcp-server-health.js";
@@ -974,11 +981,14 @@ export class McpOAuthBroker {
     const server = await this.prisma.mcpServer.findFirst({
       where: {
         id: input.serverId,
-        ...availableInSpace(input),
+        ...principalAvailable(principalOf(input), input.spaceId),
         enabled: true,
       },
     });
-    if (!server) throw new Error("MCP server endpoint is required for OAuth");
+    if (!server) {
+      await this.auditForeignServer(input, input.serverId);
+      throw new Error("MCP server endpoint is required for OAuth");
+    }
     const context = { spaceId: input.spaceId, userId: input.userId };
     const loaded = await this.loadMaterial(server, context);
     // A stdio server has no MCP endpoint; OAuth runs against its authorization server.
@@ -995,7 +1005,7 @@ export class McpOAuthBroker {
       throw new Error("Too many pending MCP authorization attempts; wait and try again");
     }
     const activeCount = await this.prisma.mcpOAuthSession.count({
-      where: { spaceId: input.spaceId, userId: input.userId },
+      where: { spaceId: input.spaceId, ...credentialOwner(principalOf(input)) },
     });
     if (activeCount >= MAX_PENDING_SESSIONS) {
       throw new Error("Too many pending MCP authorization attempts; wait and try again");
@@ -1123,7 +1133,7 @@ export class McpOAuthBroker {
       const server = await this.prisma.mcpServer.findFirst({
         where: {
           id: session.serverId,
-          ...availableInSpace(input),
+          ...principalAvailable(principalOf(input), input.spaceId),
           enabled: true,
         },
       });
@@ -1162,7 +1172,7 @@ export class McpOAuthBroker {
     // The exchange sends the client secret: check it against the binding stored now, not
     // the one this flow started with, in case an overlapping flow bound the client first.
     const current = await this.prisma.mcpServer.findFirst({
-      where: { id: pending.serverId, ...availableInSpace(input) },
+      where: { id: pending.serverId, ...principalAvailable(principalOf(input), input.spaceId) },
       select: { id: true, endpoint: true, secretId: true },
     });
     if (current) {
@@ -1211,6 +1221,7 @@ export class McpOAuthBroker {
         this.discardPending(sessionId, pending);
       }
     }
+    // credential-lookup: exempt (system sweep of expired sign-ins, reads no credential)
     await runAsSystem("expire abandoned MCP sign-ins in every Space", () =>
       this.prisma.mcpOAuthSession.deleteMany({ where: { createdAt: { lt: new Date(cutoff) } } }),
     );
@@ -1223,16 +1234,30 @@ export class McpOAuthBroker {
 
   async disconnect(input: { serverId: string; spaceId: string; userId: string }): Promise<void> {
     const server = await this.prisma.mcpServer.findFirst({
-      where: { id: input.serverId, ...availableInSpace(input) },
+      where: { id: input.serverId, ...principalAvailable(principalOf(input), input.spaceId) },
     });
+    if (!server) await this.auditForeignServer(input, input.serverId);
     if (!server?.secretId) return;
     const row = await this.prisma.secret.findFirst({
-      where: { id: server.secretId, ...itemSecretIn(input) },
+      where: { id: server.secretId, ...principalItemSecret(principalOf(input), input.spaceId) },
     });
     if (!row) return;
     const material = await this.read(row.ciphertext, row.id);
     delete material.oauth;
     await this.replaceMaterial(server.id, material, input, { incrementRevision: true });
+  }
+
+  /** A server id that is someone else's is an audited refusal, not just "not found". */
+  private async auditForeignServer(scope: ActorRef, serverId: string): Promise<void> {
+    await ownedCredential(
+      principalOf(scope),
+      "mcp_server",
+      await this.prisma.mcpServer.findFirst({
+        where: { id: serverId },
+        select: { id: true, userId: true },
+      }),
+      { spaceId: scope.spaceId, surface: "oauth" },
+    );
   }
 
   private async loadMaterial(
@@ -1241,7 +1266,7 @@ export class McpOAuthBroker {
   ): Promise<{ material: OAuthMaterial; secretId?: string }> {
     if (!server.secretId) return { material: {} };
     const row = await this.prisma.secret.findFirst({
-      where: { id: server.secretId, ...itemSecretIn(context) },
+      where: { id: server.secretId, ...principalItemSecret(principalOf(context), context.spaceId) },
     });
     return row
       ? { material: await this.read(row.ciphertext, row.id), secretId: row.id }
@@ -1487,7 +1512,7 @@ export class McpOAuthBroker {
     expectedEndpoint?: string | null,
   ): Promise<MaterialSnapshot> {
     const server = await tx.mcpServer.findFirst({
-      where: { id: serverId, ...availableInSpace(context) },
+      where: { id: serverId, ...principalAvailable(principalOf(context), context.spaceId) },
       select: { endpoint: true, secretId: true },
     });
     if (!server) throw new McpCredentialRefusedError("MCP server is unavailable");
@@ -1497,7 +1522,10 @@ export class McpOAuthBroker {
       );
     const secret = server.secretId
       ? await tx.secret.findFirst({
-          where: { id: server.secretId, ...itemSecretIn(context) },
+          where: {
+            id: server.secretId,
+            ...principalItemSecret(principalOf(context), context.spaceId),
+          },
         })
       : null;
     return { server, secret };
@@ -1527,7 +1555,7 @@ export class McpOAuthBroker {
     incrementRevision = false,
   ): Promise<boolean> {
     const server = await tx.mcpServer.findFirst({
-      where: { id: serverId, ...availableInSpace(context) },
+      where: { id: serverId, ...principalAvailable(principalOf(context), context.spaceId) },
       select: { endpoint: true, secretId: true, spaceId: true, allSpaces: true },
     });
     if (!server) throw new McpCredentialRefusedError("MCP server is unavailable");
@@ -1540,7 +1568,10 @@ export class McpOAuthBroker {
       await tx.$queryRaw`SELECT id FROM secrets WHERE id = ${server.secretId} FOR UPDATE`;
     const current = server.secretId
       ? await tx.secret.findFirst({
-          where: { id: server.secretId, ...itemSecretIn(context) },
+          where: {
+            id: server.secretId,
+            ...principalItemSecret(principalOf(context), context.spaceId),
+          },
         })
       : null;
     if (current?.ciphertext !== snapshot.secret?.ciphertext) return false;

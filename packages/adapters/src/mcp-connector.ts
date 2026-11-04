@@ -27,7 +27,7 @@ import {
   resolveMcpOAuthFileTemplate,
 } from "@rakazo/contracts";
 import type { McpServer, PrismaClient, ThreadEvents } from "@rakazo/db";
-import { availableInSpace, itemSecretIn } from "@rakazo/db";
+import { ownedCredential, principalAvailable, principalItemSecret, principalOf } from "@rakazo/db";
 import { getLogger } from "@rakazo/logging";
 import { sanitizedError } from "@rakazo/logging/monitoring";
 import { catalogToolPrefix } from "./approval-effect.js";
@@ -442,7 +442,7 @@ export class McpConnector implements ConnectorProvider {
 
   private async authorizedTools(context: AdapterContext): Promise<ConnectorTool[]> {
     if (!context.botId) return [];
-    const usable = { enabled: true, ...availableInSpace(context) };
+    const usable = { enabled: true, ...principalAvailable(principalOf(context), context.spaceId) };
     const [assigned, shared] = await Promise.all([
       this.prisma.botMcpServer.findMany({
         where: {
@@ -652,7 +652,7 @@ export class McpConnector implements ConnectorProvider {
       yield { type: "error", message: "MCP tools require a bot context" };
       return;
     }
-    const usable = { enabled: true, ...availableInSpace(context) };
+    const usable = { enabled: true, ...principalAvailable(principalOf(context), context.spaceId) };
     const assignment =
       (await this.prisma.botMcpServer.findFirst({
         where: {
@@ -676,6 +676,18 @@ export class McpConnector implements ConnectorProvider {
         message: `MCP server "${assignment.server.name}" is unavailable: ${reason}`,
       };
       return;
+    }
+    if (!assignment) {
+      // A server id the model named that belongs to someone else is a refusal worth recording.
+      await ownedCredential(
+        principalOf(context),
+        "mcp_server",
+        await this.prisma.mcpServer.findFirst({
+          where: { id: call.route.resourceId },
+          select: { id: true, userId: true },
+        }),
+        { spaceId: context.spaceId, botId: context.botId },
+      );
     }
     if (
       !assignment ||
@@ -1033,18 +1045,28 @@ export class McpConnector implements ConnectorProvider {
     try {
       let secret = server.secretId
         ? await this.prisma.secret.findFirst({
-            where: { id: server.secretId, ...itemSecretIn(context) },
+            where: {
+              id: server.secretId,
+              ...principalItemSecret(principalOf(context), context.spaceId),
+            },
           })
         : null;
       if (server.secretId && !secret) {
         // OAuth refresh replaces the secret without updating this run's server snapshot.
         const current = await this.prisma.mcpServer.findFirst({
-          where: { id: server.id, revision: server.revision, ...availableInSpace(context) },
+          where: {
+            id: server.id,
+            revision: server.revision,
+            ...principalAvailable(principalOf(context), context.spaceId),
+          },
           select: { secretId: true },
         });
         if (current?.secretId) {
           secret = await this.prisma.secret.findFirst({
-            where: { id: current.secretId, ...itemSecretIn(context) },
+            where: {
+              id: current.secretId,
+              ...principalItemSecret(principalOf(context), context.spaceId),
+            },
           });
         }
         if (!secret) throw new Error("MCP server secret is unavailable; retry");

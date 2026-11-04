@@ -221,6 +221,7 @@ async function failRun(scenario: Scenario) {
         scenario.personalKey
           ? {
               id: "personal",
+              userId: "user-1",
               provider: "openrouter",
               secretId: "personal-secret",
               userPreferences: [],

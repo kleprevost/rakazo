@@ -10,6 +10,7 @@ import {
   ConnectorRegistry,
   capabilityGate,
   classifyInputForCall,
+  reconcileManagedConnection,
   setActivePolicy,
 } from "@rakazo/adapters";
 import type { Actor } from "@rakazo/contracts";
@@ -18,6 +19,7 @@ import type { PrismaClient } from "@rakazo/db";
 import {
   asSystem,
   createDb,
+  findModelCredentialById,
   installAuditEventStore,
   installSecurityEventStore,
   runAsSystem,
@@ -356,5 +358,83 @@ describe.skipIf(!enabled)("capability broker release gate (PostgreSQL, runtime r
       }),
     );
     expect(verdict).toEqual({ outcome: "deny", rule: "principal_mismatch" });
+  });
+
+  it("refuses another user's credential at the lookup itself, with the gate out of the way", async () => {
+    const annSpace = actors.ann.spaceId;
+    const benConnection = `cb-forged-conn-${suffix}`;
+    const annConnection = `cb-own-conn-${suffix}`;
+    const benModel = `cb-forged-model-${suffix}`;
+    const annModel = `cb-own-model-${suffix}`;
+    // Ben's rows sit in Ann's Space: only the owner check stands between Ann's run and them.
+    await system.connection.createMany({
+      data: [
+        {
+          id: benConnection,
+          spaceId: annSpace,
+          userId: actors.ben.userId,
+          provider: "calendar",
+          displayName: "Calendar",
+          status: "connected",
+        },
+        {
+          id: annConnection,
+          spaceId: annSpace,
+          userId: actors.ann.userId,
+          provider: "calendar",
+          displayName: "Calendar",
+          status: "connected",
+        },
+      ],
+    });
+    await system.userModelCredential.createMany({
+      data: [
+        { id: benModel, userId: actors.ben.userId, provider: "openai", label: "b", secretId: "s1" },
+        { id: annModel, userId: actors.ann.userId, provider: "openai", label: "a", secretId: "s2" },
+      ],
+    });
+    try {
+      const run = { spaceId: annSpace, userId: actors.ann.userId };
+      const ctx = context("ann");
+      // Gate bypassed: the lookups are called directly as Ann's run, naming Ben's ids.
+      const outcome = await as("ann", async () => ({
+        forgedConnection: await reconcileManagedConnection(
+          prisma,
+          undefined,
+          run,
+          ctx,
+          benConnection,
+        ),
+        ownConnection: await reconcileManagedConnection(prisma, undefined, run, ctx, annConnection),
+        ownModel: await findModelCredentialById(prisma, run, annModel),
+      }));
+      // Row security already hides Ben's row from Ann's session; as the system the owner check
+      // alone has to refuse it.
+      const forgedModel = await runAsSystem("release gate model lookup", () =>
+        findModelCredentialById(prisma, run, benModel),
+      );
+      expect(outcome.forgedConnection).toBe("missing");
+      expect(outcome.ownConnection).toBe("connected");
+      expect(forgedModel).toBeNull();
+      expect(outcome.ownModel?.id).toBe(annModel);
+
+      expect(await denials()).toEqual([
+        expect.objectContaining({
+          rule: "principal_mismatch",
+          surface: "credential",
+          kind: "connection",
+          resourceId: benConnection,
+        }),
+        expect.objectContaining({
+          rule: "principal_mismatch",
+          surface: "credential",
+          kind: "model_connection",
+          resourceId: benModel,
+        }),
+      ]);
+    } finally {
+      await system.connection.deleteMany({ where: { id: { in: [benConnection, annConnection] } } });
+      await system.userModelCredential.deleteMany({ where: { id: { in: [benModel, annModel] } } });
+    }
   });
 });

@@ -46,6 +46,10 @@ model User {
   /// emails then follow the language of the browser that asked for them.
   locale                      String?
   marketingEmailOptOutAt      DateTime?
+  /// Set when an admin or the directory deprovisions the account: no session, no sign-in. Data stays.
+  deprovisionedAt             DateTime?
+  /// "admin" | "provisioning" while deprovisioned.
+  deprovisionedVia            String?
   sessions                    Session[]
   accounts                    Account[]
   passkeys                    Passkey[]
@@ -2675,6 +2679,8 @@ model UserDirectoryClaim {
   /// The directory returned a link instead of the full list; claim grants fail closed.
   truncated   Boolean  @default(false)
   refreshedAt DateTime @default(now())
+  /// Held by an API instance while it reads this person's groups from the directory.
+  syncLeaseUntil DateTime?
 
   @@map("user_directory_claims")
 }

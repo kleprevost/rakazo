@@ -54,6 +54,8 @@ export type SkillVersion = z.infer<typeof SkillVersionSchema>;
 export const SkillSubmissionSchema = z.object({
   versionId: Id,
   skillId: Id,
+  /** The personal taught skill it was submitted from. */
+  sourceSkillId: Id,
   number: z.number().int(),
   name: z.string(),
   status: SkillVersionStatusSchema,

@@ -75,6 +75,9 @@ param oidcTenantId string
 param oidcClientId string
 @secure()
 param oidcClientSecret string
+// Optional bearer token for the directory deactivation endpoint (docs/enterprise/features/identity-lifecycle.md).
+@secure()
+param scimBearerToken string = ''
 param oidcName string = 'Microsoft'
 param oidcAccessClaim string = 'roles'
 param oidcAllowedValues string = 'Rakazo.User,Rakazo.Admin'
@@ -87,6 +90,8 @@ param securityEmails string = ''
 param fleetEmails string = ''
 param auditorEmails string = ''
 param oidcRevalidateMinutes string = '60'
+// Minutes between directory reads of each person's groups; empty is off (docs/enterprise/features/identity-lifecycle.md).
+param directorySyncMinutes string = ''
 param oidcTrustEmail bool = true
 @description('Add Easy Auth (Entra) in front of the web app, anonymous requests allowed. Needs the code that reads AUTH_EASY_AUTH (placeholder name).')
 param enableEasyAuth bool = false
@@ -209,6 +214,8 @@ module apps 'modules/aca-apps.bicep' = {
     screenProxySecret: screenProxySecret
     supervisorToken: supervisorToken
     oidcClientSecret: oidcClientSecret
+    scimBearerToken: scimBearerToken
+    directorySyncMinutes: directorySyncMinutes
     azureOpenAiApiKey: azureOpenAiApiKey
     oidcTenantId: oidcTenantId
     oidcClientId: oidcClientId

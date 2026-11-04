@@ -38,6 +38,8 @@ param supervisorToken string
 param oidcClientSecret string
 @secure()
 param azureOpenAiApiKey string
+@secure()
+param scimBearerToken string = ''
 
 param oidcTenantId string
 param oidcClientId string
@@ -53,6 +55,7 @@ param fleetEmails string
 param auditorEmails string
 param oidcRevalidateMinutes string
 param oidcTrustEmail bool
+param directorySyncMinutes string = ''
 
 param piDefaultModel string
 param azureOpenAiResourceName string
@@ -83,6 +86,10 @@ var registrySecrets = empty(ghcrToken) ? [] : [
 var easyAuthEnv = enableEasyAuth ? [{ name: 'AUTH_EASY_AUTH', value: 'true' }] : []
 // Shared AI employees: people add their own instance (docs/enterprise/features/shared-employees.md). API only.
 var sharedEmployeesEnv = enableSharedEmployees ? [{ name: 'SHARED_EMPLOYEES_ENABLED', value: 'true' }] : []
+// Directory deactivation endpoint (docs/enterprise/features/identity-lifecycle.md), only when a token is given. API only.
+var scimEnv = empty(scimBearerToken) ? [] : [{ name: 'SCIM_BEARER_TOKEN', secretRef: 'scim-bearer-token' }]
+// Group sync from the directory (docs/enterprise/features/identity-lifecycle.md), only when set. API only.
+var directorySyncEnv = empty(directorySyncMinutes) ? [] : [{ name: 'DIRECTORY_SYNC_MINUTES', value: directorySyncMinutes }]
 // Operator roles beyond admin (docs/enterprise/features/admin-roles.md), set only when given. API only.
 var operatorRolesEnv = concat(
   empty(oidcSecurityValues) ? [] : [{ name: 'OIDC_SECURITY_VALUES', value: oidcSecurityValues }],
@@ -140,7 +147,9 @@ var apiEnv = concat(
   workItemsEnv,
   easyAuthEnv,
   sharedEmployeesEnv,
-  operatorRolesEnv
+  operatorRolesEnv,
+  scimEnv,
+  directorySyncEnv
 )
 
 var apiSecrets = concat(
@@ -153,6 +162,7 @@ var apiSecrets = concat(
     { name: 'oidc-client-secret', value: oidcClientSecret }
     { name: 'azure-openai-api-key', value: azureOpenAiApiKey }
   ],
+  empty(scimBearerToken) ? [] : [{ name: 'scim-bearer-token', value: scimBearerToken }],
   registrySecrets
 )
 

@@ -100,6 +100,17 @@ const counts = (diff: EntitlementDiff): ReconcileResult => ({
 /** Recomputes one user's rows from their claims and every grant that can reach them. */
 async function reconcileUserIn(tx: Tx, userId: string, now: Date): Promise<ReconcileResult> {
   await lockUsers(tx, [userId]);
+  // A deprovisioned account holds nothing; reactivating recomputes it from the grants.
+  const deprovisioned = await tx.user.findFirst({
+    where: { id: userId, deprovisionedAt: { not: null } },
+    select: { id: true },
+  });
+  if (deprovisioned) {
+    const current = await tx.employeeEntitlement.findMany({ where: { userId } });
+    const diff = diffEntitlements(compact(current.map(toRow)), []);
+    await apply(tx, diff);
+    return counts(diff);
+  }
   const claims = await tx.userDirectoryClaim.findUnique({ where: { userId } });
   const values = claims?.values ?? [];
   const truncated = claims?.truncated ?? false;
@@ -272,7 +283,7 @@ export async function reconcileEmployeeEntitlements(
         });
         const claimsOf = new Map(claimRows.map((row) => [row.userId, row]));
         const existing = await tx.user.findMany({
-          where: { id: { in: chunk } },
+          where: { id: { in: chunk }, deprovisionedAt: null },
           select: { id: true },
         });
         const present = new Set(existing.map((row) => row.id));
@@ -350,5 +361,62 @@ async function recordChange(
       updated: result.updated,
       removed: result.removed,
     },
+  });
+}
+
+export type DirectorySyncOptions = {
+  now?: Date;
+  /** A person's groups are read again after this long. */
+  intervalMs: number;
+  /** Claims marked stale are retried after this long instead. */
+  retryMs: number;
+  /** How long a claim holds a person while they are read. */
+  leaseMs: number;
+  limit: number;
+};
+
+/**
+ * Claims the people whose groups are due for a directory read. A person is claimed with a
+ * compare-and-set on their claim row, so several API instances never read the same person
+ * twice, and a crashed read is retried when its lease runs out. Deprovisioned accounts are
+ * left alone.
+ */
+export async function claimDueDirectoryClaims(
+  db: Pick<PrismaClient, "userDirectoryClaim">,
+  options: DirectorySyncOptions,
+): Promise<Array<{ userId: string; email: string }>> {
+  const now = options.now ?? new Date();
+  const leaseUntil = new Date(now.getTime() + options.leaseMs);
+  const unleased = { OR: [{ syncLeaseUntil: null }, { syncLeaseUntil: { lt: now } }] };
+  return runAsSystem("claim directory reads", async () => {
+    const due = await db.userDirectoryClaim.findMany({
+      where: {
+        AND: [
+          unleased,
+          {
+            OR: [
+              {
+                truncated: false,
+                refreshedAt: { lt: new Date(now.getTime() - options.intervalMs) },
+              },
+              { truncated: true, refreshedAt: { lt: new Date(now.getTime() - options.retryMs) } },
+            ],
+          },
+        ],
+        user: { deprovisionedAt: null },
+      },
+      select: { userId: true, refreshedAt: true, user: { select: { email: true } } },
+      orderBy: { refreshedAt: "asc" },
+      take: options.limit,
+    });
+    const claimed: Array<{ userId: string; email: string }> = [];
+    for (const row of due) {
+      const taken = await db.userDirectoryClaim.updateMany({
+        where: { userId: row.userId, refreshedAt: row.refreshedAt, ...unleased },
+        data: { syncLeaseUntil: leaseUntil },
+      });
+      if (taken.count === 1) claimed.push({ userId: row.userId, email: row.user.email });
+    }
+    return claimed;
   });
 }

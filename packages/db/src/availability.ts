@@ -7,11 +7,7 @@
 export function availableInSpace(scope: { spaceId: string; userId: string }) {
   return {
     userId: scope.userId,
-    OR: [
-      { spaceId: scope.spaceId },
-      { allSpaces: true },
-      { availableIn: { some: { spaceId: scope.spaceId } } },
-    ],
+    ...reachesSpace(scope.spaceId),
   };
 }
 
@@ -37,5 +33,12 @@ export function spaceAvailability(row: {
       row.spaceId,
       ...(row.availableIn ?? []).map((entry) => entry.spaceId).filter((id) => id !== row.spaceId),
     ],
+  };
+}
+
+/** The space reach of `availableInSpace`, for a lookup by id that checks the owner afterwards. */
+export function reachesSpace(spaceId: string) {
+  return {
+    OR: [{ spaceId }, { allSpaces: true }, { availableIn: { some: { spaceId } } }],
   };
 }

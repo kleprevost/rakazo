@@ -933,6 +933,7 @@ msgid "Apply"
 msgstr "लागू करें"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "Approval boundaries"
 msgstr "अनुमोदन सीमाएं"
 
@@ -945,6 +946,7 @@ msgstr "अनुमोदन मॉडल"
 msgid "Approvals"
 msgstr "स्वीकृतियाँ"
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/MessagingSettingsPanel.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
 #: src/pages/shell/message-cards.tsx
@@ -966,6 +968,7 @@ msgstr "स्क्रीन पर अनुमोदित या अस्�
 msgid "Approve this server to let your agent use its tools."
 msgstr "अपने एजेंट को इसके टूल उपयोग करने देने के लिए इस सर्वर को अनुमोदित करें।"
 
+#: src/components/teach/SkillDraftCard.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
 msgid "Approved"
 msgstr ""
@@ -1033,6 +1036,10 @@ msgstr "फ़ाइल संलग्न करें"
 #: src/pages/shell/chat-shared.ts
 msgid "Attachment"
 msgstr "अटैचमेंट"
+
+#: src/pages/admin/AdminSkillsPage.tsx
+msgid "Audience"
+msgstr "दर्शक"
 
 #: src/pages/admin/AdminShell.tsx
 msgid "Audit log"
@@ -2417,6 +2424,7 @@ msgstr ""
 msgid "Could not run routine"
 msgstr ""
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/ExternalConversationSettings.tsx
 #: src/pages/KnowledgeSection.tsx
 #: src/pages/McpServersOverlay.tsx
@@ -2542,6 +2550,10 @@ msgstr ""
 #: src/pages/ScratchpadSection.tsx
 msgid "Could not update"
 msgstr "अपडेट नहीं हो सका"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Could not update account"
+msgstr "खाता अपडेट नहीं किया जा सका"
 
 #: src/components/ModelCredits.tsx
 msgid "Could not update billing"
@@ -2770,6 +2782,14 @@ msgstr ""
 #: src/lib/cron.ts
 msgid "days"
 msgstr "दिन"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Deactivate"
+msgstr "निष्क्रिय करें"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Deactivated"
+msgstr "निष्क्रिय"
 
 #: src/components/call/IncomingCall.tsx
 #: src/pages/MessagingSettingsPanel.tsx
@@ -3306,6 +3326,10 @@ msgstr "हर महीने"
 msgid "Every week"
 msgstr "हर सप्ताह"
 
+#: src/pages/admin/AdminSkillsPage.tsx
+msgid "Everyone"
+msgstr "सभी"
+
 #: src/pages/PluginsOverlay.tsx
 msgid "Executor token"
 msgstr "Executor टोकन"
@@ -3394,6 +3418,7 @@ msgid "Failed."
 msgstr "विफल।"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "Failure handling"
 msgstr "विफलता प्रबंधन"
 
@@ -3569,6 +3594,7 @@ msgid "Grants"
 msgstr "अनुमतियाँ"
 
 #: src/lib/identity-display.ts
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/MessagingSettingsPanel.tsx
 #: src/pages/shell/chat-header.tsx
 #: src/pages/shell/side-panel.tsx
@@ -3725,6 +3751,7 @@ msgid "How other bots see it"
 msgstr "दूसरे बॉट इसे कैसे देखते हैं"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "How to check"
 msgstr "जांच कैसे करें"
 
@@ -3816,6 +3843,7 @@ msgid "Input"
 msgstr "इनपुट"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "Inputs"
 msgstr "इनपुट"
 
@@ -4503,6 +4531,7 @@ msgstr ""
 #: src/pages/AccountSettingsOverlay.tsx
 #: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/admin/AdminCapabilitiesPage.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/Auth.tsx
 #: src/pages/GroupPanel.tsx
 #: src/pages/McpServersOverlay.tsx
@@ -4814,6 +4843,7 @@ msgstr "मान्य स्किल नहीं"
 msgid "Not added: {0}"
 msgstr ""
 
+#: src/components/teach/SkillDraftCard.tsx
 #: src/pages/admin/AdminComputersPage.tsx
 msgid "Not approved"
 msgstr "अनुमोदित नहीं"
@@ -5255,6 +5285,10 @@ msgstr "प्रति दस लाख टोकन, इनपुट / आउ�
 msgid "Permissions"
 msgstr "अनुमतियाँ"
 
+#: src/pages/admin/AdminSkillsPage.tsx
+msgid "Person"
+msgstr "व्यक्ति"
+
 #: src/pages/shell/agent-import.tsx
 msgid "Persona"
 msgstr "व्यक्तित्व"
@@ -5412,6 +5446,7 @@ msgid "Providers"
 msgstr "प्रोवाइडर"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/shell/share-employee-dialog.tsx
 msgid "Publish"
 msgstr "प्रकाशित करें"
@@ -5466,6 +5501,10 @@ msgstr "प्रतिक्रिया दें"
 msgid "Reactions"
 msgstr "प्रतिक्रियाएँ"
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Reactivate"
+msgstr "फिर से सक्रिय करें"
+
 #: src/pages/shell/bot-panel.tsx
 msgid "Read replies aloud"
 msgstr "उत्तर पढ़कर सुनाएं"
@@ -5474,6 +5513,7 @@ msgstr "उत्तर पढ़कर सुनाएं"
 msgid "Ready"
 msgstr "तैयार"
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
 msgid "Reason"
 msgstr ""
@@ -5615,6 +5655,7 @@ msgstr ""
 msgid "Registration is closed"
 msgstr "पंजीकरण बंद है"
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
 #: src/pages/shell/share-employee-dialog.tsx
 msgid "Reject"
@@ -5654,6 +5695,7 @@ msgstr "फिर से लोड करें"
 #: src/components/TrustedLinkSitesSettings.tsx
 #: src/components/vault/LoginFieldsInput.tsx
 #: src/components/vault/VaultItemDetail.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/McpServersOverlay.tsx
 #: src/pages/ModelRoleSettings.tsx
 #: src/pages/PluginsOverlay.tsx
@@ -5960,6 +6002,7 @@ msgstr ""
 msgid "Role for {name}"
 msgstr ""
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/shell/share-employee-dialog.tsx
 msgid "Roll back"
 msgstr ""
@@ -6499,6 +6542,7 @@ msgstr "स्किल {position}"
 #: src/components/integrations/plugin-marketplace.tsx
 #: src/components/integrations/skills-dialog.tsx
 #: src/components/SidebarFooter.tsx
+#: src/pages/admin/AdminShell.tsx
 #: src/pages/Shell.tsx
 #: src/pages/shell/agent-import.tsx
 #: src/pages/shell/hire-role-dialog.tsx
@@ -6682,6 +6726,7 @@ msgid "Status"
 msgstr ""
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "Steps"
 msgstr "चरण"
 
@@ -6985,6 +7030,10 @@ msgstr "सोच रहा है"
 #: src/pages/ModelRoleSettings.tsx
 msgid "Thinking: {0}"
 msgstr "सोच: {0}"
+
+#: src/lib/user-error.ts
+msgid "This account is deactivated"
+msgstr "यह खाता निष्क्रिय है"
 
 #: src/lib/user-error.ts
 msgid "This app needs its own sign-in setup to connect."
@@ -7478,6 +7527,10 @@ msgstr ""
 msgid "User"
 msgstr ""
 
+#: src/pages/admin/AdminSkillsPage.tsx
+msgid "User ID"
+msgstr "उपयोगकर्ता ID"
+
 #: src/pages/memory-providers/HonchoSettingsForm.tsx
 msgid "User peer"
 msgstr ""
@@ -7546,6 +7599,7 @@ msgstr "पुष्टि करके जोड़ें"
 msgid "Verifying…"
 msgstr "पुष्टि की जा रही है…"
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/Artifacts.tsx
 msgid "Version"
 msgstr ""
@@ -7593,6 +7647,11 @@ msgstr "थोड़ी देर रुकें और फिर से पर
 #: src/lib/work-phase.ts
 msgid "Waiting"
 msgstr "प्रतीक्षारत"
+
+#: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
+msgid "Waiting for review"
+msgstr "समीक्षा की प्रतीक्षा में"
 
 #: src/lib/roster-status.ts
 msgid "Waiting in line…"
@@ -7678,6 +7737,7 @@ msgid "What this bot is for"
 msgstr "यह बॉट किस लिए है"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "What to return"
 msgstr "क्या लौटाना है"
 
@@ -7708,6 +7768,7 @@ msgstr "कब चलाएं"
 #: src/components/teach/SkillDraftCard.tsx
 #: src/components/vault/VaultItemDetail.tsx
 #: src/components/vault/VaultItemEditor.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "When to use"
 msgstr "कब उपयोग करें"
 

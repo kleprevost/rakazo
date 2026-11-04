@@ -44,7 +44,7 @@ roles; `me.adminRoles` returns them and `me.isAdmin` stays the `platform` role.
 |---|---|
 | `admin.overview` | security, fleet, auditor |
 | `admin.users.list` | security, auditor |
-| `admin.users.endSessions` | security |
+| `admin.users.endSessions`, `.deprovision`, `.reactivate` | security |
 | `admin.bots.list` | security, auditor |
 | `admin.bots.suspend`, `.resume` | security |
 | `admin.quarantine.list` | security, auditor |

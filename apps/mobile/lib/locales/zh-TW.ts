@@ -971,6 +971,7 @@ export const ZH_TW_MESSAGES: Record<string, string> = {
   "Email is not allowed to register": "該電子信箱不允許註冊",
   "Email verification required": "需要驗證電子信箱",
   "Link SSO": "關聯 SSO",
+  "This account is deactivated": "此帳號已停用",
   "Registration is closed": "註冊已關閉",
   Retry: "重試",
   "Send deletion code": "傳送刪除驗證碼",

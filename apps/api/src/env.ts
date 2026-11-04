@@ -43,6 +43,10 @@ export interface AppEnv {
   oidc?: OidcConfig;
   /** Sign in from the identity App Service / Container Apps built-in authentication forwards. */
   easyAuth?: boolean;
+  /** Minutes between directory reads of each person's groups; unset leaves group sync off. */
+  directorySyncMinutes?: number;
+  /** Shared secret for the provisioning endpoint; unset leaves it off. */
+  scimBearerToken?: string;
   nodeEnv: string;
   desktopStackToken?: string;
   databaseUrl: string;
@@ -227,6 +231,18 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): AppEnv {
   if (easyAuth && !issuer) throw new Error("AUTH_EASY_AUTH requires OIDC configuration");
   if (easyAuth && revalidate)
     throw new Error("AUTH_EASY_AUTH cannot be combined with OIDC_REVALIDATE_MINUTES");
+  const directorySync = optional(source.DIRECTORY_SYNC_MINUTES);
+  if (directorySync && !/^\d+$/.test(directorySync))
+    throw new Error("DIRECTORY_SYNC_MINUTES must be a whole number of minutes");
+  if (directorySync && Number(directorySync) < 15)
+    throw new Error("DIRECTORY_SYNC_MINUTES must be at least 15");
+  if (directorySync && !issuer)
+    throw new Error("DIRECTORY_SYNC_MINUTES requires OIDC configuration");
+  if (directorySync && (optional(source.OIDC_ACCESS_CLAIM) ?? "groups") !== "groups")
+    throw new Error("DIRECTORY_SYNC_MINUTES requires OIDC_ACCESS_CLAIM=groups");
+  const scimBearerToken = optional(source.SCIM_BEARER_TOKEN);
+  if (scimBearerToken && scimBearerToken.length < 32)
+    throw new Error("SCIM_BEARER_TOKEN must be at least 32 characters");
   const oidc =
     issuer && clientId && clientSecret
       ? {
@@ -260,6 +276,8 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): AppEnv {
     breachedPasswordCheck: source.AUTH_BREACHED_PASSWORD_CHECK_ENABLED === "true",
     oidc,
     easyAuth,
+    scimBearerToken,
+    directorySyncMinutes: directorySync ? Number(directorySync) : undefined,
     nodeEnv: source.NODE_ENV ?? "",
     databaseUrl: required(source, "DATABASE_URL"),
     realtimeDatabaseUrl: source.REALTIME_DATABASE_URL ?? required(source, "DATABASE_URL"),

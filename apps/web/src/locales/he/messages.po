@@ -933,6 +933,7 @@ msgid "Apply"
 msgstr "החלה"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "Approval boundaries"
 msgstr "גבולות אישור"
 
@@ -945,6 +946,7 @@ msgstr "מודל אישור"
 msgid "Approvals"
 msgstr "אישורים"
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/MessagingSettingsPanel.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
 #: src/pages/shell/message-cards.tsx
@@ -966,6 +968,7 @@ msgstr "יש לאשר או לדחות על המסך."
 msgid "Approve this server to let your agent use its tools."
 msgstr "יש לאשר את השרת הזה כדי שהסוכן יוכל להשתמש בכלים שלו."
 
+#: src/components/teach/SkillDraftCard.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
 msgid "Approved"
 msgstr ""
@@ -1033,6 +1036,10 @@ msgstr "צירוף קובץ"
 #: src/pages/shell/chat-shared.ts
 msgid "Attachment"
 msgstr "קובץ מצורף"
+
+#: src/pages/admin/AdminSkillsPage.tsx
+msgid "Audience"
+msgstr "קהל"
 
 #: src/pages/admin/AdminShell.tsx
 msgid "Audit log"
@@ -2417,6 +2424,7 @@ msgstr ""
 msgid "Could not run routine"
 msgstr "לא ניתן להריץ את הרוטינה"
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/ExternalConversationSettings.tsx
 #: src/pages/KnowledgeSection.tsx
 #: src/pages/McpServersOverlay.tsx
@@ -2542,6 +2550,10 @@ msgstr ""
 #: src/pages/ScratchpadSection.tsx
 msgid "Could not update"
 msgstr "לא ניתן לעדכן"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Could not update account"
+msgstr "לא ניתן לעדכן את החשבון"
 
 #: src/components/ModelCredits.tsx
 msgid "Could not update billing"
@@ -2770,6 +2782,14 @@ msgstr "עבודה יומיומית"
 #: src/lib/cron.ts
 msgid "days"
 msgstr "ימים"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Deactivate"
+msgstr "השבת"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Deactivated"
+msgstr "מושבת"
 
 #: src/components/call/IncomingCall.tsx
 #: src/pages/MessagingSettingsPanel.tsx
@@ -3306,6 +3326,10 @@ msgstr "כל חודש"
 msgid "Every week"
 msgstr "כל שבוע"
 
+#: src/pages/admin/AdminSkillsPage.tsx
+msgid "Everyone"
+msgstr "כולם"
+
 #: src/pages/PluginsOverlay.tsx
 msgid "Executor token"
 msgstr "טוקן Executor"
@@ -3394,6 +3418,7 @@ msgid "Failed."
 msgstr "נכשל."
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "Failure handling"
 msgstr "טיפול בכשלים"
 
@@ -3569,6 +3594,7 @@ msgid "Grants"
 msgstr "הרשאות"
 
 #: src/lib/identity-display.ts
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/MessagingSettingsPanel.tsx
 #: src/pages/shell/chat-header.tsx
 #: src/pages/shell/side-panel.tsx
@@ -3725,6 +3751,7 @@ msgid "How other bots see it"
 msgstr "איך בוטים אחרים רואים אותו"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "How to check"
 msgstr "איך לבדוק"
 
@@ -3816,6 +3843,7 @@ msgid "Input"
 msgstr "קלט"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "Inputs"
 msgstr "קלטים"
 
@@ -4503,6 +4531,7 @@ msgstr ""
 #: src/pages/AccountSettingsOverlay.tsx
 #: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/admin/AdminCapabilitiesPage.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/Auth.tsx
 #: src/pages/GroupPanel.tsx
 #: src/pages/McpServersOverlay.tsx
@@ -4814,6 +4843,7 @@ msgstr "מיומנות לא תקינה"
 msgid "Not added: {0}"
 msgstr ""
 
+#: src/components/teach/SkillDraftCard.tsx
 #: src/pages/admin/AdminComputersPage.tsx
 msgid "Not approved"
 msgstr "לא מאושר"
@@ -5255,6 +5285,10 @@ msgstr "לכל מיליון אסימונים, קלט / פלט"
 msgid "Permissions"
 msgstr "הרשאות"
 
+#: src/pages/admin/AdminSkillsPage.tsx
+msgid "Person"
+msgstr "אדם"
+
 #: src/pages/shell/agent-import.tsx
 msgid "Persona"
 msgstr "פרסונה"
@@ -5412,6 +5446,7 @@ msgid "Providers"
 msgstr "ספקים"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/shell/share-employee-dialog.tsx
 msgid "Publish"
 msgstr "פרסם"
@@ -5466,6 +5501,10 @@ msgstr "הוספת אמוג׳י"
 msgid "Reactions"
 msgstr "אמוג׳י"
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Reactivate"
+msgstr "הפעל מחדש"
+
 #: src/pages/shell/bot-panel.tsx
 msgid "Read replies aloud"
 msgstr "הקראת תשובות בקול"
@@ -5474,6 +5513,7 @@ msgstr "הקראת תשובות בקול"
 msgid "Ready"
 msgstr "מוכן"
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
 msgid "Reason"
 msgstr ""
@@ -5615,6 +5655,7 @@ msgstr ""
 msgid "Registration is closed"
 msgstr "ההרשמה סגורה"
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
 #: src/pages/shell/share-employee-dialog.tsx
 msgid "Reject"
@@ -5654,6 +5695,7 @@ msgstr "טעינה מחדש"
 #: src/components/TrustedLinkSitesSettings.tsx
 #: src/components/vault/LoginFieldsInput.tsx
 #: src/components/vault/VaultItemDetail.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/McpServersOverlay.tsx
 #: src/pages/ModelRoleSettings.tsx
 #: src/pages/PluginsOverlay.tsx
@@ -5960,6 +6002,7 @@ msgstr ""
 msgid "Role for {name}"
 msgstr ""
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/shell/share-employee-dialog.tsx
 msgid "Roll back"
 msgstr ""
@@ -6499,6 +6542,7 @@ msgstr "מיומנות {position}"
 #: src/components/integrations/plugin-marketplace.tsx
 #: src/components/integrations/skills-dialog.tsx
 #: src/components/SidebarFooter.tsx
+#: src/pages/admin/AdminShell.tsx
 #: src/pages/Shell.tsx
 #: src/pages/shell/agent-import.tsx
 #: src/pages/shell/hire-role-dialog.tsx
@@ -6682,6 +6726,7 @@ msgid "Status"
 msgstr "סטטוס"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "Steps"
 msgstr "שלבים"
 
@@ -6985,6 +7030,10 @@ msgstr "חשיבה"
 #: src/pages/ModelRoleSettings.tsx
 msgid "Thinking: {0}"
 msgstr "חשיבה: {0}"
+
+#: src/lib/user-error.ts
+msgid "This account is deactivated"
+msgstr "החשבון הזה מושבת"
 
 #: src/lib/user-error.ts
 msgid "This app needs its own sign-in setup to connect."
@@ -7478,6 +7527,10 @@ msgstr ""
 msgid "User"
 msgstr ""
 
+#: src/pages/admin/AdminSkillsPage.tsx
+msgid "User ID"
+msgstr "מזהה משתמש"
+
 #: src/pages/memory-providers/HonchoSettingsForm.tsx
 msgid "User peer"
 msgstr ""
@@ -7546,6 +7599,7 @@ msgstr "אימות והוספה"
 msgid "Verifying…"
 msgstr "מאמת…"
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/Artifacts.tsx
 msgid "Version"
 msgstr "גרסה"
@@ -7593,6 +7647,11 @@ msgstr "יש להמתין רגע ולבדוק שוב."
 #: src/lib/work-phase.ts
 msgid "Waiting"
 msgstr "ממתין"
+
+#: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
+msgid "Waiting for review"
+msgstr "ממתין לבדיקה"
 
 #: src/lib/roster-status.ts
 msgid "Waiting in line…"
@@ -7678,6 +7737,7 @@ msgid "What this bot is for"
 msgstr "למה הבוט הזה משמש"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "What to return"
 msgstr "מה להחזיר"
 
@@ -7708,6 +7768,7 @@ msgstr "מתי להריץ"
 #: src/components/teach/SkillDraftCard.tsx
 #: src/components/vault/VaultItemDetail.tsx
 #: src/components/vault/VaultItemEditor.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "When to use"
 msgstr "מתי להשתמש"
 

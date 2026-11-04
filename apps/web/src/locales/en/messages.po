@@ -933,6 +933,7 @@ msgid "Apply"
 msgstr "Apply"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "Approval boundaries"
 msgstr "Approval boundaries"
 
@@ -945,6 +946,7 @@ msgstr "Approval model"
 msgid "Approvals"
 msgstr "Approvals"
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/MessagingSettingsPanel.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
 #: src/pages/shell/message-cards.tsx
@@ -966,6 +968,7 @@ msgstr "Approve or deny it on screen."
 msgid "Approve this server to let your agent use its tools."
 msgstr "Approve this server to let your agent use its tools."
 
+#: src/components/teach/SkillDraftCard.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
 msgid "Approved"
 msgstr "Approved"
@@ -1033,6 +1036,10 @@ msgstr "Attach file"
 #: src/pages/shell/chat-shared.ts
 msgid "Attachment"
 msgstr "Attachment"
+
+#: src/pages/admin/AdminSkillsPage.tsx
+msgid "Audience"
+msgstr "Audience"
 
 #: src/pages/admin/AdminShell.tsx
 msgid "Audit log"
@@ -2417,6 +2424,7 @@ msgstr "Could not revoke grant"
 msgid "Could not run routine"
 msgstr "Could not run routine"
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/ExternalConversationSettings.tsx
 #: src/pages/KnowledgeSection.tsx
 #: src/pages/McpServersOverlay.tsx
@@ -2542,6 +2550,10 @@ msgstr "Could not transcribe that recording."
 #: src/pages/ScratchpadSection.tsx
 msgid "Could not update"
 msgstr "Could not update"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Could not update account"
+msgstr "Could not update account"
 
 #: src/components/ModelCredits.tsx
 msgid "Could not update billing"
@@ -2770,6 +2782,14 @@ msgstr "Day-to-day work"
 #: src/lib/cron.ts
 msgid "days"
 msgstr "days"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Deactivate"
+msgstr "Deactivate"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Deactivated"
+msgstr "Deactivated"
 
 #: src/components/call/IncomingCall.tsx
 #: src/pages/MessagingSettingsPanel.tsx
@@ -3306,6 +3326,10 @@ msgstr "Every month"
 msgid "Every week"
 msgstr "Every week"
 
+#: src/pages/admin/AdminSkillsPage.tsx
+msgid "Everyone"
+msgstr "Everyone"
+
 #: src/pages/PluginsOverlay.tsx
 msgid "Executor token"
 msgstr "Executor token"
@@ -3394,6 +3418,7 @@ msgid "Failed."
 msgstr "Failed."
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "Failure handling"
 msgstr "Failure handling"
 
@@ -3569,6 +3594,7 @@ msgid "Grants"
 msgstr "Grants"
 
 #: src/lib/identity-display.ts
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/MessagingSettingsPanel.tsx
 #: src/pages/shell/chat-header.tsx
 #: src/pages/shell/side-panel.tsx
@@ -3725,6 +3751,7 @@ msgid "How other bots see it"
 msgstr "How other bots see it"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "How to check"
 msgstr "How to check"
 
@@ -3816,6 +3843,7 @@ msgid "Input"
 msgstr "Input"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "Inputs"
 msgstr "Inputs"
 
@@ -4503,6 +4531,7 @@ msgstr "My computers"
 #: src/pages/AccountSettingsOverlay.tsx
 #: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/admin/AdminCapabilitiesPage.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/Auth.tsx
 #: src/pages/GroupPanel.tsx
 #: src/pages/McpServersOverlay.tsx
@@ -4814,6 +4843,7 @@ msgstr "Not a valid skill"
 msgid "Not added: {0}"
 msgstr "Not added: {0}"
 
+#: src/components/teach/SkillDraftCard.tsx
 #: src/pages/admin/AdminComputersPage.tsx
 msgid "Not approved"
 msgstr "Not approved"
@@ -5255,6 +5285,10 @@ msgstr "Per million tokens, input / output"
 msgid "Permissions"
 msgstr "Permissions"
 
+#: src/pages/admin/AdminSkillsPage.tsx
+msgid "Person"
+msgstr "Person"
+
 #: src/pages/shell/agent-import.tsx
 msgid "Persona"
 msgstr "Persona"
@@ -5412,6 +5446,7 @@ msgid "Providers"
 msgstr "Providers"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/shell/share-employee-dialog.tsx
 msgid "Publish"
 msgstr "Publish"
@@ -5466,6 +5501,10 @@ msgstr "React"
 msgid "Reactions"
 msgstr "Reactions"
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Reactivate"
+msgstr "Reactivate"
+
 #: src/pages/shell/bot-panel.tsx
 msgid "Read replies aloud"
 msgstr "Read replies aloud"
@@ -5474,6 +5513,7 @@ msgstr "Read replies aloud"
 msgid "Ready"
 msgstr "Ready"
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
 msgid "Reason"
 msgstr "Reason"
@@ -5615,6 +5655,7 @@ msgstr "Region"
 msgid "Registration is closed"
 msgstr "Registration is closed"
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
 #: src/pages/shell/share-employee-dialog.tsx
 msgid "Reject"
@@ -5654,6 +5695,7 @@ msgstr "Reload"
 #: src/components/TrustedLinkSitesSettings.tsx
 #: src/components/vault/LoginFieldsInput.tsx
 #: src/components/vault/VaultItemDetail.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/McpServersOverlay.tsx
 #: src/pages/ModelRoleSettings.tsx
 #: src/pages/PluginsOverlay.tsx
@@ -5960,6 +6002,7 @@ msgstr "Role"
 msgid "Role for {name}"
 msgstr "Role for {name}"
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/shell/share-employee-dialog.tsx
 msgid "Roll back"
 msgstr "Roll back"
@@ -6499,6 +6542,7 @@ msgstr "Skill {position}"
 #: src/components/integrations/plugin-marketplace.tsx
 #: src/components/integrations/skills-dialog.tsx
 #: src/components/SidebarFooter.tsx
+#: src/pages/admin/AdminShell.tsx
 #: src/pages/Shell.tsx
 #: src/pages/shell/agent-import.tsx
 #: src/pages/shell/hire-role-dialog.tsx
@@ -6682,6 +6726,7 @@ msgid "Status"
 msgstr "Status"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "Steps"
 msgstr "Steps"
 
@@ -6985,6 +7030,10 @@ msgstr "Thinking"
 #: src/pages/ModelRoleSettings.tsx
 msgid "Thinking: {0}"
 msgstr "Thinking: {0}"
+
+#: src/lib/user-error.ts
+msgid "This account is deactivated"
+msgstr "This account is deactivated"
 
 #: src/lib/user-error.ts
 msgid "This app needs its own sign-in setup to connect."
@@ -7478,6 +7527,10 @@ msgstr "Use up to 512 letters, digits, _ or -."
 msgid "User"
 msgstr "User"
 
+#: src/pages/admin/AdminSkillsPage.tsx
+msgid "User ID"
+msgstr "User ID"
+
 #: src/pages/memory-providers/HonchoSettingsForm.tsx
 msgid "User peer"
 msgstr "User peer"
@@ -7546,6 +7599,7 @@ msgstr "Verify and add"
 msgid "Verifying…"
 msgstr "Verifying…"
 
+#: src/pages/admin/AdminSkillsPage.tsx
 #: src/pages/Artifacts.tsx
 msgid "Version"
 msgstr "Version"
@@ -7593,6 +7647,11 @@ msgstr "Wait a moment and test again."
 #: src/lib/work-phase.ts
 msgid "Waiting"
 msgstr "Waiting"
+
+#: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
+msgid "Waiting for review"
+msgstr "Waiting for review"
 
 #: src/lib/roster-status.ts
 msgid "Waiting in line…"
@@ -7678,6 +7737,7 @@ msgid "What this bot is for"
 msgstr "What this bot is for"
 
 #: src/components/teach/SkillDraftCard.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "What to return"
 msgstr "What to return"
 
@@ -7708,6 +7768,7 @@ msgstr "When to run"
 #: src/components/teach/SkillDraftCard.tsx
 #: src/components/vault/VaultItemDetail.tsx
 #: src/components/vault/VaultItemEditor.tsx
+#: src/pages/admin/AdminSkillsPage.tsx
 msgid "When to use"
 msgstr "When to use"
 

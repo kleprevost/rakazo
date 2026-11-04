@@ -21,6 +21,7 @@ export * from "./content-encryption.js";
 export * from "./content-export.js";
 export * from "./content-keys.js";
 export * from "./content-migration.js";
+export * from "./credential-principal.js";
 export * from "./credential-secrets.js";
 export * from "./cross-space-communication.js";
 export * from "./database-access.js";

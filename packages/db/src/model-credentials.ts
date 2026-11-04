@@ -1,5 +1,6 @@
 import { canonicalPiProviderId, storedPiProviderIds, usableModelId } from "@rakazo/contracts";
 import type { PrismaClient } from "./client.js";
+import { credentialOwner, ownedCredential, principalOf } from "./credential-principal.js";
 
 export const newestCredentialOrder = [
   { updatedAt: "desc" as const },
@@ -65,7 +66,10 @@ export function findNewestUserModelCredential(
   provider: string,
 ) {
   return prisma.userModelCredential.findFirst({
-    where: { userId, provider: modelCredentialProviderFilter(provider) },
+    where: {
+      ...credentialOwner(principalOf({ userId })),
+      provider: modelCredentialProviderFilter(provider),
+    },
     orderBy: newestModelCredentialOrder,
   });
 }
@@ -243,6 +247,7 @@ export async function findModelCredential(
   provider: string,
   modelId?: string | null,
 ) {
+  const owner = credentialOwner(principalOf(scope));
   if (
     typeof prisma.userModelPreference.findMany === "function" &&
     typeof prisma.userModelCredential.findMany === "function"
@@ -250,13 +255,13 @@ export async function findModelCredential(
     const [preferences, credentials] = await Promise.all([
       prisma.userModelPreference.findMany({
         where: {
-          userId: scope.userId,
+          ...owner,
           credential: { provider: modelCredentialProviderFilter(provider) },
         },
         include: { credential: true },
       }),
       prisma.userModelCredential.findMany({
-        where: { userId: scope.userId, provider: modelCredentialProviderFilter(provider) },
+        where: { ...owner, provider: modelCredentialProviderFilter(provider) },
       }),
     ]);
     return credentialFromChoice(
@@ -270,7 +275,7 @@ export async function findModelCredential(
   if (requestedModelId) {
     const matching = await prisma.userModelPreference.findFirst({
       where: {
-        userId: scope.userId,
+        ...owner,
         modelId: requestedModelId,
         credential: { provider: modelCredentialProviderFilter(provider) },
       },
@@ -285,7 +290,7 @@ export async function findModelCredential(
   }
   const preference = await prisma.userModelPreference.findFirst({
     where: {
-      userId: scope.userId,
+      ...owner,
       credential: { provider: modelCredentialProviderFilter(provider) },
     },
     include: { credential: true },
@@ -296,7 +301,7 @@ export async function findModelCredential(
       chooseModelCredential({ provider, modelId, preferences: [preference], credentials: [] }),
     );
   }
-  const credential = await findNewestUserModelCredential(prisma, scope.userId, provider);
+  const credential = await findNewestUserModelCredential(prisma, owner.userId, provider);
   return credentialFromChoice(
     chooseModelCredential({
       provider,
@@ -307,21 +312,26 @@ export async function findModelCredential(
   );
 }
 
-/** One connection by id, with its own model; null when it is gone. */
+/**
+ * One connection by id, with its own model; null when it is gone or another user's. The id may
+ * come from a client or a model, so a row outside the requester's ownership is an audited refusal.
+ */
 export async function findModelCredentialById(
   prisma: Pick<PrismaClient, "userModelCredential">,
   scope: ModelCredentialScope,
   credentialId: string,
   provider?: string,
 ) {
-  const credential = await prisma.userModelCredential.findFirst({
+  const principal = principalOf(scope);
+  const owner = credentialOwner(principal);
+  const found = await prisma.userModelCredential.findFirst({
     where: {
       id: credentialId,
-      userId: scope.userId,
       ...(provider ? { provider: modelCredentialProviderFilter(provider) } : {}),
     },
-    include: { userPreferences: { where: { userId: scope.userId } } },
+    include: { userPreferences: { where: { userId: owner.userId } } },
   });
+  const credential = await ownedCredential(principal, "model_connection", found);
   if (!credential) return null;
   const { userPreferences, ...row } = credential;
   const preference = userPreferences[0];

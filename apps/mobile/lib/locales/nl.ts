@@ -983,6 +983,7 @@ export const NL_MESSAGES: Record<string, string> = {
   "Email is not allowed to register": "Dit e-mailadres mag niet worden geregistreerd",
   "Email verification required": "E-mailverificatie vereist",
   "Link SSO": "SSO koppelen",
+  "This account is deactivated": "Dit account is gedeactiveerd",
   "Registration is closed": "Registratie is gesloten",
   Retry: "Opnieuw proberen",
   "Send deletion code": "Verwijderingscode verzenden",
