@@ -55,14 +55,12 @@ export const CapabilityGrantSetInputSchema = z
 
 export const capabilityGrantsContract = {
   /** The grants in force for a bot (its own and inherited) or for an employee. */
-  list: oc
-    .input(z.object(target).refine(oneTarget, ONE_TARGET))
-    .output(
-      z.object({
-        mode: CapabilityModeSchema.nullable(),
-        grants: z.array(CapabilityGrantViewSchema),
-      }),
-    ),
+  list: oc.input(z.object(target).refine(oneTarget, ONE_TARGET)).output(
+    z.object({
+      mode: CapabilityModeSchema.nullable(),
+      grants: z.array(CapabilityGrantViewSchema),
+    }),
+  ),
   /**
    * A bot's owner may grant read scopes, restrict further, and delegate their own credentials. A
    * write, send, spend or other non-read scope needs an admin unless central policy lists it as
