@@ -589,15 +589,15 @@ Choices the design left open:
 - Quarantine does not set `suspendedAt`, so resume and lift stay independent and nothing has to
   remember which bots it suspended. Lifting only ends the quarantine.
 - Starting it writes the row first (gates close at once), then cancels active runs with
-  `cancelBotRuns` (extracted from `suspendBot` and shared), deletes the covered bots' `BotSecret`
-  rows and `BotMcpServer` assignments and clears the bot webhook secret. Personal `Connection`,
-  `McpServer` and `VaultCredential` rows are never touched; the quarantined bot is blocked from
-  using them. Events: `bot.quarantined` and `bot.released` (metadata: scope kind and id, counts,
-  reason); a blocked call is the existing `tool.call` audit with outcome `denied` and
-  `reason: "quarantined"`.
-- Not done: stopping the computer (as in suspend, run work and the screen lease are released,
-  the computer follows its idle lifecycle), live MCP session eviction (assignments are gone and
-  the gates refuse the bot), a model-turn recheck beyond the run-start gate (cancel ends the
+  `cancelBotRuns` (extracted from `suspendBot` and shared). Nothing is deleted or revoked: bot
+  secrets, MCP assignments, webhook secrets and personal connections stay, and the gates make them
+  unusable, so releasing restores full function with no reconfiguration. Inbound webhook deliveries
+  to a quarantined bot are refused in `loadWebhookTarget`. Events: `bot.quarantined` and
+  `bot.released` (metadata: scope kind and id, counts, reason); a blocked call is the existing
+  `tool.call` audit with outcome `denied` and `reason: "quarantined"`.
+- Not done: revoking short-lived OAuth access tokens (no revocation primitive exists for MCP
+  sessions today), stopping the computer (as in suspend, run work and the screen lease are released,
+  the computer follows its idle lifecycle), a model-turn recheck beyond the run-start gate (cancel ends the
   lease, so a mid-turn worker aborts), the rate-limited `quarantine.blocked` event, and the
   quarantine control for a Space or chat group in the Admin UI (the procedure supports both).
 - Fleet's computer quarantine is a separate flag on `Computer` (`adminQuarantinedAt`); the bot

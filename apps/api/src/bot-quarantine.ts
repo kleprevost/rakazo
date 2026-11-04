@@ -50,9 +50,9 @@ async function coveredBotIds(deps: SuspensionDeps, scope: Scope): Promise<string
 /**
  * Quarantines one bot, every bot in a Space or chat group, or all bots. The row goes in first, so
  * every gate refuses the bots from that moment; then their active runs are cancelled (the
- * suspend primitive, no drain) and their own credentials are removed: bot secrets, MCP
- * assignments and the webhook secret. A user's personal connections, MCP servers and vault are
- * never touched: the quarantined bot is simply blocked from using them. Admin only.
+ * suspend primitive, no drain). Secrets, MCP configuration, webhook secrets and personal
+ * connections are never touched: they are unusable while the gates refuse the bot, so releasing
+ * restores everything. Admin only.
  */
 export async function startQuarantine(
   deps: SuspensionDeps,
@@ -62,8 +62,6 @@ export async function startQuarantine(
   id: string;
   bots: number;
   cancelledRuns: number;
-  revokedSecrets: number;
-  revokedMcpAssignments: number;
 }> {
   await requireAdmin(deps, actorId);
   const scope: Scope = {
@@ -84,36 +82,8 @@ export async function startQuarantine(
         select: { id: true },
       }),
     ));
-  const { cancelled, revokedSecrets, revokedMcpAssignments } = await system("revoke", () =>
-    deps.prisma.$transaction(async (tx) => {
-      const cancelled = await cancelBotRuns(tx, botIds, now);
-      const where = botIds ? { botId: { in: botIds } } : {};
-      const secrets = await tx.botSecret.deleteMany({ where });
-      const assignments = await tx.botMcpServer.deleteMany({ where });
-      const withWebhook = await tx.bot.findMany({
-        where: { ...(botIds ? { id: { in: botIds } } : {}), webhookSecretId: { not: null } },
-        select: { id: true, webhookSecretId: true },
-      });
-      if (withWebhook.length) {
-        await tx.secret.deleteMany({
-          where: {
-            id: {
-              in: withWebhook.flatMap((bot) => (bot.webhookSecretId ? [bot.webhookSecretId] : [])),
-            },
-            kind: "webhook",
-          },
-        });
-        await tx.bot.updateMany({
-          where: { id: { in: withWebhook.map((bot) => bot.id) } },
-          data: { webhookSecretId: null },
-        });
-      }
-      return {
-        cancelled,
-        revokedSecrets: secrets.count + withWebhook.length,
-        revokedMcpAssignments: assignments.count,
-      };
-    }),
+  const cancelled = await system("cancel", () =>
+    deps.prisma.$transaction((tx) => cancelBotRuns(tx, botIds, now)),
   );
   await finishCancelledRuns(deps, cancelled);
   const bots = botIds
@@ -122,8 +92,6 @@ export async function startQuarantine(
   const summary = {
     bots,
     cancelledRuns: cancelled.runs.length,
-    revokedSecrets,
-    revokedMcpAssignments,
   };
   await system("summary", () =>
     deps.prisma.quarantine.update({ where: { id: row.id }, data: { summary } }),
@@ -143,8 +111,7 @@ export async function startQuarantine(
 }
 
 /**
- * Ends a quarantine. Idempotent. Nothing is restored: cancelled runs are not replayed and the
- * removed secrets and MCP assignments must be set up again by their owners.
+ * Ends a quarantine. Idempotent. Cancelled runs are not replayed; everything else works again.
  */
 export async function liftQuarantine(
   deps: SuspensionDeps,

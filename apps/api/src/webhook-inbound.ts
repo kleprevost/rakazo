@@ -5,6 +5,7 @@ import { inboundRoutineModelPin } from "@rakazo/adapters";
 import type { MessageBlock } from "@rakazo/contracts";
 import { escapePromptData, inboundRoutineBlock, messageBlockForArtifact } from "@rakazo/core";
 import type { PrismaClient } from "@rakazo/db";
+import { activeQuarantine } from "@rakazo/db";
 import { getLogger } from "@rakazo/logging";
 
 export const WEBHOOK_MAX_BODY_BYTES = 64 * 1024;
@@ -196,6 +197,7 @@ export async function loadWebhookTarget(
       spaceId: true,
       userId: true,
       webhookSecretId: true,
+      groupMembers: { select: { groupId: true } },
       thread: { select: { id: true } },
     },
   });
@@ -204,6 +206,10 @@ export async function loadWebhookTarget(
     cache.delete(botId);
     return null;
   }
+  // A quarantined bot takes no deliveries; the secret stays, so release needs no setup.
+  const groupIds = bot.groupMembers.map((member) => member.groupId);
+  if (await activeQuarantine(deps.prisma, { id: botId, spaceId: bot.spaceId, groupIds }))
+    return null;
 
   const secret = await deps.prisma.secret.findUnique({
     where: { id: bot.webhookSecretId },

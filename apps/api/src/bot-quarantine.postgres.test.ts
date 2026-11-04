@@ -13,6 +13,7 @@ import {
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { liftQuarantine, listQuarantines, startQuarantine } from "./bot-quarantine.js";
 import { assertBotNotSuspended } from "./bot-suspension.js";
+import { loadWebhookTarget } from "./webhook-inbound.js";
 
 const databaseUrl = process.env.DATABASE_URL;
 const enabled = process.env.VERIFY_DATABASE === "1" && Boolean(databaseUrl);
@@ -42,6 +43,12 @@ describe.skipIf(!enabled)("quarantining AI employees (PostgreSQL)", () => {
       env: { adminEmails: [adminEmail], ssoAdminEnabled: false },
       auth: { isSsoAdmin: async () => false },
     }) as unknown as Parameters<typeof startQuarantine>[0];
+
+  const webhookDeps = () =>
+    ({
+      prisma,
+      secrets: { load: async () => "hook-secret" },
+    }) as unknown as Parameters<typeof loadWebhookTarget>[0];
 
   beforeAll(() => {
     const db = createDb(databaseUrl!);
@@ -112,7 +119,7 @@ describe.skipIf(!enabled)("quarantining AI employees (PostgreSQL)", () => {
   };
   const blocked = (botId: string) => runAsSystem("test", () => botBlockedNow(prisma, botId));
 
-  it("stops a bot mid-assignment, removes its own credentials and keeps the user's connections", async () => {
+  it("stops a bot mid-assignment, blocks all use of its credentials and restores them on release", async () => {
     const running = await work("running");
     const queued = await work("queued");
     const server = await system.mcpServer.create({
@@ -156,6 +163,18 @@ describe.skipIf(!enabled)("quarantining AI employees (PostgreSQL)", () => {
         ciphertext: "fake",
       },
     });
+    const webhook = await system.secret.create({
+      data: {
+        userId: identity.userId,
+        spaceId: identity.spaceId,
+        kind: "webhook",
+        ciphertext: "cipher",
+      },
+    });
+    await system.bot.update({
+      where: { id: identity.botId },
+      data: { webhookSecretId: webhook.id },
+    });
     expect((await blocked(identity.botId)).blocked).toBeNull();
 
     const result = await start({
@@ -167,8 +186,6 @@ describe.skipIf(!enabled)("quarantining AI employees (PostgreSQL)", () => {
     expect(result).toMatchObject({
       bots: 1,
       cancelledRuns: 2,
-      revokedSecrets: 1,
-      revokedMcpAssignments: 1,
     });
     expect(await runStatus(running.id)).toBe("cancelled");
     expect(await runStatus(queued.id)).toBe("cancelled");
@@ -177,17 +194,37 @@ describe.skipIf(!enabled)("quarantining AI employees (PostgreSQL)", () => {
     await expect(
       runAsSystem("test", () => assertBotNotSuspended(prisma, identity.botId)),
     ).rejects.toMatchObject({ code: "FORBIDDEN", message: "Quarantined by your organization" });
-    expect(await system.botSecret.count({ where: { botId: identity.botId } })).toBe(0);
-    expect(await system.botMcpServer.count({ where: { botId: identity.botId } })).toBe(0);
+    // Nothing is deleted: the bot's secret, MCP assignment and webhook secret stay as configured.
+    expect(await system.botSecret.count({ where: { botId: identity.botId } })).toBe(1);
+    expect(await system.botMcpServer.count({ where: { botId: identity.botId } })).toBe(1);
     expect(await system.mcpServer.count({ where: { id: server.id } })).toBe(1);
     expect(await system.vaultCredential.count({ where: { id: vault.id } })).toBe(1);
+    expect(
+      (await system.bot.findUniqueOrThrow({ where: { id: identity.botId } })).webhookSecretId,
+    ).toBe(webhook.id);
+    expect(
+      await runAsSystem("test", () => loadWebhookTarget(webhookDeps(), new Map(), identity.botId)),
+    ).toBeNull();
+
+    await liftQuarantine(deps(), adminId, result.id);
+
+    expect((await blocked(identity.botId)).blocked).toBeNull();
+    expect(await system.botSecret.count({ where: { botId: identity.botId } })).toBe(1);
+    expect(await system.botMcpServer.count({ where: { botId: identity.botId } })).toBe(1);
+    expect(
+      (await runAsSystem("test", () => loadWebhookTarget(webhookDeps(), new Map(), identity.botId)))
+        ?.expected,
+    ).toBe("hook-secret");
+    await expect(
+      runAsSystem("test", () => assertBotNotSuspended(prisma, identity.botId)),
+    ).resolves.toBeUndefined();
     const events = await system.securityEvent.findMany({ where: { userId: adminId } });
-    expect(events).toHaveLength(1);
-    expect(events[0]).toMatchObject({
+    expect(events.map((event) => event.type).sort()).toEqual(["bot.quarantined", "bot.released"]);
+    expect(events.find((event) => event.type === "bot.quarantined")).toMatchObject({
       type: "bot.quarantined",
       metadata: { scopeKind: "bot", scopeId: identity.botId, reason: "suspected leak" },
     });
-    expect(JSON.stringify(events[0]?.metadata)).not.toContain("fake");
+    expect(JSON.stringify(events.map((event) => event.metadata))).not.toContain("fake");
   });
 
   it("covers a Space by membership at use time, including a bot added afterwards", async () => {
@@ -234,7 +271,7 @@ describe.skipIf(!enabled)("quarantining AI employees (PostgreSQL)", () => {
     expect((await blocked((await newBot()).id)).blocked).toBe("quarantined");
   });
 
-  it("releases on lift, idempotently, and restores nothing it removed", async () => {
+  it("releases on lift, idempotently", async () => {
     await system.botSecret.create({
       data: {
         id: randomUUID(),
@@ -258,7 +295,7 @@ describe.skipIf(!enabled)("quarantining AI employees (PostgreSQL)", () => {
     await expect(
       runAsSystem("test", () => assertBotNotSuspended(prisma, identity.botId)),
     ).resolves.toBeUndefined();
-    expect(await system.botSecret.count({ where: { botId: identity.botId } })).toBe(0);
+    expect(await system.botSecret.count({ where: { botId: identity.botId } })).toBe(1);
     expect((await listQuarantines(deps(), adminId)).quarantines).toEqual([]);
     const types = (await system.securityEvent.findMany({ where: { userId: adminId } })).map(
       (event) => event.type,

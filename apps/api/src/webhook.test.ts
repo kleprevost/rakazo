@@ -26,6 +26,7 @@ const SECRET = "webhook-test-secret-value-32chars!!";
 
 function createDeps(
   overrides: {
+    quarantined?: boolean;
     bot?: {
       id: string;
       spaceId: string;
@@ -62,9 +63,10 @@ function createDeps(
           spaceId: "ws-1",
           userId: "user-1",
           webhookSecretId: "secret-1",
+          groupMembers: [],
           thread: { id: "thread-1" },
         }
-      : overrides.bot;
+      : overrides.bot && { ...overrides.bot, groupMembers: [] };
   const secret =
     overrides.secret === undefined
       ? {
@@ -89,6 +91,9 @@ function createDeps(
       bot: {
         findUnique: vi.fn(async () => bot),
       },
+      quarantine: {
+        findFirst: vi.fn(async () => (overrides.quarantined ? { id: "q-1", reason: "" } : null)),
+      },
       secret: {
         findUnique: vi.fn(async () => secret),
       },
@@ -112,6 +117,15 @@ function mount(deps: WebhookDeps) {
   mountWebhookHttpRoutes(app, deps);
   return app;
 }
+
+describe("loadWebhookTarget while quarantined", () => {
+  it("takes no deliveries for a quarantined bot and works again once released", async () => {
+    const blocked = createDeps({ quarantined: true });
+    expect(await loadWebhookTarget(blocked, new Map(), "bot-1")).toBeNull();
+    const released = createDeps({});
+    expect((await loadWebhookTarget(released, new Map(), "bot-1"))?.expected).toBe(SECRET);
+  });
+});
 
 describe("formatUntrustedDeliveryPayload", () => {
   it("labels and fences delivery JSON as untrusted data", () => {
@@ -970,6 +984,7 @@ describe("webhook secret decryption", () => {
       spaceId: "ws-1",
       userId: "user-1",
       webhookSecretId,
+      groupMembers: [],
       thread: { id: "thread-1" },
     })) as never);
 
@@ -1158,11 +1173,13 @@ describe("webhook secret cache", () => {
                   spaceId: "ws-1",
                   userId: "user-1",
                   webhookSecretId,
+                  groupMembers: [],
                   thread: { id: "thread-1" },
                 }
               : null;
           }),
         },
+        quarantine: { findFirst: vi.fn(async () => null) },
         secret: {
           findUnique: vi.fn(async ({ where }: { where: { id: string } }) => {
             const ciphertext = secrets.get(where.id);

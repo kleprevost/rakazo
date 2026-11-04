@@ -69,8 +69,8 @@ one-shot). Cancelled runs are not restored; the user sends the message again.
 
 ## Quarantine
 A stronger stop for incidents lives in [capability-broker.md](./capability-broker.md): it composes
-with suspend (same cancellation primitive, same gates) but is its own state and also removes the
-bot's own credentials.
+with suspend (same cancellation primitive, same gates) but is its own state and also refuses inbound
+webhooks; nothing is deleted.
 
 ## Not covered
 - Child bots (`spawn_bot`) are separate AI employees; suspend each one, they are all in the list.

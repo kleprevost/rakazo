@@ -257,9 +257,9 @@ export const adminContract = {
     resume: oc.input(z.object({ botId: Id })).output(z.object({ ok: z.literal(true) })),
   },
   /**
-   * Incident stop for one bot, a Space, a chat group or every bot: cancels active runs, blocks new
-   * runs and every tool, connector and computer call, and removes the bots' own secrets and MCP
-   * assignments. Personal connections are never revoked. Releasing restores none of that.
+   * Incident stop for one bot, a Space, a chat group or every bot: cancels active runs and blocks
+   * new runs and every tool, connector, MCP, webhook and computer call. Nothing is deleted or
+   * revoked, so releasing restores full function.
    */
   quarantine: {
     list: oc.output(z.object({ quarantines: z.array(AdminQuarantineSchema) })),
@@ -268,8 +268,6 @@ export const adminContract = {
         id: z.string(),
         bots: z.number().int(),
         cancelledRuns: z.number().int(),
-        revokedSecrets: z.number().int(),
-        revokedMcpAssignments: z.number().int(),
       }),
     ),
     lift: oc.input(z.object({ id: Id })).output(z.object({ ok: z.literal(true) })),
