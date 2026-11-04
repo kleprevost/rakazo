@@ -14,6 +14,7 @@ import { replaceEqualDeep } from "@tanstack/react-query";
 import type { RefObject } from "react";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { takeInitialBootstrap } from "../../lib/bootstrap";
+import { linkedBotRoute } from "../../lib/bootstrap-target";
 import { TODAY_PATH, takeLanding } from "../../lib/landing";
 import { localTimezone } from "../../lib/local-timezone";
 import { markOnce } from "../../lib/performance";
@@ -249,6 +250,7 @@ export function useSpaceBootstrap({
   chat,
   navigate,
   redirectKeepingOverlay,
+  openSpaceChat,
 }: {
   rpc: ReturnType<typeof createSpaceRpc>;
   roster: SpaceRoster;
@@ -263,6 +265,8 @@ export function useSpaceBootstrap({
   chat: ChatTarget | undefined;
   navigate: Navigation["navigate"];
   redirectKeepingOverlay: Navigation["redirectKeepingOverlay"];
+  /** Opens a linked bot that lives in another of the user's Spaces. */
+  openSpaceChat: RefObject<(spaceId: string, path: string) => void>;
 }) {
   const {
     bots,
@@ -380,6 +384,14 @@ export function useSpaceBootstrap({
           setRoutinesBotId(bootstrap.thread.botId ?? null);
           markOnce("rk:renderer:bots-response");
           markOnce("rk:renderer:thread-response");
+        }
+        // Checked before the roster gate: a refresh that landed first may already have moved away.
+        const linked = groupId
+          ? undefined
+          : linkedBotRoute(bootstrap, botId, window.location.search);
+        if (linked) {
+          openSpaceChat.current(linked.spaceId, linked.path);
+          return;
         }
         if (!applyBotLists) return;
         // A shell that reopened from cache is already on a chat; it moves only if that chat is gone.

@@ -419,6 +419,10 @@ msgstr "{title}，保存为 {savedAs}"
 msgid "{toolCount, plural, one {# tool} other {# tools}}"
 msgstr "{toolCount, plural, one {# 个工具} other {# 个工具}}"
 
+#: src/components/ModelCredits.tsx
+msgid "{vcpus} vCPU, {memoryGb} GB, {hours} computer hours a month"
+msgstr "{vcpus} vCPU、{memoryGb} GB、每月 {hours} 小时电脑时长"
+
 #. placeholder {0}: mention.name
 #: src/pages/shell/composer.tsx
 msgid "@{0}"
@@ -1348,6 +1352,7 @@ msgstr "无法读取图像"
 #: src/pages/model-settings/space-bots-model.tsx
 #: src/pages/ModelSettingsOverlay.tsx
 #: src/pages/Onboarding.tsx
+#: src/pages/OrganizationSettingsPanel.tsx
 #: src/pages/PaymentWalletSettingsPanel.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
 #: src/pages/shell/create-bot-dialog.tsx
@@ -1765,6 +1770,10 @@ msgstr "电脑已休眠。打开就能唤醒。"
 #: src/pages/shell/computer-view.tsx
 msgid "Computer is stopped"
 msgstr "电脑已停止"
+
+#: src/pages/ModelSettingsOverlay.tsx
+msgid "Computer-use model"
+msgstr "电脑操作模型"
 
 #: src/components/ComputerDeviceSettings.tsx
 #: src/pages/AccountSettingsOverlay.tsx
@@ -2650,6 +2659,7 @@ msgstr ""
 msgid "CPU"
 msgstr ""
 
+#: src/components/CreateOrganizationDialog.tsx
 #: src/pages/Board.tsx
 #: src/pages/shell/agent-import.tsx
 #: src/pages/shell/create-bot-dialog.tsx
@@ -2670,6 +2680,11 @@ msgstr "创建账户"
 #: src/pages/GroupPanel.tsx
 msgid "Create group"
 msgstr "创建群组"
+
+#: src/components/CreateOrganizationDialog.tsx
+#: src/pages/OrganizationSettingsPanel.tsx
+msgid "Create organization"
+msgstr "创建组织"
 
 #: src/pages/RoutineEditor.tsx
 msgid "Create Routine"
@@ -2849,6 +2864,7 @@ msgstr ""
 #: src/pages/BotContextMenu.tsx
 #: src/pages/KnowledgeSection.tsx
 #: src/pages/McpServersOverlay.tsx
+#: src/pages/OrganizationSettingsPanel.tsx
 #: src/pages/RoutineEditor.tsx
 #: src/pages/shell/archived-chats.tsx
 #: src/pages/shell/dialogs.tsx
@@ -2875,6 +2891,7 @@ msgstr "删除 {0}"
 #. placeholder {0}: deleting.name
 #. placeholder {0}: item.name
 #: src/pages/McpServersOverlay.tsx
+#: src/pages/OrganizationSettingsPanel.tsx
 #: src/pages/shell/dialogs.tsx
 msgid "Delete {0}?"
 msgstr "删除 {0}？"
@@ -2891,6 +2908,10 @@ msgstr "删除群组"
 #: src/pages/shell/dialogs.tsx
 msgid "Delete memories too"
 msgstr "同时删除记忆"
+
+#: src/pages/OrganizationSettingsPanel.tsx
+msgid "Delete organization"
+msgstr "删除组织"
 
 #: src/pages/shell/sidebar-roster.tsx
 msgid "Delete section"
@@ -2911,6 +2932,7 @@ msgstr "已删除"
 
 #: src/components/PasskeySettings.tsx
 #: src/pages/Artifacts.tsx
+#: src/pages/OrganizationSettingsPanel.tsx
 #: src/pages/shell/dialogs.tsx
 msgid "Deleting…"
 msgstr "正在删除…"
@@ -4538,6 +4560,7 @@ msgstr "已静音"
 msgid "My computers"
 msgstr ""
 
+#: src/components/CreateOrganizationDialog.tsx
 #: src/components/teach/SkillDraftCard.tsx
 #: src/components/vault/VaultItemEditor.tsx
 #: src/pages/AccountSettingsOverlay.tsx
@@ -4548,6 +4571,7 @@ msgstr ""
 #: src/pages/GroupPanel.tsx
 #: src/pages/McpServersOverlay.tsx
 #: src/pages/model-settings/providers-section.tsx
+#: src/pages/OrganizationSettingsPanel.tsx
 #: src/pages/PluginsOverlay.tsx
 #: src/pages/RoutineEditor.tsx
 #: src/pages/shell/agent-import.tsx
@@ -5115,8 +5139,9 @@ msgstr "或粘贴 API 密钥"
 
 #: src/components/ComputerProviderSettings.tsx
 #: src/pages/admin/AdminPolicyPage.tsx
+#: src/pages/settings-nav.ts
 msgid "Organization"
-msgstr ""
+msgstr "组织"
 
 #: src/pages/memory-providers/SupermemorySettingsForm.tsx
 msgid "Organization API key"
@@ -5349,6 +5374,10 @@ msgstr "置顶"
 #: src/pages/Shell.tsx
 msgid "Pinned"
 msgstr "置顶"
+
+#: src/components/ModelCredits.tsx
+msgid "Plan"
+msgstr "方案"
 
 #: src/components/ArtifactFileCard.tsx
 msgid "Play {name}"
@@ -6105,6 +6134,10 @@ msgstr "销售与 CRM"
 #: src/pages/ExternalConversationSettings.tsx
 msgid "Same as {botName}"
 msgstr "与 {botName} 相同"
+
+#: src/pages/ModelSettingsOverlay.tsx
+msgid "Same as main model"
+msgstr "与主模型相同"
 
 #: src/lib/cron.ts
 msgid "Saturday"
@@ -6874,6 +6907,10 @@ msgid "Switch"
 msgstr "切换"
 
 #: src/components/ModelCredits.tsx
+msgid "Switch to {tierTargetName}?"
+msgstr "切换到 {tierTargetName}？"
+
+#: src/components/ModelCredits.tsx
 msgid "Switch to yearly"
 msgstr "切换为按年"
 
@@ -7014,6 +7051,10 @@ msgstr "所选记忆提供方在此构建中不可用。"
 msgid "The shared link stops working"
 msgstr "共享链接将失效"
 
+#: src/components/ModelCredits.tsx
+msgid "The unused difference is credited to your next invoice."
+msgstr "未使用的差额将抵扣到你的下一张账单。"
+
 #: src/pages/model-settings/space-bots-model.tsx
 msgid "Their own model is cleared. You can pick one again in each bot."
 msgstr "已清除各自的模型。你可以在每个 Bot 里重新选择。"
@@ -7086,6 +7127,7 @@ msgstr "这通电话已经不响了。"
 msgid "This can't be undone."
 msgstr "此操作无法撤销。"
 
+#: src/pages/OrganizationSettingsPanel.tsx
 #: src/pages/shell/dialogs.tsx
 msgid "This cannot be undone."
 msgstr "此操作无法撤销。"
@@ -7355,6 +7397,10 @@ msgstr "周二"
 #: src/pages/admin/AdminAuditPage.tsx
 msgid "Type"
 msgstr "类型"
+
+#: src/pages/OrganizationSettingsPanel.tsx
+msgid "Type {name} to confirm"
+msgstr "输入 {name} 以确认"
 
 #: src/components/teach/TeachRecordingChrome.tsx
 msgid "Type without recording"
@@ -7891,6 +7937,10 @@ msgstr "你的 Anthropic"
 msgid "Your card is charged {annualPrice} today, less the unused part of this month."
 msgstr "今天将从你的卡中扣款 {annualPrice}，并抵扣本月未使用的部分。"
 
+#: src/components/ModelCredits.tsx
+msgid "Your card is charged the prorated difference today."
+msgstr "今天将从你的卡中扣除按比例计算的差额。"
+
 #: src/pages/Shell.tsx
 msgid "Your computer's disk is nearly full. Free up space by removing build output and caches you no longer need."
 msgstr "电脑的磁盘快满了。请删除不再需要的构建输出和缓存，以释放空间。"
@@ -7929,6 +7979,10 @@ msgstr "你的 OpenRouter"
 #: src/components/ModelCredits.tsx
 msgid "Your plan becomes {annualPrice} / year when your trial ends."
 msgstr "试用结束后，你的套餐将变为每年 {annualPrice}。"
+
+#: src/components/ModelCredits.tsx
+msgid "Your plan becomes {tierTargetLabel} when your trial ends."
+msgstr "试用结束后，你的方案将变为 {tierTargetLabel}。"
 
 #: src/components/integrations/skills-dialog.tsx
 msgid "Your skills"
