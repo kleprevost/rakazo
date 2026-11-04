@@ -39,13 +39,23 @@ export type CalendarRoutine = z.infer<typeof CalendarRoutineSchema>;
 export const CalendarOccurrenceSchema = z.object({ routineId: Id, at: IsoDate });
 export type CalendarOccurrence = z.infer<typeof CalendarOccurrenceSchema>;
 
-export const CalendarOutcomeSchema = z.enum(["success", "failed", "skipped", "running"]);
+/** A run's state, or its receipt when it has one (`no_change`, `action_needed`, `missed`). */
+export const CalendarOutcomeSchema = z.enum([
+  "success",
+  "failed",
+  "skipped",
+  "running",
+  "no_change",
+  "action_needed",
+  "missed",
+]);
 export type CalendarOutcome = z.infer<typeof CalendarOutcomeSchema>;
 
-/** A run that already happened in the range. */
+/** A firing that already happened in the range: a run, or a check that started none. */
 export const CalendarRunSchema = z.object({
   routineId: Id,
-  runId: Id,
+  /** Null for a firing that started no run: a quiet or failed check, or a missed one. */
+  runId: Id.nullable(),
   at: IsoDate,
   outcome: CalendarOutcomeSchema,
   /** The reply to open in the chat; null when the run posted nothing. */

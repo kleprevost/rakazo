@@ -488,6 +488,10 @@ msgid "Account menu for {name}"
 msgstr "{name} का खाता मेन्यू"
 
 #: src/pages/Calendar.tsx
+msgid "Action needed"
+msgstr "कार्रवाई आवश्यक"
+
+#: src/pages/Calendar.tsx
 msgid "Actions"
 msgstr "कार्रवाइयाँ"
 
@@ -4306,6 +4310,11 @@ msgstr "मिनट"
 msgid "minutes"
 msgstr "मिनट"
 
+#: src/pages/Calendar.tsx
+#: src/pages/Today.tsx
+msgid "Missed"
+msgstr "छूट गया"
+
 #: src/components/call/VoiceChatCard.tsx
 msgid "Missed call"
 msgstr "मिस्ड कॉल"
@@ -4623,6 +4632,10 @@ msgstr ""
 #: src/pages/shell/bot-picker.tsx
 msgid "No bots match"
 msgstr ""
+
+#: src/pages/Calendar.tsx
+msgid "No change"
+msgstr "कोई बदलाव नहीं"
 
 #: src/pages/Employees.tsx
 msgid "No employees yet"

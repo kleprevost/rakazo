@@ -244,6 +244,30 @@ it("lists a run waiting on the user under Needs attention, never under Working",
   expect(attention?.textContent).not.toContain("Paused run-ask");
 });
 
+it("lists a failed check and a missed run as exceptions that open the chat", async () => {
+  const exception = {
+    ...bot,
+    kind: "routine_exception" as const,
+    runId: null,
+    routineId: "routine-9",
+    at,
+    error: null,
+  };
+  rpc.today.summary.mockResolvedValue({
+    ...empty,
+    counts: { ...empty.counts, attention: 2 },
+    attention: [
+      { ...exception, key: "receipt:r1", title: "Release watch", outcome: "failed", error: "503" },
+      { ...exception, key: "receipt:r2", title: "Weekly report", outcome: "missed" },
+    ],
+  });
+  const container = await mount();
+  await vi.waitFor(() => expect(container.querySelector('[data-testid="today"]')).not.toBeNull());
+  expect(container.textContent).toContain("503");
+  expect(container.textContent).toContain("Weekly report · Missed");
+  expect(container.querySelectorAll("button")).toHaveLength(0);
+});
+
 it("never offers a decision for an approval, only a way into its chat", async () => {
   rpc.today.summary.mockResolvedValue(populated);
   const container = await mount();

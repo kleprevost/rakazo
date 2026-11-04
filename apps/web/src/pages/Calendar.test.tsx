@@ -69,6 +69,21 @@ const populated: CalendarRange = {
       outcome: "success",
       messageId: null,
     },
+    {
+      routineId: "routine-1",
+      runId: null,
+      at: localAt(12, 9),
+      outcome: "no_change",
+      messageId: null,
+    },
+    {
+      routineId: "routine-1",
+      runId: "run-3",
+      at: localAt(12, 10),
+      outcome: "action_needed",
+      messageId: null,
+    },
+    { routineId: "routine-2", runId: null, at: localAt(13, 9), outcome: "missed", messageId: null },
   ],
 };
 
@@ -147,10 +162,13 @@ it("asks for the current week and places past and upcoming items on their days",
     { from: localAt(9, 0), to: localAt(16, 0) },
     expect.anything(),
   );
-  expect(container.querySelectorAll('[data-testid="calendar-past"]')).toHaveLength(2);
+  expect(container.querySelectorAll('[data-testid="calendar-past"]')).toHaveLength(5);
   expect(container.querySelectorAll('[data-testid="calendar-upcoming"]')).toHaveLength(1);
   expect(container.textContent).toContain("Failed");
   expect(container.textContent).toContain("Done");
+  expect(container.textContent).toContain("No change");
+  expect(container.textContent).toContain("Action needed");
+  expect(container.textContent).toContain("Missed");
   const hrefs = [...container.querySelectorAll("a")].map((a) => a.getAttribute("href"));
   expect(hrefs).toContain("/app/bot-1?m=m1");
   expect(hrefs).toContain("/app/g/g1");

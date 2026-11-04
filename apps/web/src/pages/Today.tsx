@@ -256,14 +256,30 @@ function AttentionRow({ item }: { item: TodayAttention }) {
     }
   };
   const detail =
-    item.kind === "approval" || item.kind === "question" ? item.text : (item.error ?? item.title);
+    item.kind === "approval" || item.kind === "question"
+      ? item.text
+      : item.kind === "routine_exception" && item.outcome === "missed"
+        ? item.title
+        : (item.error ?? item.title);
   return (
     <li className="py-2 text-sm">
       <div className="flex items-baseline gap-2">
         <Link to={chatPath(item)} className="min-w-0 flex-1 hover:underline">
           <span className="font-medium">{item.botName}</span>{" "}
-          <span className={item.kind.startsWith("failed") ? "text-destructive" : undefined}>
+          <span
+            className={
+              item.kind.startsWith("failed") || item.kind === "routine_exception"
+                ? "text-destructive"
+                : undefined
+            }
+          >
             {detail}
+            {item.kind === "routine_exception" && item.outcome === "missed" ? (
+              <>
+                {" · "}
+                <Trans>Missed</Trans>
+              </>
+            ) : null}
           </span>
         </Link>
         <span className="shrink-0 text-xs text-muted-foreground">

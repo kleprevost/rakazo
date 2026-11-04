@@ -488,6 +488,10 @@ msgid "Account menu for {name}"
 msgstr "Accountmenu voor {name}"
 
 #: src/pages/Calendar.tsx
+msgid "Action needed"
+msgstr "Actie vereist"
+
+#: src/pages/Calendar.tsx
 msgid "Actions"
 msgstr "Acties"
 
@@ -4306,6 +4310,11 @@ msgstr "minuut"
 msgid "minutes"
 msgstr "minuten"
 
+#: src/pages/Calendar.tsx
+#: src/pages/Today.tsx
+msgid "Missed"
+msgstr "Gemist"
+
 #: src/components/call/VoiceChatCard.tsx
 msgid "Missed call"
 msgstr "Gemist gesprek"
@@ -4623,6 +4632,10 @@ msgstr ""
 #: src/pages/shell/bot-picker.tsx
 msgid "No bots match"
 msgstr "Geen bots gevonden"
+
+#: src/pages/Calendar.tsx
+msgid "No change"
+msgstr "Geen wijziging"
 
 #: src/pages/Employees.tsx
 msgid "No employees yet"

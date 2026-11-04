@@ -488,6 +488,10 @@ msgid "Account menu for {name}"
 msgstr "{name} 的账户菜单"
 
 #: src/pages/Calendar.tsx
+msgid "Action needed"
+msgstr "需要处理"
+
+#: src/pages/Calendar.tsx
 msgid "Actions"
 msgstr "操作"
 
@@ -4306,6 +4310,11 @@ msgstr "分钟"
 msgid "minutes"
 msgstr "分钟"
 
+#: src/pages/Calendar.tsx
+#: src/pages/Today.tsx
+msgid "Missed"
+msgstr "已错过"
+
 #: src/components/call/VoiceChatCard.tsx
 msgid "Missed call"
 msgstr "未接来电"
@@ -4623,6 +4632,10 @@ msgstr ""
 #: src/pages/shell/bot-picker.tsx
 msgid "No bots match"
 msgstr "没有匹配的 Bot"
+
+#: src/pages/Calendar.tsx
+msgid "No change"
+msgstr "无变化"
 
 #: src/pages/Employees.tsx
 msgid "No employees yet"

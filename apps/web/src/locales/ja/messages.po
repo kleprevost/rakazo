@@ -488,6 +488,10 @@ msgid "Account menu for {name}"
 msgstr "{name}のアカウントメニュー"
 
 #: src/pages/Calendar.tsx
+msgid "Action needed"
+msgstr "対応が必要"
+
+#: src/pages/Calendar.tsx
 msgid "Actions"
 msgstr "操作"
 
@@ -4306,6 +4310,11 @@ msgstr "分"
 msgid "minutes"
 msgstr "分"
 
+#: src/pages/Calendar.tsx
+#: src/pages/Today.tsx
+msgid "Missed"
+msgstr "実行されず"
+
 #: src/components/call/VoiceChatCard.tsx
 msgid "Missed call"
 msgstr "不在着信"
@@ -4623,6 +4632,10 @@ msgstr ""
 #: src/pages/shell/bot-picker.tsx
 msgid "No bots match"
 msgstr "一致するボットはありません"
+
+#: src/pages/Calendar.tsx
+msgid "No change"
+msgstr "変更なし"
 
 #: src/pages/Employees.tsx
 msgid "No employees yet"
