@@ -79,6 +79,13 @@ param oidcName string = 'Microsoft'
 param oidcAccessClaim string = 'roles'
 param oidcAllowedValues string = 'Rakazo.User,Rakazo.Admin'
 param oidcAdminValues string = 'Rakazo.Admin'
+@description('Operator roles narrower than admin (docs/enterprise/features/admin-roles.md): comma-separated token values (OIDC_<ROLE>_VALUES) and email lists (RAKAZO_<ROLE>_EMAILS). Empty means none.')
+param oidcSecurityValues string = ''
+param oidcFleetValues string = ''
+param oidcAuditorValues string = ''
+param securityEmails string = ''
+param fleetEmails string = ''
+param auditorEmails string = ''
 param oidcRevalidateMinutes string = '60'
 param oidcTrustEmail bool = true
 @description('Add Easy Auth (Entra) in front of the web app, anonymous requests allowed. Needs the code that reads AUTH_EASY_AUTH (placeholder name).')
@@ -209,6 +216,12 @@ module apps 'modules/aca-apps.bicep' = {
     oidcAccessClaim: oidcAccessClaim
     oidcAllowedValues: oidcAllowedValues
     oidcAdminValues: oidcAdminValues
+    oidcSecurityValues: oidcSecurityValues
+    oidcFleetValues: oidcFleetValues
+    oidcAuditorValues: oidcAuditorValues
+    securityEmails: securityEmails
+    fleetEmails: fleetEmails
+    auditorEmails: auditorEmails
     // Easy Auth sessions have no refresh token, so the API refuses both settings together.
     oidcRevalidateMinutes: enableEasyAuth ? '' : oidcRevalidateMinutes
     oidcTrustEmail: oidcTrustEmail

@@ -199,6 +199,10 @@ msgstr ""
 msgid "{days}d ago"
 msgstr "{days} दिन पहले"
 
+#: src/pages/admin/AdminCapabilitiesPage.tsx
+msgid "{denied, plural, one {# call would have been denied in 7 days} other {# calls would have been denied in 7 days}}"
+msgstr "{denied, plural, one {# कॉल 7 दिनों में अस्वीकार हो जाती} other {# कॉल 7 दिनों में अस्वीकार हो जातीं}}"
+
 #: src/components/markdown-copy.tsx
 msgid "{from}–{to} of {total} rows"
 msgstr "{total} पंक्तियों में से {from}–{to}"
@@ -419,9 +423,21 @@ msgstr "@{0}"
 msgid "/ month"
 msgstr "/ महीना"
 
+#: src/components/capabilities/BotAccess.tsx
+msgid "1 day"
+msgstr "1 दिन"
+
 #: src/components/integrations/space-availability.tsx
 msgid "1 space"
 msgstr ""
+
+#: src/components/capabilities/BotAccess.tsx
+msgid "30 days"
+msgstr "30 दिन"
+
+#: src/components/capabilities/BotAccess.tsx
+msgid "7 days"
+msgstr "7 दिन"
 
 #: src/pages/shell/message-cards.tsx
 msgid "A bit of everything"
@@ -449,9 +465,10 @@ msgstr ""
 msgid "About {label}"
 msgstr "{label} के बारे में"
 
+#: src/components/capabilities/BotAccess.tsx
 #: src/pages/shell/share-employee-dialog.tsx
 msgid "Access"
-msgstr ""
+msgstr "एक्सेस"
 
 #: src/components/ComputerProviderSettings.tsx
 msgid "Access key ID"
@@ -572,6 +589,10 @@ msgstr "इस रूटीन को चलाने के लिए ट्र
 #: src/lib/tts.ts
 msgid "Add a voice provider key and pick a voice in Voice settings."
 msgstr ""
+
+#: src/components/capabilities/BotAccess.tsx
+msgid "Add access"
+msgstr "एक्सेस जोड़ें"
 
 #: src/pages/McpServersOverlay.tsx
 msgid "Add an HTTPS server URL."
@@ -741,6 +762,7 @@ msgid "All time"
 msgstr ""
 
 #: src/components/ApprovalRulesSettings.tsx
+#: src/components/capabilities/CapabilitySimulator.tsx
 msgid "Allow"
 msgstr "अनुमति दें"
 
@@ -965,6 +987,7 @@ msgstr "आर्काइव किया गया"
 msgid "Archived"
 msgstr "आर्काइव किया गया"
 
+#: src/components/capabilities/CapabilitySimulator.tsx
 #: src/pages/McpServersOverlay.tsx
 msgid "Arguments"
 msgstr "आर्ग्युमेंट"
@@ -975,6 +998,8 @@ msgid "Artifacts"
 msgstr ""
 
 #: src/components/ApprovalRulesSettings.tsx
+#: src/components/capabilities/BotAccess.tsx
+#: src/components/capabilities/CapabilitySimulator.tsx
 msgid "Ask"
 msgstr "पूछें"
 
@@ -1335,6 +1360,10 @@ msgstr "रद्द"
 #: src/pages/ActivityList.tsx
 msgid "Cancelled"
 msgstr "रद्द किया गया"
+
+#: src/pages/admin/AdminShell.tsx
+msgid "Capabilities"
+msgstr "क्षमताएँ"
 
 #: src/components/vault/kinds.tsx
 msgid "Card"
@@ -2492,7 +2521,10 @@ msgstr "MCP सर्वर का परीक्षण नहीं हो स
 msgid "Could not transcribe that recording."
 msgstr ""
 
+#: src/components/capabilities/BotAccess.tsx
+#: src/components/capabilities/CapabilitySimulator.tsx
 #: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/admin/AdminCapabilitiesPage.tsx
 #: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/ScratchpadSection.tsx
 msgid "Could not update"
@@ -2844,6 +2876,8 @@ msgid "Denied"
 msgstr "अस्वीकृत"
 
 #: src/components/AskCard.tsx
+#: src/components/capabilities/BotAccess.tsx
+#: src/components/capabilities/CapabilitySimulator.tsx
 #: src/pages/shell/share-employee-dialog.tsx
 msgid "Deny"
 msgstr "अस्वीकार करें"
@@ -3135,6 +3169,10 @@ msgstr ""
 msgid "Ends {day}"
 msgstr ""
 
+#: src/pages/admin/AdminCapabilitiesPage.tsx
+msgid "Enforce"
+msgstr "लागू करें"
+
 #: src/components/GitHubStarPrompt.tsx
 msgid "Enjoying Rakazo?"
 msgstr ""
@@ -3272,9 +3310,10 @@ msgstr "तालिका बड़ी करें"
 msgid "expired"
 msgstr "समाप्त"
 
+#: src/components/capabilities/BotAccess.tsx
 #: src/components/vault/VaultItemDetail.tsx
 msgid "Expires"
-msgstr ""
+msgstr "समाप्ति"
 
 #: src/components/vault/kinds.tsx
 msgid "Expires {expiry}"
@@ -3507,6 +3546,10 @@ msgstr ""
 #: src/pages/AdminAccessPage.tsx
 msgid "Granting…"
 msgstr ""
+
+#: src/pages/admin/AdminCapabilitiesPage.tsx
+msgid "Grants"
+msgstr "अनुमतियाँ"
 
 #: src/lib/identity-display.ts
 #: src/pages/MessagingSettingsPanel.tsx
@@ -4320,6 +4363,7 @@ msgid "Missed call"
 msgstr "मिस्ड कॉल"
 
 #: src/components/ApprovalRulesSettings.tsx
+#: src/pages/admin/AdminCapabilitiesPage.tsx
 msgid "Mode"
 msgstr "मोड"
 
@@ -4441,6 +4485,7 @@ msgstr ""
 #: src/components/vault/VaultItemEditor.tsx
 #: src/pages/AccountSettingsOverlay.tsx
 #: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/admin/AdminCapabilitiesPage.tsx
 #: src/pages/Auth.tsx
 #: src/pages/GroupPanel.tsx
 #: src/pages/McpServersOverlay.tsx
@@ -4512,6 +4557,10 @@ msgstr ""
 #: src/pages/shell/import-status.ts
 msgid "Needs: {names}"
 msgstr "ज़रूरी: {names}"
+
+#: src/components/capabilities/BotAccess.tsx
+msgid "Never"
+msgstr "कभी नहीं"
 
 #: src/components/ApprovalRulesSettings.tsx
 msgid "Never ask"
@@ -4848,6 +4897,10 @@ msgstr "OAuth कनेक्शन विफल"
 msgid "OAuth expired"
 msgstr "OAuth की समय-सीमा समाप्त हो गई"
 
+#: src/pages/admin/AdminCapabilitiesPage.tsx
+msgid "Off"
+msgstr "बंद"
+
 #: src/components/ComputerDeviceSettings.tsx
 msgid "Offline"
 msgstr ""
@@ -5034,6 +5087,7 @@ msgstr ""
 #: src/components/pages/SharePopover.tsx
 #: src/lib/identity-display.ts
 #: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/admin/AdminCapabilitiesPage.tsx
 #: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/Board.tsx
 #: src/pages/shell/share-employee-dialog.tsx
@@ -5864,6 +5918,11 @@ msgstr "प्रोवाइडर सेटिंग्स की समीक
 msgid "Revoke"
 msgstr ""
 
+#. placeholder {0}: grant.scope
+#: src/components/capabilities/BotAccess.tsx
+msgid "Revoke {0}"
+msgstr "{0} रद्द करें"
+
 #: src/pages/AdminAccessPage.tsx
 msgid "Revoked"
 msgstr ""
@@ -6202,6 +6261,10 @@ msgstr ""
 msgid "Serenity endpoint is required."
 msgstr ""
 
+#: src/components/capabilities/CapabilitySimulator.tsx
+msgid "Server"
+msgstr "सर्वर"
+
 #: src/pages/McpServersOverlay.tsx
 msgid "Server name"
 msgstr "सर्वर का नाम"
@@ -6249,6 +6312,11 @@ msgstr "सेटअप पूरा हुआ"
 #: src/pages/model-settings/compatible-model-fields.tsx
 msgid "Setup help"
 msgstr "सेटअप सहायता"
+
+#: src/components/capabilities/CapabilitySimulator.tsx
+#: src/pages/admin/AdminCapabilitiesPage.tsx
+msgid "Shadow"
+msgstr "शैडो"
 
 #: src/components/ComputerProviderSettings.tsx
 #: src/pages/shell/avatar-studio-popover.tsx
@@ -6385,6 +6453,10 @@ msgstr ""
 #: src/components/integrations/plugin-marketplace.tsx
 msgid "Sign-in cancelled. Try again."
 msgstr ""
+
+#: src/components/capabilities/CapabilitySimulator.tsx
+msgid "Simulate"
+msgstr "सिमुलेट करें"
 
 #: src/components/vault/VaultItemDetail.tsx
 #: src/components/vault/VaultItemEditor.tsx
@@ -7112,6 +7184,10 @@ msgstr "टूल आर्ग्युमेंट JSON होने चाह�
 msgid "Tool name"
 msgstr "टूल का नाम"
 
+#: src/components/capabilities/CapabilitySimulator.tsx
+msgid "Tool or scope"
+msgstr "टूल या स्कोप"
+
 #: src/pages/PluginsOverlay.tsx
 #: src/pages/shell/bot-panel.tsx
 msgid "Tools"
@@ -7650,6 +7726,10 @@ msgstr "आपके ChatGPT या Claude प्लान के साथ क�
 #: src/pages/memory-providers/HonchoSettingsForm.tsx
 msgid "Workspace"
 msgstr ""
+
+#: src/pages/admin/AdminCapabilitiesPage.tsx
+msgid "Would deny"
+msgstr "अस्वीकार होता"
 
 #: src/lib/billing.ts
 msgid "year"

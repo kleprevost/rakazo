@@ -4,6 +4,7 @@ import {
   setCapabilityGrant,
   setCapabilityMode,
 } from "../capability-grants.js";
+import { capabilityShadowSummary, simulateCapability } from "../capability-insight.js";
 import type { RouterContext } from "./context.js";
 
 /** Capability grants and the shadow switch. Each handler authorizes before it reads or writes. */
@@ -19,6 +20,12 @@ export function capabilityGrantsRoutes(ctx: RouterContext) {
       ),
       revoke: authed.capabilityGrants.revoke.handler(({ context, input }) =>
         revokeCapabilityGrant(deps, context.actor, input),
+      ),
+      simulate: authed.capabilityGrants.simulate.handler(({ context, input }) =>
+        simulateCapability(deps, context.actor, input),
+      ),
+      shadowSummary: authed.capabilityGrants.shadowSummary.handler(({ context, input }) =>
+        capabilityShadowSummary(deps, context.actor, input),
       ),
       setMode: authed.capabilityGrants.setMode.handler(({ context, input }) =>
         setCapabilityMode(deps, context.actor, input),

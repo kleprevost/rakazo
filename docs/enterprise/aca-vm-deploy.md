@@ -179,6 +179,15 @@ requests allowed, same app registration and client secret as OIDC) and sets `AUT
 web and api (see [easy-auth.md](./easy-auth.md); it cannot be combined with `OIDC_REVALIDATE_MINUTES`). The
 Easy Auth redirect URI must be registered as above.
 
+## Operator roles (optional)
+
+`oidcAdminValues` grants the `platform` admin role. To give people a narrower role
+([admin-roles.md](./features/admin-roles.md)), set `oidcSecurityValues`, `oidcFleetValues` and
+`oidcAuditorValues` (token values, like `oidcAdminValues`) and, for accounts matched by verified
+email instead, `securityEmails`, `fleetEmails` and `auditorEmails` (comma-separated). Each defaults to
+empty and is passed to the api only when set (`OIDC_<ROLE>_VALUES`, `RAKAZO_<ROLE>_EMAILS`). The
+worker does not read them.
+
 ## Smoke test
 
 1. Open `webUrl`: the sign-in page shows the Microsoft button; sign in as a user with `Rakazo.User`.
