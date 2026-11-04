@@ -13,6 +13,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type * as ComputerLifecycleModule from "./computer-lifecycle.js";
 import { createRunExecutor } from "./executor.js";
 import { setActivePolicy } from "./policy-runtime.js";
+import { withRunGates } from "./testing/run-gates.js";
 
 vi.mock("./computer-lifecycle.js", async (importOriginal) => ({
   ...(await importOriginal<typeof ComputerLifecycleModule>()),
@@ -249,7 +250,7 @@ async function failRun(scenario: Scenario) {
   });
   const send = vi.fn(async (_message: NotificationMessage, _context: unknown) => undefined);
   const executor = createRunExecutor({
-    prisma,
+    prisma: withRunGates(prisma),
     deploymentModelKey: "fake-deployment-key",
     secretStore: { load: vi.fn(async () => "fixture-personal-key"), put: vi.fn() },
     runtime: { describe: () => ({ capabilities: { scripted: false } }), run: runtimeRun },
@@ -691,7 +692,7 @@ function retryHarness(scenario: RetryScenario = {}) {
   });
   const send = vi.fn(async (_message: NotificationMessage, _context: unknown) => undefined);
   const executor = createRunExecutor({
-    prisma,
+    prisma: withRunGates(prisma),
     jobs: { enqueue },
     notifications: { send },
   } as unknown as Parameters<typeof createRunExecutor>[0]);

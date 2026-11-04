@@ -14,6 +14,7 @@ import type * as AutoReviewModule from "./auto-review.js";
 import type * as ComputerLifecycleModule from "./computer-lifecycle.js";
 import { createRunExecutor } from "./executor.js";
 import { FakeMediaGenerationProvider } from "./media-generation-provider.js";
+import { withRunGates } from "./testing/run-gates.js";
 
 vi.mock("./computer-lifecycle.js", async (importOriginal) => ({
   ...(await importOriginal<typeof ComputerLifecycleModule>()),
@@ -262,10 +263,10 @@ function fixture(runId = "run-1") {
   });
   const executor = createRunExecutor({
     deploymentModelKey: "fixture-model-key",
-    prisma: {
+    prisma: withRunGates({
       ...prisma,
       $transaction: async (work: (tx: typeof prisma) => Promise<unknown>) => work(prisma),
-    },
+    }),
     mediaGeneration: media,
     artifacts: { put: artifactPut, get: vi.fn() },
     runtime: { describe: () => ({ capabilities: { scripted: false } }), run: runtimeRun },

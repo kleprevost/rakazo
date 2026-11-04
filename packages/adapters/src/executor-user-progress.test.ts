@@ -15,6 +15,7 @@ import { createRunExecutor } from "./executor.js";
 import { createJobReconciler } from "./job-reconciler.js";
 import type * as ModelVisionModule from "./model-vision.js";
 import { PEER_NOTHING_NEW_REPLY } from "./silent-reply.js";
+import { withRunGates } from "./testing/run-gates.js";
 import { MID_TURN_PROGRESS_MIN_TURN_AGE_MS, userProgressClientNonce } from "./user-progress.js";
 
 vi.mock("./computer-lifecycle.js", async (importOriginal) => ({
@@ -303,7 +304,7 @@ async function runTurn(
   vision.seesImages = options.graphical ?? false;
   const executor = createRunExecutor({
     deploymentModelKey: "fixture-model-key",
-    prisma,
+    prisma: withRunGates(prisma),
     runtime: {
       describe: () => ({ capabilities: { scripted: false } }),
       run: runtimeRun,

@@ -6,6 +6,7 @@ import type * as ComputerLifecycleModule from "./computer-lifecycle.js";
 import { createRunExecutor } from "./executor.js";
 import type { RemoteConnectorDependencies } from "./installed-connectors.js";
 import { InstalledConnectorProvider } from "./installed-connectors.js";
+import { withRunGates } from "./testing/run-gates.js";
 
 vi.mock("./computer-lifecycle.js", async (importOriginal) => ({
   ...(await importOriginal<typeof ComputerLifecycleModule>()),
@@ -293,7 +294,7 @@ async function executorHarness(server: ReturnType<typeof statefulMcpServer>) {
   });
   const executor = createRunExecutor({
     deploymentModelKey: "fixture-model-key",
-    prisma,
+    prisma: withRunGates(prisma),
     connector,
     runtime: {
       describe: () => ({ capabilities: { scripted: false } }),
