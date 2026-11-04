@@ -388,7 +388,7 @@ it("deactivates after a confirming click and offers to reactivate a deactivated 
   expect(rows[1]?.textContent).toContain("Deactivated");
   expect(labels(rows[1])).toEqual(["Reactivate"]);
 
-  const deactivate = rows[0]?.querySelectorAll("button")[1] as HTMLButtonElement;
+  const deactivate = rows[0]?.querySelectorAll("button")[2] as HTMLButtonElement;
   await act(async () => deactivate.click());
   expect(api.deprovision).not.toHaveBeenCalled();
   expect(deactivate.textContent).toBe("Confirm");
