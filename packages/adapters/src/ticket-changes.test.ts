@@ -1,5 +1,6 @@
 import type { PrismaClient } from "@rakazo/db";
 import { describe, expect, it, vi } from "vitest";
+import { withRunGates } from "./testing/run-gates.js";
 import type { TicketChange } from "./ticket-changes.js";
 import { createTicketChangeNotifier } from "./ticket-changes.js";
 
@@ -15,7 +16,7 @@ function setup(ticketBoardEnabled: boolean, status = "todo") {
   const enqueue = vi.fn(async () => {});
   const createRun = vi.fn(async () => ({ id: "run-1" }));
   const createTask = vi.fn(async () => ({ id: "task-1" }));
-  const tx = {
+  const tx = withRunGates({
     ticket: {
       findFirst: vi.fn(async () => ({
         id: "ticket-1",
@@ -30,7 +31,7 @@ function setup(ticketBoardEnabled: boolean, status = "todo") {
     },
     task: { create: createTask },
     run: { create: createRun },
-  };
+  });
   const transaction = vi.fn(async (fn: (client: typeof tx) => Promise<unknown>) => fn(tx));
   const changes = createTicketChangeNotifier({
     ticketBoardEnabled,

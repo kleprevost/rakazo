@@ -2,6 +2,7 @@ import { once } from "node:events";
 import { createServer } from "node:http";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type * as ComputerLifecycleModule from "./computer-lifecycle.js";
+import { withRunGates } from "./testing/run-gates.js";
 import { isLoopGuardStopText, MAX_CONSECUTIVE_OVER_LIMIT_ACTION_CALLS } from "./tool-loop.js";
 
 const provisionComputer = vi.hoisted(() => vi.fn());
@@ -278,7 +279,7 @@ async function runLoop(
     });
   const emptyMethod = (key: string | symbol) =>
     empty[key as keyof typeof empty] ?? (async () => ({}));
-  const proxied: object = new Proxy(prisma, {
+  const proxied: object = new Proxy(withRunGates(prisma), {
     get: (target, key) =>
       typeof key === "string" && key.startsWith("$") && !(key in target)
         ? async () => []
