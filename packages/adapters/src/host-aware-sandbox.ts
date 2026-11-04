@@ -206,6 +206,13 @@ export class HostAwareSandbox implements SandboxProvider {
     return provider.inspect(computer, context);
   }
 
+  async isolateNetwork(computer: ComputerRef, isolated: boolean, context: AdapterContext) {
+    const provider = this.route(computer);
+    return provider.isolateNetwork
+      ? provider.isolateNetwork(computer, isolated, context)
+      : ("unsupported" as const);
+  }
+
   async isStopped(computer: ComputerRef, context: AdapterContext): Promise<boolean> {
     return this.route(computer).isStopped?.(computer, context) ?? false;
   }

@@ -42,6 +42,7 @@ import type { Actor, ComputerReleaseReason, ComputerStatus } from "@rakazo/contr
 import {
   attachmentMaxBytes,
   attachmentSizeLabel,
+  BOT_QUARANTINED_MESSAGE,
   ComputerCommandSchema,
   foldComputerCommands,
 } from "@rakazo/contracts";
@@ -81,6 +82,7 @@ export function computerRoutes(ctx: RouterContext) {
       boot: authed.computer.boot.handler(async ({ context, input }) => {
         const bot = await repos.getBot(context.actor, input.botId);
         if (!bot.computer) throw new IsolationError();
+        assertComputerNotQuarantined(bot.computer);
         if (bot.computer.state === "running" && bot.computer.providerRef) {
           try {
             await ensureComputerWorkspaceLayout(
@@ -335,6 +337,7 @@ export function computerRoutes(ctx: RouterContext) {
       }),
       takeover: authed.computer.takeover.handler(async ({ context, input }) => {
         let bot = await repos.getBot(context.actor, input.botId);
+        if (bot.computer) assertComputerNotQuarantined(bot.computer);
         if (!bot.computer?.providerRef || bot.computer.state !== "running") {
           throw new ORPCError("BAD_REQUEST", { message: "computer must be running" });
         }
@@ -494,6 +497,7 @@ export function computerRoutes(ctx: RouterContext) {
       input: authed.computer.input.handler(async ({ context, input }) => {
         const bot = await repos.getBot(context.actor, input.botId);
         const computer = bot.computer;
+        if (computer) assertComputerNotQuarantined(computer);
         if (!computer || !hasActiveComputerControl(computer) || computer.controlBotId !== bot.id) {
           await expireStaleComputerControl(deps, computer);
           throw new ORPCError("FORBIDDEN");
@@ -715,6 +719,7 @@ export function computerRoutes(ctx: RouterContext) {
         const computer = bot.computer;
         if (
           !computer?.providerRef ||
+          computer.adminQuarantinedAt ||
           computer.state !== "running" ||
           !deps.sandbox.connectTerminal ||
           !computerSupportsTerminal(computer.kind)
@@ -771,6 +776,7 @@ export function computerRoutes(ctx: RouterContext) {
         }
         if (
           !bot.computer?.providerRef ||
+          bot.computer.adminQuarantinedAt ||
           (bot.computer.state !== "running" && bot.computer.state !== "booting")
         ) {
           return { url: null };
@@ -878,6 +884,12 @@ async function leaseHeldByFinishedRun(
   if (!lease || lease.expiresAt.getTime() <= Date.now()) return false;
   const run = await prisma.run.findUnique({ where: { id: lease.runId }, select: { status: true } });
   return Boolean(run && !(ACTIVE_RUN_STATUSES as readonly string[]).includes(run.status));
+}
+
+/** An admin-quarantined computer takes no start, takeover or input until released. */
+function assertComputerNotQuarantined(computer: { adminQuarantinedAt: Date | null }) {
+  if (computer.adminQuarantinedAt)
+    throw new ORPCError("FORBIDDEN", { message: BOT_QUARANTINED_MESSAGE });
 }
 
 async function computerStatus(

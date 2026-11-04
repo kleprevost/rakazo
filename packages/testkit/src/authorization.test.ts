@@ -518,6 +518,8 @@ describeWithDatabase("API authorization and resource isolation", () => {
       ["admin/quarantine/lift", { id: "missing-quarantine" }],
       ["admin/computers/list"],
       ["admin/computers/get", { computerId: "missing-computer" }],
+      ["admin/computers/quarantine", { computerIds: ["missing-computer"] }],
+      ["admin/computers/release", { computerIds: ["missing-computer"] }],
       [
         "admin/computers/operations/create",
         { kind: "hibernate", computerIds: ["missing-computer"] },
@@ -2470,6 +2472,12 @@ describeWithDatabase("API authorization and resource isolation", () => {
       await expectForbidden(app, cookie, "admin/computers/get", { computerId: "missing-computer" });
       await expectForbidden(app, cookie, "admin/quarantine/start", { scopeKind: "all" });
       await expectForbidden(app, cookie, "admin/quarantine/lift", { id: "missing-quarantine" });
+      await expectForbidden(app, cookie, "admin/computers/quarantine", {
+        computerIds: ["missing-computer"],
+      });
+      await expectForbidden(app, cookie, "admin/computers/release", {
+        computerIds: ["missing-computer"],
+      });
       await expectForbidden(app, cookie, "admin/computers/operations/create", {
         kind: "hibernate",
         computerIds: ["missing-computer"],

@@ -1565,6 +1565,14 @@ model Computer {
   /// provider's own image. The running digest is in `observation`.
   imageRef                String?
   imageDigest             String?
+  /// Set by an admin to contain the computer: it refuses start, wake, takeover and execution
+  /// leases until released. Separate from `state = quarantined`, which means an unconfirmed stop.
+  adminQuarantinedAt      DateTime?
+  adminQuarantinedByUserId String?
+  adminQuarantineReason   String?
+  /// The bot quarantine that contained this computer, so lifting it releases the computer;
+  /// null when an admin quarantined the computer directly.
+  adminQuarantineId       String?
   updates                 ComputerUpdate[]
   homeDeletionNotice      HomeDeletionNotice?
   observation             ComputerObservation?

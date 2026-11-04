@@ -13,7 +13,29 @@ import {
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { liftQuarantine, listQuarantines, startQuarantine } from "./bot-quarantine.js";
 import { assertBotNotSuspended } from "./bot-suspension.js";
+import type * as ComputerQuarantine from "./computer-quarantine.js";
 import { loadWebhookTarget } from "./webhook-inbound.js";
+
+// A quarantine of every bot reaches every computer in the database, including the ones other test
+// files are using at the same moment. These tests are about the bots, so keep containment to the
+// fixture's own Space.
+const own = vi.hoisted(() => ({ spaceId: "" }));
+vi.mock("./computer-quarantine.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof ComputerQuarantine>();
+  return {
+    ...actual,
+    computersCoveredBy: async (...args: Parameters<typeof actual.computersCoveredBy>) => {
+      const ids = await actual.computersCoveredBy(...args);
+      const mine = await runAsSystem("test: own computers", () =>
+        args[0].prisma.computer.findMany({
+          where: { id: { in: ids }, spaceId: own.spaceId },
+          select: { id: true },
+        }),
+      );
+      return mine.map((computer) => computer.id);
+    },
+  };
+});
 
 const databaseUrl = process.env.DATABASE_URL;
 const enabled = process.env.VERIFY_DATABASE === "1" && Boolean(databaseUrl);
@@ -28,6 +50,7 @@ describe.skipIf(!enabled)("quarantining AI employees (PostgreSQL)", () => {
   const extraBots: string[] = [];
   const quarantineIds: string[] = [];
   const sandbox = {
+    describe: () => ({ id: "fake", capabilities: {} }),
     execute: vi.fn(async function* () {
       yield { type: "exit", code: 0 };
     }),
@@ -69,6 +92,7 @@ describe.skipIf(!enabled)("quarantining AI employees (PostgreSQL)", () => {
         { signupsEnabled: undefined, signupAllowlist: undefined },
       ),
     );
+    own.spaceId = identity.spaceId;
     adminId = `admin-${randomUUID()}`;
     adminEmail = `${adminId}@example.test`;
     await system.user.create({
@@ -77,6 +101,12 @@ describe.skipIf(!enabled)("quarantining AI employees (PostgreSQL)", () => {
     cancel.mockClear();
   });
   afterEach(async () => {
+    // Quarantines are deleted below without being lifted, so the computers they contained would
+    // stay flagged for every other test sharing this database.
+    await system.computer.updateMany({
+      where: { adminQuarantineId: { in: quarantineIds } },
+      data: { adminQuarantinedAt: null, adminQuarantinedByUserId: null, adminQuarantineId: null },
+    });
     await system.quarantine.deleteMany({
       where: { OR: [{ id: { in: quarantineIds } }, { createdByUserId: adminId }] },
     });
@@ -149,7 +179,7 @@ describe.skipIf(!enabled)("quarantining AI employees (PostgreSQL)", () => {
         name: "TOKEN",
         origin: "https://api.example.test",
         auth: {},
-        ciphertext: "fake",
+        ciphertext: "secret-ciphertext",
       },
     });
     const vault = await system.vaultCredential.create({
@@ -160,7 +190,7 @@ describe.skipIf(!enabled)("quarantining AI employees (PostgreSQL)", () => {
         name: "personal",
         origin: "https://login.example.test",
         auth: {},
-        ciphertext: "fake",
+        ciphertext: "secret-ciphertext",
       },
     });
     const webhook = await system.secret.create({
@@ -219,12 +249,19 @@ describe.skipIf(!enabled)("quarantining AI employees (PostgreSQL)", () => {
       runAsSystem("test", () => assertBotNotSuspended(prisma, identity.botId)),
     ).resolves.toBeUndefined();
     const events = await system.securityEvent.findMany({ where: { userId: adminId } });
-    expect(events.map((event) => event.type).sort()).toEqual(["bot.quarantined", "bot.released"]);
+    expect(events.map((event) => event.type).sort()).toEqual([
+      "bot.quarantined",
+      "bot.released",
+      "computer.quarantined",
+      "computer.released",
+    ]);
     expect(events.find((event) => event.type === "bot.quarantined")).toMatchObject({
       type: "bot.quarantined",
       metadata: { scopeKind: "bot", scopeId: identity.botId, reason: "suspected leak" },
     });
-    expect(JSON.stringify(events.map((event) => event.metadata))).not.toContain("fake");
+    expect(JSON.stringify(events.map((event) => event.metadata))).not.toContain(
+      "secret-ciphertext",
+    );
   });
 
   it("covers a Space by membership at use time, including a bot added afterwards", async () => {
@@ -266,9 +303,11 @@ describe.skipIf(!enabled)("quarantining AI employees (PostgreSQL)", () => {
   });
 
   it("covers every bot with the all scope", async () => {
-    await start({ scopeKind: "all" });
+    const { id } = await start({ scopeKind: "all" });
     expect((await blocked(identity.botId)).blocked).toBe("quarantined");
     expect((await blocked((await newBot()).id)).blocked).toBe("quarantined");
+    // It reaches every computer in the database; let go of them straight away.
+    await liftQuarantine(deps(), adminId, id);
   });
 
   it("releases on lift, idempotently", async () => {
@@ -281,7 +320,7 @@ describe.skipIf(!enabled)("quarantining AI employees (PostgreSQL)", () => {
         name: "TOKEN",
         origin: "https://api.example.test",
         auth: {},
-        ciphertext: "fake",
+        ciphertext: "secret-ciphertext",
       },
     });
     const { id } = await start({ scopeKind: "bot", scopeId: identity.botId });
@@ -300,7 +339,12 @@ describe.skipIf(!enabled)("quarantining AI employees (PostgreSQL)", () => {
     const types = (await system.securityEvent.findMany({ where: { userId: adminId } })).map(
       (event) => event.type,
     );
-    expect(types.sort()).toEqual(["bot.quarantined", "bot.released"]);
+    expect(types.sort()).toEqual([
+      "bot.quarantined",
+      "bot.released",
+      "computer.quarantined",
+      "computer.released",
+    ]);
   });
 
   it("is admin only and answers NOT_FOUND for an unknown target", async () => {

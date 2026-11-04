@@ -65,6 +65,7 @@ export function toComputerStatus(
     controlRunId?: string | null;
     homeRevision: string;
     maintenanceId?: string | null;
+    adminQuarantinedAt?: Date | null;
     diskUsedBytes?: bigint | null;
     diskFreeBytes?: bigint | null;
     diskDismissedPercent?: number | null;
@@ -77,7 +78,7 @@ export function toComputerStatus(
       ? "stopped"
       : computer?.maintenanceId
         ? "booting"
-        : computer?.state === "quarantined"
+        : computer?.state === "quarantined" || computer?.adminQuarantinedAt
           ? "error"
           : computer?.state === "suspending"
             ? "running"

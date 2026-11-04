@@ -1280,6 +1280,53 @@ app.post("/computers/:id/stop", async (c) => {
   }
 });
 
+/**
+ * Cuts a running computer off from every network, or puts it back on its own bot network. Used to
+ * quarantine a computer that could not be stopped at once. It answers 409 where the topology shares
+ * one network between the supervisor and its computers, because disconnecting would cut the
+ * supervisor off too; and it answers success only after reading the result back from Docker.
+ */
+app.post("/computers/:id/network", async (c) => {
+  const id = c.req.param("id");
+  const botId = c.req.header("x-rakazo-bot-id");
+  const parsed = z
+    .object({ isolated: z.boolean() })
+    .safeParse(await c.req.json().catch(() => undefined));
+  if (!parsed.success) return c.json({ error: "invalid request" }, 400);
+  if (screenNetworkMode === "internal")
+    return c.json({ error: "network isolation unavailable" }, 409);
+  try {
+    if (!botId) throw new ComputerIdentityError("missing computer identity");
+    return await withBotLifecycleLock(botId, async () => {
+      const { container, info } = await managedContainer(
+        id,
+        botId,
+        c.req.header("x-rakazo-space-id"),
+      );
+      if (!info.State.Running) return c.json({ running: false, isolated: false });
+      if (parsed.data.isolated) {
+        for (const name of Object.keys(info.NetworkSettings?.Networks ?? {}))
+          await docker.getNetwork(name).disconnect({ Container: container.id, Force: true });
+      } else if (Object.keys(info.NetworkSettings?.Networks ?? {}).length === 0) {
+        const owner = computerNetworkOwnerFor(dataDir, await inspectSupervisorContainer());
+        if (!(await reconnectBotComputer(container, botId, owner, false)))
+          return c.json({ error: "computer network could not be restored" }, 500);
+      }
+      const after = await container.inspect();
+      const attached = Object.keys(after.NetworkSettings?.Networks ?? {}).length > 0;
+      if (attached === parsed.data.isolated)
+        return c.json({ error: "computer network was not changed" }, 500);
+      return c.json({ running: true, isolated: parsed.data.isolated });
+    });
+  } catch (error) {
+    if (error instanceof ComputerIdentityError)
+      return c.json({ error: "invalid computer identity" }, 403);
+    if (error && typeof error === "object" && "statusCode" in error && error.statusCode === 404)
+      return c.json({ error: "computer not found" }, 404);
+    return c.json({ error: "computer network change failed" }, 500);
+  }
+});
+
 app.delete("/computers/:id", async (c) => {
   const id = c.req.param("id");
   const botId = c.req.header("x-rakazo-bot-id");

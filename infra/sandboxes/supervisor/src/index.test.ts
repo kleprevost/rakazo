@@ -190,6 +190,7 @@ describe("sandbox supervisor HTTP boundary", () => {
       ["DELETE", "/computers/id/screen"],
       ["POST", "/computers/id/input"],
       ["POST", "/computers/id/stop"],
+      ["POST", "/computers/id/network"],
       ["DELETE", "/computers/id"],
     ];
 

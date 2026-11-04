@@ -17,6 +17,8 @@ const api = vi.hoisted(() => ({
   operations: vi.fn(),
   operation: vi.fn(),
   createOperation: vi.fn(),
+  quarantineComputers: vi.fn(),
+  releaseComputers: vi.fn(),
   policy: vi.fn(),
   audit: vi.fn(),
   endSessions: vi.fn(),
@@ -35,7 +37,11 @@ vi.mock("../../lib/rpc", () => ({
       users: { endSessions: api.endSessions },
       bots: { suspend: api.suspend, resume: api.resume },
       quarantine: { start: api.quarantineStart, lift: api.quarantineLift },
-      computers: { operations: { create: api.createOperation } },
+      computers: {
+        operations: { create: api.createOperation },
+        quarantine: api.quarantineComputers,
+        release: api.releaseComputers,
+      },
     },
   },
 }));
@@ -805,6 +811,7 @@ const fleetComputers = {
     health: "unknown",
     runningSince: null,
     lastActivityAt: null,
+    quarantinedAt: null,
   })),
   nextCursor: null,
 };
@@ -1021,4 +1028,58 @@ it("terminates the selected computers only after a confirmation", async () => {
   });
   await settle();
   expect(api.createOperation).toHaveBeenCalledWith({ kind: "terminate", computerIds: ["c1"] });
+});
+
+it("quarantines the selected computers after a confirmation and releases them without one", async () => {
+  api.computers.mockResolvedValue(fleetComputers);
+  api.operations.mockResolvedValue({ operations: [] });
+  api.quarantineComputers.mockResolvedValue({ quarantined: 1, operationId: "op4" });
+  api.releaseComputers.mockResolvedValue({ released: 1 });
+  const { host } = await show(<AdminComputersPage />);
+  // Nothing is quarantined yet, so neither the filter nor Release is on the page.
+  expect(host.textContent).not.toContain("Quarantined");
+  const button = (name: string, root: ParentNode = host) =>
+    [...root.querySelectorAll("button")].find((b) => b.textContent === name) as HTMLElement;
+  await act(async () => {
+    (host.querySelector('[aria-label="Reporter"] [role="checkbox"]') as HTMLElement).click();
+  });
+  await settle();
+  expect(button("Release")).toBeUndefined();
+  await act(async () => {
+    button("Quarantine").click();
+  });
+  await settle();
+  expect(document.body.textContent).toContain("Quarantine 1 computer?");
+  expect(api.quarantineComputers).not.toHaveBeenCalled();
+  // The page reloads after the call and finds it quarantined.
+  api.computers.mockResolvedValue({
+    computers: fleetComputers.computers.map((computer, index) => ({
+      ...computer,
+      quarantinedAt: index === 0 ? "2026-02-06T00:00:00.000Z" : null,
+    })),
+    nextCursor: null,
+  });
+  await act(async () => {
+    const dialog = document.body.querySelector('[role="alertdialog"]') as HTMLElement;
+    button("Quarantine", dialog).click();
+  });
+  await settle();
+  expect(api.quarantineComputers).toHaveBeenCalledWith({ computerIds: ["c1"] });
+
+  // The row says so, the filter appears and Release acts on it.
+  await act(async () => {
+    button("Quarantined")?.click();
+  });
+  await settle();
+  expect(host.querySelector('[aria-label="Reporter"]')?.textContent).toContain("Quarantined");
+  expect(api.computers).toHaveBeenLastCalledWith(expect.objectContaining({ quarantined: true }));
+  await act(async () => {
+    (host.querySelector('[aria-label="Reporter"] [role="checkbox"]') as HTMLElement).click();
+  });
+  await settle();
+  await act(async () => {
+    button("Release").click();
+  });
+  await settle();
+  expect(api.releaseComputers).toHaveBeenCalledWith({ computerIds: ["c1"] });
 });

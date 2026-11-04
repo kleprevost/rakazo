@@ -945,6 +945,7 @@ describe("Docker sandbox streams through the supervisor", () => {
       inspect: true,
       usage: true,
       imageSelection: true,
+      networkIsolation: true,
     });
     await expect(
       provider.inspect({ id: "box", botId: "bot", kind: "docker", providerRef: "box" }, context),
@@ -992,5 +993,40 @@ describe("Docker sandbox streams through the supervisor", () => {
     expect(reports.get("b")).toMatchObject({ runtime: "gone" });
     expect(reports.get("c")).toBeNull();
     expect(reports.get("d")).toBeNull();
+  });
+
+  it("cuts a running computer off from its network and reports only what the supervisor confirmed", async () => {
+    const fetchMock = vi.fn(async (url: string | URL | Request, init?: RequestInit) => {
+      const target = String(url);
+      if (target.includes("/shared/"))
+        return Response.json({ error: "unavailable" }, { status: 409 });
+      if (target.includes("/gone/")) return Response.json({ error: "not found" }, { status: 404 });
+      if (target.includes("/stopped/")) return Response.json({ running: false, isolated: false });
+      if (target.includes("/broken/")) return new Response("{}", { status: 500 });
+      return Response.json({ running: true, isolated: JSON.parse(String(init?.body)).isolated });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    const provider = new DockerSandboxProvider("http://supervisor.test", "test-token");
+    const ref = (id: string) => ({ id, botId: "bot", kind: "docker" as const, providerRef: id });
+    await expect(provider.isolateNetwork(ref("box"), true, context)).resolves.toBe("applied");
+    await expect(provider.isolateNetwork(ref("box"), false, context)).resolves.toBe("applied");
+    expect(String(fetchMock.mock.calls[0]?.[0])).toBe(
+      "http://supervisor.test/computers/box/network",
+    );
+    expect(fetchMock.mock.calls.map((call) => JSON.parse(String(call[1]?.body)))).toEqual([
+      { isolated: true },
+      { isolated: false },
+    ]);
+    await expect(provider.isolateNetwork(ref("stopped"), true, context)).resolves.toBe(
+      "not_running",
+    );
+    await expect(provider.isolateNetwork(ref("gone"), true, context)).resolves.toBe("not_running");
+    // A topology that shares one network cannot isolate one computer, and says so.
+    await expect(provider.isolateNetwork(ref("shared"), true, context)).resolves.toBe(
+      "unsupported",
+    );
+    await expect(provider.isolateNetwork(ref("broken"), true, context)).rejects.toThrow(
+      "could not change computer network: 500",
+    );
   });
 });

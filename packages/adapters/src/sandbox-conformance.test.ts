@@ -83,6 +83,31 @@ describe("sandbox conformance", () => {
     await expect(fake.inspect(computer, ctx)).resolves.toMatchObject({ runtime: "gone" });
   });
 
+  it("isolates a network only where the provider declares it, and never otherwise", async () => {
+    const providers: SandboxProvider[] = [
+      new FakeSandboxProvider(),
+      fakeBoat(),
+      fakeBoxdProvider(),
+      emulatedNovita().provider(),
+      new DesktopSandboxProvider(),
+      new FakeWuyingDesktop().provider(),
+    ];
+    for (const provider of providers)
+      expect(typeof provider.isolateNetwork === "function").toBe(
+        provider.describe().capabilities.fleet?.networkIsolation === true,
+      );
+    const fake = new FakeSandboxProvider();
+    const computer = await provisionPrepared(fake, { botId: "bot-n", homePath: "/tmp/n" }, ctx);
+    await expect(fake.isolateNetwork(computer, true, ctx)).resolves.toBe("applied");
+    await expect(fake.inspect(computer, ctx)).resolves.toMatchObject({
+      egress: { mode: "isolated", enforced: true },
+    });
+    await expect(fake.isolateNetwork(computer, false, ctx)).resolves.toBe("applied");
+    await expect(fake.inspect(computer, ctx)).resolves.toMatchObject({ egress: { mode: "open" } });
+    await fake.destroy(computer, ctx);
+    await expect(fake.isolateNetwork(computer, true, ctx)).resolves.toBe("not_running");
+  });
+
   it("offers the same observation, action, and workspace contract across providers", async () => {
     const providers: SandboxProvider[] = [
       new FakeSandboxProvider(),

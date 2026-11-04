@@ -14,6 +14,7 @@ import {
 } from "../admin-fleet-operations.js";
 import { liftQuarantine, listQuarantines, startQuarantine } from "../bot-quarantine.js";
 import { resumeBot, suspendBot } from "../bot-suspension.js";
+import { quarantineComputers, releaseComputers } from "../computer-quarantine.js";
 import type { RouterContext } from "./context.js";
 
 /** The deployment admin console. Each handler checks `requireAdmin` before reading anything. */
@@ -60,6 +61,12 @@ export function adminRoutes(ctx: RouterContext) {
         ),
         get: authed.admin.computers.get.handler(({ context, input }) =>
           adminComputer(deps, context.actor.userId, input.computerId),
+        ),
+        quarantine: authed.admin.computers.quarantine.handler(({ context, input }) =>
+          quarantineComputers(deps, context.actor.userId, input),
+        ),
+        release: authed.admin.computers.release.handler(({ context, input }) =>
+          releaseComputers(deps, context.actor.userId, input),
         ),
         operations: {
           create: authed.admin.computers.operations.create.handler(({ context, input }) =>

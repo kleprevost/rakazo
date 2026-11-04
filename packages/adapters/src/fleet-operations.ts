@@ -376,6 +376,7 @@ async function executeItem(deps: RunDeps, claimed: Claimed, signal: AbortSignal)
         state: true,
         spaceId: true,
         userId: true,
+        adminQuarantinedAt: true,
         bots: { where: { archivedAt: null }, select: { id: true, userId: true }, take: 1 },
       },
     }),
@@ -398,6 +399,7 @@ async function executeItem(deps: RunDeps, claimed: Claimed, signal: AbortSignal)
     if (outcome === "deferred") return { status: "failed", outcome: "deferred" };
     return { status: "failed", outcome: "not_running" };
   }
+  if (computer.adminQuarantinedAt) return { status: "skipped_unsupported", outcome: "quarantined" };
   if (computer.state === "running") return { status: "succeeded", outcome: "already_running" };
   if (computer.state === "booting" || computer.state === "suspending")
     return { status: "skipped_busy", outcome: "busy" };

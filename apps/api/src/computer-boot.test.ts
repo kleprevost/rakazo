@@ -172,6 +172,26 @@ describe("computer boot", () => {
     expect(lifecycle.provisionComputer).not.toHaveBeenCalled();
   });
 
+  it("refuses to start a computer an admin quarantined, even one that is still running", async () => {
+    for (const computer of [
+      { ...stoppedBot.computer, adminQuarantinedAt: new Date() },
+      {
+        ...stoppedBot.computer,
+        state: "running",
+        providerRef: "box",
+        adminQuarantinedAt: new Date(),
+      },
+    ]) {
+      const prisma = {
+        bot: { findFirst: vi.fn().mockResolvedValue({ ...stoppedBot, computer }) },
+      } as unknown as PrismaClient;
+      const response = await boot(prisma);
+      expect(response?.status).toBe(403);
+    }
+    expect(lifecycle.acquireComputerExecutionLease).not.toHaveBeenCalled();
+    expect(lifecycle.provisionComputer).not.toHaveBeenCalled();
+  });
+
   it("reports a computer removed while the boot waited as not found", async () => {
     lifecycle.provisionComputer.mockRejectedValue(
       new Prisma.PrismaClientKnownRequestError("No record was found for a query.", {

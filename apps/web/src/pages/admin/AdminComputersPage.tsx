@@ -54,10 +54,12 @@ function AdminComputers() {
   const { i18n, t } = useLingui();
   const labels = useFleetLabels();
   const [notApproved, setNotApproved] = useState(false);
+  const [quarantinedOnly, setQuarantinedOnly] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [openOperation, setOpenOperation] = useState<string | null>(null);
   const [starting, setStarting] = useState(false);
   const [confirmTerminate, setConfirmTerminate] = useState(false);
+  const [confirmQuarantine, setConfirmQuarantine] = useState(false);
   const [image, setImage] = useState("");
   const operations = useFleetOperations();
   // The approved images come from the policy, read only once there is something to recreate.
@@ -72,6 +74,7 @@ function AdminComputers() {
         limit: PAGE_SIZE,
         ...(cursor ? { cursor } : {}),
         ...(notApproved ? { imageCompliance: "not_approved" as const } : {}),
+        ...(quarantinedOnly ? { quarantined: true as const } : {}),
       }),
       initialPageParam: null as string | null,
       getNextPageParam: (page) => page.nextCursor,
@@ -102,6 +105,25 @@ function AdminComputers() {
       setStarting(false);
     }
   }
+  // Release is offered once a selected computer is quarantined; the filter once any is.
+  const canRelease = rows.some((computer) => selected.has(computer.id) && computer.quarantinedAt);
+  async function contain(kind: "quarantine" | "release") {
+    setStarting(true);
+    try {
+      const input = { computerIds: [...selected] };
+      let stopping: string | null = null;
+      if (kind === "quarantine")
+        stopping = (await rpc.admin.computers.quarantine(input)).operationId;
+      else await rpc.admin.computers.release(input);
+      setSelected(new Set());
+      if (stopping) setOpenOperation(stopping);
+      await Promise.all([computers.refetch(), operations.refetch()]);
+    } catch (error) {
+      toast.error(errorText(error, t`Could not update`));
+    } finally {
+      setStarting(false);
+    }
+  }
   const governed = notApproved || rows.some((computer) => Boolean(computer.imageCompliance));
   return (
     <>
@@ -114,6 +136,17 @@ function AdminComputers() {
           onClick={() => setNotApproved(!notApproved)}
         >
           <Trans>Not approved</Trans>
+        </Button>
+      ) : null}
+      {quarantinedOnly || rows.some((computer) => computer.quarantinedAt) ? (
+        <Button
+          variant={quarantinedOnly ? "secondary" : "outline"}
+          size="sm"
+          aria-pressed={quarantinedOnly}
+          className="mb-3 mr-2"
+          onClick={() => setQuarantinedOnly(!quarantinedOnly)}
+        >
+          <Trans>Quarantined</Trans>
         </Button>
       ) : null}
       {selected.size > 0 ? (
@@ -138,6 +171,24 @@ function AdminComputers() {
           >
             {labels.kind("terminate")}
           </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={starting}
+            onClick={() => setConfirmQuarantine(true)}
+          >
+            <Trans>Quarantine</Trans>
+          </Button>
+          {canRelease ? (
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={starting}
+              onClick={() => void contain("release")}
+            >
+              <Trans>Release</Trans>
+            </Button>
+          ) : null}
           {approved.length > 0 ? (
             <NativeSelect
               aria-label={t`Image`}
@@ -179,6 +230,34 @@ function AdminComputers() {
               }}
             >
               {labels.kind("terminate")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      <AlertDialog open={confirmQuarantine} onOpenChange={setConfirmQuarantine}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              <Plural
+                value={selected.size}
+                one="Quarantine # computer?"
+                other="Quarantine # computers?"
+              />
+            </AlertDialogTitle>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>
+              <Trans>Cancel</Trans>
+            </AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              disabled={starting}
+              onClick={() => {
+                setConfirmQuarantine(false);
+                void contain("quarantine");
+              }}
+            >
+              <Trans>Quarantine</Trans>
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -312,6 +391,11 @@ function ComputerRow({
       <TableCell>{computer.kind}</TableCell>
       <TableCell>
         <Badge variant={computer.state === "running" ? "secondary" : "outline"}>{status}</Badge>
+        {computer.quarantinedAt ? (
+          <Badge variant="destructive" className="ml-2">
+            {t`Quarantined`}
+          </Badge>
+        ) : null}
       </TableCell>
       <TableCell className="max-w-48 truncate text-muted-foreground">
         {reported(computer.image)}

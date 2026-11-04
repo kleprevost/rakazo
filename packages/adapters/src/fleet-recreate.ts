@@ -62,6 +62,7 @@ export async function recreateComputer(
         providerRef: true,
         homeRevision: true,
         imageDigest: true,
+        adminQuarantinedAt: true,
         observation: { select: { imageDigest: true } },
         bots: { where: { archivedAt: null }, select: { id: true, userId: true }, take: 1 },
       },
@@ -109,6 +110,9 @@ export async function recreateComputer(
   );
   let updateId = prior?.id;
   if (!updateId) {
+    // A recreate starts the replacement; a quarantined computer stays down until released.
+    if (computer.adminQuarantinedAt)
+      return { status: "skipped_unsupported", outcome: "quarantined" };
     if (computer.state !== "running")
       return { status: "skipped_unsupported", outcome: "not_running" };
     if (!bot) return { status: "failed", outcome: "no_bot" };
