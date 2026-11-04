@@ -208,7 +208,9 @@ describe("Docker sandbox", () => {
   });
 
   it("sends a named image to the supervisor only when asked for one", async () => {
-    const fetchMock = vi.fn(async () => Response.json({ id: "computer" }));
+    const fetchMock = vi.fn(async (_url: string | URL | Request, _init?: RequestInit) =>
+      Response.json({ id: "computer" }),
+    );
     vi.stubGlobal("fetch", fetchMock);
     const provider = new DockerSandboxProvider("http://supervisor.test", "test-token");
     const digest = `sha256:${"a".repeat(64)}`;
