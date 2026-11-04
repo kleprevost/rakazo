@@ -512,6 +512,7 @@ msgstr "動態"
 
 #: src/components/integrations/plugin-marketplace.tsx
 #: src/components/SecretAskCard.tsx
+#: src/pages/Employees.tsx
 #: src/pages/McpServersOverlay.tsx
 #: src/pages/PluginsOverlay.tsx
 #: src/pages/ScratchpadSection.tsx
@@ -912,8 +913,14 @@ msgstr "核准"
 #: src/pages/MessagingSettingsPanel.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
 #: src/pages/shell/message-cards.tsx
+#: src/pages/shell/share-employee-dialog.tsx
 msgid "Approve"
 msgstr "核准"
+
+#. placeholder {0}: request.requesterName
+#: src/pages/shell/share-employee-dialog.tsx
+msgid "Approve {0}"
+msgstr ""
 
 #: src/lib/call-session.ts
 msgid "Approve or deny it on screen."
@@ -1060,6 +1067,7 @@ msgstr "頭像工作室"
 #: src/pages/Auth.tsx
 #: src/pages/Board.tsx
 #: src/pages/Calendar.tsx
+#: src/pages/Employees.tsx
 #: src/pages/McpServersOverlay.tsx
 #: src/pages/NavLinkPage.tsx
 #: src/pages/PluginsOverlay.tsx
@@ -1204,6 +1212,10 @@ msgstr "大腦標籤"
 
 #: src/components/integrations/skills-dialog.tsx
 msgid "Browse"
+msgstr ""
+
+#: src/pages/shell/bot-picker.tsx
+msgid "Browse employees"
 msgstr ""
 
 #: src/pages/PluginsOverlay.tsx
@@ -1992,6 +2004,7 @@ msgstr "無法清空對話"
 
 #: src/components/ComputerUpdateProgress.tsx
 #: src/pages/Calendar.tsx
+#: src/pages/Employees.tsx
 #: src/pages/Today.tsx
 msgid "Could not complete action"
 msgstr "無法完成操作"
@@ -2816,8 +2829,14 @@ msgid "Denied"
 msgstr "已拒絕"
 
 #: src/components/AskCard.tsx
+#: src/pages/shell/share-employee-dialog.tsx
 msgid "Deny"
 msgstr "拒絕"
+
+#. placeholder {0}: request.requesterName
+#: src/pages/shell/share-employee-dialog.tsx
+msgid "Deny {0}"
+msgstr ""
 
 #. placeholder {0}: settings.defaultProvider
 #: src/components/ComputerProviderSettings.tsx
@@ -3079,6 +3098,10 @@ msgstr ""
 #: src/lib/user-error.ts
 msgid "Email verification required"
 msgstr "需要驗證電子信箱"
+
+#: src/pages/Employees.tsx
+msgid "Employees"
+msgstr ""
 
 #. placeholder {0}: humanizeTool(toolName)
 #: src/pages/shell/bot-panel.tsx
@@ -4590,6 +4613,10 @@ msgstr ""
 msgid "No bots match"
 msgstr "沒有符合的機器人"
 
+#: src/pages/Employees.tsx
+msgid "No employees yet"
+msgstr ""
+
 #: src/components/AskCard.tsx
 #: src/components/SecretAskCard.tsx
 msgid "No longer active"
@@ -5656,7 +5683,16 @@ msgstr "正在回覆 {0}"
 msgid "Request a new code"
 msgstr "請重新獲取驗證碼"
 
+#: src/pages/Employees.tsx
+msgid "Request access"
+msgstr ""
+
+#: src/pages/Employees.tsx
+msgid "Requested"
+msgstr ""
+
 #: src/pages/MessagingSettingsPanel.tsx
+#: src/pages/shell/share-employee-dialog.tsx
 msgid "Requests"
 msgstr "請求"
 
@@ -7073,6 +7109,7 @@ msgstr "受信任的網站"
 #: src/components/pages/PagesList.tsx
 #: src/pages/ActivityList.tsx
 #: src/pages/Calendar.tsx
+#: src/pages/Employees.tsx
 #: src/pages/Onboarding.tsx
 #: src/pages/SharedPage.tsx
 #: src/pages/SpaceSearch.tsx

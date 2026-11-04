@@ -68,7 +68,9 @@ export function ShellSidebar({
   openSettings,
   openIntegrations,
   openSkills,
+  sharedEmployeesEnabled = false,
 }: {
+  sharedEmployeesEnabled?: boolean;
   isMobile: boolean;
   mobileOpen: boolean;
   setMobileOpen: (open: boolean) => void;
@@ -174,6 +176,7 @@ export function ShellSidebar({
           navigate={navigate}
           setNewSpaceOpen={setNewSpaceOpen}
           setCreateBotOpen={setCreateBotOpen}
+          sharedEmployeesEnabled={sharedEmployeesEnabled}
         />
         {mini ||
         !(

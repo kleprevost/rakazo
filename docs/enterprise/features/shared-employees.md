@@ -508,3 +508,22 @@ are shown as returned. `bots.employeeId` and `grants.list`'s `subjectLabel` (the
 now in the contracts. Not in this PR: a draft editor, expiry dates, "Add to my bots" (the directory
 in PR 6 is its home), and mobile, which waits for the native follow-up named in the build plan.
 New catalog entries are untranslated in non-English locales and fall back to English.
+
+PR 6 (directory and access requests, web and desktop) adds `employees.directory`, listing published,
+running employees marked `listed` plus every employee the caller is entitled to, each with name,
+description, owner name, the caller's role, whether they may add an instance and whether a request is
+open. It reads as system but returns card fields only; an unlisted employee the caller has no
+entitlement to never appears, and requesting one answers not found. The page is `/app/employees`,
+reached from "Browse employees" in the Create menu only when `me.sharedEmployeesEnabled` is on:
+"Add" calls `employees.addInstance` and opens the bot, "Request access" opens a request. New table
+`employee_access_requests` (additive, row-level security: the requester and the employee's
+Owners and Managers read; writes are system only; one open request per person and employee through a
+partial unique index) with `employees.requests.create|list|decide`, all refused when the flag is off.
+Approving goes through the existing `setGrant` (so role limits, reconcile and audit apply) as
+Collaborator, never lowering a role the person already holds; denying only closes the request, and the
+person may ask again. Security events `employee.access_requested` and `employee.access_decided`
+carry ids only. Notifications: requests appear in an inbox at the top of the Share dialog when
+non-empty. The existing needs-attention mechanism is per bot and per run, so it has nowhere to put a
+request that belongs to an employee, not to anyone's bot; a Today item for Owners and Managers is the
+natural follow-up. Not in this PR: a request note, withdrawing a request, choosing the granted role,
+and mobile (the native list and sheet arrive with the mobile follow-up).

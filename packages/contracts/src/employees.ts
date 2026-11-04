@@ -104,6 +104,33 @@ export const EmployeeGrantSchema = z.object({
 });
 export type EmployeeGrant = z.infer<typeof EmployeeGrantSchema>;
 
+/**
+ * One directory row: a listed employee, or one the caller is entitled to. It carries the card
+ * fields and the owner's name only, never anything from an instance.
+ */
+export const EmployeeDirectoryEntrySchema = z.object({
+  id: Id,
+  name: z.string(),
+  description: z.string(),
+  ownerName: z.string().nullable(),
+  /** The caller's highest role, or null when they have none. */
+  role: EmployeeRoleSchema.nullable(),
+  /** The caller may add their own instance (`use`). */
+  canUse: z.boolean(),
+  /** The caller has an open request. */
+  requested: z.boolean(),
+});
+export type EmployeeDirectoryEntry = z.infer<typeof EmployeeDirectoryEntrySchema>;
+
+export const EmployeeAccessRequestSchema = z.object({
+  id: Id,
+  requesterName: z.string(),
+  requesterEmail: z.string(),
+  requestedRole: EmployeeRoleSchema,
+  createdAt: IsoDate,
+});
+export type EmployeeAccessRequest = z.infer<typeof EmployeeAccessRequestSchema>;
+
 export const EmployeeDraftInputSchema = z.object({
   employeeId: Id,
   role: z.string().max(2_000).optional(),
@@ -141,6 +168,24 @@ export const employeesContract = {
   addInstance: oc
     .input(z.object({ employeeId: Id }))
     .output(z.object({ botId: Id, created: z.boolean() })),
+  /** Listed employees and the caller's own, with their access state. Needs the feature on. */
+  directory: oc.output(z.array(EmployeeDirectoryEntrySchema)),
+  requests: {
+    /** Asks for access to a listed employee the caller cannot use yet. Repeating it changes nothing. */
+    create: oc.input(z.object({ employeeId: Id })).output(z.object({ ok: z.literal(true) })),
+    /** Open requests for an employee, for Owners and Managers. */
+    list: oc.input(z.object({ employeeId: Id })).output(z.array(EmployeeAccessRequestSchema)),
+    /** Approving creates the grant; denying only closes the request. */
+    decide: oc
+      .input(
+        z.object({
+          employeeId: Id,
+          requestId: Id,
+          decision: z.enum(["approve", "deny"]),
+        }),
+      )
+      .output(z.object({ ok: z.literal(true) })),
+  },
   versions: {
     /** Edits the open draft, or opens the next one from the current version. */
     saveDraft: oc.input(EmployeeDraftInputSchema).output(EmployeeVersionSchema),

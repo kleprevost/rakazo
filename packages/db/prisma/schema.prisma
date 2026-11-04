@@ -25,7 +25,8 @@ model User {
   aiDataConsents AiDataConsent[]
   directoryClaim       UserDirectoryClaim?
   employeeEntitlements EmployeeEntitlement[]
-  pages          Page[]
+  employeeAccessRequests EmployeeAccessRequest[]
+  pages         Page[]
   id                          String                       @id
   name                        String
   email                       String
@@ -2519,6 +2520,7 @@ model Employee {
   versions          EmployeeVersion[]
   grants            EmployeeGrant[]
   entitlements      EmployeeEntitlement[]
+  accessRequests    EmployeeAccessRequest[]
   bots              Bot[]
 
   @@map("employees")
@@ -2593,4 +2595,25 @@ model EmployeeEntitlement {
   @@id([employeeId, userId, source])
   @@index([userId])
   @@map("employee_entitlements")
+}
+
+/// A person asking for access to a listed employee they are not entitled to. Owners and Managers
+/// decide; approval creates an ordinary grant. At most one pending request per person and employee
+/// (partial unique index in SQL, which Prisma cannot express).
+model EmployeeAccessRequest {
+  id              String    @id @default(cuid())
+  employeeId      String
+  employee        Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  requesterUserId String
+  requester       User      @relation(fields: [requesterUserId], references: [id], onDelete: Cascade)
+  requestedRole   String    @default("collaborator")
+  /// "pending" | "approved" | "denied" | "withdrawn"
+  status          String    @default("pending")
+  decidedBy       String?
+  decidedAt       DateTime?
+  createdAt       DateTime  @default(now())
+
+  @@index([employeeId, status])
+  @@index([requesterUserId])
+  @@map("employee_access_requests")
 }
