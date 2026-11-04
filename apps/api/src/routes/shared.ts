@@ -14,7 +14,7 @@ import {
   canonicalPiProviderId,
   resolveBotAvatarSet,
 } from "@rakazo/contracts";
-import { isAdmin } from "../admins.js";
+import { adminRoles } from "../admins.js";
 import { effectiveSandboxProvider } from "../computer-provider-config.js";
 import type { RouterDeps } from "../router.js";
 
@@ -27,7 +27,7 @@ function hostCredentials(active: boolean, provider: string) {
 }
 
 export async function meDto(deps: RouterDeps, actor: Actor): Promise<Me> {
-  const [user, setup, admin] = await Promise.all([
+  const [user, setup, roles] = await Promise.all([
     deps.prisma.user.findUniqueOrThrow({
       where: { id: actor.userId },
       select: {
@@ -40,7 +40,7 @@ export async function meDto(deps: RouterDeps, actor: Actor): Promise<Me> {
       },
     }),
     modelSetup(deps, actor),
-    isAdmin(deps, actor.userId),
+    adminRoles(deps, actor.userId),
   ]);
   // Where the deployment runs computers once an admin's choice in Settings applies.
   const sandboxProvider = effectiveSandboxProvider(setup.settings, deps.env.sandboxProvider);
@@ -56,7 +56,8 @@ export async function meDto(deps: RouterDeps, actor: Actor): Promise<Me> {
     name: user.name,
     spaceId: actor.spaceId,
     isDeploymentOwner: false,
-    isAdmin: admin,
+    isAdmin: roles.includes("platform"),
+    adminRoles: roles,
     needsModel: setup.needsModel,
     defaultProvider: canonicalPiProviderId(setup.model?.provider ?? deps.env.defaultProvider),
     defaultModel: setup.model?.modelId ?? deps.env.defaultModel,
@@ -73,7 +74,7 @@ export async function meDto(deps: RouterDeps, actor: Actor): Promise<Me> {
     // The deployment's provider: an account's own choice covers only its Team Computers.
     sandboxProvider,
     mcpStdioEnabled:
-      admin &&
+      roles.includes("platform") &&
       mcpStdioAvailable({
         stdioEnabled: deps.env.mcpStdioEnabled,
         allowedCommands: deps.env.mcpStdioAllowedCommands,

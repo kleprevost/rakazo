@@ -765,6 +765,15 @@ describe("OIDC callbacks", () => {
       expect((await signIn(claims([]))).headers.get("location")).toContain("SSO_ACCESS_DENIED");
       expect(await auth.isSsoAdmin(userId())).toBe(false);
     });
+    it("maps role values to operator roles and revokes them on the next sign-in", async () => {
+      configure({ roleValues: { fleet: ["Rakazo.Fleet"], auditor: ["Rakazo.Auditor"] } });
+      await signIn(claims(["Rakazo.Fleet", "Rakazo.User"]));
+      expect(await auth.ssoOperatorRoles(userId())).toEqual(["fleet"]);
+      expect(await auth.isSsoAdmin(userId())).toBe(false);
+      cookies = "";
+      await signIn(claims(["Rakazo.User"]));
+      expect(await auth.ssoOperatorRoles(userId())).toEqual([]);
+    });
     it("never grants admin when no admin values are configured", async () => {
       configure();
       await signIn(claims(["Rakazo.Admin"]));

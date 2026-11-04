@@ -29,6 +29,8 @@ export interface OidcConfig {
   allowedValues?: string[];
   /** Tokens carrying one of these values in the claim are deployment admins. */
   adminValues?: string[];
+  /** Tokens carrying one of these values hold the narrower operator role (platform is `adminValues`). */
+  roleValues?: Partial<Record<"security" | "fleet" | "auditor", string[]>>;
   /**
    * Re-checks signed-in SSO users against the provider this often, in minutes. Unset is off.
    * It needs a refresh token, so `offline_access` is requested at sign-in.
@@ -104,6 +106,14 @@ export function isOidcAccessAllowed(config: OidcConfig, claims: Record<string, u
 export function hasOidcAdminClaim(config: OidcConfig, claims: Record<string, unknown>) {
   const admin = config.adminValues ?? [];
   return oidcClaimValues(config, claims).some((value) => admin.includes(value));
+}
+
+/** The narrower operator roles whose values this token carries. */
+export function oidcOperatorRoles(config: OidcConfig, claims: Record<string, unknown>) {
+  const values = oidcClaimValues(config, claims);
+  return (["security", "fleet", "auditor"] as const).filter((role) =>
+    values.some((value) => config.roleValues?.[role]?.includes(value)),
+  );
 }
 
 /** Discovery never gates API startup. Failed attempts share exponential backoff. */
@@ -376,5 +386,21 @@ export async function isOidcAdminAccount(
     return hasOidcAdminClaim(config, claims);
   } catch {
     return false;
+  }
+}
+
+/** The narrower operator roles a stored ID token, still bound to this issuer and account, carries. */
+export async function oidcOperatorRolesForAccount(
+  config: OidcConfig,
+  account: { providerId: string; accountId: string; idToken?: string | null },
+  key: TokenKey,
+) {
+  if (!(await isCurrentOidcAccount(account, config.issuer, key))) return [];
+  const idToken = await openIdToken(key, account.idToken);
+  try {
+    const claims = JSON.parse(Buffer.from(idToken?.split(".")[1] ?? "", "base64url").toString());
+    return oidcOperatorRoles(config, claims);
+  } catch {
+    return [];
   }
 }

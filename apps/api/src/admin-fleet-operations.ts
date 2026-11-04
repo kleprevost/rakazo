@@ -6,11 +6,14 @@ import {
 } from "@rakazo/adapters";
 import type { FleetOperation, FleetOperationDetail } from "@rakazo/contracts";
 import { runAsSystem } from "@rakazo/db";
-import { requireAdmin } from "./admins.js";
+import { requireAdminRole } from "./admins.js";
 import type { RouterDeps } from "./router.js";
 
 type FleetDeps = Pick<RouterDeps, "prisma" | "jobs"> & {
-  env: Pick<RouterDeps["env"], "adminEmails" | "ssoAdminEnabled">;
+  env: Pick<
+    RouterDeps["env"],
+    "adminEmails" | "ssoAdminEnabled" | "operatorEmails" | "ssoOperatorRolesEnabled"
+  >;
   auth: Pick<RouterDeps["auth"], "isSsoAdmin">;
 };
 
@@ -45,7 +48,7 @@ export async function adminCreateFleetOperation(
   actorId: string,
   input: Omit<Parameters<typeof createFleetOperation>[1], "actorUserId">,
 ): Promise<{ id: string }> {
-  await requireAdmin(deps, actorId);
+  await requireAdminRole(deps, actorId, "fleet");
   try {
     return await createFleetOperation(deps, { ...input, actorUserId: actorId });
   } catch (error) {
@@ -64,7 +67,7 @@ export async function adminFleetOperations(
   actorId: string,
   input: { limit: number },
 ): Promise<{ operations: FleetOperation[] }> {
-  await requireAdmin(deps, actorId);
+  await requireAdminRole(deps, actorId, ["fleet", "auditor"]);
   const rows = await system("list", () =>
     deps.prisma.computerFleetOperation.findMany({
       orderBy: [{ createdAt: "desc" }, { id: "desc" }],
@@ -97,7 +100,7 @@ export async function adminFleetOperation(
   actorId: string,
   operationId: string,
 ): Promise<FleetOperationDetail> {
-  await requireAdmin(deps, actorId);
+  await requireAdminRole(deps, actorId, ["fleet", "auditor"]);
   const row = await system("read", () =>
     deps.prisma.computerFleetOperation.findUnique({
       where: { id: operationId },

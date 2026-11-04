@@ -13,7 +13,7 @@ import {
 } from "@rakazo/contracts";
 import type { Prisma } from "@rakazo/db";
 import { recordSecurityEvent, runAsSystem } from "@rakazo/db";
-import { isAdmin, requireAdmin } from "./admins.js";
+import { hasAdminRole, requireAdminRole } from "./admins.js";
 import type { RouterDeps } from "./router.js";
 
 /**
@@ -27,7 +27,10 @@ import type { RouterDeps } from "./router.js";
  */
 
 type Deps = Pick<RouterDeps, "prisma"> & {
-  env: Pick<RouterDeps["env"], "adminEmails" | "ssoAdminEnabled">;
+  env: Pick<
+    RouterDeps["env"],
+    "adminEmails" | "ssoAdminEnabled" | "operatorEmails" | "ssoOperatorRolesEnabled"
+  >;
   auth: Pick<RouterDeps["auth"], "isSsoAdmin">;
 };
 
@@ -78,10 +81,12 @@ async function loadBot(deps: Deps, botId: string) {
 }
 
 /** The caller's relation to the target. A stranger gets not found, so ids are not probed. */
-async function authorize(deps: Deps, actor: Actor, target: Target) {
-  const admin = await isAdmin(deps, actor.userId);
+async function authorize(deps: Deps, actor: Actor, target: Target, readOnly = false) {
+  const admin = await hasAdminRole(deps, actor.userId, "security");
+  // An auditor reads any bot's or employee's grants but never changes them.
+  const reader = admin || (readOnly && (await hasAdminRole(deps, actor.userId, "auditor")));
   if (target.employeeId !== undefined) {
-    await requireAdmin(deps, actor.userId);
+    if (!reader) throw new ORPCError("FORBIDDEN", { message: "Admins only" });
     const employee = await system("find employee", () =>
       deps.prisma.employee.findUnique({ where: { id: target.employeeId }, select: { id: true } }),
     );
@@ -90,7 +95,7 @@ async function authorize(deps: Deps, actor: Actor, target: Target) {
   }
   const bot = await loadBot(deps, target.botId ?? "");
   const owner = bot.userId === actor.userId;
-  if (!owner && !admin) throw notFound();
+  if (!owner && !reader) throw notFound();
   return { admin, owner, bot, employeeId: null };
 }
 
@@ -99,7 +104,7 @@ export async function listCapabilityGrants(
   actor: Actor,
   target: Target,
 ): Promise<{ mode: CapabilityMode | null; grants: CapabilityGrantView[] }> {
-  const access = await authorize(deps, actor, target);
+  const access = await authorize(deps, actor, target, true);
   const { bot } = access;
   const rows = await system("list", () =>
     deps.prisma.capabilityGrant.findMany({
@@ -286,7 +291,7 @@ export async function setCapabilityMode(
   actor: Actor,
   input: { botId: string; mode: CapabilityMode | null },
 ): Promise<{ ok: true }> {
-  await requireAdmin(deps, actor.userId);
+  await requireAdminRole(deps, actor.userId, "security");
   const bot = await loadBot(deps, input.botId);
   await system("set mode", () =>
     deps.prisma.bot.update({ where: { id: bot.id }, data: { capabilityMode: input.mode } }),

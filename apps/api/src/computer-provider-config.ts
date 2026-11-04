@@ -18,7 +18,7 @@ import { evaluateComputerKind } from "@rakazo/core";
 import type { PrismaClient } from "@rakazo/db";
 import { Prisma, runAsSystem } from "@rakazo/db";
 import { getLogger } from "@rakazo/logging";
-import { requireAdmin } from "./admins.js";
+import { requireAdminRole } from "./admins.js";
 import { assertComputerProviderAllowedForRequest } from "./policy-capabilities-guard.js";
 import type { RouterDeps } from "./router.js";
 import { withSerializableRetry } from "./serializable-retry.js";
@@ -27,7 +27,14 @@ export interface ComputerProviderConfigDeps {
   prisma: PrismaClient;
   secrets: Pick<SecretStore, "put" | "load" | "delete">;
   sandbox: SandboxProvider;
-  env: Pick<RouterDeps["env"], "sandboxProvider" | "adminEmails" | "ssoAdminEnabled">;
+  env: Pick<
+    RouterDeps["env"],
+    | "sandboxProvider"
+    | "adminEmails"
+    | "ssoAdminEnabled"
+    | "operatorEmails"
+    | "ssoOperatorRolesEnabled"
+  >;
   auth: Pick<RouterDeps["auth"], "isSsoAdmin">;
   resolveHostname?: ResolveHostname;
   /** Test seam: confirm the desktop answers before saving. */
@@ -143,7 +150,7 @@ export async function getComputerProviderSettings(
   deps: ComputerProviderConfigDeps,
   actor: Actor,
 ): Promise<ComputerProviderSettings> {
-  await requireAdmin(deps, actor.userId);
+  await requireAdminRole(deps, actor.userId, "platform");
   const selection = await loadComputerProviderSelection(deps.prisma, deps.secrets);
   return view(
     selection.provider,
@@ -159,7 +166,7 @@ export async function updateComputerProviderSettings(
   actor: Actor,
   input: ComputerProviderUpdate,
 ): Promise<ComputerProviderSettings> {
-  await requireAdmin(deps, actor.userId);
+  await requireAdminRole(deps, actor.userId, "platform");
   await assertComputerProviderAllowedForRequest(actor, input.provider);
   if (input.provider !== "default" && !routesBySettings(deps.env.sandboxProvider))
     throw new ORPCError("BAD_REQUEST", { message: "This deployment cannot use computer settings" });
