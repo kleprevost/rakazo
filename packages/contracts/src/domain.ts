@@ -27,6 +27,9 @@ import { SettingsScopeSchema } from "./settings-scope.js";
 export const ComputerModeSchema = z.enum(["team", "dedicated"]);
 export type ComputerMode = z.infer<typeof ComputerModeSchema>;
 
+/** How big a machine a cloud computer runs on. Providers without sizes ignore it. */
+export type ComputerSize = "standard" | "large" | "xlarge";
+
 export const MemoryScopeSchema = z.enum(["isolated", "shared"]);
 export type MemoryScopeValue = z.infer<typeof MemoryScopeSchema>;
 
@@ -164,6 +167,18 @@ export const IncomingBotCallSchema = BotSchema.pick({
   incomingCall: BotSchema.shape.incomingCall.unwrap().unwrap(),
 });
 export type IncomingBotCall = z.infer<typeof IncomingBotCallSchema>;
+
+/** A run alert the server also pushes to phones, already filtered by the chat's mute settings. */
+export const ChatAlertSchema = z.object({
+  kind: z.enum(["completion", "failure", "help", "takeover"]),
+  title: z.string(),
+  body: z.string(),
+  spaceId: Id,
+  botId: Id,
+  threadId: Id,
+  groupId: Id.optional(),
+});
+export type ChatAlert = z.infer<typeof ChatAlertSchema>;
 
 export const ReorderBotsInput = z.object({
   botIds: z

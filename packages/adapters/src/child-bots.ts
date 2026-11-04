@@ -708,6 +708,7 @@ const REMOTE_TEAM_SANDBOX_KINDS = new Set([
   "boat",
   "createos",
   "kubernetes",
+  "incus",
 ]);
 
 /**
