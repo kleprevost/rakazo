@@ -1,3 +1,4 @@
+import { addInstance } from "../employee-instances.js";
 import {
   getEmployee,
   listEmployees,
@@ -13,7 +14,7 @@ import type { RouterContext } from "./context.js";
 
 /** Employee definitions and who may use them. Each handler asks the access evaluator first. */
 export function employeesRoutes(ctx: RouterContext) {
-  const { deps, authed } = ctx;
+  const { deps, repos, authed } = ctx;
   return {
     employees: {
       list: authed.employees.list.handler(({ context }) => listEmployees(deps, context.actor)),
@@ -22,6 +23,9 @@ export function employeesRoutes(ctx: RouterContext) {
       ),
       share: authed.employees.share.handler(({ context, input }) =>
         shareBot(deps, context.actor, input),
+      ),
+      addInstance: authed.employees.addInstance.handler(({ context, input }) =>
+        addInstance(deps, repos, context.actor, input),
       ),
       versions: {
         saveDraft: authed.employees.versions.saveDraft.handler(({ context, input }) =>

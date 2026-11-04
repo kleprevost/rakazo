@@ -770,8 +770,9 @@ model Bot {
   dailyCheckIns Boolean @default(true)
   fleetManagement        Boolean @default(true)
   employeeId        String?
+  employeeVersionSeen String?
   employee          Employee?         @relation(fields: [employeeId], references: [id], onDelete: SetNull)
-  routines          Routine[]
+  routines         Routine[]
   scratchpadItems   ScratchpadItem[]
   taughtSkills      TaughtSkill[]
   memoryDocuments   MemoryDocument[]

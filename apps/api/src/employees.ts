@@ -76,7 +76,12 @@ async function roleOf(db: Db, employeeId: string, userId: string): Promise<Emplo
 }
 
 /** Loads the employee and refuses unless the caller's role may do the action. */
-async function authorize(db: Db, userId: string, employeeId: string, action: EmployeeAction) {
+export async function authorize(
+  db: Db,
+  userId: string,
+  employeeId: string,
+  action: EmployeeAction,
+) {
   const employee = await db.employee.findUnique({ where: { id: employeeId } });
   if (!employee) refuse("no_access");
   const role = await roleOf(db, employeeId, userId);

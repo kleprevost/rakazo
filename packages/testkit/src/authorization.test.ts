@@ -519,6 +519,7 @@ describeWithDatabase("API authorization and resource isolation", () => {
       ["employees/list"],
       ["employees/get", { employeeId: "missing-employee" }],
       ["employees/share", { botId: "missing-bot" }],
+      ["employees/addInstance", { employeeId: "missing-employee" }],
       ["employees/versions/saveDraft", { employeeId: "missing-employee" }],
       ["employees/versions/publish", { employeeId: "missing-employee", versionId: "missing" }],
       ["employees/versions/rollback", { employeeId: "missing-employee", versionId: "missing" }],
