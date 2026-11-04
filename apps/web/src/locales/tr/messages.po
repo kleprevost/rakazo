@@ -2407,7 +2407,7 @@ msgstr "Bağlantı iptal edilemedi"
 
 #: src/pages/admin/AdminUsersPage.tsx
 msgid "Could not revoke credentials"
-msgstr ""
+msgstr "Kimlik bilgileri iptal edilemedi"
 
 #: src/pages/AdminAccessPage.tsx
 msgid "Could not revoke grant"
@@ -2685,7 +2685,7 @@ msgstr "Kimlik bilgileri şifrelenir ve modele asla gönderilmez."
 
 #: src/pages/admin/AdminUsersPage.tsx
 msgid "Credentials revoked"
-msgstr ""
+msgstr "Kimlik bilgileri iptal edildi"
 
 #: src/pages/shell/import-status.ts
 msgid "Credentials: {names}"
@@ -5945,7 +5945,7 @@ msgstr "{0} iznini geri al"
 
 #: src/pages/admin/AdminUsersPage.tsx
 msgid "Revoke credentials"
-msgstr ""
+msgstr "Kimlik bilgilerini iptal et"
 
 #: src/pages/AdminAccessPage.tsx
 msgid "Revoked"

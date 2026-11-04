@@ -2407,7 +2407,7 @@ msgstr "Не удалось отменить соединение"
 
 #: src/pages/admin/AdminUsersPage.tsx
 msgid "Could not revoke credentials"
-msgstr ""
+msgstr "Не удалось отозвать учётные данные"
 
 #: src/pages/AdminAccessPage.tsx
 msgid "Could not revoke grant"
@@ -2685,7 +2685,7 @@ msgstr "Учётные данные зашифрованы и никогда н�
 
 #: src/pages/admin/AdminUsersPage.tsx
 msgid "Credentials revoked"
-msgstr ""
+msgstr "Учётные данные отозваны"
 
 #: src/pages/shell/import-status.ts
 msgid "Credentials: {names}"
@@ -5945,7 +5945,7 @@ msgstr "Отозвать {0}"
 
 #: src/pages/admin/AdminUsersPage.tsx
 msgid "Revoke credentials"
-msgstr ""
+msgstr "Отозвать учётные данные"
 
 #: src/pages/AdminAccessPage.tsx
 msgid "Revoked"

@@ -2408,7 +2408,7 @@ msgstr "無法撤銷連線授權"
 
 #: src/pages/admin/AdminUsersPage.tsx
 msgid "Could not revoke credentials"
-msgstr ""
+msgstr "無法撤銷憑證"
 
 #: src/pages/AdminAccessPage.tsx
 msgid "Could not revoke grant"
@@ -2686,7 +2686,7 @@ msgstr "憑證已加密，不會傳送給模型。"
 
 #: src/pages/admin/AdminUsersPage.tsx
 msgid "Credentials revoked"
-msgstr ""
+msgstr "憑證已撤銷"
 
 #: src/pages/shell/import-status.ts
 msgid "Credentials: {names}"
@@ -5946,7 +5946,7 @@ msgstr "撤銷 {0}"
 
 #: src/pages/admin/AdminUsersPage.tsx
 msgid "Revoke credentials"
-msgstr ""
+msgstr "撤銷憑證"
 
 #: src/pages/AdminAccessPage.tsx
 msgid "Revoked"

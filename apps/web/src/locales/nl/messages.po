@@ -2407,7 +2407,7 @@ msgstr "Verbinding intrekken mislukt"
 
 #: src/pages/admin/AdminUsersPage.tsx
 msgid "Could not revoke credentials"
-msgstr ""
+msgstr "Inloggegevens intrekken mislukt"
 
 #: src/pages/AdminAccessPage.tsx
 msgid "Could not revoke grant"
@@ -2685,7 +2685,7 @@ msgstr "Gegevens worden versleuteld en nooit naar het model gestuurd."
 
 #: src/pages/admin/AdminUsersPage.tsx
 msgid "Credentials revoked"
-msgstr ""
+msgstr "Inloggegevens ingetrokken"
 
 #: src/pages/shell/import-status.ts
 msgid "Credentials: {names}"
@@ -5945,7 +5945,7 @@ msgstr "{0} intrekken"
 
 #: src/pages/admin/AdminUsersPage.tsx
 msgid "Revoke credentials"
-msgstr ""
+msgstr "Inloggegevens intrekken"
 
 #: src/pages/AdminAccessPage.tsx
 msgid "Revoked"

@@ -2407,7 +2407,7 @@ msgstr "Verbindung konnte nicht widerrufen werden"
 
 #: src/pages/admin/AdminUsersPage.tsx
 msgid "Could not revoke credentials"
-msgstr ""
+msgstr "Zugangsdaten konnten nicht widerrufen werden"
 
 #: src/pages/AdminAccessPage.tsx
 msgid "Could not revoke grant"
@@ -2685,7 +2685,7 @@ msgstr "Zugangsdaten werden verschlüsselt und dem Modell nie gesendet."
 
 #: src/pages/admin/AdminUsersPage.tsx
 msgid "Credentials revoked"
-msgstr ""
+msgstr "Zugangsdaten widerrufen"
 
 #: src/pages/shell/import-status.ts
 msgid "Credentials: {names}"
@@ -5945,7 +5945,7 @@ msgstr "{0} widerrufen"
 
 #: src/pages/admin/AdminUsersPage.tsx
 msgid "Revoke credentials"
-msgstr ""
+msgstr "Zugangsdaten widerrufen"
 
 #: src/pages/AdminAccessPage.tsx
 msgid "Revoked"

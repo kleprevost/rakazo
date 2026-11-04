@@ -2407,7 +2407,7 @@ msgstr "Impossible de révoquer la connexion"
 
 #: src/pages/admin/AdminUsersPage.tsx
 msgid "Could not revoke credentials"
-msgstr ""
+msgstr "Impossible de révoquer les identifiants"
 
 #: src/pages/AdminAccessPage.tsx
 msgid "Could not revoke grant"
@@ -2685,7 +2685,7 @@ msgstr "Les identifiants sont chiffrés et jamais envoyés au modèle."
 
 #: src/pages/admin/AdminUsersPage.tsx
 msgid "Credentials revoked"
-msgstr ""
+msgstr "Identifiants révoqués"
 
 #: src/pages/shell/import-status.ts
 msgid "Credentials: {names}"
@@ -5945,7 +5945,7 @@ msgstr "Révoquer {0}"
 
 #: src/pages/admin/AdminUsersPage.tsx
 msgid "Revoke credentials"
-msgstr ""
+msgstr "Révoquer les identifiants"
 
 #: src/pages/AdminAccessPage.tsx
 msgid "Revoked"

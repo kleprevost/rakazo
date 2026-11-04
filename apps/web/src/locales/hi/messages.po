@@ -2407,7 +2407,7 @@ msgstr "कनेक्शन रद्द नहीं किया जा स�
 
 #: src/pages/admin/AdminUsersPage.tsx
 msgid "Could not revoke credentials"
-msgstr ""
+msgstr "क्रेडेंशियल रद्द नहीं किए जा सके"
 
 #: src/pages/AdminAccessPage.tsx
 msgid "Could not revoke grant"
@@ -2685,7 +2685,7 @@ msgstr "क्रेडेंशियल एन्क्रिप्टेड �
 
 #: src/pages/admin/AdminUsersPage.tsx
 msgid "Credentials revoked"
-msgstr ""
+msgstr "क्रेडेंशियल रद्द किए गए"
 
 #: src/pages/shell/import-status.ts
 msgid "Credentials: {names}"
@@ -5945,7 +5945,7 @@ msgstr "{0} रद्द करें"
 
 #: src/pages/admin/AdminUsersPage.tsx
 msgid "Revoke credentials"
-msgstr ""
+msgstr "क्रेडेंशियल रद्द करें"
 
 #: src/pages/AdminAccessPage.tsx
 msgid "Revoked"

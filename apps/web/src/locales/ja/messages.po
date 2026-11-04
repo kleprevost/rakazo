@@ -2407,7 +2407,7 @@ msgstr "接続を取り消せませんでした"
 
 #: src/pages/admin/AdminUsersPage.tsx
 msgid "Could not revoke credentials"
-msgstr ""
+msgstr "認証情報を取り消せませんでした"
 
 #: src/pages/AdminAccessPage.tsx
 msgid "Could not revoke grant"
@@ -2685,7 +2685,7 @@ msgstr "認証情報は暗号化され、モデルに送信されることはあ
 
 #: src/pages/admin/AdminUsersPage.tsx
 msgid "Credentials revoked"
-msgstr ""
+msgstr "認証情報を取り消しました"
 
 #: src/pages/shell/import-status.ts
 msgid "Credentials: {names}"
@@ -5945,7 +5945,7 @@ msgstr "{0} を取り消す"
 
 #: src/pages/admin/AdminUsersPage.tsx
 msgid "Revoke credentials"
-msgstr ""
+msgstr "認証情報を取り消す"
 
 #: src/pages/AdminAccessPage.tsx
 msgid "Revoked"

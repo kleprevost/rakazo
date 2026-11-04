@@ -2407,7 +2407,7 @@ msgstr "No se pudo revocar la conexión"
 
 #: src/pages/admin/AdminUsersPage.tsx
 msgid "Could not revoke credentials"
-msgstr ""
+msgstr "No se pudieron revocar las credenciales"
 
 #: src/pages/AdminAccessPage.tsx
 msgid "Could not revoke grant"
@@ -2685,7 +2685,7 @@ msgstr "Las credenciales se cifran y nunca se envían al modelo."
 
 #: src/pages/admin/AdminUsersPage.tsx
 msgid "Credentials revoked"
-msgstr ""
+msgstr "Credenciales revocadas"
 
 #: src/pages/shell/import-status.ts
 msgid "Credentials: {names}"
@@ -5945,7 +5945,7 @@ msgstr "Revocar {0}"
 
 #: src/pages/admin/AdminUsersPage.tsx
 msgid "Revoke credentials"
-msgstr ""
+msgstr "Revocar credenciales"
 
 #: src/pages/AdminAccessPage.tsx
 msgid "Revoked"

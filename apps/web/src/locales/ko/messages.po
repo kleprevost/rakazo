@@ -2407,7 +2407,7 @@ msgstr "연결을 해제하지 못했습니다."
 
 #: src/pages/admin/AdminUsersPage.tsx
 msgid "Could not revoke credentials"
-msgstr ""
+msgstr "자격 증명을 취소하지 못했습니다"
 
 #: src/pages/AdminAccessPage.tsx
 msgid "Could not revoke grant"
@@ -2685,7 +2685,7 @@ msgstr "인증 정보는 암호화되며 모델에 전송되지 않습니다."
 
 #: src/pages/admin/AdminUsersPage.tsx
 msgid "Credentials revoked"
-msgstr ""
+msgstr "자격 증명을 취소했습니다"
 
 #: src/pages/shell/import-status.ts
 msgid "Credentials: {names}"
@@ -5945,7 +5945,7 @@ msgstr "{0} 취소"
 
 #: src/pages/admin/AdminUsersPage.tsx
 msgid "Revoke credentials"
-msgstr ""
+msgstr "자격 증명 취소"
 
 #: src/pages/AdminAccessPage.tsx
 msgid "Revoked"

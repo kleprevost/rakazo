@@ -2407,7 +2407,7 @@ msgstr "לא ניתן לבטל את החיבור"
 
 #: src/pages/admin/AdminUsersPage.tsx
 msgid "Could not revoke credentials"
-msgstr ""
+msgstr "לא ניתן היה לבטל את פרטי הגישה"
 
 #: src/pages/AdminAccessPage.tsx
 msgid "Could not revoke grant"
@@ -2685,7 +2685,7 @@ msgstr "פרטי הגישה מוצפנים ולעולם לא נשלחים למו
 
 #: src/pages/admin/AdminUsersPage.tsx
 msgid "Credentials revoked"
-msgstr ""
+msgstr "פרטי הגישה בוטלו"
 
 #: src/pages/shell/import-status.ts
 msgid "Credentials: {names}"
@@ -5945,7 +5945,7 @@ msgstr "ביטול {0}"
 
 #: src/pages/admin/AdminUsersPage.tsx
 msgid "Revoke credentials"
-msgstr ""
+msgstr "ביטול פרטי גישה"
 
 #: src/pages/AdminAccessPage.tsx
 msgid "Revoked"
