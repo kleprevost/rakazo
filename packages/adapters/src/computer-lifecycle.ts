@@ -46,7 +46,7 @@ import {
 } from "./computer-workspace.js";
 import { resolveAgentHomePath } from "./home.js";
 import { ObjectAgentHomeStore } from "./home-object-store.js";
-import { assertComputerKindAllowed } from "./policy-capabilities.js";
+import { assertComputerImageAllowed, assertComputerKindAllowed } from "./policy-capabilities.js";
 import { sandboxAllowanceUsedUp } from "./sandbox-allowance.js";
 import {
   isSandboxDamagedError,
@@ -179,9 +179,16 @@ export async function provisionComputer(
   context: AdapterContext,
   controlHolder: "bot" | "none" = "none",
   onProgress?: ComputerUpdateProgress,
+  /** Start from this image, pinned to its digest; refused unless central policy approves it. */
+  image?: { ref: string; digest: string },
 ): Promise<ComputerRef> {
   const started = performance.now();
   const log = getLogger().child({ "computer.id": computerId, "run.id": context.runId });
+  if (image) {
+    await assertComputerImageAllowed(image, { ...context, surface: "computer" });
+    if (!deps.sandbox.describe().capabilities.fleet?.imageSelection)
+      throw new Error("This computer provider cannot start from a named image");
+  }
   let existing = await deps.prisma.computer.findUniqueOrThrow({ where: { id: computerId } });
   if (existing.state === "quarantined")
     throw new Error("Computer requires recovery after an unconfirmed stop");
@@ -404,6 +411,7 @@ export async function provisionComputer(
               homePath,
               providerRef: existing.providerRef ?? undefined,
               providerKind: existing.kind as ComputerRef["kind"],
+              ...(image ? { image } : {}),
               // A save from an older release has no time; the provider keeps its own state then.
               savedAt:
                 existing.homeRevision === "empty"
@@ -515,6 +523,10 @@ export async function provisionComputer(
         kind: ref.kind,
         restorePending: false,
         runningSince,
+        // What this start asked for; a start that names none clears an earlier one.
+        ...(image || existing.imageRef || existing.imageDigest
+          ? { imageRef: image?.ref ?? null, imageDigest: image?.digest ?? null }
+          : {}),
         ...(!reconnecting
           ? {
               controlHolder: activeControl ? "user" : controlHolder,

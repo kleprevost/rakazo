@@ -33,58 +33,78 @@ export function AdminComputersPage() {
 
 function AdminComputers() {
   const { i18n } = useLingui();
+  const [notApproved, setNotApproved] = useState(false);
   const computers = useInfiniteQuery(
     useSpaceQueries().admin.computers.list.infiniteOptions({
-      input: (cursor: string | null) => ({ limit: PAGE_SIZE, ...(cursor ? { cursor } : {}) }),
+      input: (cursor: string | null) => ({
+        limit: PAGE_SIZE,
+        ...(cursor ? { cursor } : {}),
+        ...(notApproved ? { imageCompliance: "not_approved" as const } : {}),
+      }),
       initialPageParam: null as string | null,
       getNextPageParam: (page) => page.nextCursor,
     }),
   );
   const rows = computers.data?.pages.flatMap((page) => page.computers) ?? [];
+  // Only a policy that lists approved images gives a computer a standing to filter on.
+  const governed = notApproved || rows.some((computer) => Boolean(computer.imageCompliance));
   return (
-    <AdminQuery
-      pending={computers.isPending}
-      error={computers.error}
-      onRetry={() => void computers.refetch()}
-      empty={rows.length === 0}
-    >
-      <Table data-testid="admin-computers">
-        <TableHeader>
-          <TableRow>
-            <TableHead>
-              <Trans>AI employees</Trans>
-            </TableHead>
-            <TableHead>
-              <Trans>Owner</Trans>
-            </TableHead>
-            <TableHead>
-              <Trans>Provider</Trans>
-            </TableHead>
-            <TableHead>
-              <Trans>Status</Trans>
-            </TableHead>
-            <TableHead>
-              <Trans>Image</Trans>
-            </TableHead>
-            <TableHead>
-              <Trans>Isolation</Trans>
-            </TableHead>
-            <TableHead>
-              <Trans>Health</Trans>
-            </TableHead>
-            <TableHead>
-              <Trans>Last active</Trans>
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {rows.map((computer) => (
-            <ComputerRow key={computer.id} computer={computer} locale={i18n.locale} />
-          ))}
-        </TableBody>
-      </Table>
-      <LoadMore query={computers} />
-    </AdminQuery>
+    <>
+      {governed ? (
+        <Button
+          variant={notApproved ? "secondary" : "outline"}
+          size="sm"
+          aria-pressed={notApproved}
+          className="mb-3"
+          onClick={() => setNotApproved(!notApproved)}
+        >
+          <Trans>Not approved</Trans>
+        </Button>
+      ) : null}
+      <AdminQuery
+        pending={computers.isPending}
+        error={computers.error}
+        onRetry={() => void computers.refetch()}
+        empty={rows.length === 0}
+      >
+        <Table data-testid="admin-computers">
+          <TableHeader>
+            <TableRow>
+              <TableHead>
+                <Trans>AI employees</Trans>
+              </TableHead>
+              <TableHead>
+                <Trans>Owner</Trans>
+              </TableHead>
+              <TableHead>
+                <Trans>Provider</Trans>
+              </TableHead>
+              <TableHead>
+                <Trans>Status</Trans>
+              </TableHead>
+              <TableHead>
+                <Trans>Image</Trans>
+              </TableHead>
+              <TableHead>
+                <Trans>Isolation</Trans>
+              </TableHead>
+              <TableHead>
+                <Trans>Health</Trans>
+              </TableHead>
+              <TableHead>
+                <Trans>Last active</Trans>
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {rows.map((computer) => (
+              <ComputerRow key={computer.id} computer={computer} locale={i18n.locale} />
+            ))}
+          </TableBody>
+        </Table>
+        <LoadMore query={computers} />
+      </AdminQuery>
+    </>
   );
 }
 
@@ -138,6 +158,11 @@ function ComputerRow({ computer, locale }: { computer: AdminComputer; locale: st
       </TableCell>
       <TableCell className="max-w-48 truncate text-muted-foreground">
         {reported(computer.image)}
+        {computer.imageCompliance === "not_approved" ? (
+          <Badge variant="outline" className="ml-2">
+            {t`Not approved`}
+          </Badge>
+        ) : null}
       </TableCell>
       <TableCell className="text-muted-foreground">{reported(computer.isolation)}</TableCell>
       <TableCell>

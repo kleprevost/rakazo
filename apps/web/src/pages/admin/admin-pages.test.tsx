@@ -474,6 +474,69 @@ it("opens a computer's detail: observation, disk and restart history, and its fa
     expect(detail).toContain(part);
 });
 
+it("flags computers off the approved image list and filters to them, only when a list exists", async () => {
+  const computer = {
+    kind: "docker",
+    scope: "team",
+    state: "running",
+    ownerName: "Mia",
+    ownerEmail: "mia@example.test",
+    spaceName: "Team space",
+    image: "registry.example.test/computer:1",
+    isolation: "container",
+    inspection: "inspected",
+    health: "ok",
+    runningSince: null,
+    lastActivityAt: null,
+  };
+  // No policy list: nothing is graded, so there is nothing to flag or filter.
+  api.computers.mockResolvedValue({
+    computers: [{ ...computer, id: "c1", bots: [], imageCompliance: null }],
+    nextCursor: null,
+  });
+  const plain = await show(<AdminComputersPage />);
+  expect(plain.host.textContent).not.toContain("Not approved");
+
+  document.body.innerHTML = "";
+  api.computers.mockClear();
+  api.computers.mockImplementation(async (input?: { imageCompliance?: string }) => ({
+    computers: [
+      {
+        ...computer,
+        id: "c1",
+        bots: [{ id: "b1", name: "Approved bot" }],
+        imageCompliance: "approved",
+      },
+      {
+        ...computer,
+        id: "c2",
+        bots: [{ id: "b2", name: "Drifted bot" }],
+        imageCompliance: "not_approved",
+      },
+    ].filter((entry) => !input?.imageCompliance || entry.imageCompliance === "not_approved"),
+    nextCursor: null,
+  }));
+  const { host } = await show(<AdminComputersPage />);
+  const rows = () =>
+    [...host.querySelectorAll('[data-testid="admin-computers"] tbody tr')].map(
+      (row) => row.textContent ?? "",
+    );
+  expect(rows()).toHaveLength(2);
+  expect(rows()[0]).not.toContain("Not approved");
+  expect(rows()[1]).toContain("Not approved");
+
+  const toggle = [...host.querySelectorAll("button")].find(
+    (button) => button.textContent === "Not approved",
+  ) as HTMLButtonElement;
+  expect(toggle.getAttribute("aria-pressed")).toBe("false");
+  await act(async () => toggle.click());
+  for (let round = 0; round < 3; round += 1) await settle();
+  expect(api.computers).toHaveBeenLastCalledWith({ limit: 50, imageCompliance: "not_approved" });
+  expect(rows()).toHaveLength(1);
+  expect(rows()[0]).toContain("Drifted bot");
+  expect(toggle.getAttribute("aria-pressed")).toBe("true");
+});
+
 it("suspends an AI employee after a confirming click and resumes it in one click", async () => {
   const bot = {
     id: "b1",
@@ -627,12 +690,17 @@ it("renders policy rules as section.rule rows without budgets", () => {
     policyRows({
       version: 1,
       tools: { deny: ["computer.*"] },
-      computers: { allowHostComputer: false, egress: { denyDomains: ["a.test", "b.test"] } },
+      computers: {
+        allowHostComputer: false,
+        images: { allow: [{ digest: `sha256:${"a".repeat(64)}`, tag: "2026.11" }] },
+        egress: { denyDomains: ["a.test", "b.test"] },
+      },
       budgets: { perBotUsd: 3 },
     }),
   ).toEqual([
     { key: "tools.deny", value: "computer.*" },
     { key: "computers.allowHostComputer", value: "false" },
+    { key: "computers.images.allow", value: `sha256:${"a".repeat(64)} 2026.11` },
     { key: "computers.egress.denyDomains", value: "a.test, b.test" },
   ]);
 });

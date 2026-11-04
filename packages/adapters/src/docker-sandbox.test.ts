@@ -207,6 +207,25 @@ describe("Docker sandbox", () => {
     }
   });
 
+  it("sends a named image to the supervisor only when asked for one", async () => {
+    const fetchMock = vi.fn(async (_url: string | URL | Request, _init?: RequestInit) =>
+      Response.json({ id: "computer" }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    const provider = new DockerSandboxProvider("http://supervisor.test", "test-token");
+    const digest = `sha256:${"a".repeat(64)}`;
+    const image = { ref: `registry.example.test/computer@${digest}`, digest };
+
+    await provider.provision({ botId: "bot", homePath: "/tmp/bot", image }, context);
+    await provider.provision({ botId: "bot", homePath: "/tmp/bot" }, context);
+
+    const bodies = fetchMock.mock.calls.map(
+      ([, init]) => JSON.parse(String((init as RequestInit).body)) as Record<string, unknown>,
+    );
+    expect(bodies[0]).toMatchObject({ botId: "bot", image });
+    expect(bodies[1]).not.toHaveProperty("image");
+  });
+
   it("rejects a declared oversized success response without buffering it", async () => {
     const cancel = vi.fn();
     vi.stubGlobal(
@@ -922,7 +941,11 @@ describe("Docker sandbox streams through the supervisor", () => {
     );
     vi.stubGlobal("fetch", fetchMock);
     const provider = new DockerSandboxProvider("http://supervisor.test", "test-token");
-    expect(provider.describe().capabilities.fleet).toEqual({ inspect: true, usage: true });
+    expect(provider.describe().capabilities.fleet).toEqual({
+      inspect: true,
+      usage: true,
+      imageSelection: true,
+    });
     await expect(
       provider.inspect({ id: "box", botId: "bot", kind: "docker", providerRef: "box" }, context),
     ).resolves.toEqual({

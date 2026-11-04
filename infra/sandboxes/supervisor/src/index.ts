@@ -65,6 +65,7 @@ import {
 } from "./computer-spec.js";
 import { EgressNotEnforced, verifyRestrictedEgress } from "./egress-probe.js";
 import { assertComputerHomeWritable } from "./home-ownership.js";
+import { loadSupervisorPolicy, requestedImageApproved } from "./image-policy.js";
 import { attachSupervisorProxy } from "./screen-proxy.js";
 import type { ScreenAssignment } from "./supervisor-logic.js";
 import {
@@ -112,6 +113,8 @@ import {
 } from "./supervisor-logic.js";
 
 loadRootEnv();
+// The same policy file the API loads; it names the only images a request may start a computer from.
+const supervisorPolicy = loadSupervisorPolicy();
 
 const dockerSocketPath = resolveDockerSocketPath();
 const docker = dockerSocketPath ? new Docker({ socketPath: dockerSocketPath }) : new Docker();
@@ -226,6 +229,12 @@ app.post("/computers", async (c) => {
       botId: z.string().min(1),
       homePath: z.string().min(1),
       spaceId: z.string().min(1),
+      image: z
+        .object({
+          ref: z.string().min(1).max(512),
+          digest: z.string().min(1).max(128),
+        })
+        .optional(),
     })
     .parse(await c.req.json());
   try {
@@ -233,8 +242,14 @@ app.post("/computers", async (c) => {
       botId: body.botId,
       spaceId: body.spaceId,
     });
+    // Checked here against the supervisor's own copy of the policy, whatever the API decided.
+    if (body.image && !requestedImageApproved(supervisorPolicy, body.image))
+      return c.json({ error: "image not approved" }, 403);
+    const computerImage = body.image?.ref ?? COMPUTER_IMAGE;
     return await withBotLifecycleLock(body.botId, async () => {
-      await ensureComputerImage();
+      await (body.image
+        ? computerImageEnsurer(docker, computerImage, computerContext)()
+        : ensureComputerImage());
       await ensureRestrictedEgressEnforced();
       const runtimeInfo = await inspectSupervisorContainer();
       // A containerized supervisor's host paths (data directory, Docker socket) are known only now.
@@ -260,7 +275,7 @@ app.post("/computers", async (c) => {
       const existing = await findBotContainer(body.botId, body.spaceId);
       if (existing) {
         const info = await existing.inspect();
-        const desired = await docker.getImage(COMPUTER_IMAGE).inspect();
+        const desired = await docker.getImage(computerImage).inspect();
         const controlPublishOk = controlPortPublicationMatches(
           info.HostConfig.PortBindings,
           controlViaLoopback,
@@ -313,7 +328,7 @@ app.post("/computers", async (c) => {
           if (started) await existing.start();
           return c.json({
             id: existing.id,
-            image: COMPUTER_IMAGE,
+            image: computerImage,
             resumed: true,
             started,
           });
@@ -356,7 +371,7 @@ app.post("/computers", async (c) => {
             : await ensureBotNetwork(body.botId, networkOwner);
         const options = containerCreateOptions({
           name,
-          image: COMPUTER_IMAGE,
+          image: computerImage,
           botId: body.botId,
           spaceId: body.spaceId,
           ...storage,
@@ -404,7 +419,7 @@ app.post("/computers", async (c) => {
         }
         return c.json({
           id: container.id,
-          image: COMPUTER_IMAGE,
+          image: computerImage,
           resumed: false,
         });
       };

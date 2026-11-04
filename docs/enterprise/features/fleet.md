@@ -1,6 +1,6 @@
 # Computer fleet manager (design)
 
-Design; build plan PR 1 (read-only inventory) and PR 2 (observation) are implemented. An Admin page where operators see every bot computer in
+Design; build plan PR 1 (read-only inventory), PR 2 (observation) and PR 3 (image governance) are implemented. An Admin page where operators see every bot computer in
 the install and act on them, one or in bulk: recreate from an approved image without losing the
 home folder, terminate, quarantine, hibernate, wake. Provider-neutral. It works first with the Docker
 supervisor on the ACA + VM deployment ([aca-vm.md](../aca-vm.md)) and later with the Kubernetes
@@ -366,9 +366,31 @@ ids, outcome code. Never: paths, file names, provider error text, tokens, screen
    stays in PR 8. Tests: supervisor shaping and endpoint auth, Docker and Kubernetes adapters,
    the observer and staleness, admin shaping and authorization, web states, and a Postgres test
    for the observer table.
-3. **Image governance.** `computers.images` in the policy schema, compliance flags and filter,
-   "needs attention" strip, `computer.image.noncompliant` events, `enforce: block_new` at
-   `provisionComputer` and the supervisor allow-list and `image` request field. Tests: 12.
+3. **Image governance.** As built: `computers.images.allow` in the policy schema, a list of
+   `{ digest, tag? }` (full `sha256:` digests only; the tag is display text, never matched).
+   `provision()` gains an optional `image: { ref, digest }` and the `fleet.imageSelection`
+   capability flag (Docker and the fake provider). A named image is accepted only when its digest is
+   listed and `ref` is pinned to it (`repo@sha256:...`), so a tag cannot stand in; with no list
+   nothing is approved. `provisionComputer` takes the image as a final argument and checks it before
+   reading the computer or calling the provider (`computers.images`, `FORBIDDEN`/policy), recording
+   `computer.image_refused` with the digest only. The supervisor re-checks independently: it loads
+   the same `RAKAZO_POLICY_FILE` (mounted on the VM at `/data/policy.yaml`) and answers 403
+   `image not approved` otherwise, so no list travels in a request and no new trust path exists;
+   it then pulls and starts exactly that reference. Additive migration: nullable
+   `computers.imageRef` and `imageDigest`, written by `provisionComputer` when a start names an
+   image (null otherwise). `admin.computers.list/get` return `imageCompliance`
+   (`approved | not_approved | unknown`, null without a list) from the last observation, else the
+   recorded image; a missing digest (tag only) is `not_approved`. `list` takes
+   `imageCompliance: "not_approved"`, applied in the query, and the page shows a "Not approved"
+   badge and a toggle only when a list exists. Deviations: `enforce` is not in the schema. A named
+   image is always checked, and the configured default image is only reported on, because its
+   digest is not known before it starts; `block_new` and `recreate_when_idle` follow with PR 9. The
+   `isolation` column is not added (nothing reads it). The "needs attention" strip and the
+   transition-only `computer.image.noncompliant` event are not built. A running computer that is
+   re-provisioned is reused, so a named image takes effect on a start or on Recreate (PR 5), and a
+   later start without one returns the supervisor to its configured image. Tests: 12 (policy schema,
+   evaluator, provisioning refusal and audit, supervisor loader and 403, compliance flags and the
+   filter against Postgres, web).
 4. **Fleet engine with hibernate and wake.** Operation and item tables, claims, reconciler, audit,
    operation page, `maxParallel`, halt. Hibernate and wake are the safe first operations. Tests: 5, 6, 7, 13, 14.
 5. **Recreate.** `targetImageDigest`, idempotent `ComputerUpdate`, verification and per-item

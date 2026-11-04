@@ -106,6 +106,12 @@ export const AdminComputerSchema = z.object({
    * older than three observation intervals; never `ok` on stale data.
    */
   health: z.enum(["ok", "degraded", "unreachable", "unknown"]),
+  /**
+   * The last known image against `computers.images` in central policy: null when the policy lists
+   * no images, `unknown` before any image is known, `not_approved` for a digest off the list or an
+   * image with no digest.
+   */
+  imageCompliance: z.enum(["approved", "not_approved", "unknown"]).nullable(),
   runningSince: z.string().nullable(),
   lastActivityAt: z.string().nullable(),
 });
@@ -236,7 +242,14 @@ export const adminContract = {
   },
   /** Every bot computer in the deployment. Read-only; metadata only, never content. */
   computers: {
-    list: oc.input(AdminPageInputSchema).output(AdminComputerPageSchema),
+    list: oc
+      .input(
+        AdminPageInputSchema.extend({
+          /** Only computers whose last known image the policy does not approve; none without a policy list. */
+          imageCompliance: z.literal("not_approved").optional(),
+        }),
+      )
+      .output(AdminComputerPageSchema),
     get: oc.input(z.object({ computerId: Id })).output(AdminComputerDetailSchema),
   },
   policy: oc.output(AdminPolicyViewSchema),

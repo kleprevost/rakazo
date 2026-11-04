@@ -44,6 +44,8 @@ services:
       # restricted refuses to start computers unless restrict-computer-egress.sh is in place.
       SANDBOX_COMPUTER_EGRESS: restricted
       SANDBOX_COMPUTER_DNS: ${SANDBOX_COMPUTER_DNS:-}
+      # The policy file's approved computer images; a request naming another image is refused.
+      RAKAZO_POLICY_FILE: ${RAKAZO_POLICY_FILE:-}
       LOG_LEVEL: ${LOG_LEVEL:-info}
     ports:
       - "7091:7091"
