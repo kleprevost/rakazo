@@ -2323,6 +2323,10 @@ msgstr "無法播放測試片段"
 msgid "Could not preview plugin"
 msgstr ""
 
+#: src/components/teach/SkillDraftCard.tsx
+msgid "Could not publish skill"
+msgstr "無法發布技能"
+
 #: src/lib/model-connection-preflight.ts
 msgid "Could not reach the model server."
 msgstr "無法連線到模型伺服器。"
@@ -5400,9 +5404,10 @@ msgstr "供應商"
 msgid "Providers"
 msgstr "供應商"
 
+#: src/components/teach/SkillDraftCard.tsx
 #: src/pages/shell/share-employee-dialog.tsx
 msgid "Publish"
-msgstr ""
+msgstr "發布"
 
 #: src/components/CloudAgentCard.tsx
 msgid "Pull request"
@@ -6725,6 +6730,10 @@ msgstr "提交"
 #: src/pages/PluginsOverlay.tsx
 msgid "Submit a plugin"
 msgstr ""
+
+#: src/components/teach/SkillDraftCard.tsx
+msgid "Submitted"
+msgstr "已提交"
 
 #: src/components/ModelCredits.tsx
 #: src/pages/Paywall.tsx

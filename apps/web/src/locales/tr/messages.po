@@ -2322,6 +2322,10 @@ msgstr "Deneme sesi çalınamadı"
 msgid "Could not preview plugin"
 msgstr ""
 
+#: src/components/teach/SkillDraftCard.tsx
+msgid "Could not publish skill"
+msgstr "Beceri yayınlanamadı"
+
 #: src/lib/model-connection-preflight.ts
 msgid "Could not reach the model server."
 msgstr "Model sunucusuna ulaşılamadı."
@@ -5399,9 +5403,10 @@ msgstr "Sağlayıcı"
 msgid "Providers"
 msgstr "Sağlayıcılar"
 
+#: src/components/teach/SkillDraftCard.tsx
 #: src/pages/shell/share-employee-dialog.tsx
 msgid "Publish"
-msgstr ""
+msgstr "Yayınla"
 
 #: src/components/CloudAgentCard.tsx
 msgid "Pull request"
@@ -6724,6 +6729,10 @@ msgstr "Gönder"
 #: src/pages/PluginsOverlay.tsx
 msgid "Submit a plugin"
 msgstr ""
+
+#: src/components/teach/SkillDraftCard.tsx
+msgid "Submitted"
+msgstr "Gönderildi"
 
 #: src/components/ModelCredits.tsx
 #: src/pages/Paywall.tsx

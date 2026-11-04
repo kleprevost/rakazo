@@ -611,6 +611,19 @@ describeWithDatabase("API authorization and resource isolation", () => {
       ["availability/set"],
       ["availability/items"],
       ["availability/chooseForSpace"],
+      ["skillPublishing/submit", { skillId: "missing-skill" }],
+      ["skillPublishing/mine"],
+      ["skillPublishing/withdraw", { versionId: "missing-version" }],
+      ["skillPublishing/review/list"],
+      ["skillPublishing/review/get", { versionId: "missing-version" }],
+      ["skillPublishing/review/decide", { versionId: "missing-version", decision: "approve" }],
+      ["skillPublishing/catalog"],
+      [
+        "skillPublishing/publish",
+        { skillId: "missing-skill", versionId: "missing-version", audience: { kind: "all" } },
+      ],
+      ["skillPublishing/unpublish", { audienceId: "missing-audience" }],
+      ["skillPublishing/rollback", { skillId: "missing-skill", versionId: "missing-version" }],
       ["marketplace/catalog"],
       ["marketplace/review"],
       ["marketplace/submissions"],
@@ -2521,6 +2534,17 @@ describeWithDatabase("API authorization and resource isolation", () => {
       ["capabilityGrants/setMode", { botId: "missing-bot", mode: "shadow" }, ["security"]],
       ["capabilityGrants/list", { employeeId: "missing-employee" }, ["security", "auditor"]],
       ["marketplace/submissions", {}, []],
+      ["skillPublishing/review/list", {}, []],
+      ["skillPublishing/review/get", { versionId: "missing-version" }, []],
+      ["skillPublishing/review/decide", { versionId: "missing-version", decision: "approve" }, []],
+      ["skillPublishing/catalog", {}, []],
+      [
+        "skillPublishing/publish",
+        { skillId: "missing-skill", versionId: "missing-version", audience: { kind: "all" } },
+        [],
+      ],
+      ["skillPublishing/unpublish", { audienceId: "missing-audience" }, []],
+      ["skillPublishing/rollback", { skillId: "missing-skill", versionId: "missing-version" }, []],
     ];
     for (const [procedure, body, allowed] of calls) {
       for (const [role, cookie] of Object.entries(cookies)) {

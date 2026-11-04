@@ -27,6 +27,8 @@ model User {
   employeeEntitlements EmployeeEntitlement[]
   employeeAccessRequests EmployeeAccessRequest[]
   employeeKnowledgeProposals EmployeeKnowledgeProposal[]
+  publishedSkills PublishedSkill[] @relation("PublishedSkillAuthor")
+  publishedSkillVersions PublishedSkillVersion[] @relation("PublishedSkillVersionAuthor")
   pages         Page[]
   id                          String                       @id
   name                        String
@@ -2804,4 +2806,68 @@ model Assignment {
   @@index([spaceId, userId, updatedAt])
   @@index([employeeId])
   @@map("assignments")
+}
+
+/// One skill a person offered to publish, kept across its versions. Authorship is a plain
+/// reference; nothing here points at the source skill's recording or the author's memory.
+model PublishedSkill {
+  id            String   @id @default(cuid())
+  authorUserId  String?
+  author        User?    @relation("PublishedSkillAuthor", fields: [authorUserId], references: [id], onDelete: SetNull)
+  /// Plain id of the personal taught skill (no relation: the copy stands alone).
+  sourceSkillId String
+  name          String
+  createdAt     DateTime @default(now())
+  versions      PublishedSkillVersion[]
+  audiences     PublishedSkillAudience[]
+
+  @@unique([authorUserId, sourceSkillId])
+  @@map("published_skills")
+}
+
+/// A frozen copy of a playbook. Content is immutable (trigger in SQL); only the review outcome changes.
+model PublishedSkillVersion {
+  id            String    @id @default(cuid())
+  skillId       String
+  skill         PublishedSkill @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  number        Int
+  /// submitted | approved | rejected | withdrawn
+  status        String    @default("submitted")
+  name          String
+  description   String
+  playbook      Json
+  authorUserId  String?
+  author        User?     @relation("PublishedSkillVersionAuthor", fields: [authorUserId], references: [id], onDelete: SetNull)
+  sourceSkillId String
+  submittedAt   DateTime  @default(now())
+  decidedBy     String?
+  decidedAt     DateTime?
+  reason        String?
+  audiences     PublishedSkillAudience[]
+
+  @@unique([skillId, number])
+  @@index([status])
+  @@index([authorUserId])
+  // Partial unique index published_skill_versions_open_key is created in SQL: one open submission per skill.
+  @@map("published_skill_versions")
+}
+
+/// Who runs which approved version: a user, a directory claim value, or everyone ("all", "*").
+model PublishedSkillAudience {
+  id           String   @id @default(cuid())
+  skillId      String
+  skill        PublishedSkill @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  /// user | claim | all
+  subjectKind  String
+  subjectValue String
+  versionId    String
+  version      PublishedSkillVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
+  pinnedBy     String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([skillId, subjectKind, subjectValue])
+  @@index([subjectKind, subjectValue])
+  @@index([versionId])
+  @@map("published_skill_audiences")
 }

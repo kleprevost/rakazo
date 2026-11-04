@@ -7,6 +7,8 @@ type MockClient = {
   quarantine?: Table;
   capabilityGrant?: Table;
   routine?: Table;
+  publishedSkillAudience?: Table;
+  userDirectoryClaim?: Table;
   $transaction?: unknown;
 };
 
@@ -21,7 +23,7 @@ const BOT_GATE_FIELDS = {
 
 /**
  * Gives a mocked client the reads every run start and tool gate makes, answering "allowed":
- * the bot is not suspended, no quarantine covers it, the capability broker is off with no grants, and a routine claim succeeds. A test's own
+ * the bot is not suspended, no quarantine covers it, the capability broker is off with no grants, no skill is published to the person, and a routine claim succeeds. A test's own
  * fake for the same method wins, and a bot row it returns is completed with the gate fields it
  * leaves out, so a test of a blocked bot still defines its own answer. A new run-start gate adds
  * its default here, once, in the same change that adds the gate.
@@ -46,6 +48,14 @@ export function withRunGates<T>(prisma: T): T {
     }
     target.quarantine = { findFirst: vi.fn(async () => null), ...target.quarantine };
     target.capabilityGrant = { findMany: vi.fn(async () => []), ...target.capabilityGrant };
+    target.publishedSkillAudience = {
+      findMany: vi.fn(async () => []),
+      ...target.publishedSkillAudience,
+    };
+    target.userDirectoryClaim = {
+      findUnique: vi.fn(async () => null),
+      ...target.userDirectoryClaim,
+    };
     target.routine = { updateMany: vi.fn(async () => ({ count: 1 })), ...target.routine };
     return target;
   };
