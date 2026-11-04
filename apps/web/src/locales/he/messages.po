@@ -488,6 +488,10 @@ msgid "Account menu for {name}"
 msgstr "תפריט החשבון של {name}"
 
 #: src/pages/Calendar.tsx
+msgid "Action needed"
+msgstr "נדרשת פעולה"
+
+#: src/pages/Calendar.tsx
 msgid "Actions"
 msgstr "פעולות"
 
@@ -4306,6 +4310,11 @@ msgstr "דקה"
 msgid "minutes"
 msgstr "דקות"
 
+#: src/pages/Calendar.tsx
+#: src/pages/Today.tsx
+msgid "Missed"
+msgstr "הוחמץ"
+
 #: src/components/call/VoiceChatCard.tsx
 msgid "Missed call"
 msgstr ""
@@ -4623,6 +4632,10 @@ msgstr ""
 #: src/pages/shell/bot-picker.tsx
 msgid "No bots match"
 msgstr "אין בוטים תואמים"
+
+#: src/pages/Calendar.tsx
+msgid "No change"
+msgstr "אין שינוי"
 
 #: src/pages/Employees.tsx
 msgid "No employees yet"

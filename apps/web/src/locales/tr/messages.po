@@ -488,6 +488,10 @@ msgid "Account menu for {name}"
 msgstr "{name} için hesap menüsü"
 
 #: src/pages/Calendar.tsx
+msgid "Action needed"
+msgstr "İşlem gerekli"
+
+#: src/pages/Calendar.tsx
 msgid "Actions"
 msgstr "Eylemler"
 
@@ -4306,6 +4310,11 @@ msgstr "dakika"
 msgid "minutes"
 msgstr "dakika"
 
+#: src/pages/Calendar.tsx
+#: src/pages/Today.tsx
+msgid "Missed"
+msgstr "Kaçırıldı"
+
 #: src/components/call/VoiceChatCard.tsx
 msgid "Missed call"
 msgstr ""
@@ -4623,6 +4632,10 @@ msgstr ""
 #: src/pages/shell/bot-picker.tsx
 msgid "No bots match"
 msgstr ""
+
+#: src/pages/Calendar.tsx
+msgid "No change"
+msgstr "Değişiklik yok"
 
 #: src/pages/Employees.tsx
 msgid "No employees yet"

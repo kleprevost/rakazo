@@ -488,6 +488,10 @@ msgid "Account menu for {name}"
 msgstr "Menu da conta de {name}"
 
 #: src/pages/Calendar.tsx
+msgid "Action needed"
+msgstr "Ação necessária"
+
+#: src/pages/Calendar.tsx
 msgid "Actions"
 msgstr "Ações"
 
@@ -4306,6 +4310,11 @@ msgstr "minuto"
 msgid "minutes"
 msgstr "minutos"
 
+#: src/pages/Calendar.tsx
+#: src/pages/Today.tsx
+msgid "Missed"
+msgstr "Perdido"
+
 #: src/components/call/VoiceChatCard.tsx
 msgid "Missed call"
 msgstr ""
@@ -4623,6 +4632,10 @@ msgstr ""
 #: src/pages/shell/bot-picker.tsx
 msgid "No bots match"
 msgstr ""
+
+#: src/pages/Calendar.tsx
+msgid "No change"
+msgstr "Sem alterações"
 
 #: src/pages/Employees.tsx
 msgid "No employees yet"

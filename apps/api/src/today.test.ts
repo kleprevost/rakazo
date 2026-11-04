@@ -42,7 +42,9 @@ function fixture() {
   const tickets = vi.fn(async (_args: { where: Record<string, unknown> }) => [] as unknown[]);
   const tasks = vi.fn(async (_args: unknown) => [] as unknown[]);
   const bots = vi.fn(async (_args: { where: Record<string, unknown> }) => [] as unknown[]);
+  const receipts = vi.fn(async (_args: { where: Record<string, unknown> }) => [] as unknown[]);
   const prisma = {
+    routineReceipt: { findMany: receipts },
     board: { findUnique: vi.fn(async () => ({ id: "board-1", ticketPrefix: "RAK" })) },
     ticket: { findMany: tickets },
     task: { findMany: tasks },
@@ -64,7 +66,7 @@ function fixture() {
       }
       return [];
     });
-  return { prisma, runs, messages, artifacts, routines, tickets, tasks, bots, byStatus };
+  return { prisma, receipts, runs, messages, artifacts, routines, tickets, tasks, bots, byStatus };
 }
 
 const approvalBlock = {
@@ -281,6 +283,63 @@ describe("today summary", () => {
       artifacts: [{ id: "artifact-1", name: "report.pdf", mimeType: "application/pdf" }],
     });
     expect(summary.counts.completed).toBe(2);
+  });
+
+  it("keeps quiet routine runs out of Done and shows check failures and misses as exceptions", async () => {
+    const { prisma, receipts, byStatus } = fixture();
+    byStatus({
+      completed: [
+        runRow("quiet", {
+          status: "completed",
+          trigger: "routine",
+          routine: { name: "Inbox watch" },
+          completedAt: at(5),
+        }),
+        runRow("news", {
+          status: "completed",
+          trigger: "routine",
+          routine: { name: "Inbox watch" },
+          completedAt: at(15),
+        }),
+      ],
+    });
+    const receipt = (id: string, routineId: string, outcome: string, minutesAgo: number) => ({
+      id,
+      routineId,
+      botId: "bot-1",
+      runId: null,
+      outcome,
+      detail: outcome === "failed" ? "gmail failed: 503" : null,
+      scheduledFor: at(minutesAgo),
+      routine: { name: routineId, bot: { name: "Maya" }, thread: null },
+    });
+    receipts.mockImplementation(async ({ where }) => {
+      if (where.outcome === "no_change") return [{ runId: "quiet" }];
+      const outcomes = (where.outcome as { in: string[] }).in;
+      if (outcomes.includes("failed"))
+        return [
+          receipt("r1", "outage", "failed", 10),
+          receipt("r2", "outage", "missed", 40),
+          receipt("r3", "skipped", "missed", 20),
+          receipt("r4", "recovered", "failed", 60),
+        ];
+      // A clean check after the failure clears it; a clean check before it does not.
+      return [
+        { routineId: "recovered", scheduledFor: at(30) },
+        { routineId: "outage", scheduledFor: at(90) },
+      ];
+    });
+    const summary = await todaySummary(prisma, actor, now);
+    expect(TodaySummarySchema.parse(summary)).toEqual(summary);
+    expect(summary.completed.map((run) => run.runId)).toEqual(["news"]);
+    expect(summary.attention.map((item) => item.kind)).toEqual([
+      "routine_exception",
+      "routine_exception",
+    ]);
+    expect(summary.attention).toMatchObject([
+      { routineId: "outage", outcome: "failed", error: "gmail failed: 503" },
+      { routineId: "skipped", outcome: "missed", error: null },
+    ]);
   });
 
   it("lists upcoming routine runs", async () => {

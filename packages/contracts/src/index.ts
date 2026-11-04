@@ -41,6 +41,7 @@ export * from "./payments.js";
 export * from "./policy.js";
 export * from "./reactions.js";
 export * from "./role-template.js";
+export * from "./routine-receipts.js";
 export * from "./routine-watch.js";
 export * from "./rpc.js";
 export * from "./runs.js";

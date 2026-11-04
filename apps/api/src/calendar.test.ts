@@ -33,16 +33,23 @@ function routineRow(id: string, overrides: Record<string, unknown> = {}) {
   };
 }
 
-function fixture(rows: unknown[] = [], runs: unknown[] = [], messages: unknown[] = []) {
+function fixture(
+  rows: unknown[] = [],
+  runs: unknown[] = [],
+  messages: unknown[] = [],
+  receipts: unknown[] = [],
+) {
   const routines = vi.fn(async (_args: unknown) => rows);
   const runFind = vi.fn(async (_args: unknown) => runs);
   const messageFind = vi.fn(async (_args: unknown) => messages);
+  const receiptFind = vi.fn(async (_args: unknown) => receipts);
   const prisma = {
+    routineReceipt: { findMany: receiptFind },
     routine: { findMany: routines },
     run: { findMany: runFind },
     message: { findMany: messageFind },
   } as unknown as PrismaClient;
-  return { prisma, routines, runFind, messageFind };
+  return { prisma, routines, runFind, messageFind, receiptFind };
 }
 
 describe("projectOccurrences", () => {
@@ -211,6 +218,63 @@ describe("calendar range", () => {
       ["run-hook", "skipped", null],
     ]);
     expect(result.truncated).toBe(false);
+  });
+
+  it("shows each firing's receipt: run outcomes, quiet checks and misses without a run", async () => {
+    const rows = [routineRow("daily"), routineRow("watching", { crons: [], watch: { kind: "x" } })];
+    const runs = [
+      {
+        id: "run-quiet",
+        routineId: "daily",
+        threadId: "t1",
+        status: "completed",
+        createdAt: new Date("2026-03-10T09:00:00Z"),
+      },
+      {
+        id: "run-news",
+        routineId: "daily",
+        threadId: "t1",
+        status: "completed",
+        createdAt: new Date("2026-03-09T09:00:00Z"),
+      },
+      {
+        id: "run-live",
+        routineId: "daily",
+        threadId: "t1",
+        status: "running",
+        createdAt: new Date("2026-03-10T11:00:00Z"),
+      },
+    ];
+    const receipts = [
+      { routineId: "daily", runId: "run-quiet", scheduledFor: new Date(), outcome: "no_change" },
+      { routineId: "daily", runId: "run-news", scheduledFor: new Date(), outcome: "action_needed" },
+      {
+        routineId: "watching",
+        runId: null,
+        scheduledFor: new Date("2026-03-10T10:30:00Z"),
+        outcome: "no_change",
+      },
+      {
+        routineId: "daily",
+        runId: null,
+        scheduledFor: new Date("2026-03-08T09:00:00Z"),
+        outcome: "missed",
+      },
+    ];
+    const { prisma, receiptFind } = fixture(rows, runs, [], receipts);
+    const result = await calendarRange(prisma, actor, range, now);
+    expect(CalendarRangeSchema.parse(result)).toEqual(result);
+    expect(result.past.map((r) => [r.runId, r.outcome])).toEqual([
+      [null, "missed"],
+      ["run-news", "action_needed"],
+      ["run-quiet", "no_change"],
+      [null, "no_change"],
+      ["run-live", "running"],
+    ]);
+    expect(result.routines.map((r) => r.routineId)).toEqual(["daily", "watching"]);
+    expect(receiptFind.mock.calls[0]?.[0]).toMatchObject({
+      where: { spaceId: "space-1", userId: "user-1", routineId: { in: ["daily", "watching"] } },
+    });
   });
 
   it("flags truncation when more runs exist than the cap", async () => {

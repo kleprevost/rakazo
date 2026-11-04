@@ -488,6 +488,10 @@ msgid "Account menu for {name}"
 msgstr "{name}의 계정 메뉴"
 
 #: src/pages/Calendar.tsx
+msgid "Action needed"
+msgstr "조치 필요"
+
+#: src/pages/Calendar.tsx
 msgid "Actions"
 msgstr "작업"
 
@@ -4306,6 +4310,11 @@ msgstr "분"
 msgid "minutes"
 msgstr "분"
 
+#: src/pages/Calendar.tsx
+#: src/pages/Today.tsx
+msgid "Missed"
+msgstr "누락됨"
+
 #: src/components/call/VoiceChatCard.tsx
 msgid "Missed call"
 msgstr ""
@@ -4623,6 +4632,10 @@ msgstr ""
 #: src/pages/shell/bot-picker.tsx
 msgid "No bots match"
 msgstr ""
+
+#: src/pages/Calendar.tsx
+msgid "No change"
+msgstr "변경 없음"
 
 #: src/pages/Employees.tsx
 msgid "No employees yet"
