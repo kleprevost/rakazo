@@ -86,6 +86,7 @@ const matrix: Array<[string, Array<Exclude<AdminRole, "platform">>, (admin: Admi
   ["quarantine.list", ["security", "auditor"], (a) => a.quarantine.list()],
   ["quarantine.start", ["security"], (a) => a.quarantine.start({ scopeKind: "all" })],
   ["quarantine.lift", ["security"], (a) => a.quarantine.lift({ id: "q-1" })],
+  ["credentials.revoke", ["security"], (a) => a.credentials.revoke({ userId: "member" })],
   ["computers.list", ["security", "fleet", "auditor"], (a) => a.computers.list({ limit: 10 })],
   [
     "computers.get",

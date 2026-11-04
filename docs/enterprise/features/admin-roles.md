@@ -8,7 +8,7 @@ auditor can look but not change. Wave 4 item 1.
 | Role | Holds |
 |---|---|
 | `platform` | Everything. This is today's admin: nobody's access changes on upgrade. |
-| `security` | Sessions and revocation, bot suspension and quarantine, audit log, capability grants and modes, users and bots views. |
+| `security` | Sessions and credential revocation, bot suspension and quarantine, audit log, capability grants and modes, users and bots views. |
 | `fleet` | Computers, fleet operations, images (reads the policy for approved images). |
 | `auditor` | Read-only: every view above, no mutation. |
 
@@ -49,6 +49,7 @@ roles; `me.adminRoles` returns them and `me.isAdmin` stays the `platform` role.
 | `admin.bots.suspend`, `.resume` | security |
 | `admin.quarantine.list` | security, auditor |
 | `admin.quarantine.start`, `.lift` | security |
+| `admin.credentials.revoke` | security |
 | `admin.computers.list`, `.get` | security, fleet, auditor |
 | `admin.computers.quarantine`, `.release` | security |
 | `admin.computers.operations.create` | fleet |

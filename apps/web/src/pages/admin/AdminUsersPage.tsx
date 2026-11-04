@@ -90,7 +90,7 @@ function UserRow({
 }) {
   const { t } = useLingui();
   const { can } = useAdminRoles();
-  const [confirming, setConfirming] = useState<"end" | "deactivate" | null>(null);
+  const [confirming, setConfirming] = useState<"end" | "credentials" | "deactivate" | null>(null);
   const [busy, setBusy] = useState(false);
   async function run(action: () => Promise<unknown>, done?: string, failed?: string) {
     setBusy(true);
@@ -106,7 +106,7 @@ function UserRow({
     }
   }
   const confirmable = (
-    kind: "end" | "deactivate",
+    kind: "end" | "credentials" | "deactivate",
     label: string,
     action: () => Promise<unknown>,
     done?: string,
@@ -162,6 +162,13 @@ function UserRow({
               () => rpc.admin.users.endSessions({ userId: user.id }),
               t`Sessions ended`,
               t`Could not end sessions`,
+            )}
+            {confirmable(
+              "credentials",
+              t`Revoke credentials`,
+              () => rpc.admin.credentials.revoke({ userId: user.id }),
+              t`Credentials revoked`,
+              t`Could not revoke credentials`,
             )}
             {confirmable("deactivate", t`Deactivate`, () =>
               rpc.admin.users.deprovision({ userId: user.id }),

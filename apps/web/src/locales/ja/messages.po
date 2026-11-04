@@ -2412,6 +2412,10 @@ msgstr "パスワードをリセットできませんでした"
 msgid "Could not revoke connection"
 msgstr "接続を取り消せませんでした"
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Could not revoke credentials"
+msgstr "認証情報を取り消せませんでした"
+
 #: src/pages/AdminAccessPage.tsx
 msgid "Could not revoke grant"
 msgstr ""
@@ -2690,6 +2694,10 @@ msgstr "認証情報を保存しました"
 #: src/pages/PluginsOverlay.tsx
 msgid "Credentials are encrypted and never sent to the model."
 msgstr "認証情報は暗号化され、モデルに送信されることはありません。"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Credentials revoked"
+msgstr "認証情報を取り消しました"
 
 #: src/pages/shell/import-status.ts
 msgid "Credentials: {names}"
@@ -5976,6 +5984,10 @@ msgstr "取り消す"
 #: src/components/capabilities/BotAccess.tsx
 msgid "Revoke {0}"
 msgstr "{0} を取り消す"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Revoke credentials"
+msgstr "認証情報を取り消す"
 
 #: src/pages/AdminAccessPage.tsx
 msgid "Revoked"

@@ -717,6 +717,21 @@ Choices the design left open:
   mobile surface (mobile has no admin surface; the owner's Access section is web and desktop, and enforcement
   applies to mobile chats as everywhere).
 
+PR 7, credential revocation (no migration; `apps/api/src/admin-credential-revocation.ts`). Choices the design left open:
+- `admin.credentials.revoke({userId} | {botId})` (security role, `requireAdminRole`; never your own account). It replaces the
+  `revokeCredentials` quarantine option that Decision 3 dropped: quarantine still never revokes a personal connection, and
+  a Postgres test pins that.
+- A user target removes what disconnecting removes, for every Space: connected apps are marked `revoked` (the status the
+  run-start filter already excludes; no new `needs_reauth` state) and revoked at their provider through the existing
+  managed-connector `revoke`; MCP servers lose their secret and pending sign-ins and bump `revision`, which ends live sessions
+  in every process; vault items, bot secrets, model and voice connections are deleted with their stored secrets, and pending
+  model sign-ins are cancelled. A bot target removes only that bot's own secrets and MCP assignments; the owner's connections,
+  vault and MCP servers stay.
+- A provider that cannot confirm a revoke is counted (`providerUnconfirmed`) and logged; the local revoke stands, so the next
+  call fails regardless. There is no optional `revoke` hook on providers beyond the existing one.
+- One `credential.revoked` SecurityEvent (also in the audit log) carries the admin id, the target and counts only.
+- Admin Users page: a "Revoke credentials" action beside "End sessions", with the same two-step "Confirm". A bot target has no
+  UI; use the procedure.
 Credential principal assertions (no migration; `packages/db/src/credential-principal.ts`). Closes the PR 5
 deviation above, ahead of shared employees:
 - Every credential lookup in the adapters and the db package takes the run's acting requester as a `RunPrincipal`

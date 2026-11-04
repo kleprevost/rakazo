@@ -2412,6 +2412,10 @@ msgstr "Passwort konnte nicht zurückgesetzt werden"
 msgid "Could not revoke connection"
 msgstr "Verbindung konnte nicht widerrufen werden"
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Could not revoke credentials"
+msgstr "Zugangsdaten konnten nicht widerrufen werden"
+
 #: src/pages/AdminAccessPage.tsx
 msgid "Could not revoke grant"
 msgstr ""
@@ -2690,6 +2694,10 @@ msgstr "Zugangsdaten gespeichert"
 #: src/pages/PluginsOverlay.tsx
 msgid "Credentials are encrypted and never sent to the model."
 msgstr "Zugangsdaten werden verschlüsselt und dem Modell nie gesendet."
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Credentials revoked"
+msgstr "Zugangsdaten widerrufen"
 
 #: src/pages/shell/import-status.ts
 msgid "Credentials: {names}"
@@ -5976,6 +5984,10 @@ msgstr "Widerrufen"
 #: src/components/capabilities/BotAccess.tsx
 msgid "Revoke {0}"
 msgstr "{0} widerrufen"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Revoke credentials"
+msgstr "Zugangsdaten widerrufen"
 
 #: src/pages/AdminAccessPage.tsx
 msgid "Revoked"

@@ -2412,6 +2412,10 @@ msgstr "Wachtwoord opnieuw instellen mislukt"
 msgid "Could not revoke connection"
 msgstr "Verbinding intrekken mislukt"
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Could not revoke credentials"
+msgstr "Inloggegevens intrekken mislukt"
+
 #: src/pages/AdminAccessPage.tsx
 msgid "Could not revoke grant"
 msgstr ""
@@ -2690,6 +2694,10 @@ msgstr "Gegeven opgeslagen"
 #: src/pages/PluginsOverlay.tsx
 msgid "Credentials are encrypted and never sent to the model."
 msgstr "Gegevens worden versleuteld en nooit naar het model gestuurd."
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Credentials revoked"
+msgstr "Inloggegevens ingetrokken"
 
 #: src/pages/shell/import-status.ts
 msgid "Credentials: {names}"
@@ -5976,6 +5984,10 @@ msgstr "Intrekken"
 #: src/components/capabilities/BotAccess.tsx
 msgid "Revoke {0}"
 msgstr "{0} intrekken"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Revoke credentials"
+msgstr "Inloggegevens intrekken"
 
 #: src/pages/AdminAccessPage.tsx
 msgid "Revoked"

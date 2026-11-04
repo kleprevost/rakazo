@@ -2412,6 +2412,10 @@ msgstr "Не удалось сбросить пароль"
 msgid "Could not revoke connection"
 msgstr "Не удалось отменить соединение"
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Could not revoke credentials"
+msgstr "Не удалось отозвать учётные данные"
+
 #: src/pages/AdminAccessPage.tsx
 msgid "Could not revoke grant"
 msgstr ""
@@ -2690,6 +2694,10 @@ msgstr "Учетные данные сохранены"
 #: src/pages/PluginsOverlay.tsx
 msgid "Credentials are encrypted and never sent to the model."
 msgstr "Учётные данные зашифрованы и никогда не передаются модели."
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Credentials revoked"
+msgstr "Учётные данные отозваны"
 
 #: src/pages/shell/import-status.ts
 msgid "Credentials: {names}"
@@ -5976,6 +5984,10 @@ msgstr "Отозвать"
 #: src/components/capabilities/BotAccess.tsx
 msgid "Revoke {0}"
 msgstr "Отозвать {0}"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Revoke credentials"
+msgstr "Отозвать учётные данные"
 
 #: src/pages/AdminAccessPage.tsx
 msgid "Revoked"

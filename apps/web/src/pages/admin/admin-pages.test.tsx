@@ -22,6 +22,7 @@ const api = vi.hoisted(() => ({
   policy: vi.fn(),
   audit: vi.fn(),
   endSessions: vi.fn(),
+  revokeCredentials: vi.fn(),
   deprovision: vi.fn(),
   reactivate: vi.fn(),
   suspend: vi.fn(),
@@ -43,6 +44,7 @@ const api = vi.hoisted(() => ({
 vi.mock("../../lib/rpc", () => ({
   rpc: {
     admin: {
+      credentials: { revoke: api.revokeCredentials },
       users: {
         endSessions: api.endSessions,
         deprovision: api.deprovision,
@@ -254,11 +256,13 @@ it("hides the end-sessions action from an auditor but not from security", async 
   const auditor = await show(<AdminUsersPage />);
   expect(auditor.host.textContent).toContain("sam@example.test");
   expect(auditor.host.textContent).not.toContain("End sessions");
+  expect(auditor.host.textContent).not.toContain("Revoke credentials");
 
   document.body.innerHTML = "";
   api.me.mockResolvedValue({ isAdmin: false, adminRoles: ["security"] });
   const security = await show(<AdminUsersPage />);
   expect(security.host.textContent).toContain("End sessions");
+  expect(security.host.textContent).toContain("Revoke credentials");
 });
 
 it("shows the overview: loading, error with retry, and populated", async () => {
@@ -346,6 +350,16 @@ it("shows the users page: empty, error, and populated with the end-sessions acti
   await act(async () => button.click());
   expect(api.endSessions).toHaveBeenCalledWith({ userId: "u2" });
   expect(api.toastSuccess).toHaveBeenCalledWith("Sessions ended");
+
+  // Revoking credentials asks for confirmation the same way.
+  api.revokeCredentials.mockResolvedValue({});
+  const revoke = rows[1]?.querySelectorAll("button")[1] as HTMLButtonElement;
+  expect(revoke.textContent).toBe("Revoke credentials");
+  await act(async () => revoke.click());
+  expect(api.revokeCredentials).not.toHaveBeenCalled();
+  await act(async () => revoke.click());
+  expect(api.revokeCredentials).toHaveBeenCalledWith({ userId: "u2" });
+  expect(api.toastSuccess).toHaveBeenCalledWith("Credentials revoked");
 });
 
 it("deactivates after a confirming click and offers to reactivate a deactivated account", async () => {
@@ -370,11 +384,11 @@ it("deactivates after a confirming click and offers to reactivate a deactivated 
   const rows = host.querySelectorAll('[data-testid="admin-users"] tbody tr');
   const labels = (row?: Element) =>
     [...(row?.querySelectorAll("button") ?? [])].map((b) => b.textContent);
-  expect(labels(rows[0])).toEqual(["End sessions", "Deactivate"]);
+  expect(labels(rows[0])).toEqual(["End sessions", "Revoke credentials", "Deactivate"]);
   expect(rows[1]?.textContent).toContain("Deactivated");
   expect(labels(rows[1])).toEqual(["Reactivate"]);
 
-  const deactivate = rows[0]?.querySelectorAll("button")[1] as HTMLButtonElement;
+  const deactivate = rows[0]?.querySelectorAll("button")[2] as HTMLButtonElement;
   await act(async () => deactivate.click());
   expect(api.deprovision).not.toHaveBeenCalled();
   expect(deactivate.textContent).toBe("Confirm");

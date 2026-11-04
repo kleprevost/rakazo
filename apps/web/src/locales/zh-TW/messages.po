@@ -2413,6 +2413,10 @@ msgstr "無法重設密碼"
 msgid "Could not revoke connection"
 msgstr "無法撤銷連線授權"
 
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Could not revoke credentials"
+msgstr "無法撤銷憑證"
+
 #: src/pages/AdminAccessPage.tsx
 msgid "Could not revoke grant"
 msgstr ""
@@ -2691,6 +2695,10 @@ msgstr "憑證已儲存"
 #: src/pages/PluginsOverlay.tsx
 msgid "Credentials are encrypted and never sent to the model."
 msgstr "憑證已加密，不會傳送給模型。"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Credentials revoked"
+msgstr "憑證已撤銷"
 
 #: src/pages/shell/import-status.ts
 msgid "Credentials: {names}"
@@ -5977,6 +5985,10 @@ msgstr "撤銷授權"
 #: src/components/capabilities/BotAccess.tsx
 msgid "Revoke {0}"
 msgstr "撤銷 {0}"
+
+#: src/pages/admin/AdminUsersPage.tsx
+msgid "Revoke credentials"
+msgstr "撤銷憑證"
 
 #: src/pages/AdminAccessPage.tsx
 msgid "Revoked"

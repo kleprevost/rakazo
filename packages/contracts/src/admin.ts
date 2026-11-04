@@ -371,6 +371,29 @@ export const AdminQuarantineStartSchema = z
     message: "scopeId is required for every scope except all",
   });
 
+/** Revokes one account's credentials, or one bot's own. */
+export const AdminRevokeCredentialsSchema = z
+  .object({ userId: Id.optional(), botId: Id.optional() })
+  .refine((input) => (input.userId === undefined) !== (input.botId === undefined), {
+    message: "Name a user or a bot",
+  });
+
+export const AdminCredentialRevocationSchema = z.object({
+  /** Connected apps marked revoked. */
+  connections: z.number().int(),
+  /** Of those, how many the app's provider could not confirm revoking; they are revoked here regardless. */
+  providerUnconfirmed: z.number().int(),
+  /** MCP servers whose sign-in or secrets were removed. */
+  mcpServers: z.number().int(),
+  /** Bot assignments to MCP servers removed (a bot target only). */
+  mcpAssignments: z.number().int(),
+  vaultItems: z.number().int(),
+  botSecrets: z.number().int(),
+  modelConnections: z.number().int(),
+  voiceConnections: z.number().int(),
+});
+export type AdminCredentialRevocation = z.infer<typeof AdminCredentialRevocationSchema>;
+
 export const adminContract = {
   overview: oc.output(AdminOverviewSchema),
   users: {
@@ -413,6 +436,15 @@ export const adminContract = {
       }),
     ),
     lift: oc.input(z.object({ id: Id })).output(z.object({ ok: z.literal(true) })),
+  },
+  /**
+   * Removes an account's stored credentials (connected apps, MCP sign-ins, vault, model and voice
+   * connections) or one bot's own (its secrets and MCP assignments), for a departure or a
+   * suspected compromise. The next call fails. Quarantine never does this by itself. Not
+   * available on your own account.
+   */
+  credentials: {
+    revoke: oc.input(AdminRevokeCredentialsSchema).output(AdminCredentialRevocationSchema),
   },
   /** Every bot with its broker mode and grant count; per-bot grants, mode and the simulator are `capabilityGrants`. */
   capabilities: {

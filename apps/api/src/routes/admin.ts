@@ -9,6 +9,7 @@ import {
   adminReactivate,
   adminUsers,
 } from "../admin-console.js";
+import { revokeCredentials } from "../admin-credential-revocation.js";
 import {
   adminCreateFleetOperation,
   adminFleetOperation,
@@ -62,6 +63,11 @@ export function adminRoutes(ctx: RouterContext) {
         ),
         lift: authed.admin.quarantine.lift.handler(({ context, input }) =>
           liftQuarantine(deps, context.actor.userId, input.id),
+        ),
+      },
+      credentials: {
+        revoke: authed.admin.credentials.revoke.handler(({ context, input }) =>
+          revokeCredentials(deps, context.actor.userId, input),
         ),
       },
       capabilities: {
