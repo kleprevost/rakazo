@@ -14,6 +14,18 @@ describe("toComputerStatus", () => {
       }),
     ).toMatchObject({ state: "error", screenAvailable: false });
   });
+  it("shows a computer an admin quarantined as an error without making its screen available", () => {
+    expect(
+      toComputerStatus("bot", {
+        kind: "docker",
+        state: "running",
+        scope: "team",
+        controlHolder: "none",
+        homeRevision: "saved",
+        adminQuarantinedAt: new Date(),
+      }),
+    ).toMatchObject({ state: "error", screenAvailable: false });
+  });
   it("warns at 90% full until the user hides it, and again once the disk fills further", () => {
     const computer = {
       kind: "docker",

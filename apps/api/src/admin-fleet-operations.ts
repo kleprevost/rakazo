@@ -67,7 +67,7 @@ export async function adminFleetOperations(
   actorId: string,
   input: { limit: number },
 ): Promise<{ operations: FleetOperation[] }> {
-  await requireAdminRole(deps, actorId, ["fleet", "auditor"]);
+  await requireAdminRole(deps, actorId, ["security", "fleet", "auditor"]);
   const rows = await system("list", () =>
     deps.prisma.computerFleetOperation.findMany({
       orderBy: [{ createdAt: "desc" }, { id: "desc" }],
@@ -100,7 +100,7 @@ export async function adminFleetOperation(
   actorId: string,
   operationId: string,
 ): Promise<FleetOperationDetail> {
-  await requireAdminRole(deps, actorId, ["fleet", "auditor"]);
+  await requireAdminRole(deps, actorId, ["security", "fleet", "auditor"]);
   const row = await system("read", () =>
     deps.prisma.computerFleetOperation.findUnique({
       where: { id: operationId },

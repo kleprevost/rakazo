@@ -64,6 +64,11 @@ msgstr ""
 msgid "{0, plural, one {# tool} other {# tools}}"
 msgstr ""
 
+#. placeholder {0}: selected.size
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "{0, plural, one {Quarantine # computer?} other {Quarantine # computers?}}"
+msgstr "{0, plural, other {隔離 # 台電腦?}}"
+
 #. placeholder {0}: pinned.length
 #: src/pages/model-settings/space-bots-model.tsx
 msgid "{0, plural, one {Switch # bot to the space default?} other {Switch # bots to the space default?}}"
@@ -5404,6 +5409,7 @@ msgid "Pull request"
 msgstr "Pull request"
 
 #: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/admin/AdminComputersPage.tsx
 msgid "Quarantine"
 msgstr "隔離"
 
@@ -5618,6 +5624,7 @@ msgid "Rejecting…"
 msgstr ""
 
 #: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/admin/AdminComputersPage.tsx
 msgid "Release"
 msgstr "解除"
 

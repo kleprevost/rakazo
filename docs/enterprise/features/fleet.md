@@ -1,6 +1,6 @@
 # Computer fleet manager (design)
 
-Design; build plan PR 1 (read-only inventory), PR 2 (observation), PR 3 (image governance), PR 4 (operations engine), PR 5 (recreate) and PR 6 (terminate) are implemented. An Admin page where operators see every bot computer in
+Design; build plan PR 1 (read-only inventory), PR 2 (observation), PR 3 (image governance), PR 4 (operations engine), PR 5 (recreate), PR 6 (terminate) and PR 7 (quarantine and release) are implemented. An Admin page where operators see every bot computer in
 the install and act on them, one or in bulk: recreate from an approved image without losing the
 home folder, terminate, quarantine, hibernate, wake. Provider-neutral. It works first with the Docker
 supervisor on the ACA + VM deployment ([aca-vm.md](../aca-vm.md)) and later with the Kubernetes
@@ -464,8 +464,47 @@ ids, outcome code. Never: paths, file names, provider error text, tokens, screen
    handling (`fleet-terminate.postgres.test.ts`: marker and browser profile restored on the next
    start, failed save destroys nothing, busy skip, replay, already stopped or hibernated, one open
    operation per computer; admin authorization; web confirmation).
-7. **Quarantine and release.** Flag, gates, Docker `networkIsolation`, optional suspend composition,
-   Kubernetes label patch and RBAC change documented. Tests: 9, 10, 11.
+7. **Quarantine and release.** As built: an admin flag on the computer (`adminQuarantinedAt`, who,
+   a reason of at most 200 characters, and `adminQuarantineId` for the bot quarantine that set it),
+   separate from `state = quarantined`. Two procedures, `admin.computers.quarantine` and
+   `admin.computers.release` (bulk, up to 200), not fleet operation kinds: quarantine must cancel
+   runs, and the cancel primitive (`cancelBotRuns`, `finishCancelledRuns`) lives with the API.
+   Quarantine sets the flag first, so every gate refuses from that moment; then cancels the active
+   runs of the bots on those computers (cancel-only, nothing is revoked, personal connections are
+   untouched); then cuts the network where the provider can; then queues one ordinary `terminate`
+   operation, so the stop is the PR 6 save-home-and-destroy path, with its busy skips. Release
+   clears the flag and restores the network of a computer that is still up. It starts nothing: a
+   stopped computer comes back on next use. The gates: `provisionComputer` (start, wake, boot),
+   `acquireComputerExecutionLease` (also re-checked after the lease row is written), any
+   `replaceComputer` that is not stop-only, owner boot, takeover and input, the screen and terminal
+   URLs (which return none), and the fleet `wake` and `recreate` items (`skipped_unsupported`,
+   outcome `quarantined`). The owner sees the computer as in error, like the safety state.
+   **Network isolation** is a `SandboxCapabilities.fleet.networkIsolation` flag with
+   `isolateNetwork(computer, isolated)`. Only the Docker supervisor has it
+   (`POST /computers/:id/network`: disconnect from every network, reconnect to the bot network on
+   release, and success only after Docker is read back); it answers 409, so `unsupported`, where
+   `SANDBOX_SCREEN_NETWORK=internal` shares one network. Every other provider has no flag and is
+   reported `unsupported`; the operation still stops idle machines. The outcome (`applied`,
+   `not_running`, `unsupported`, `failed`) is in the response counts and in each
+   `computer.quarantined` and `computer.released` event; it is never reported as isolated unless
+   the provider confirmed it. **Bot quarantine** now also contains the computers whose active bots
+   it all covers (flag with `adminQuarantineId`, no run re-cancel, network cut, terminate) and
+   lifting it releases those computers, not restarting them. A Team computer that also serves a bot
+   outside the quarantine is left to its idle lifecycle, because stopping it would stop other
+   people's work. An admin who quarantines a computer a bot quarantine holds takes it over, so
+   lifting the bot quarantine no longer releases it. The Computers page gains Quarantine (behind a
+   confirmation), Release (once a selected computer is quarantined), a Quarantined badge, and a
+   Quarantined filter (once any computer is). Deviations: Docker disconnects the container from every network instead of moving it to an
+   internal network (the section 3 sketch), because that needs no new network to create and
+   clean up and a quarantined computer has no use for its screen; no `suspendBots` option, since the
+   quarantined computer's bots already cannot start it and bot quarantine is its own action; no
+   Kubernetes label patch or RBAC change (no `networkIsolation` there, reported unsupported); live
+   user control is never taken by force, so that computer stays running, flagged and cut off until
+   the person lets go and an operator terminates it; the supervisor's inspection does not report
+   an isolated network as an egress mode, so the detail sheet keeps showing what it showed;
+   no isolation result is shown in the page, only in the audit events. Tests: 9, 10, 11
+   (`computer-quarantine.postgres.test.ts`, supervisor route and Docker adapter tests, the sandbox
+   conformance test, owner boot and status, admin authorization, web).
 8. **Kubernetes parity and orphans.** `list`, usage, orphan report, AKS notes in `azure-aks.md`.
 9. Follow-up: signature verification (a provider-neutral `ImageVerifier` called before provision, with
    the Docker supervisor and an admission policy as adapters), `recreate_when_idle` enforcement.

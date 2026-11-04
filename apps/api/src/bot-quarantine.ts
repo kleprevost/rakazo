@@ -5,6 +5,11 @@ import { recordSecurityEvent, runAsSystem } from "@rakazo/db";
 import { requireAdminRole } from "./admins.js";
 import type { SuspensionDeps } from "./bot-suspension.js";
 import { cancelBotRuns, finishCancelledRuns } from "./bot-suspension.js";
+import {
+  computersCoveredBy,
+  containComputers,
+  releaseContainedComputers,
+} from "./computer-quarantine.js";
 
 const system = <T>(what: string, fn: () => Promise<T>) =>
   runAsSystem(`bot quarantine: ${what}`, fn);
@@ -50,9 +55,11 @@ async function coveredBotIds(deps: SuspensionDeps, scope: Scope): Promise<string
 /**
  * Quarantines one bot, every bot in a Space or chat group, or all bots. The row goes in first, so
  * every gate refuses the bots from that moment; then their active runs are cancelled (the
- * suspend primitive, no drain). Secrets, MCP configuration, webhook secrets and personal
- * connections are never touched: they are unusable while the gates refuse the bot, so releasing
- * restores everything. Admin only.
+ * suspend primitive, no drain). The computers only these bots use are contained too (flagged,
+ * network cut where the provider can, idle machines stopped with their homes saved); a Team
+ * computer that also serves a bot outside the quarantine is left to its idle lifecycle.
+ * Secrets, MCP configuration, webhook secrets and personal connections are never touched: they
+ * are unusable while the gates refuse the bot, so releasing restores everything. Admin only.
  */
 export async function startQuarantine(
   deps: SuspensionDeps,
@@ -62,6 +69,7 @@ export async function startQuarantine(
   id: string;
   bots: number;
   cancelledRuns: number;
+  computers: number;
 }> {
   await requireAdminRole(deps, actorId, "security");
   const scope: Scope = {
@@ -86,12 +94,18 @@ export async function startQuarantine(
     deps.prisma.$transaction((tx) => cancelBotRuns(tx, botIds, now)),
   );
   await finishCancelledRuns(deps, cancelled);
+  const contained = await containComputers(deps, actorId, await computersCoveredBy(deps, botIds), {
+    reason,
+    quarantineId: row.id,
+    runsCancelled: true,
+  });
   const bots = botIds
     ? botIds.length
     : await system("count", () => deps.prisma.bot.count({ where: { archivedAt: null } }));
   const summary = {
     bots,
     cancelledRuns: cancelled.runs.length,
+    computers: contained.quarantined,
   };
   await system("summary", () =>
     deps.prisma.quarantine.update({ where: { id: row.id }, data: { summary } }),
@@ -112,6 +126,7 @@ export async function startQuarantine(
 
 /**
  * Ends a quarantine. Idempotent. Cancelled runs are not replayed; everything else works again.
+ * The computers it contained are released but not restarted: they start again on next use.
  */
 export async function liftQuarantine(
   deps: SuspensionDeps,
@@ -133,7 +148,8 @@ export async function liftQuarantine(
       data: { liftedAt: new Date(), liftedByUserId: actorId },
     }),
   );
-  if (lifted.count === 1)
+  if (lifted.count === 1) {
+    await releaseContainedComputers(deps, actorId, { adminQuarantineId: id });
     await recordSecurityEvent({
       type: "bot.released",
       userId: actorId,
@@ -143,6 +159,7 @@ export async function liftQuarantine(
         scopeId: row.scopeId ?? undefined,
       },
     });
+  }
   return { ok: true };
 }
 

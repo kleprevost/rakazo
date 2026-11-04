@@ -525,6 +525,8 @@ describeWithDatabase("API authorization and resource isolation", () => {
       ["admin/quarantine/lift", { id: "missing-quarantine" }],
       ["admin/computers/list"],
       ["admin/computers/get", { computerId: "missing-computer" }],
+      ["admin/computers/quarantine", { computerIds: ["missing-computer"] }],
+      ["admin/computers/release", { computerIds: ["missing-computer"] }],
       [
         "admin/computers/operations/create",
         { kind: "hibernate", computerIds: ["missing-computer"] },
@@ -2496,18 +2498,20 @@ describeWithDatabase("API authorization and resource isolation", () => {
       ["admin/quarantine/list", {}, ["security", "auditor"]],
       ["admin/quarantine/start", { scopeKind: "bot", scopeId: "missing-bot" }, ["security"]],
       ["admin/quarantine/lift", { id: "missing-quarantine" }, ["security"]],
-      ["admin/computers/list", {}, ["fleet", "auditor"]],
-      ["admin/computers/get", { computerId: "missing-computer" }, ["fleet", "auditor"]],
+      ["admin/computers/list", {}, ["security", "fleet", "auditor"]],
+      ["admin/computers/get", { computerId: "missing-computer" }, ["security", "fleet", "auditor"]],
+      ["admin/computers/quarantine", { computerIds: ["missing-computer"] }, ["security"]],
+      ["admin/computers/release", { computerIds: ["missing-computer"] }, ["security"]],
       [
         "admin/computers/operations/create",
         { kind: "hibernate", computerIds: ["missing-computer"] },
         ["fleet"],
       ],
-      ["admin/computers/operations/list", {}, ["fleet", "auditor"]],
+      ["admin/computers/operations/list", {}, ["security", "fleet", "auditor"]],
       [
         "admin/computers/operations/get",
         { operationId: "missing-operation" },
-        ["fleet", "auditor"],
+        ["security", "fleet", "auditor"],
       ],
       ["admin/policy", {}, ["security", "fleet", "auditor"]],
       ["admin/audit", {}, ["security", "auditor"]],
@@ -2555,6 +2559,12 @@ describeWithDatabase("API authorization and resource isolation", () => {
       await expectForbidden(app, cookie, "admin/computers/get", { computerId: "missing-computer" });
       await expectForbidden(app, cookie, "admin/quarantine/start", { scopeKind: "all" });
       await expectForbidden(app, cookie, "admin/quarantine/lift", { id: "missing-quarantine" });
+      await expectForbidden(app, cookie, "admin/computers/quarantine", {
+        computerIds: ["missing-computer"],
+      });
+      await expectForbidden(app, cookie, "admin/computers/release", {
+        computerIds: ["missing-computer"],
+      });
       await expectForbidden(app, cookie, "admin/computers/operations/create", {
         kind: "hibernate",
         computerIds: ["missing-computer"],

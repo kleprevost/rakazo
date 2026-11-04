@@ -63,6 +63,11 @@ msgstr "{0, plural, one {# espacio} other {# espacios}}"
 msgid "{0, plural, one {# tool} other {# tools}}"
 msgstr ""
 
+#. placeholder {0}: selected.size
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "{0, plural, one {Quarantine # computer?} other {Quarantine # computers?}}"
+msgstr "{0, plural, one {¿Poner # computadora en cuarentena?} other {¿Poner # computadoras en cuarentena?}}"
+
 #. placeholder {0}: pinned.length
 #: src/pages/model-settings/space-bots-model.tsx
 msgid "{0, plural, one {Switch # bot to the space default?} other {Switch # bots to the space default?}}"
@@ -5403,6 +5408,7 @@ msgid "Pull request"
 msgstr "Solicitud de incorporación"
 
 #: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/admin/AdminComputersPage.tsx
 msgid "Quarantine"
 msgstr "Poner en cuarentena"
 
@@ -5617,6 +5623,7 @@ msgid "Rejecting…"
 msgstr "Rechazando…"
 
 #: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/admin/AdminComputersPage.tsx
 msgid "Release"
 msgstr "Liberar"
 

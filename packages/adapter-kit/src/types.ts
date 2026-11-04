@@ -266,8 +266,17 @@ export interface SandboxCapabilities {
     usage?: boolean;
     /** `provision({ image })` starts the computer from the named image instead of the provider's own. */
     imageSelection?: boolean;
+    /**
+     * `isolateNetwork()` cuts a running computer off from every network and can restore it. Offered
+     * only where the provider can really do it; a provider without it is reported unsupported,
+     * and a quarantine never claims isolation it did not apply.
+     */
+    networkIsolation?: boolean;
   };
 }
+
+/** What `isolateNetwork` did: `not_running` means there was no live network to change. */
+export type NetworkIsolationResult = "applied" | "not_running" | "unsupported";
 
 /** What a provider can read about one computer without changing it. */
 export interface ComputerInspection {

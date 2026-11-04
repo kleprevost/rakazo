@@ -2606,3 +2606,105 @@ describe("computer network reclaim", () => {
     });
   });
 });
+
+describe("computer network isolation", () => {
+  const headers = () => ({
+    authorization: `Bearer ${resolveSupervisorToken(process.env)}`,
+    "content-type": "application/json",
+    "x-rakazo-bot-id": "bot",
+    "x-rakazo-space-id": "space",
+  });
+  const labels = { "rakazo.managed": "true", "rakazo.botId": "bot", "rakazo.spaceId": "space" };
+  const botNet = computerNetworkNameFor("bot");
+
+  /** A container that reports the networks it is attached to as they change. */
+  function setup(running: boolean, attached: string[]) {
+    let networks = [...attached];
+    const container = {
+      id: "box",
+      inspect: vi.fn(async () => ({
+        Config: { Labels: labels },
+        State: { Running: running },
+        HostConfig: { NetworkMode: botNet },
+        NetworkSettings: {
+          Networks: Object.fromEntries(networks.map((name) => [name, { NetworkID: name }])),
+        },
+      })),
+    };
+    const network = {
+      inspect: vi.fn().mockResolvedValue({ Id: "net", Options: {} }),
+      disconnect: vi.fn(async () => {
+        networks = [];
+      }),
+      connect: vi.fn(async () => {
+        networks = [botNet];
+      }),
+    };
+    mocks.docker.getContainer.mockReturnValue(container);
+    mocks.docker.getNetwork.mockReturnValue(network);
+    mocks.docker.createNetwork.mockResolvedValue({});
+    return { container, network };
+  }
+  const post = async (isolated: unknown) => {
+    const { supervisorApp } = await import("./index.js");
+    return supervisorApp.request("/computers/box/network", {
+      method: "POST",
+      headers: headers(),
+      body: JSON.stringify({ isolated }),
+    });
+  };
+
+  it("disconnects a running computer from every network and confirms it from Docker", async () => {
+    const { network } = setup(true, [botNet]);
+    const response = await post(true);
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ running: true, isolated: true });
+    expect(network.disconnect).toHaveBeenCalledWith({ Container: "box", Force: true });
+  });
+
+  it("reconnects an isolated computer to its own network on release", async () => {
+    const { network } = setup(true, []);
+    const response = await post(false);
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ running: true, isolated: false });
+    expect(network.connect).toHaveBeenCalledWith({ Container: "box" });
+  });
+
+  it("does not claim isolation when Docker still shows a network", async () => {
+    const { network } = setup(true, [botNet]);
+    network.disconnect.mockResolvedValue(undefined);
+    const response = await post(true);
+    expect(response.status).toBe(500);
+    expect(await response.json()).toEqual({ error: "computer network was not changed" });
+  });
+
+  it("changes nothing on a computer that is not running", async () => {
+    const { network } = setup(false, []);
+    const response = await post(true);
+    expect(await response.json()).toEqual({ running: false, isolated: false });
+    expect(network.disconnect).not.toHaveBeenCalled();
+    expect(network.connect).not.toHaveBeenCalled();
+  });
+
+  it("refuses another computer identity and malformed requests", async () => {
+    const { network } = setup(true, [botNet]);
+    mocks.docker.getContainer.mockReturnValue({
+      inspect: vi.fn().mockResolvedValue({
+        Config: { Labels: { ...labels, "rakazo.botId": "other" } },
+        State: { Running: true },
+        NetworkSettings: { Networks: { [botNet]: {} } },
+      }),
+    });
+    expect((await post(true)).status).toBe(403);
+    expect((await post("yes")).status).toBe(400);
+    expect(network.disconnect).not.toHaveBeenCalled();
+  });
+
+  it("is unavailable where computers share the supervisor's network", async () => {
+    vi.stubEnv("SANDBOX_SCREEN_NETWORK", "internal");
+    const { network } = setup(true, [botNet]);
+    const response = await post(true);
+    expect(response.status).toBe(409);
+    expect(network.disconnect).not.toHaveBeenCalled();
+  });
+});

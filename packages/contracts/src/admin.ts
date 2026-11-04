@@ -143,6 +143,8 @@ export const AdminComputerSchema = z.object({
   imageCompliance: z.enum(["approved", "not_approved", "unknown"]).nullable(),
   runningSince: z.string().nullable(),
   lastActivityAt: z.string().nullable(),
+  /** When an admin quarantined it; null when it is not. */
+  quarantinedAt: z.string().nullable(),
 });
 export type AdminComputer = z.infer<typeof AdminComputerSchema>;
 
@@ -195,6 +197,13 @@ export const AdminComputerPageSchema = z.object({
   nextCursor: z.string().nullable(),
 });
 export type AdminComputerPage = z.infer<typeof AdminComputerPageSchema>;
+
+export const NetworkIsolationOutcomeSchema = z.enum([
+  "applied",
+  "not_running",
+  "unsupported",
+  "failed",
+]);
 
 export const FLEET_OPERATION_KINDS = ["hibernate", "wake", "recreate", "terminate"] as const;
 export const FleetOperationKindSchema = z.enum(FLEET_OPERATION_KINDS);
@@ -379,6 +388,8 @@ export const adminContract = {
         id: z.string(),
         bots: z.number().int(),
         cancelledRuns: z.number().int(),
+        /** Computers contained with them: only those no other bot uses. */
+        computers: z.number().int(),
       }),
     ),
     lift: oc.input(z.object({ id: Id })).output(z.object({ ok: z.literal(true) })),
@@ -394,10 +405,38 @@ export const adminContract = {
         AdminPageInputSchema.extend({
           /** Only computers whose last known image the policy does not approve; none without a policy list. */
           imageCompliance: z.literal("not_approved").optional(),
+          /** Only computers an admin quarantined. */
+          quarantined: z.literal(true).optional(),
         }),
       )
       .output(AdminComputerPageSchema),
     get: oc.input(z.object({ computerId: Id })).output(AdminComputerDetailSchema),
+    /**
+     * Contains computers: refuses start, wake, takeover and execution leases, cancels the runs of
+     * the bots on them, cuts the network where the provider can really do it and stops idle
+     * machines with their homes saved. A busy machine is never destroyed. Nothing is revoked.
+     */
+    quarantine: oc
+      .input(
+        z.object({
+          computerIds: z.array(Id).min(1).max(FLEET_MAX_COMPUTERS),
+          reason: z.string().trim().max(200).optional(),
+        }),
+      )
+      .output(
+        z.object({
+          quarantined: z.number().int(),
+          cancelledRuns: z.number().int(),
+          /** Computers by what the network cut came to; `unsupported` is never counted as isolated. */
+          networkIsolation: z.partialRecord(NetworkIsolationOutcomeSchema, z.number().int()),
+          /** The terminate operation stopping the idle ones; null when none were running. */
+          operationId: z.string().nullable(),
+        }),
+      ),
+    /** Clears the flag and restores a still-running computer's network. Starts nothing. */
+    release: oc
+      .input(z.object({ computerIds: z.array(Id).min(1).max(FLEET_MAX_COMPUTERS) }))
+      .output(z.object({ released: z.number().int() })),
     /** Hibernate, wake, recreate or terminate many computers at a bounded pace. Busy computers are skipped, never forced. */
     operations: {
       create: oc.input(FleetOperationInputSchema).output(z.object({ id: z.string() })),

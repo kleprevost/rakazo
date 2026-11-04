@@ -113,9 +113,14 @@ async function inBatches<T, R>(items: T[], size: number, fn: (item: T) => Promis
 export async function adminComputers(
   deps: ComputersDeps,
   actorId: string,
-  input: { cursor?: string; limit: number; imageCompliance?: "not_approved" },
+  input: {
+    cursor?: string;
+    limit: number;
+    imageCompliance?: "not_approved";
+    quarantined?: true;
+  },
 ): Promise<AdminComputerPage> {
-  await requireAdminRole(deps, actorId, ["fleet", "auditor"]);
+  await requireAdminRole(deps, actorId, ["security", "fleet", "auditor"]);
   const rows = await system("list computers", () =>
     deps.prisma.computer.findMany({
       select: {
@@ -131,10 +136,14 @@ export async function adminComputers(
         userId: true,
         runningSince: true,
         updatedAt: true,
+        adminQuarantinedAt: true,
         space: { select: { name: true } },
         bots: { select: { id: true, name: true }, orderBy: { name: "asc" } },
       },
-      ...(input.imageCompliance ? { where: notApprovedWhere() } : {}),
+      where: {
+        ...(input.imageCompliance ? notApprovedWhere() : {}),
+        ...(input.quarantined ? { adminQuarantinedAt: { not: null } } : {}),
+      },
       orderBy: [{ createdAt: "desc" }, { id: "desc" }],
       take: input.limit + 1,
       ...(input.cursor ? { cursor: { id: input.cursor }, skip: 1 } : {}),
@@ -193,6 +202,7 @@ export async function adminComputers(
         imageCompliance: complianceFor(computer, observationById.get(computer.id)),
         runningSince: computer.runningSince?.toISOString() ?? null,
         lastActivityAt: last?.toISOString() ?? null,
+        quarantinedAt: computer.adminQuarantinedAt?.toISOString() ?? null,
       };
     }),
     nextCursor: rows.length > input.limit ? (page.at(-1)?.id ?? null) : null,
@@ -210,7 +220,7 @@ export async function adminComputer(
   actorId: string,
   computerId: string,
 ): Promise<AdminComputerDetail> {
-  await requireAdminRole(deps, actorId, ["fleet", "auditor"]);
+  await requireAdminRole(deps, actorId, ["security", "fleet", "auditor"]);
   const computer = await system("read computer", () =>
     deps.prisma.computer.findUnique({
       where: { id: computerId },
@@ -229,6 +239,7 @@ export async function adminComputer(
         diskFreeBytes: true,
         imageRef: true,
         imageDigest: true,
+        adminQuarantinedAt: true,
         space: { select: { name: true } },
         bots: { select: { id: true, name: true }, orderBy: { name: "asc" } },
         observation: true,
@@ -271,6 +282,7 @@ export async function adminComputer(
     imageCompliance: complianceFor(computer, observation),
     runningSince: computer.runningSince?.toISOString() ?? null,
     lastActivityAt: last?.toISOString() ?? null,
+    quarantinedAt: computer.adminQuarantinedAt?.toISOString() ?? null,
     createdAt: computer.createdAt.toISOString(),
     imageDigest: observation?.imageDigest ?? computer.imageDigest ?? null,
     disk:

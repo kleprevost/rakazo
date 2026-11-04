@@ -386,6 +386,9 @@ is by membership at use time, not a snapshot of ids.
   **stopped** (removing live sessions, browser logins and command variables from memory). Shared
   team computers are not stopped if other non-quarantined bots use them; their screen lease and
   run work for the quarantined bot are released and the bot cannot dispatch to it.
+  As built (fleet PR 7, [fleet.md](./fleet.md)): the computers only quarantined bots use are
+  flagged, cut off from the network where the provider can, and stopped with their homes saved;
+  lifting the quarantine releases them without restarting them.
 
 ### Cancel or drain: cancel
 **Chosen: cancel** active runs (the suspend primitive `cancelRunsInTransaction`), not drain.

@@ -7,6 +7,7 @@ import type {
   ComputerInspection,
   ComputerRef,
   ControlLeaseRef,
+  NetworkIsolationResult,
   PortableFile,
   ProcessEvent,
   SandboxProvider,
@@ -35,6 +36,8 @@ export interface FakeBox {
   screenLeases: Map<string, string>;
   /** The image it was started from; the provider default when none was named. */
   image?: { ref: string; digest: string };
+  /** Cut off from every network by `isolateNetwork`. */
+  isolated?: boolean;
 }
 
 export class FakeSandboxProvider implements SandboxProvider {
@@ -56,7 +59,7 @@ export class FakeSandboxProvider implements SandboxProvider {
         takeover: true,
         persistentHome: true,
         multiScreen: true,
-        fleet: { inspect: true, usage: true, imageSelection: true },
+        fleet: { inspect: true, usage: true, imageSelection: true, networkIsolation: true },
       },
     };
   }
@@ -108,8 +111,21 @@ export class FakeSandboxProvider implements SandboxProvider {
             health: "ok" as const,
           }
         : {}),
-      egress: { mode: "open", enforced: false },
+      egress: box.isolated
+        ? { mode: "isolated", enforced: true }
+        : { mode: "open", enforced: false },
     };
+  }
+
+  async isolateNetwork(
+    computer: ComputerRef,
+    isolated: boolean,
+    _context: AdapterContext,
+  ): Promise<NetworkIsolationResult> {
+    const box = this.boxes.get(computer.id);
+    if (!box?.running) return "not_running";
+    box.isolated = isolated;
+    return "applied";
   }
 
   async prepare(_computer: ComputerRef, _context: AdapterContext): Promise<void> {}

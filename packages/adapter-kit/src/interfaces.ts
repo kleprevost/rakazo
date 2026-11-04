@@ -58,6 +58,7 @@ import type {
   MessagingPlatformDescriptor,
   MessagingSendRequest,
   MessagingSendResult,
+  NetworkIsolationResult,
   NotificationMessage,
   PageBrowserCommand,
   PageBrowserResult,
@@ -172,6 +173,17 @@ export interface SandboxProvider {
     computers: Array<{ computer: ComputerRef; spaceId: string }>,
     context: AdapterContext,
   ): Promise<Map<string, ComputerInspection | null>>;
+  /**
+   * Cuts the running computer off from every network (`isolated: true`) or restores its network
+   * (`false`), offered when `capabilities.fleet.networkIsolation` is true. Resolves `applied` only
+   * when the provider confirms the change; `unsupported` when this deployment cannot do it, and
+   * `not_running` when the computer is not up, so there was nothing to change.
+   */
+  isolateNetwork?(
+    computer: ComputerRef,
+    isolated: boolean,
+    context: AdapterContext,
+  ): Promise<NetworkIsolationResult>;
   /** True only when this computer currently mounts the server's home directory. */
   hasMountedHome?(computer: ComputerRef, context: AdapterContext): Promise<boolean>;
   /** Perform idempotent provider setup after the lifecycle has captured the reference. */

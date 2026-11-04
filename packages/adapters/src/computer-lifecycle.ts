@@ -164,6 +164,17 @@ export class ComputerBusyError extends Error {
   }
 }
 
+/**
+ * An admin quarantined this computer: it takes no start, wake, takeover or execution lease until
+ * released. Not retryable, unlike `ComputerBusyError`.
+ */
+export class ComputerQuarantinedError extends Error {
+  constructor() {
+    super("Computer is quarantined");
+    this.name = "ComputerQuarantinedError";
+  }
+}
+
 export { toComputerRef } from "./computer-support.js";
 
 export async function provisionComputer(
@@ -192,6 +203,7 @@ export async function provisionComputer(
   let existing = await deps.prisma.computer.findUniqueOrThrow({ where: { id: computerId } });
   if (existing.state === "quarantined")
     throw new Error("Computer requires recovery after an unconfirmed stop");
+  if (existing.adminQuarantinedAt) throw new ComputerQuarantinedError();
   if (existing.maintenanceId && existing.maintenanceId !== context.operationId)
     throw new ComputerBusyError();
   if (existing.controlLeaseId && !hasActiveComputerControl(existing)) {
@@ -837,6 +849,7 @@ export async function acquireComputerExecutionLease(
   } & ({ workerId: string; runFence: number } | { workerId?: never; runFence?: never }),
 ): Promise<ComputerExecutionLease | null> {
   const computer = await prisma.computer.findUniqueOrThrow({ where: { id: input.computerId } });
+  if (computer.adminQuarantinedAt) throw new ComputerQuarantinedError();
   if (computer.maintenanceId && computer.maintenanceId !== input.runId)
     throw new ComputerBusyError();
   if (computer.scope !== "team") return null;
@@ -899,8 +912,10 @@ async function validateAcquiredComputerLease(
 ): Promise<ComputerExecutionLease> {
   const computer = await prisma.computer.findUniqueOrThrow({
     where: { id: lease.computerId },
-    select: { state: true, maintenanceId: true, updatedAt: true },
+    select: { state: true, maintenanceId: true, updatedAt: true, adminQuarantinedAt: true },
   });
+  // Quarantine may begin between the lease insert and here; the lease is then cancelled with its run.
+  if (computer.adminQuarantinedAt) throw new ComputerQuarantinedError();
   if (
     !isLiveSuspending(computer) &&
     (!computer.maintenanceId || computer.maintenanceId === lease.runId)
@@ -1035,6 +1050,8 @@ export async function replaceComputer(
       throw new Error("This computer provider cannot start from a named image");
   }
   let existing = await deps.prisma.computer.findUniqueOrThrow({ where: { id: computerId } });
+  // A stop-only replacement is how a quarantined computer is contained; any other would restart it.
+  if (existing.adminQuarantinedAt && !options?.stopOnly) throw new ComputerQuarantinedError();
   if (existing.maintenanceId && existing.maintenanceId !== context.operationId)
     throw new ComputerBusyError();
   const botId = context.botId;

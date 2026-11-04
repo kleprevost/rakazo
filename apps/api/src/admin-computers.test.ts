@@ -188,6 +188,7 @@ describe("admin computer inventory", () => {
       imageCompliance: null,
       runningSince: "2026-03-02T00:00:00.000Z",
       lastActivityAt: "2026-03-02T01:00:00.000Z",
+      quarantinedAt: null,
     });
     // Only the running computer on the configured provider is asked.
     expect(inspect).toHaveBeenCalledTimes(1);
@@ -224,6 +225,7 @@ describe("admin computer inventory", () => {
       "lastActivityAt",
       "ownerEmail",
       "ownerName",
+      "quarantinedAt",
       "runningSince",
       "scope",
       "spaceName",
@@ -398,6 +400,19 @@ describe("admin computer image compliance", () => {
     await adminComputers(unlisted.deps, "admin", { limit: 10, imageCompliance: "not_approved" });
     expect(unlisted.findMany).toHaveBeenCalledWith(
       expect.objectContaining({ where: { id: { in: [] } } }),
+    );
+  });
+
+  it("shows when an admin quarantined a computer and filters to those server-side", async () => {
+    const { deps, findMany } = setup();
+    const quarantinedAt = new Date("2026-03-03T00:00:00Z");
+    findMany.mockImplementationOnce((async () => [
+      { ...rows[0], adminQuarantinedAt: quarantinedAt },
+    ]) as never);
+    const page = await adminComputers(deps, "admin", { limit: 10, quarantined: true });
+    expect(page.computers[0]?.quarantinedAt).toBe("2026-03-03T00:00:00.000Z");
+    expect(findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { adminQuarantinedAt: { not: null } } }),
     );
   });
 });

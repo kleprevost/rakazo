@@ -9,6 +9,7 @@ import type {
   ComputerObservation,
   ComputerRef,
   ControlLeaseRef,
+  NetworkIsolationResult,
   PageBrowserCommand,
   PageBrowserResult,
   PortableFile,
@@ -158,7 +159,7 @@ export class DockerSandboxProvider implements SandboxProvider {
         takeover: true,
         persistentHome: true,
         multiScreen: true,
-        fleet: { inspect: true, usage: true, imageSelection: true },
+        fleet: { inspect: true, usage: true, imageSelection: true, networkIsolation: true },
       },
     };
   }
@@ -265,6 +266,39 @@ export class DockerSandboxProvider implements SandboxProvider {
       throw new Error(`could not inspect computer: ${res.status}`);
     }
     return dockerInspection(await readSandboxJson<SupervisorInspectionBody>(res, context.signal));
+  }
+
+  /**
+   * Disconnects the running container from every network, or reconnects it to its own. The
+   * supervisor reads the result back from Docker before it answers, so `applied` is confirmed.
+   * It answers 409 where the screen topology shares one network, which is `unsupported` here.
+   */
+  async isolateNetwork(
+    computer: ComputerRef,
+    isolated: boolean,
+    context: AdapterContext,
+  ): Promise<NetworkIsolationResult> {
+    if (computer.kind !== "docker") return "unsupported";
+    const res = await fetch(this.url(`/computers/${computer.id}/network`), {
+      method: "POST",
+      headers: { ...this.headers(context, computer.botId), "content-type": "application/json" },
+      body: JSON.stringify({ isolated }),
+      signal: context.signal,
+    });
+    if (res.status === 404) {
+      cancelResponseBody(res);
+      return "not_running";
+    }
+    if (res.status === 409) {
+      cancelResponseBody(res);
+      return "unsupported";
+    }
+    if (!res.ok) {
+      cancelResponseBody(res);
+      throw new Error(`could not change computer network: ${res.status}`);
+    }
+    const body = await readSandboxJson<{ running: boolean }>(res, context.signal);
+    return body.running ? "applied" : "not_running";
   }
 
   /** One supervisor call for many computers; null marks one it could not report on. */

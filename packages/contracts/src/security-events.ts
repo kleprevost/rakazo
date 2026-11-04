@@ -41,6 +41,8 @@ export const SECURITY_EVENT_TYPES = [
   "computer.woken",
   "computer.recreated",
   "computer.terminated",
+  "computer.quarantined",
+  "computer.released",
   "rate_limit.hit",
   "employee.entitlements_reconciled",
   "employee.shared",
