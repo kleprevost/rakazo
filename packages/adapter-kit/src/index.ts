@@ -5,6 +5,7 @@ export * from "./billing-errors.js";
 export * from "./cloud-agents.js";
 export * from "./connector-errors.js";
 export * from "./decisions.js";
+export * from "./directory-claims.js";
 export * from "./interfaces.js";
 export * from "./media-generation.js";
 export * from "./messaging-installations.js";
