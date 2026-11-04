@@ -1133,3 +1133,50 @@ it("quarantines the selected computers after a confirmation and releases them wi
   await settle();
   expect(api.releaseComputers).toHaveBeenCalledWith({ computerIds: ["c1"] });
 });
+
+it("offers Quarantine and Release only to roles that may contain, and fleet actions only to fleet", async () => {
+  const quarantined = {
+    computers: fleetComputers.computers.map((computer, index) => ({
+      ...computer,
+      quarantinedAt: index === 0 ? "2026-02-06T00:00:00.000Z" : null,
+    })),
+    nextCursor: null,
+  };
+  api.computers.mockResolvedValue(quarantined);
+  api.operations.mockResolvedValue({ operations: [] });
+  const buttons = (host: HTMLElement) =>
+    [...host.querySelectorAll("button")].map((b) => b.textContent);
+  const select = async (host: HTMLElement) => {
+    await act(async () => {
+      (host.querySelector('[aria-label="Reporter"] [role="checkbox"]') as HTMLElement).click();
+    });
+    await settle();
+  };
+
+  // Fleet runs operations; the quarantined badge and filter are still readable.
+  api.me.mockResolvedValue({ isAdmin: false, adminRoles: ["fleet"] });
+  const fleet = await show(<AdminComputersPage />);
+  expect(fleet.host.textContent).toContain("Quarantined");
+  await select(fleet.host);
+  expect(buttons(fleet.host)).toContain("Hibernate");
+  expect(buttons(fleet.host)).not.toContain("Quarantine");
+  expect(buttons(fleet.host)).not.toContain("Release");
+
+  // An auditor reads only.
+  document.body.innerHTML = "";
+  api.me.mockResolvedValue({ isAdmin: false, adminRoles: ["auditor"] });
+  const auditor = await show(<AdminComputersPage />);
+  expect(auditor.host.textContent).toContain("Quarantined");
+  expect(auditor.host.querySelector('[role="checkbox"]')).toBeNull();
+
+  // Security contains but runs no fleet operations.
+  document.body.innerHTML = "";
+  api.me.mockResolvedValue({ isAdmin: false, adminRoles: ["security"] });
+  const security = await show(<AdminComputersPage />);
+  await select(security.host);
+  expect(buttons(security.host)).toContain("Quarantine");
+  expect(buttons(security.host)).toContain("Release");
+  expect(buttons(security.host)).not.toContain("Hibernate");
+  expect(buttons(security.host)).not.toContain("Terminate");
+  await settle();
+});

@@ -4,7 +4,7 @@ import { createFleetOperation, toComputerRef } from "@rakazo/adapters";
 import type { Prisma } from "@rakazo/db";
 import { recordSecurityEvent, runAsSystem } from "@rakazo/db";
 import { getLogger } from "@rakazo/logging";
-import { requireAdmin } from "./admins.js";
+import { requireAdminRole } from "./admins.js";
 import type { SuspensionDeps } from "./bot-suspension.js";
 import { cancelBotRuns, finishCancelledRuns } from "./bot-suspension.js";
 
@@ -194,7 +194,7 @@ export async function quarantineComputers(
   actorId: string,
   input: { computerIds: string[]; reason?: string },
 ): Promise<ContainmentSummary> {
-  await requireAdmin(deps, actorId);
+  await requireAdminRole(deps, actorId, "security");
   return containComputers(deps, actorId, input.computerIds, { reason: input.reason });
 }
 
@@ -251,7 +251,7 @@ export async function releaseComputers(
   actorId: string,
   input: { computerIds: string[] },
 ): Promise<{ released: number }> {
-  await requireAdmin(deps, actorId);
+  await requireAdminRole(deps, actorId, "security");
   const known = await system("check", () =>
     deps.prisma.computer.count({ where: { id: { in: input.computerIds } } }),
   );

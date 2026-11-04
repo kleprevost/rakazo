@@ -50,6 +50,7 @@ roles; `me.adminRoles` returns them and `me.isAdmin` stays the `platform` role.
 | `admin.quarantine.list` | security, auditor |
 | `admin.quarantine.start`, `.lift` | security |
 | `admin.computers.list`, `.get` | fleet, auditor |
+| `admin.computers.quarantine`, `.release` | security |
 | `admin.computers.operations.create` | fleet |
 | `admin.computers.operations.list`, `.get` | fleet, auditor |
 | `admin.policy` | security, fleet, auditor |

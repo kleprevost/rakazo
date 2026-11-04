@@ -2495,6 +2495,8 @@ describeWithDatabase("API authorization and resource isolation", () => {
       ["admin/quarantine/lift", { id: "missing-quarantine" }, ["security"]],
       ["admin/computers/list", {}, ["fleet", "auditor"]],
       ["admin/computers/get", { computerId: "missing-computer" }, ["fleet", "auditor"]],
+      ["admin/computers/quarantine", { computerIds: ["missing-computer"] }, ["security"]],
+      ["admin/computers/release", { computerIds: ["missing-computer"] }, ["security"]],
       [
         "admin/computers/operations/create",
         { kind: "hibernate", computerIds: ["missing-computer"] },

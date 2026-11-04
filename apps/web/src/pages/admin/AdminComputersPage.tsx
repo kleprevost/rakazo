@@ -54,7 +54,10 @@ export function AdminComputersPage() {
 function AdminComputers() {
   const { i18n, t } = useLingui();
   const labels = useFleetLabels();
-  const canRun = useAdminRoles().can("fleet");
+  const { can } = useAdminRoles();
+  const canRun = can("fleet");
+  const canContain = can("security");
+  const canSelect = canRun || canContain;
   const [notApproved, setNotApproved] = useState(false);
   const [quarantinedOnly, setQuarantinedOnly] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -154,7 +157,7 @@ function AdminComputers() {
       {selected.size > 0 ? (
         <div className="mb-3 flex items-center gap-2">
           <span className="text-muted-foreground tabular-nums">{selected.size}</span>
-          {(["hibernate", "wake", "recreate"] as const).map((kind) => (
+          {(canRun ? (["hibernate", "wake", "recreate"] as const) : []).map((kind) => (
             <Button
               key={kind}
               variant="outline"
@@ -165,23 +168,27 @@ function AdminComputers() {
               {labels.kind(kind)}
             </Button>
           ))}
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={starting}
-            onClick={() => setConfirmTerminate(true)}
-          >
-            {labels.kind("terminate")}
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={starting}
-            onClick={() => setConfirmQuarantine(true)}
-          >
-            <Trans>Quarantine</Trans>
-          </Button>
-          {canRelease ? (
+          {canRun ? (
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={starting}
+              onClick={() => setConfirmTerminate(true)}
+            >
+              {labels.kind("terminate")}
+            </Button>
+          ) : null}
+          {canContain ? (
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={starting}
+              onClick={() => setConfirmQuarantine(true)}
+            >
+              <Trans>Quarantine</Trans>
+            </Button>
+          ) : null}
+          {canContain && canRelease ? (
             <Button
               variant="outline"
               size="sm"
@@ -191,7 +198,7 @@ function AdminComputers() {
               <Trans>Release</Trans>
             </Button>
           ) : null}
-          {approved.length > 0 ? (
+          {canRun && approved.length > 0 ? (
             <NativeSelect
               aria-label={t`Image`}
               size="sm"
@@ -274,7 +281,7 @@ function AdminComputers() {
           <TableHeader>
             <TableRow>
               <TableHead className="w-8">
-                {canRun ? (
+                {canSelect ? (
                   <Checkbox
                     aria-label={t`Select all`}
                     checked={rows.length > 0 && rows.every((computer) => selected.has(computer.id))}
@@ -318,7 +325,7 @@ function AdminComputers() {
                 key={computer.id}
                 computer={computer}
                 locale={i18n.locale}
-                selected={canRun ? selected.has(computer.id) : null}
+                selected={canSelect ? selected.has(computer.id) : null}
                 onToggle={() => toggle(computer.id)}
               />
             ))}
