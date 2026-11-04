@@ -2,6 +2,7 @@ import type { SettingsScope, SpaceSetting } from "@rakazo/contracts";
 import { SpaceSettingSchema } from "@rakazo/contracts";
 import type { PrismaClient } from "./client.js";
 import { Prisma } from "./client.js";
+import { credentialOwner, principalOf } from "./credential-principal.js";
 import { withTransactionRetry } from "./transaction-retry.js";
 
 type Scope = { userId: string; spaceId: string };
@@ -110,7 +111,9 @@ async function clearSpaceCopy(tx: CopyClient, scope: Scope, setting: SpaceSettin
   } else if (setting === "voice") {
     await tx.spaceVoicePreference.deleteMany({ where: member });
   } else if (setting === "credentials") {
-    await tx.vaultCredential.deleteMany({ where: member });
+    await tx.vaultCredential.deleteMany({
+      where: { spaceId: scope.spaceId, ...credentialOwner(principalOf(scope)) },
+    });
   } else {
     await tx.actionApprovalRule.deleteMany({
       where: { spaceId: scope.spaceId, createdByUserId: scope.userId },

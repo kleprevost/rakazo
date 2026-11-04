@@ -37,6 +37,7 @@ export async function recordMcpServerHealth(
   revision?: number,
 ): Promise<void> {
   try {
+    // credential-lookup: exempt (writes health columns by id and resolves no credential)
     // updateMany so a server deleted mid-probe is a silent no-op. Only health columns are
     // written: `revision` stays put (a bump evicts live sessions). `updatedAt` is touched by
     // Prisma's @updatedAt, but nothing orders or version-checks on it (it is display-only).

@@ -19,8 +19,10 @@ import type { ComputerMode, PrismaClient, ThreadEvents } from "@rakazo/db";
 import {
   appendEventInTransaction,
   createThreadMessageInTransaction,
+  credentialOwner,
   listApprovalRules,
   parseComputerMode,
+  principalOf,
 } from "@rakazo/db";
 import { getLogger } from "@rakazo/logging";
 import { loadLoginPasswordRedactions, shellCommandEnvironment } from "./bot-secrets.js";
@@ -348,7 +350,7 @@ async function toolContext(
   routine: RoutineWatchTarget,
 ): Promise<AdapterContext> {
   const rows = await prisma.connection.findMany({
-    where: { userId: routine.userId, spaceId: routine.spaceId },
+    where: { ...credentialOwner(principalOf(routine)), spaceId: routine.spaceId },
     select: {
       id: true,
       connectorId: true,

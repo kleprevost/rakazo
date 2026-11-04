@@ -8,7 +8,7 @@ import type {
   SecretStore,
 } from "@rakazo/adapter-kit";
 import type { PrismaClient } from "@rakazo/db";
-import { availableInSpace, itemSecretIn } from "@rakazo/db";
+import { principalAvailable, principalItemSecret, principalOf } from "@rakazo/db";
 import { parse as parseYaml } from "yaml";
 import { z } from "zod";
 import {
@@ -182,7 +182,7 @@ export class InstalledConnectorProvider implements ConnectorProvider {
   private async authorizedTools(context: AdapterContext): Promise<ConnectorTool[]> {
     const installs = await this.prisma.capabilityInstall.findMany({
       where: {
-        ...availableInSpace(context),
+        ...principalAvailable(principalOf(context), context.spaceId),
         kind: { in: ["mcp", "api", "graphql"] },
       },
       orderBy: { createdAt: "asc" },
@@ -294,7 +294,7 @@ export class InstalledConnectorProvider implements ConnectorProvider {
     const install = await this.prisma.capabilityInstall.findFirst({
       where: {
         id: installId,
-        ...availableInSpace(context),
+        ...principalAvailable(principalOf(context), context.spaceId),
         kind: { in: ["mcp", "api", "graphql"] },
       },
     });
@@ -378,7 +378,10 @@ export class InstalledConnectorProvider implements ConnectorProvider {
   ): Promise<string | undefined> {
     if (!install.secretId) return undefined;
     const row = await this.prisma.secret.findFirst({
-      where: { id: install.secretId, ...itemSecretIn(context) },
+      where: {
+        id: install.secretId,
+        ...principalItemSecret(principalOf(context), context.spaceId),
+      },
     });
     return row ? await this.secrets.load(row.ciphertext, row.id) : undefined;
   }

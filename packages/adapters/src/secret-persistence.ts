@@ -23,6 +23,7 @@ async function deleteUnreferenced(
   store: SecretStore,
   candidates: Candidate[],
 ): Promise<void> {
+  // credential-lookup: exempt (counts references across every tenant and returns no credential)
   for (const row of new Map(candidates.map((row) => [row.ciphertext, row])).values()) {
     try {
       if (

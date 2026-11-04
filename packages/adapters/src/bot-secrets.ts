@@ -39,7 +39,9 @@ import {
 } from "@rakazo/contracts";
 import type { Prisma, PrismaClient } from "@rakazo/db";
 import {
+  credentialOwner,
   lockSpaceSettings,
+  principalOf,
   runCodeKind,
   runCodeSpentKind,
   runLoginKind,
@@ -87,7 +89,10 @@ async function assertVaultInUse(client: VaultClient, scope: BotSecretScope) {
 /** The vault rows a call reads and writes: the account's (no Space) or the Space's own. */
 async function vaultFields(client: VaultClient, scope: BotSecretScope) {
   const target = await settingsTarget(client, scope, "credentials", scope.vault);
-  return { userId: scope.userId, spaceId: target === "space" ? scope.spaceId : null };
+  return {
+    ...credentialOwner(principalOf(scope)),
+    spaceId: target === "space" ? scope.spaceId : null,
+  };
 }
 
 const metadata = { name: true, origin: true, auth: true } as const;

@@ -544,7 +544,7 @@ describe("recent turn images follow model vision", () => {
     );
     expect(prisma.userModelCredential.findFirst).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: { id: "work-credential", userId: "user-1", provider: backup.provider },
+        where: { id: "work-credential", provider: backup.provider },
       }),
     );
     expect(prisma.userModelPreference.findFirst).not.toHaveBeenCalled();

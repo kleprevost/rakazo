@@ -291,6 +291,7 @@ describe("reconcileManagedConnection", () => {
       connection: {
         findFirst: vi.fn().mockResolvedValue({
           id: "conn-1",
+          userId: "user-1",
           connectorId: "composio",
           provider: "gmail",
           status: "pending",
@@ -336,6 +337,7 @@ describe("tryCompleteConnectionWithCode", () => {
       connection: {
         findFirst: vi.fn().mockResolvedValue({
           id: "conn-1",
+          userId: "user-1",
           connectorId: "composio",
           provider: "gmail",
           providerRef: "gmail-state",
@@ -363,7 +365,6 @@ describe("tryCompleteConnectionWithCode", () => {
       where: {
         id: "conn-1",
         spaceId: "workspace-1",
-        userId: "user-1",
         status: { in: ["pending", "connected"] },
       },
     });
@@ -380,6 +381,7 @@ describe("tryCompleteConnectionWithCode", () => {
       connection: {
         findFirst: vi.fn().mockResolvedValue({
           id: "conn-1",
+          userId: "user-1",
           connectorId: "composio",
           provider: "gmail",
           providerRef: "gmail-state",
@@ -413,6 +415,7 @@ describe("tryCompleteConnectionWithCode", () => {
       connection: {
         findFirst: vi.fn().mockResolvedValue({
           id: "conn-1",
+          userId: "user-1",
           connectorId: "composio",
           provider: "gmail",
           providerRef: "gmail-state",

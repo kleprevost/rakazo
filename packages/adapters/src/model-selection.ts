@@ -7,7 +7,13 @@ import {
   usableModelId,
 } from "@rakazo/contracts";
 import type { PrismaClient } from "@rakazo/db";
-import { chooseModelCredential, findModelCredential, findModelCredentialById } from "@rakazo/db";
+import {
+  chooseModelCredential,
+  credentialOwner,
+  findModelCredential,
+  findModelCredentialById,
+  principalOf,
+} from "@rakazo/db";
 import { deploymentServesModel, resolveDeploymentModel } from "./deployment-model.js";
 import { modelCredentialDto } from "./model-connect.js";
 import type { ModelCredentialAuthKind } from "./pi-catalog-availability.js";
@@ -146,7 +152,7 @@ export async function modelCredentialAuthKindsForSpace(
   const hosted = hostedProvider && (await hasHostedModelCredits(prisma, scope, hostedProvider));
   const [credentials, preferences] = await Promise.all([
     prisma.userModelCredential.findMany({
-      where: { userId: scope.userId },
+      where: credentialOwner(principalOf(scope)),
       select: {
         id: true,
         provider: true,
@@ -501,7 +507,7 @@ export async function findConnectedModelCredential(
   };
   if (preferred.enabledModelIds?.includes(id)) return selected;
   const credentials = await prisma.userModelCredential.findMany({
-    where: { userId: actor.userId, provider },
+    where: { ...credentialOwner(principalOf(actor)), provider },
     orderBy: [{ updatedAt: "desc" }, { createdAt: "desc" }, { id: "desc" }],
   });
   const candidates = [];
@@ -894,7 +900,7 @@ export async function hasHostedModelCredits(
   });
   if (settings?.modelCreditsEnabled === false) {
     return !(await prisma.userModelCredential.findFirst({
-      where: { userId: scope.userId, provider },
+      where: { ...credentialOwner(principalOf(scope)), provider },
       select: { id: true },
     }));
   }
@@ -908,7 +914,7 @@ export async function hasHostedModelCredits(
   if (credits?.mode === "credits") return true;
   if (!credits || credits.balanceMicros <= 0n) return false;
   return !(await prisma.userModelCredential.findFirst({
-    where: { userId: scope.userId, provider },
+    where: { ...credentialOwner(principalOf(scope)), provider },
     select: { id: true },
   }));
 }

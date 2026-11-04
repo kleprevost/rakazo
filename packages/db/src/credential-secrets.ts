@@ -1,5 +1,6 @@
 import type { PrismaClient } from "./client.js";
 import { Prisma } from "./client.js";
+import { credentialOwner, principalOf } from "./credential-principal.js";
 import { withTransactionRetry } from "./transaction-retry.js";
 
 type CredentialSecretClient = Pick<
@@ -15,6 +16,7 @@ export async function deleteUnreferencedCredentialSecret(
     secretId: string;
   },
 ): Promise<void> {
+  // credential-lookup: exempt (counts references to a secret and returns no credential)
   const [modelReferences, voiceReferences] = await Promise.all([
     prisma.userModelCredential.count({
       where: {
@@ -69,7 +71,7 @@ export async function retireModelCredential(
     const checked = input.matchesFailedSecret
       ? await prisma.$transaction(async (tx) => {
           const credential = await tx.userModelCredential.findFirst({
-            where: { id: input.credentialId, userId: input.userId },
+            where: { id: input.credentialId, ...credentialOwner(principalOf(input)) },
           });
           if (!credential || (input.secretId && credential.secretId !== input.secretId))
             return undefined;
@@ -90,7 +92,7 @@ export async function retireModelCredential(
     return prisma.$transaction(
       async (tx) => {
         const credential = await tx.userModelCredential.findFirst({
-          where: { id: input.credentialId, userId: input.userId },
+          where: { id: input.credentialId, ...credentialOwner(principalOf(input)) },
         });
         if (!credential || (input.secretId && credential.secretId !== input.secretId)) return false;
         const secret = await tx.secret.findFirst({
