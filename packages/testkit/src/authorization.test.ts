@@ -537,6 +537,23 @@ describeWithDatabase("API authorization and resource isolation", () => {
         "employees/requests/decide",
         { employeeId: "missing-employee", requestId: "missing", decision: "deny" },
       ],
+      ["employees/knowledge/list", { employeeId: "missing-employee" }],
+      [
+        "employees/knowledge/propose",
+        { employeeId: "missing-employee", path: "a.md", content: "x" },
+      ],
+      ["employees/knowledge/set", { employeeId: "missing-employee", path: "a.md", content: "x" }],
+      ["employees/knowledge/retire", { employeeId: "missing-employee", path: "a.md" }],
+      ["employees/knowledge/proposals/list", { employeeId: "missing-employee" }],
+      ["employees/knowledge/proposals/mine", { employeeId: "missing-employee" }],
+      [
+        "employees/knowledge/proposals/decide",
+        { employeeId: "missing-employee", proposalId: "missing", decision: "reject" },
+      ],
+      [
+        "employees/knowledge/proposals/withdraw",
+        { employeeId: "missing-employee", proposalId: "x" },
+      ],
       ["employees/versions/saveDraft", { employeeId: "missing-employee" }],
       ["employees/versions/publish", { employeeId: "missing-employee", versionId: "missing" }],
       ["employees/versions/rollback", { employeeId: "missing-employee", versionId: "missing" }],

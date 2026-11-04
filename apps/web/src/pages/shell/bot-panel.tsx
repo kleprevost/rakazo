@@ -610,7 +610,7 @@ export function BotSettings({
           </ErrorBoundary>
           <ErrorBoundary fallback={<SectionLoadFailed />}>
             <Suspense fallback={null}>
-              <KnowledgeSection botId={bot.id} />
+              <KnowledgeSection botId={bot.id} employeeId={bot.employeeId} />
             </Suspense>
           </ErrorBoundary>
           <div className="space-y-6 pt-6">

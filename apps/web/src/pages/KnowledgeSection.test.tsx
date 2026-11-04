@@ -9,6 +9,7 @@ import { createRoot } from "react-dom/client";
 import { afterEach, expect, it, vi } from "vitest";
 
 const api = vi.hoisted(() => ({ list: vi.fn(), create: vi.fn(), get: vi.fn() }));
+const employeesApi = vi.hoisted(() => ({ knowledge: { propose: vi.fn() } }));
 const memoryApi = vi.hoisted(() => ({
   list: vi.fn(async () => []),
   remove: vi.fn(),
@@ -29,7 +30,7 @@ vi.mock("../components/integrations/space-availability", () => ({
 }));
 
 vi.mock("../lib/rpc", () => {
-  const client = { agentSkills: api, memory: memoryApi };
+  const client = { agentSkills: api, memory: memoryApi, employees: employeesApi };
   return {
     rpc: client,
     rpcForSpace: () => client,
@@ -492,6 +493,54 @@ it("says how much memory no longer reaches the bot", async () => {
       omitted: [],
     });
     await act(async () => root.unmount());
+    vi.unstubAllGlobals();
+  }
+});
+
+it("offers the edited text of an instance's note to the team, and only on an instance", async () => {
+  vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
+  const note = {
+    id: "doc-1",
+    path: "refunds.md",
+    content: "Refund in 14 days.",
+    revision: 1,
+    scope: "bot",
+  };
+  memoryApi.list.mockResolvedValue([note] as never);
+  employeesApi.knowledge.propose.mockResolvedValue({ ok: true });
+  const container = document.createElement("div");
+  document.body.append(container);
+  const root = createRoot(container);
+  const button = (text: string) => {
+    const found = [...container.querySelectorAll("button")].find((entry) =>
+      entry.textContent?.includes(text),
+    );
+    if (!found) throw new Error(`Missing button: ${text}`);
+    return found;
+  };
+  try {
+    await show(root, <KnowledgeSection botId="bot-1" />);
+    await act(async () => button("refunds.md").click());
+    expect(container.textContent).not.toContain("Suggest to team");
+    await show(root, <KnowledgeSection botId="bot-2" employeeId="emp-1" />);
+    await act(async () => button("refunds.md").click());
+    const area = container.querySelector("textarea") as HTMLTextAreaElement;
+    await act(async () => {
+      const setter = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, "value")?.set;
+      setter?.call(area, "Refund in 30 days.");
+      area.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+    await act(async () => button("Suggest to team").click());
+    expect(employeesApi.knowledge.propose).toHaveBeenCalledWith({
+      employeeId: "emp-1",
+      path: "refunds.md",
+      content: "Refund in 30 days.",
+    });
+    expect(button("Suggested").disabled).toBe(true);
+  } finally {
+    await act(async () => root.unmount());
+    container.remove();
+    memoryApi.list.mockResolvedValue([] as never);
     vi.unstubAllGlobals();
   }
 });

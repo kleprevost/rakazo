@@ -36,7 +36,10 @@ const asRecord = (value: unknown): Record<string, unknown> =>
  * here whatever started the run. Their data is left alone: the instance stays, inert.
  */
 export async function resolveEmployeeRun(
-  prisma: Pick<PrismaClient, "employee" | "employeeEntitlement" | "employeeVersion" | "bot">,
+  prisma: Pick<
+    PrismaClient,
+    "employee" | "employeeEntitlement" | "employeeVersion" | "employeeKnowledge" | "bot"
+  >,
   bot: EmployeeRunBotRow,
 ): Promise<EmployeeRun> {
   const employeeId = bot.employeeId;
@@ -74,13 +77,20 @@ export async function resolveEmployeeRun(
     return { ok: false, message: EMPLOYEE_ACCESS_REMOVED_MESSAGE };
   }
   if (!employee.currentVersionId) return { ok: false, message: EMPLOYEE_UNAVAILABLE_MESSAGE };
-  const [version, published] = await Promise.all([
+  const [version, published, knowledge] = await Promise.all([
     prisma.employeeVersion.findFirst({
       where: { id: employee.currentVersionId, employeeId, state: "published" },
     }),
     prisma.employeeVersion.findMany({
       where: { employeeId, state: "published" },
       select: { instructions: true },
+    }),
+    // Read at run start, so a retirement or edit applies on the next run and a running turn keeps its snapshot.
+    prisma.employeeKnowledge.findMany({
+      where: { employeeId, state: "approved" },
+      select: { path: true, content: true },
+      orderBy: { path: "asc" },
+      take: 200,
     }),
   ]);
   if (!version) return { ok: false, message: EMPLOYEE_UNAVAILABLE_MESSAGE };
@@ -101,6 +111,7 @@ export async function resolveEmployeeRun(
         modelPolicy: asRecord(version.modelPolicy),
       },
       published.map((row) => row.instructions),
+      knowledge,
     ),
   };
 }

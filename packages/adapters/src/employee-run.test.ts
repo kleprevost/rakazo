@@ -18,6 +18,7 @@ function fakePrisma(
   options: {
     entitlements?: { role: string; source: string }[];
     employee?: Record<string, unknown> | null;
+    knowledge?: { path: string; content: string }[];
   } = {},
 ) {
   const update = vi.fn().mockResolvedValue({});
@@ -46,9 +47,10 @@ function fakePrisma(
       }),
       findMany: vi.fn().mockResolvedValue([{ instructions: "Definition" }]),
     },
+    employeeKnowledge: { findMany: vi.fn().mockResolvedValue(options.knowledge ?? []) },
     bot: { update },
   };
-  return { prisma: prisma as never, update };
+  return { prisma: prisma as never, update, findKnowledge: prisma.employeeKnowledge.findMany };
 }
 
 describe("resolveEmployeeRun", () => {
@@ -63,6 +65,20 @@ describe("resolveEmployeeRun", () => {
       where: { id: "bot-1" },
       data: { employeeVersionSeen: "v2" },
     });
+  });
+
+  it("puts approved shared knowledge between the definition and the personal note", async () => {
+    const { prisma, findKnowledge } = fakePrisma({
+      knowledge: [{ path: "refunds.md", content: "Refund in 14 days." }],
+    });
+    const result = await resolveEmployeeRun(prisma, { ...bot, instructions: "Call me Sam." });
+    if (!result.ok) throw new Error("expected a run");
+    const text = result.composed.instructions;
+    expect(text.indexOf("Definition")).toBeLessThan(text.indexOf("Refund in 14 days."));
+    expect(text.indexOf("Refund in 14 days.")).toBeLessThan(text.indexOf("Call me Sam."));
+    expect(findKnowledge).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { employeeId: "emp-1", state: "approved" } }),
+    );
   });
 
   it("does not write again when the version was already seen", async () => {

@@ -5,6 +5,8 @@ import type {
   EmployeeDetail,
   EmployeeGrant,
   EmployeeGrantSubjectKind,
+  EmployeeKnowledge,
+  EmployeeKnowledgeProposal,
   EmployeeRole,
 } from "@rakazo/contracts";
 import { EMPLOYEE_ROLES } from "@rakazo/contracts";
@@ -87,6 +89,8 @@ type Loaded = {
   detail: EmployeeDetail;
   grants: EmployeeGrant[] | null;
   requests: EmployeeAccessRequest[];
+  proposals: EmployeeKnowledgeProposal[];
+  knowledge: EmployeeKnowledge[];
 };
 
 /** Who has access to a shared employee, and its versions. Everything here is a procedure call. */
@@ -110,7 +114,15 @@ function Access({ employeeId, api }: { employeeId: string; api: EmployeesApi }) 
     const requests = grants
       ? await api.requests.list({ employeeId }).catch(() => [] as EmployeeAccessRequest[])
       : [];
-    setLoaded({ detail, grants, requests });
+    const proposals = grants
+      ? await api.knowledge.proposals
+          .list({ employeeId })
+          .catch(() => [] as EmployeeKnowledgeProposal[])
+      : [];
+    const knowledge = grants
+      ? await api.knowledge.list({ employeeId }).catch(() => [] as EmployeeKnowledge[])
+      : [];
+    setLoaded({ detail, grants, requests, proposals, knowledge });
   }, [api, employeeId]);
 
   useEffect(() => {
@@ -171,7 +183,7 @@ function Access({ employeeId, api }: { employeeId: string; api: EmployeesApi }) 
     );
   }
 
-  const { detail, grants, requests } = loaded;
+  const { detail, grants, requests, proposals, knowledge } = loaded;
   const actorRole = detail.employee.role;
   const canManage = grants !== null;
   const addRoles = EMPLOYEE_ROLES.filter((role) => allowed(actorRole, "user", null, role));
@@ -269,6 +281,79 @@ function Access({ employeeId, api }: { employeeId: string; api: EmployeesApi }) 
                       }
                     >
                       {t`Approve`}
+                    </Button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+          {proposals.length > 0 || knowledge.length > 0 ? (
+            <div className="space-y-2">
+              <SectionHeading>{t`Team knowledge`}</SectionHeading>
+              <ul className="space-y-2" aria-label={t`Team knowledge`}>
+                {proposals.map((proposal) => (
+                  <li key={proposal.id} className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span dir="auto" className="min-w-0 flex-1 truncate text-[14px]">
+                        {proposal.path}
+                      </span>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        disabled={busy}
+                        aria-label={t`Reject ${proposal.path}`}
+                        onClick={() =>
+                          void run(() =>
+                            api.knowledge.proposals.decide({
+                              employeeId,
+                              proposalId: proposal.id,
+                              decision: "reject",
+                            }),
+                          )
+                        }
+                      >
+                        {t`Reject`}
+                      </Button>
+                      <Button
+                        size="sm"
+                        disabled={busy || proposal.stale}
+                        aria-label={t`Approve ${proposal.path}`}
+                        onClick={() =>
+                          void run(() =>
+                            api.knowledge.proposals.decide({
+                              employeeId,
+                              proposalId: proposal.id,
+                              decision: "approve",
+                            }),
+                          )
+                        }
+                      >
+                        {t`Approve`}
+                      </Button>
+                    </div>
+                    <pre
+                      dir="auto"
+                      className="max-h-40 overflow-auto whitespace-pre-wrap rounded-md bg-muted/50 p-2 text-[13px]"
+                    >
+                      {proposal.content}
+                    </pre>
+                  </li>
+                ))}
+                {knowledge.map((entry) => (
+                  <li key={entry.path} className="flex items-center gap-2">
+                    <span dir="auto" className="min-w-0 flex-1 truncate text-[14px]">
+                      {entry.path}
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      aria-label={t`Retire ${entry.path}`}
+                      disabled={busy}
+                      onClick={() =>
+                        void run(() => api.knowledge.retire({ employeeId, path: entry.path }))
+                      }
+                    >
+                      <X />
                     </Button>
                   </li>
                 ))}
