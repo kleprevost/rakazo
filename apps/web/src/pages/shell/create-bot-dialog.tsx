@@ -1,6 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import type { BotAvatarSet } from "@rakazo/contracts";
-import { BOT_NAME_MAX_LENGTH, DEFAULT_NEW_BOT_AVATAR_SET } from "@rakazo/contracts";
+import { BOT_NAME_MAX_LENGTH } from "@rakazo/contracts";
 import {
   newClientId,
   ORGANIC_AVATAR_HEART_FAMILY,
@@ -38,17 +38,19 @@ export interface CreateBotDialogInput {
   color: string;
   /** Reserve the logo preview's persistent seed through creation and retries. */
   id?: string;
-  avatarSet: BotAvatarSet;
   /** The organic family the preview drew; omitted when a studio shape is picked. */
   avatarFamily?: number;
 }
 
 /** Mounted only while open; the parent unmounts it from `onCancel` or after `onCreate`. */
 export function CreateBotDialog({
+  avatarSet,
   onCancel,
   onCreate,
   hire,
 }: {
+  /** The account's set: the server gives it to the new bot, so the preview draws it too. */
+  avatarSet: BotAvatarSet;
   onCancel: () => void;
   onCreate: (input: CreateBotDialogInput) => Promise<void>;
   /** Offers hiring from a role template; absent where the API has none. */
@@ -68,7 +70,6 @@ export function CreateBotDialog({
     value: pick(BOT_AVATAR_COLORS),
     identity: pick(ORGANIC_IDENTITIES),
   }));
-  const [avatarSet, setAvatarSet] = useState<BotAvatarSet>(DEFAULT_NEW_BOT_AVATAR_SET);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hiring, setHiring] = useState(false);
@@ -84,7 +85,6 @@ export function CreateBotDialog({
         name: trimmed,
         color: look.value,
         ...(avatarSet === "rakazo" ? { id: previewId } : {}),
-        avatarSet,
         ...(organic ? { avatarFamily: organicAvatarFamily(look.identity) } : {}),
       });
     } catch (err) {
@@ -150,10 +150,6 @@ export function CreateBotDialog({
             identity={avatarSet === "rakazo" ? previewId : look.identity}
             organicIdentities={ORGANIC_IDENTITIES}
             avatarSet={avatarSet}
-            onAvatarSetChange={(set, value) => {
-              setAvatarSet(set);
-              setLook((current) => ({ ...current, value }));
-            }}
             onChange={(value, identity) => {
               setLook((current) => ({ value, identity: identity ?? current.identity }));
             }}
