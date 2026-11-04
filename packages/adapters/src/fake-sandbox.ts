@@ -52,7 +52,7 @@ export class FakeSandboxProvider implements SandboxProvider {
         takeover: true,
         persistentHome: true,
         multiScreen: true,
-        fleet: { inspect: true },
+        fleet: { inspect: true, usage: true },
       },
     };
   }
@@ -93,8 +93,16 @@ export class FakeSandboxProvider implements SandboxProvider {
     if (!box) return { runtime: "gone", isolation: "container" };
     return {
       runtime: box.running ? "running" : "stopped",
-      image: { ref: "fake/computer:test" },
+      image: { ref: "fake/computer:test", digest: `sha256:${"f".repeat(64)}` },
       isolation: "container",
+      restartCount: 0,
+      ...(box.running
+        ? {
+            usage: { cpuMillis: 10, memoryBytes: 1024, memoryLimitBytes: 4096, pids: 3 },
+            health: "ok" as const,
+          }
+        : {}),
+      egress: { mode: "open", enforced: false },
     };
   }
 

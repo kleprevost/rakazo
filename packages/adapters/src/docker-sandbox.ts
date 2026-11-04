@@ -65,6 +65,32 @@ async function safeBody(res: Response, signal?: AbortSignal): Promise<string> {
   }
 }
 
+interface SupervisorInspectionBody {
+  running?: boolean;
+  image?: string;
+  imageDigest?: string;
+  startedAt?: string;
+  restartCount?: number;
+  health?: "ok" | "degraded";
+  usage?: ComputerInspection["usage"];
+  egress?: ComputerInspection["egress"];
+}
+
+function dockerInspection(body: SupervisorInspectionBody): ComputerInspection {
+  return {
+    runtime: body.running === true ? "running" : "stopped",
+    ...(body.image
+      ? { image: { ref: body.image, ...(body.imageDigest ? { digest: body.imageDigest } : {}) } }
+      : {}),
+    isolation: "container",
+    ...(body.startedAt ? { startedAt: body.startedAt } : {}),
+    ...(typeof body.restartCount === "number" ? { restartCount: body.restartCount } : {}),
+    ...(body.usage ? { usage: body.usage } : {}),
+    ...(body.egress ? { egress: body.egress } : {}),
+    ...(body.health ? { health: body.health } : {}),
+  };
+}
+
 async function readSandboxJson<T>(
   res: Response,
   signal: AbortSignal,
@@ -132,7 +158,7 @@ export class DockerSandboxProvider implements SandboxProvider {
         takeover: true,
         persistentHome: true,
         multiScreen: true,
-        fleet: { inspect: true },
+        fleet: { inspect: true, usage: true },
       },
     };
   }
@@ -224,7 +250,7 @@ export class DockerSandboxProvider implements SandboxProvider {
   }
 
   async inspect(computer: ComputerRef, context: AdapterContext): Promise<ComputerInspection> {
-    const res = await fetch(this.url(`/computers/${computer.id}`), {
+    const res = await fetch(this.url(`/computers/${computer.id}/inspect`), {
       method: "GET",
       headers: this.headers(context, computer.botId),
       signal: context.signal,
@@ -237,12 +263,51 @@ export class DockerSandboxProvider implements SandboxProvider {
       cancelResponseBody(res);
       throw new Error(`could not inspect computer: ${res.status}`);
     }
-    const body = await readSandboxJson<{ running?: boolean; image?: string }>(res, context.signal);
-    return {
-      runtime: body.running === true ? "running" : "stopped",
-      ...(body.image ? { image: { ref: body.image } } : {}),
-      isolation: "container",
-    };
+    return dockerInspection(await readSandboxJson<SupervisorInspectionBody>(res, context.signal));
+  }
+
+  /** One supervisor call for many computers; null marks one it could not report on. */
+  async inspectMany(
+    computers: Array<{ computer: ComputerRef; spaceId: string }>,
+    context: AdapterContext,
+  ): Promise<Map<string, ComputerInspection | null>> {
+    const results = new Map<string, ComputerInspection | null>();
+    for (let i = 0; i < computers.length; i += 100) {
+      const chunk = computers.slice(i, i + 100);
+      const res = await fetch(this.url("/computers/inspect"), {
+        method: "POST",
+        headers: { ...this.headers(context), "content-type": "application/json" },
+        body: JSON.stringify({
+          computers: chunk.map(({ computer, spaceId }) => ({
+            id: computer.id,
+            botId: computer.botId,
+            spaceId,
+          })),
+        }),
+        signal: context.signal,
+      });
+      if (!res.ok) {
+        cancelResponseBody(res);
+        throw new Error(`could not inspect computers: ${res.status}`);
+      }
+      const body = await readSandboxJson<{
+        results: Record<string, SupervisorInspectionBody | { error: string }>;
+      }>(res, context.signal);
+      for (const { computer } of chunk) {
+        const entry = body.results[computer.id];
+        results.set(
+          computer.id,
+          !entry
+            ? null
+            : "error" in entry
+              ? /no such container|not found/i.test(entry.error)
+                ? { runtime: "gone", isolation: "container" }
+                : null
+              : dockerInspection(entry),
+        );
+      }
+    }
+    return results;
   }
 
   async prepare(_computer: ComputerRef, _context: AdapterContext): Promise<void> {}

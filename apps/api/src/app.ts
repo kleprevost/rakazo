@@ -45,6 +45,7 @@ import {
   createBackgroundJobHandlers,
   createCloudAgentConnection,
   createConnectorStack,
+  createFleetObserver,
   createIdleComputerSweeper,
   createJobReconciler,
   createMessagingContextLoader,
@@ -759,6 +760,7 @@ async function buildApp(overrides: CreateAppOverrides): Promise<AppHandles> {
         ),
         reconcileAuditLog: createAuditLogReconciler(prisma, auditLogConfig()),
         reconcileIdleComputers: createIdleComputerSweeper({ prisma, jobs }),
+        reconcileFleetObservations: createFleetObserver({ prisma, sandbox }),
       })
     : undefined;
   reconciler?.start();

@@ -96,10 +96,59 @@ export const AdminComputerSchema = z.object({
    * report them, `unavailable` when it could not be reached, `not_running` when nothing was asked.
    */
   inspection: z.enum(["inspected", "skipped_unsupported", "unavailable", "not_running"]),
+  /**
+   * The provider's health report from the latest observation. `unknown` when none exists or it is
+   * older than three observation intervals; never `ok` on stale data.
+   */
+  health: z.enum(["ok", "degraded", "unreachable", "unknown"]),
   runningSince: z.string().nullable(),
   lastActivityAt: z.string().nullable(),
 });
 export type AdminComputer = z.infer<typeof AdminComputerSchema>;
+
+/** One stretch the computer ran; the restart history. */
+export const AdminComputerRunSchema = z.object({
+  startedAt: z.string(),
+  endedAt: z.string().nullable(),
+  endReason: z.string().nullable(),
+  lastSeenAt: z.string().nullable(),
+});
+
+/** Everything the list shows plus the latest observation and restart history. Metadata only. */
+export const AdminComputerDetailSchema = AdminComputerSchema.extend({
+  createdAt: z.string(),
+  /** The content digest actually running, when the provider reports one. */
+  imageDigest: z.string().nullable(),
+  /** The home's disk as last measured; null where it never was. */
+  disk: z.object({ usedBytes: z.number(), freeBytes: z.number() }).nullable(),
+  /** The latest stored observation, even when stale; null before the first one. */
+  observation: z
+    .object({
+      observedAt: z.string(),
+      runtime: z.enum(["running", "stopped", "gone"]),
+      startedAt: z.string().nullable(),
+      /** Provider-visible restarts of the same machine. */
+      restartCount: z.number().int().nullable(),
+      usage: z
+        .object({
+          cpuMillis: z.number().nullable(),
+          memoryBytes: z.number().nullable(),
+          memoryLimitBytes: z.number().nullable(),
+          pids: z.number().nullable(),
+        })
+        .nullable(),
+      egress: z
+        .object({
+          mode: z.enum(["open", "restricted", "isolated", "unknown"]),
+          enforced: z.boolean(),
+        })
+        .nullable(),
+    })
+    .nullable(),
+  /** Newest first, the last 20. */
+  runs: z.array(AdminComputerRunSchema),
+});
+export type AdminComputerDetail = z.infer<typeof AdminComputerDetailSchema>;
 
 export const AdminComputerPageSchema = z.object({
   computers: z.array(AdminComputerSchema),
@@ -181,7 +230,10 @@ export const adminContract = {
     resume: oc.input(z.object({ botId: Id })).output(z.object({ ok: z.literal(true) })),
   },
   /** Every bot computer in the deployment. Read-only; metadata only, never content. */
-  computers: { list: oc.input(AdminPageInputSchema).output(AdminComputerPageSchema) },
+  computers: {
+    list: oc.input(AdminPageInputSchema).output(AdminComputerPageSchema),
+    get: oc.input(z.object({ computerId: Id })).output(AdminComputerDetailSchema),
+  },
   policy: oc.output(AdminPolicyViewSchema),
   audit: oc.input(AdminAuditInputSchema).output(AdminAuditPageSchema),
 };

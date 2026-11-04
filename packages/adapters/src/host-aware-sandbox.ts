@@ -132,12 +132,15 @@ async function createBaseRunSandbox(
 
 export class HostAwareSandbox implements SandboxProvider {
   readonly pageBrowser?: SandboxProvider["pageBrowser"];
+  readonly inspectMany?: SandboxProvider["inspectMany"];
 
   constructor(
     private readonly isolated: SandboxProvider,
     private readonly host: SandboxProvider,
     private readonly hostEnabled: () => Promise<boolean>,
   ) {
+    if (isolated.inspectMany)
+      this.inspectMany = (computers, context) => isolated.inspectMany!(computers, context);
     if (isolated.pageBrowser || host.pageBrowser) {
       this.pageBrowser = (computer, request, context) => {
         const provider = this.route(computer);

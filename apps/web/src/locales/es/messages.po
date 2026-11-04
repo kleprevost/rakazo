@@ -2517,6 +2517,10 @@ msgstr "No se pudo actualizar tu billetera"
 msgid "Country"
 msgstr ""
 
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "CPU"
+msgstr ""
+
 #: src/pages/Board.tsx
 #: src/pages/shell/agent-import.tsx
 #: src/pages/shell/create-bot-dialog.tsx
@@ -2687,6 +2691,10 @@ msgstr ""
 #: src/pages/MemorySettingsOverlay.tsx
 msgid "Default scope"
 msgstr "Alcance predeterminado"
+
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Degraded"
+msgstr ""
 
 #: src/components/AccountAccess.tsx
 #: src/components/pages/PagesList.tsx
@@ -2868,6 +2876,10 @@ msgstr "{disconnectName} desconectado."
 msgid "Disconnecting…"
 msgstr "Desconectando…"
 
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Disk"
+msgstr ""
+
 #: src/components/AskCard.tsx
 #: src/components/ComputerUpdateProgress.tsx
 #: src/components/PasskeyOffer.tsx
@@ -3002,6 +3014,10 @@ msgstr "Editar nombre"
 #: src/pages/BotContextMenu.tsx
 msgid "Edit Profile"
 msgstr "Editar perfil"
+
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Egress"
+msgstr ""
 
 #: src/components/vault/VaultItemDetail.tsx
 #: src/components/vault/VaultItemEditor.tsx
@@ -3466,6 +3482,14 @@ msgstr "Valor del encabezado"
 msgid "Headers"
 msgstr "Encabezados"
 
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Health"
+msgstr ""
+
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Healthy"
+msgstr ""
+
 #: src/pages/VoiceSettingsOverlay.tsx
 msgid "Hear a sample"
 msgstr "Escuchar una muestra"
@@ -3722,6 +3746,7 @@ msgstr "Invitar amigos"
 msgid "Invite link"
 msgstr "Enlace de invitación"
 
+#: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/MemorySettingsOverlay.tsx
 #: src/pages/shell/bot-panel.tsx
 msgid "Isolated"
@@ -4068,6 +4093,7 @@ msgstr "Miembro"
 msgid "Members ({0})"
 msgstr "Miembros ({0})"
 
+#: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/KnowledgeSection.tsx
 #: src/pages/MemorySettingsOverlay.tsx
 #: src/pages/settings-nav.ts
@@ -4739,6 +4765,7 @@ msgstr "Solo tú"
 
 #: src/components/markdown-link-prompt.tsx
 #: src/components/pages/PagesList.tsx
+#: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/PaymentWalletSettingsPanel.tsx
 #: src/pages/shell/computer-panel.tsx
 #: src/pages/shell/import-setup-card.tsx
@@ -5572,6 +5599,10 @@ msgstr ""
 msgid "Restart to update"
 msgstr "Reiniciar para actualizar"
 
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Restarts"
+msgstr ""
+
 #: src/components/InstructionSettings.tsx
 #: src/pages/shell/archived-chats.tsx
 msgid "Restore"
@@ -5592,6 +5623,10 @@ msgstr "Restaurado"
 #: src/components/ComputerUpdateProgress.tsx
 msgid "Restoring your workspace"
 msgstr "Restaurando tu espacio de trabajo"
+
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Restricted"
+msgstr ""
 
 #: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/Calendar.tsx
@@ -6947,6 +6982,10 @@ msgstr "Deshacer"
 msgid "Uninstall"
 msgstr "Desinstalar"
 
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Unknown"
+msgstr ""
+
 #: src/pages/MessagingSettingsPanel.tsx
 msgid "Unlink"
 msgstr "Desvincular"
@@ -6959,6 +6998,10 @@ msgstr "Activar el sonido"
 #: src/pages/BotContextMenu.tsx
 msgid "Unpin"
 msgstr "Desfijar"
+
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Unreachable"
+msgstr ""
 
 #: src/pages/ActivityList.tsx
 msgid "Unread"

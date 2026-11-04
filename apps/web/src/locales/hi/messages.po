@@ -2517,6 +2517,10 @@ msgstr ""
 msgid "Country"
 msgstr ""
 
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "CPU"
+msgstr ""
+
 #: src/pages/Board.tsx
 #: src/pages/shell/agent-import.tsx
 #: src/pages/shell/create-bot-dialog.tsx
@@ -2687,6 +2691,10 @@ msgstr ""
 #: src/pages/MemorySettingsOverlay.tsx
 msgid "Default scope"
 msgstr "डिफ़ॉल्ट स्कोप"
+
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Degraded"
+msgstr ""
 
 #: src/components/AccountAccess.tsx
 #: src/components/pages/PagesList.tsx
@@ -2868,6 +2876,10 @@ msgstr "{disconnectName} डिस्कनेक्ट किया गया�
 msgid "Disconnecting…"
 msgstr "डिस्कनेक्ट हो रहा है…"
 
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Disk"
+msgstr ""
+
 #: src/components/AskCard.tsx
 #: src/components/ComputerUpdateProgress.tsx
 #: src/components/PasskeyOffer.tsx
@@ -3002,6 +3014,10 @@ msgstr "नाम संपादित करें"
 #: src/pages/BotContextMenu.tsx
 msgid "Edit Profile"
 msgstr "प्रोफ़ाइल संपादित करें"
+
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Egress"
+msgstr ""
 
 #: src/components/vault/VaultItemDetail.tsx
 #: src/components/vault/VaultItemEditor.tsx
@@ -3466,6 +3482,14 @@ msgstr "हेडर मान"
 msgid "Headers"
 msgstr "हेडर"
 
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Health"
+msgstr ""
+
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Healthy"
+msgstr ""
+
 #: src/pages/VoiceSettingsOverlay.tsx
 msgid "Hear a sample"
 msgstr "एक नमूना सुनें"
@@ -3722,6 +3746,7 @@ msgstr "दोस्तों को आमंत्रित करें"
 msgid "Invite link"
 msgstr "आमंत्रण लिंक"
 
+#: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/MemorySettingsOverlay.tsx
 #: src/pages/shell/bot-panel.tsx
 msgid "Isolated"
@@ -4068,6 +4093,7 @@ msgstr "सदस्य"
 msgid "Members ({0})"
 msgstr ""
 
+#: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/KnowledgeSection.tsx
 #: src/pages/MemorySettingsOverlay.tsx
 #: src/pages/settings-nav.ts
@@ -4739,6 +4765,7 @@ msgstr "सिर्फ़ आप"
 
 #: src/components/markdown-link-prompt.tsx
 #: src/components/pages/PagesList.tsx
+#: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/PaymentWalletSettingsPanel.tsx
 #: src/pages/shell/computer-panel.tsx
 #: src/pages/shell/import-setup-card.tsx
@@ -5572,6 +5599,10 @@ msgstr ""
 msgid "Restart to update"
 msgstr ""
 
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Restarts"
+msgstr ""
+
 #: src/components/InstructionSettings.tsx
 #: src/pages/shell/archived-chats.tsx
 msgid "Restore"
@@ -5591,6 +5622,10 @@ msgstr "बहाल किया गया"
 
 #: src/components/ComputerUpdateProgress.tsx
 msgid "Restoring your workspace"
+msgstr ""
+
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Restricted"
 msgstr ""
 
 #: src/pages/admin/AdminBotsPage.tsx
@@ -6947,6 +6982,10 @@ msgstr "पूर्ववत करें"
 msgid "Uninstall"
 msgstr ""
 
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Unknown"
+msgstr ""
+
 #: src/pages/MessagingSettingsPanel.tsx
 msgid "Unlink"
 msgstr ""
@@ -6959,6 +6998,10 @@ msgstr "अनम्यूट करें"
 #: src/pages/BotContextMenu.tsx
 msgid "Unpin"
 msgstr "पिन हटाएं"
+
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Unreachable"
+msgstr ""
 
 #: src/pages/ActivityList.tsx
 msgid "Unread"

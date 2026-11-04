@@ -3,6 +3,7 @@ import type {
   CommandRequest,
   ComputerActionRequest,
   ComputerInput,
+  ComputerInspection,
   ComputerRef,
   ControlLeaseRef,
   PortableFile,
@@ -170,6 +171,7 @@ export async function refreshComputerProvider(sandbox: SandboxProvider) {
 /** Resolve settings per operation; retain only the adapter for each current ciphertext. */
 export class ConfiguredSandbox implements SandboxProvider {
   readonly pageBrowser?: SandboxProvider["pageBrowser"];
+  readonly inspectMany?: SandboxProvider["inspectMany"];
   private selection: ComputerProviderSelection = { provider: "default", settings: null };
   private selectionLoadedAt = 0;
   private selected?: SandboxProvider;
@@ -199,6 +201,30 @@ export class ConfiguredSandbox implements SandboxProvider {
       for (const [key, entry] of this.providers)
         if (entry.ciphertext === ref) this.providers.delete(key);
     });
+    // Batched reports are offered where the deployment's own computers have them; each computer
+    // is grouped under the provider that holds it.
+    if (primary.inspectMany)
+      this.inspectMany = async (items, context) => {
+        const groups = new Map<SandboxProvider, typeof items>();
+        for (const item of items) {
+          const provider = await this.route(item.computer);
+          groups.set(provider, [...(groups.get(provider) ?? []), item]);
+        }
+        const out = new Map<string, ComputerInspection | null>();
+        for (const [provider, group] of groups) {
+          if (provider.inspectMany) {
+            for (const [id, report] of await provider.inspectMany(group, context))
+              out.set(id, report);
+            continue;
+          }
+          for (const { computer } of group)
+            out.set(
+              computer.id,
+              (await provider.inspect?.(computer, context).catch(() => null)) ?? null,
+            );
+        }
+        return out;
+      };
     // Bots are offered page tools only where the deployment's own computers have them.
     if (primary.pageBrowser)
       this.pageBrowser = async (computer, request, context) => {
@@ -356,6 +382,12 @@ export class ConfiguredSandbox implements SandboxProvider {
 
   async isRunning(computer: ComputerRef, context: AdapterContext) {
     return (await this.route(computer)).isRunning?.(computer, context) ?? false;
+  }
+
+  async inspect(computer: ComputerRef, context: AdapterContext) {
+    const provider = await this.route(computer);
+    if (!provider.inspect) throw new Error("this computer cannot be inspected");
+    return provider.inspect(computer, context);
   }
 
   async isStopped(computer: ComputerRef, context: AdapterContext) {

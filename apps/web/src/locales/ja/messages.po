@@ -2517,6 +2517,10 @@ msgstr ""
 msgid "Country"
 msgstr ""
 
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "CPU"
+msgstr ""
+
 #: src/pages/Board.tsx
 #: src/pages/shell/agent-import.tsx
 #: src/pages/shell/create-bot-dialog.tsx
@@ -2687,6 +2691,10 @@ msgstr ""
 #: src/pages/MemorySettingsOverlay.tsx
 msgid "Default scope"
 msgstr "デフォルトの範囲"
+
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Degraded"
+msgstr ""
 
 #: src/components/AccountAccess.tsx
 #: src/components/pages/PagesList.tsx
@@ -2868,6 +2876,10 @@ msgstr "{disconnectName}を切断しました。"
 msgid "Disconnecting…"
 msgstr "切断中…"
 
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Disk"
+msgstr ""
+
 #: src/components/AskCard.tsx
 #: src/components/ComputerUpdateProgress.tsx
 #: src/components/PasskeyOffer.tsx
@@ -3002,6 +3014,10 @@ msgstr "名前を編集"
 #: src/pages/BotContextMenu.tsx
 msgid "Edit Profile"
 msgstr "プロフィールを編集"
+
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Egress"
+msgstr ""
 
 #: src/components/vault/VaultItemDetail.tsx
 #: src/components/vault/VaultItemEditor.tsx
@@ -3466,6 +3482,14 @@ msgstr "ヘッダー値"
 msgid "Headers"
 msgstr "ヘッダー"
 
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Health"
+msgstr ""
+
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Healthy"
+msgstr ""
+
 #: src/pages/VoiceSettingsOverlay.tsx
 msgid "Hear a sample"
 msgstr "サンプルを再生"
@@ -3722,6 +3746,7 @@ msgstr "友だちを招待"
 msgid "Invite link"
 msgstr "招待リンク"
 
+#: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/MemorySettingsOverlay.tsx
 #: src/pages/shell/bot-panel.tsx
 msgid "Isolated"
@@ -4068,6 +4093,7 @@ msgstr "メンバー"
 msgid "Members ({0})"
 msgstr "メンバー（{0}）"
 
+#: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/KnowledgeSection.tsx
 #: src/pages/MemorySettingsOverlay.tsx
 #: src/pages/settings-nav.ts
@@ -4739,6 +4765,7 @@ msgstr "自分のみ"
 
 #: src/components/markdown-link-prompt.tsx
 #: src/components/pages/PagesList.tsx
+#: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/PaymentWalletSettingsPanel.tsx
 #: src/pages/shell/computer-panel.tsx
 #: src/pages/shell/import-setup-card.tsx
@@ -5572,6 +5599,10 @@ msgstr ""
 msgid "Restart to update"
 msgstr "再起動してアップデート"
 
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Restarts"
+msgstr ""
+
 #: src/components/InstructionSettings.tsx
 #: src/pages/shell/archived-chats.tsx
 msgid "Restore"
@@ -5592,6 +5623,10 @@ msgstr "復元しました"
 #: src/components/ComputerUpdateProgress.tsx
 msgid "Restoring your workspace"
 msgstr "ワークスペースを復元中"
+
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Restricted"
+msgstr ""
 
 #: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/Calendar.tsx
@@ -6947,6 +6982,10 @@ msgstr "元に戻す"
 msgid "Uninstall"
 msgstr "アンインストール"
 
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Unknown"
+msgstr ""
+
 #: src/pages/MessagingSettingsPanel.tsx
 msgid "Unlink"
 msgstr "リンクを解除"
@@ -6959,6 +6998,10 @@ msgstr "ミュート解除"
 #: src/pages/BotContextMenu.tsx
 msgid "Unpin"
 msgstr "ピン留めを解除"
+
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Unreachable"
+msgstr ""
 
 #: src/pages/ActivityList.tsx
 msgid "Unread"

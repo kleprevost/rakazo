@@ -2517,6 +2517,10 @@ msgstr ""
 msgid "Country"
 msgstr ""
 
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "CPU"
+msgstr ""
+
 #: src/pages/Board.tsx
 #: src/pages/shell/agent-import.tsx
 #: src/pages/shell/create-bot-dialog.tsx
@@ -2687,6 +2691,10 @@ msgstr ""
 #: src/pages/MemorySettingsOverlay.tsx
 msgid "Default scope"
 msgstr "היקף ברירת מחדל"
+
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Degraded"
+msgstr ""
 
 #: src/components/AccountAccess.tsx
 #: src/components/pages/PagesList.tsx
@@ -2868,6 +2876,10 @@ msgstr "{disconnectName} נותק."
 msgid "Disconnecting…"
 msgstr "מנתק…"
 
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Disk"
+msgstr ""
+
 #: src/components/AskCard.tsx
 #: src/components/ComputerUpdateProgress.tsx
 #: src/components/PasskeyOffer.tsx
@@ -3002,6 +3014,10 @@ msgstr "עריכת שם"
 #: src/pages/BotContextMenu.tsx
 msgid "Edit Profile"
 msgstr "עריכת פרופיל"
+
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Egress"
+msgstr ""
 
 #: src/components/vault/VaultItemDetail.tsx
 #: src/components/vault/VaultItemEditor.tsx
@@ -3466,6 +3482,14 @@ msgstr "ערך ה-header"
 msgid "Headers"
 msgstr "Headers"
 
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Health"
+msgstr ""
+
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Healthy"
+msgstr ""
+
 #: src/pages/VoiceSettingsOverlay.tsx
 msgid "Hear a sample"
 msgstr "השמעת דוגמה"
@@ -3722,6 +3746,7 @@ msgstr "הזמנת חברים"
 msgid "Invite link"
 msgstr "קישור הזמנה"
 
+#: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/MemorySettingsOverlay.tsx
 #: src/pages/shell/bot-panel.tsx
 msgid "Isolated"
@@ -4068,6 +4093,7 @@ msgstr "חבר"
 msgid "Members ({0})"
 msgstr ""
 
+#: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/KnowledgeSection.tsx
 #: src/pages/MemorySettingsOverlay.tsx
 #: src/pages/settings-nav.ts
@@ -4739,6 +4765,7 @@ msgstr "רק את/ה"
 
 #: src/components/markdown-link-prompt.tsx
 #: src/components/pages/PagesList.tsx
+#: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/PaymentWalletSettingsPanel.tsx
 #: src/pages/shell/computer-panel.tsx
 #: src/pages/shell/import-setup-card.tsx
@@ -5572,6 +5599,10 @@ msgstr ""
 msgid "Restart to update"
 msgstr "הפעלה מחדש לעדכון"
 
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Restarts"
+msgstr ""
+
 #: src/components/InstructionSettings.tsx
 #: src/pages/shell/archived-chats.tsx
 msgid "Restore"
@@ -5592,6 +5623,10 @@ msgstr "שוחזר"
 #: src/components/ComputerUpdateProgress.tsx
 msgid "Restoring your workspace"
 msgstr "משחזר את סביבת העבודה"
+
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Restricted"
+msgstr ""
 
 #: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/Calendar.tsx
@@ -6947,6 +6982,10 @@ msgstr "ביטול"
 msgid "Uninstall"
 msgstr "הסרת התקנה"
 
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Unknown"
+msgstr ""
+
 #: src/pages/MessagingSettingsPanel.tsx
 msgid "Unlink"
 msgstr "ביטול קישור"
@@ -6959,6 +6998,10 @@ msgstr "ביטול השתקה"
 #: src/pages/BotContextMenu.tsx
 msgid "Unpin"
 msgstr "ביטול הצמדה"
+
+#: src/pages/admin/AdminComputersPage.tsx
+msgid "Unreachable"
+msgstr ""
 
 #: src/pages/ActivityList.tsx
 msgid "Unread"

@@ -1,7 +1,7 @@
 import type { SandboxProvider } from "@rakazo/adapter-kit";
 import type { PrismaClient } from "@rakazo/db";
 import { describe, expect, it, vi } from "vitest";
-import { adminComputers } from "./admin-computers.js";
+import { adminComputer, adminComputers } from "./admin-computers.js";
 import type { RouterDeps } from "./router.js";
 
 const base = {
@@ -50,15 +50,72 @@ const rows = [
   },
 ];
 
-function setup(options: { admin?: boolean; sandbox?: Partial<SandboxProvider> } = {}) {
+const observedAt = new Date(Date.now() - 10_000);
+
+const observation = {
+  computerId: "c-1",
+  observedAt,
+  runtime: "running",
+  imageRef: "registry.example/computer:1",
+  imageDigest: `sha256:${"a".repeat(64)}`,
+  isolation: "container",
+  restartCount: 2,
+  startedAt: new Date("2026-03-02T00:00:00Z"),
+  cpuMillis: 150,
+  memoryBytes: 1024n,
+  memoryLimitBytes: 4096n,
+  pids: 9,
+  egressMode: "restricted",
+  egressEnforced: true,
+  health: "degraded",
+};
+
+function setup(
+  options: {
+    admin?: boolean;
+    sandbox?: Partial<SandboxProvider>;
+    observed?: Partial<typeof observation>;
+  } = {},
+) {
   const findMany = vi.fn(async ({ take }: { take: number }) => rows.slice(0, take));
   const prisma = {
     user: {
       findUnique: async () => ({ email: "ada@example.test", emailVerified: true }),
       findMany: async () => [{ id: "owner", name: "Olive Owner", email: "olive@example.test" }],
     },
-    computer: { findMany },
+    computer: {
+      findMany,
+      findUnique: vi.fn(async ({ where }: { where: { id: string } }) => {
+        const row = rows.find((entry) => entry.id === where.id);
+        return row
+          ? {
+              ...row,
+              createdAt: new Date("2026-02-01T00:00:00Z"),
+              diskUsedBytes: 5n,
+              diskFreeBytes: 95n,
+              observation: row.id === "c-1" ? { ...observation, ...options.observed } : null,
+            }
+          : null;
+      }),
+    },
+    computerObservation: {
+      findMany: async () => [{ ...observation, ...options.observed }],
+    },
     computerRun: {
+      findMany: async () => [
+        {
+          startedAt: new Date("2026-03-02T00:00:00Z"),
+          endedAt: null,
+          endReason: null,
+          lastSeenAt: new Date("2026-03-02T01:00:00Z"),
+        },
+        {
+          startedAt: new Date("2026-03-01T00:00:00Z"),
+          endedAt: new Date("2026-03-01T05:00:00Z"),
+          endReason: "replaced",
+          lastSeenAt: null,
+        },
+      ],
       groupBy: async () => [
         {
           computerId: "c-1",
@@ -126,6 +183,7 @@ describe("admin computer inventory", () => {
       image: "registry.example/computer:1",
       isolation: "container",
       inspection: "inspected",
+      health: "degraded",
       runningSince: "2026-03-02T00:00:00.000Z",
       lastActivityAt: "2026-03-02T01:00:00.000Z",
     });
@@ -154,6 +212,7 @@ describe("admin computer inventory", () => {
       expect(text).not.toContain(secret);
     expect(Object.keys(page.computers[0] ?? {}).sort()).toEqual([
       "bots",
+      "health",
       "id",
       "image",
       "inspection",
@@ -222,5 +281,64 @@ describe("admin computer inventory", () => {
     const page = await adminComputers(deps, "admin", { limit: 2 });
     expect(page.computers.map((computer) => computer.id)).toEqual(["c-1", "c-2"]);
     expect(page.nextCursor).toBe("c-2");
+  });
+});
+
+describe("admin computer detail", () => {
+  it("refuses a non-admin before reading anything", async () => {
+    const { deps, inspect } = setup({ admin: false });
+    await expect(adminComputer(deps, "member", "c-1")).rejects.toMatchObject({
+      code: "FORBIDDEN",
+    });
+    expect(inspect).not.toHaveBeenCalled();
+  });
+
+  it("answers not found for an unknown computer", async () => {
+    const { deps } = setup();
+    await expect(adminComputer(deps, "admin", "missing")).rejects.toMatchObject({
+      code: "NOT_FOUND",
+    });
+  });
+
+  it("shapes the observation, disk and restart history", async () => {
+    const { deps } = setup();
+    const detail = await adminComputer(deps, "admin", "c-1");
+    expect(detail).toMatchObject({
+      id: "c-1",
+      health: "degraded",
+      imageDigest: `sha256:${"a".repeat(64)}`,
+      disk: { usedBytes: 5, freeBytes: 95 },
+      observation: {
+        runtime: "running",
+        restartCount: 2,
+        usage: { cpuMillis: 150, memoryBytes: 1024, memoryLimitBytes: 4096, pids: 9 },
+        egress: { mode: "restricted", enforced: true },
+      },
+    });
+    expect(detail.runs.map((run) => run.endReason)).toEqual([null, "replaced"]);
+    const text = JSON.stringify(detail);
+    for (const secret of [
+      "home-secret-key",
+      "screen.internal",
+      "wrapped-key",
+      "lease-secret",
+      "box-1",
+    ])
+      expect(text).not.toContain(secret);
+  });
+
+  it("reports unknown, never ok, once the observation is older than three intervals", async () => {
+    const { deps } = setup({
+      observed: { observedAt: new Date(Date.now() - 4 * 60_000), health: "ok" },
+    });
+    expect((await adminComputer(deps, "admin", "c-1")).health).toBe("unknown");
+    const page = await adminComputers(deps, "admin", { limit: 10 });
+    expect(page.computers[0]?.health).toBe("unknown");
+  });
+
+  it("has no observation or health before the observer has run", async () => {
+    const { deps } = setup();
+    const detail = await adminComputer(deps, "admin", "c-3");
+    expect(detail).toMatchObject({ observation: null, health: "unknown", imageDigest: null });
   });
 });
