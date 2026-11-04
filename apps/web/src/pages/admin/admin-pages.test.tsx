@@ -139,6 +139,7 @@ beforeEach(() => {
   api.me.mockResolvedValue({ isAdmin: true });
   api.overview.mockResolvedValue({ modelCredits: false });
   api.quarantines.mockResolvedValue({ quarantines: [] });
+  api.policy.mockResolvedValue({ policy: null });
 });
 
 it("sends a non-admin back to the app without asking the API for admin data", async () => {
@@ -897,4 +898,91 @@ it("reports a failure to start an operation and keeps the selection", async () =
   await settle();
   expect(api.toastError).toHaveBeenCalledWith("nope");
   expect(host.textContent).toContain("Hibernate");
+});
+
+it("recreates the selected computers from an approved image and shows each outcome", async () => {
+  const approved = `sha256:${"b".repeat(64)}`;
+  api.computers.mockResolvedValue(fleetComputers);
+  api.operations.mockResolvedValue({ operations: [] });
+  api.createOperation.mockResolvedValue({ id: "op2" });
+  api.policy.mockResolvedValue({
+    policy: {
+      version: 1,
+      computers: { images: { allow: [{ digest: approved, tag: "2026.11" }] } },
+    },
+  });
+  const { host } = await show(<AdminComputersPage />);
+  expect(host.querySelector('select[aria-label="Image"]')).toBeNull();
+  await act(async () => {
+    (host.querySelector('[aria-label="Reporter"] [role="checkbox"]') as HTMLElement).click();
+  });
+  await settle();
+  const picker = host.querySelector('select[aria-label="Image"]') as HTMLSelectElement;
+  expect([...picker.options].map((option) => option.textContent)).toEqual(["Default", "2026.11"]);
+  await act(async () => {
+    picker.value = approved;
+    picker.dispatchEvent(new Event("change", { bubbles: true }));
+  });
+  api.operations.mockResolvedValue({
+    operations: [
+      {
+        id: "op2",
+        kind: "recreate",
+        imageDigest: approved,
+        status: "completed_with_failures",
+        createdAt: "2026-02-05T00:00:00.000Z",
+        finishedAt: "2026-02-05T00:02:00.000Z",
+        maxParallel: 3,
+        haltAfterFailures: 2,
+        counts: { succeeded: 1, failed: 1 },
+      },
+    ],
+  });
+  api.operation.mockResolvedValue({
+    ...(await api.operations()).operations[0],
+    items: [
+      {
+        computerId: "c1",
+        spaceName: "Team space",
+        bots: ["Reporter"],
+        status: "succeeded",
+        outcome: "recreated",
+        imageDigestBefore: `sha256:${"a".repeat(64)}`,
+        imageDigestAfter: approved,
+        homeRevisionBefore: "r1",
+        homeRevisionAfter: "r2",
+        finishedAt: "2026-02-05T00:01:00.000Z",
+      },
+      {
+        computerId: "c2",
+        spaceName: "Team space",
+        bots: ["Courier"],
+        status: "failed",
+        outcome: "failed_checkpoint",
+        imageDigestBefore: null,
+        imageDigestAfter: null,
+        homeRevisionBefore: null,
+        homeRevisionAfter: null,
+        finishedAt: "2026-02-05T00:01:00.000Z",
+      },
+    ],
+  });
+  await act(async () => {
+    (
+      [...host.querySelectorAll("button")].find((b) => b.textContent === "Recreate") as HTMLElement
+    ).click();
+  });
+  await settle();
+  expect(api.createOperation).toHaveBeenCalledWith({
+    kind: "recreate",
+    computerIds: ["c1"],
+    imageDigest: approved,
+  });
+  const items = [
+    ...document.body.querySelectorAll('[data-testid="fleet-operation-items"] tbody tr'),
+  ].map((item) => item.textContent ?? "");
+  expect(items[0]).toContain("Done");
+  expect(items[0]).toContain("b".repeat(12));
+  expect(items[1]).toContain("Failed");
+  expect(items[1]).toContain("Not saved, left running");
 });

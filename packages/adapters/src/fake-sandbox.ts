@@ -33,6 +33,8 @@ export interface FakeBox {
   running: boolean;
   screens: Map<string, string>;
   screenLeases: Map<string, string>;
+  /** The image it was started from; the provider default when none was named. */
+  image?: { ref: string; digest: string };
 }
 
 export class FakeSandboxProvider implements SandboxProvider {
@@ -83,6 +85,7 @@ export class FakeSandboxProvider implements SandboxProvider {
       running: true,
       screens: new Map([["default", "ready"]]),
       screenLeases: new Map(),
+      ...(request.image ? { image: request.image } : {}),
     });
     return ref;
   }
@@ -96,7 +99,7 @@ export class FakeSandboxProvider implements SandboxProvider {
     if (!box) return { runtime: "gone", isolation: "container" };
     return {
       runtime: box.running ? "running" : "stopped",
-      image: { ref: "fake/computer:test", digest: `sha256:${"f".repeat(64)}` },
+      image: box.image ?? { ref: "fake/computer:test", digest: `sha256:${"f".repeat(64)}` },
       isolation: "container",
       restartCount: 0,
       ...(box.running

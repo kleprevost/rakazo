@@ -39,6 +39,7 @@ export const SECURITY_EVENT_TYPES = [
   "computer.fleet.item.skipped",
   "computer.hibernated",
   "computer.woken",
+  "computer.recreated",
   "rate_limit.hit",
   "employee.entitlements_reconciled",
   "employee.shared",

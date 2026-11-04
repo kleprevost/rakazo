@@ -1460,6 +1460,10 @@ model ComputerUpdate {
   botId      String
   status     String   @default("queued")
   stage      String   @default("preparing")
+  /// Recreate only: the approved image digest to provision; null keeps the provider's own image.
+  targetImageDigest String?
+  /// A fleet item's id, so a replayed item finds this update instead of queueing a second one.
+  idempotencyKey    String?  @unique
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
@@ -1558,8 +1562,11 @@ model ComputerObservation {
 /// by the API on create and by whichever instance runs an item.
 model ComputerFleetOperation {
   id                String              @id @default(cuid())
-  /// hibernate | wake
+  /// hibernate | wake | recreate
   kind              String
+  /// Recreate only: the approved image digest every computer is rebuilt from; null keeps the
+  /// provider's own image.
+  imageDigest       String?
   /// queued | running | completed | completed_with_failures
   status            String              @default("queued")
   actorUserId       String
@@ -1586,6 +1593,13 @@ model ComputerFleetItem {
   status         String                 @default("queued")
   /// A short code for the outcome; never provider text.
   outcome        String?
+  /// Recreate only: what the computer ran and held before and after.
+  imageDigestBefore     String?
+  imageDigestAfter      String?
+  homeRevisionBefore    String?
+  homeRevisionAfter     String?
+  browserProfilesBefore Int?
+  computerUpdateId      String?
   attempt        Int                    @default(0)
   claimId        String?
   claimExpiresAt DateTime?
