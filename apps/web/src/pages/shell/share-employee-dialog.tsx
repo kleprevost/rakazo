@@ -1,6 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
 import type {
   Bot,
+  EmployeeAccessRequest,
   EmployeeDetail,
   EmployeeGrant,
   EmployeeGrantSubjectKind,
@@ -82,7 +83,11 @@ function RoleSelect({
   );
 }
 
-type Loaded = { detail: EmployeeDetail; grants: EmployeeGrant[] | null };
+type Loaded = {
+  detail: EmployeeDetail;
+  grants: EmployeeGrant[] | null;
+  requests: EmployeeAccessRequest[];
+};
 
 /** Who has access to a shared employee, and its versions. Everything here is a procedure call. */
 function Access({ employeeId, api }: { employeeId: string; api: EmployeesApi }) {
@@ -101,7 +106,11 @@ function Access({ employeeId, api }: { employeeId: string; api: EmployeesApi }) 
     const grants = canManageAccess(detail.employee.role)
       ? await api.grants.list({ employeeId })
       : null;
-    setLoaded({ detail, grants });
+    // The inbox is a convenience: a failure to read it must not hide the access list.
+    const requests = grants
+      ? await api.requests.list({ employeeId }).catch(() => [] as EmployeeAccessRequest[])
+      : [];
+    setLoaded({ detail, grants, requests });
   }, [api, employeeId]);
 
   useEffect(() => {
@@ -162,7 +171,7 @@ function Access({ employeeId, api }: { employeeId: string; api: EmployeesApi }) 
     );
   }
 
-  const { detail, grants } = loaded;
+  const { detail, grants, requests } = loaded;
   const actorRole = detail.employee.role;
   const canManage = grants !== null;
   const addRoles = EMPLOYEE_ROLES.filter((role) => allowed(actorRole, "user", null, role));
@@ -219,6 +228,53 @@ function Access({ employeeId, api }: { employeeId: string; api: EmployeesApi }) 
               </ul>
             ) : null}
           </div>
+          {requests.length > 0 ? (
+            <div className="space-y-2">
+              <SectionHeading>{t`Requests`}</SectionHeading>
+              <ul className="space-y-1" aria-label={t`Requests`}>
+                {requests.map((request) => (
+                  <li key={request.id} className="flex items-center gap-2">
+                    <span dir="auto" className="min-w-0 flex-1 truncate text-[14px]">
+                      {request.requesterName}
+                    </span>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={busy}
+                      aria-label={t`Deny ${request.requesterName}`}
+                      onClick={() =>
+                        void run(() =>
+                          api.requests.decide({
+                            employeeId,
+                            requestId: request.id,
+                            decision: "deny",
+                          }),
+                        )
+                      }
+                    >
+                      {t`Deny`}
+                    </Button>
+                    <Button
+                      size="sm"
+                      disabled={busy}
+                      aria-label={t`Approve ${request.requesterName}`}
+                      onClick={() =>
+                        void run(() =>
+                          api.requests.decide({
+                            employeeId,
+                            requestId: request.id,
+                            decision: "approve",
+                          }),
+                        )
+                      }
+                    >
+                      {t`Approve`}
+                    </Button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
           <ul className="space-y-1" aria-label={t`Access`}>
             {grants.map((grant) => {
               const name = grant.subjectLabel ?? grant.subjectValue;

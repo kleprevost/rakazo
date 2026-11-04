@@ -616,7 +616,7 @@ Choices the design left open:
 - `capabilityMode` (off, shadow, enforce) and `requireGrants` are the caller's: the evaluator always
   evaluates as enforce and returns the outcome.
 
-PR 4, grants store and shadow mode (migration `20261128120000_capability_grants`, `packages/db/src/capability-grants.ts`,
+PR 4, grants store and shadow mode (migration `20261129120000_capability_grants`, `packages/db/src/capability-grants.ts`,
 `apps/api/src/capability-grants.ts`, `packages/adapters/src/capability-shadow.ts`). Nothing is enforced yet.
 Choices the design left open:
 - `capability_grants` holds a bot's rows (`kind` `bot` or `delegation`) and an employee's (`kind` `bot`

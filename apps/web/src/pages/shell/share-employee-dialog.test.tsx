@@ -1,6 +1,11 @@
 // @vitest-environment jsdom
 
-import type { EmployeeDetail, EmployeeGrant, EmployeeRole } from "@rakazo/contracts";
+import type {
+  EmployeeAccessRequest,
+  EmployeeDetail,
+  EmployeeGrant,
+  EmployeeRole,
+} from "@rakazo/contracts";
 import type { ReactNode } from "react";
 import { act } from "react";
 import type { Root } from "react-dom/client";
@@ -98,6 +103,10 @@ function makeApi(
       set: vi.fn(async () => grants[0]!),
       remove: vi.fn(async () => ({ ok: true as const })),
     },
+    requests: {
+      list: vi.fn(async () => [] as EmployeeAccessRequest[]),
+      decide: vi.fn(async () => ({ ok: true as const })),
+    },
     versions: {
       publish: vi.fn(async () => detail(role).employee),
       rollback: vi.fn(async () => detail(role).employee),
@@ -184,6 +193,55 @@ describe("ShareEmployeeDialog", () => {
     ]);
     // A directory group cannot be an Owner, so the choice is not offered.
     expect(options(byLabel("Role for sales"))).toEqual(["viewer", "collaborator", "manager"]);
+  });
+
+  describe("access requests", () => {
+    const pendingRequest: EmployeeAccessRequest = {
+      id: "req-1",
+      requesterName: "Rae Request",
+      requesterEmail: "rae@example.test",
+      requestedRole: "collaborator",
+      createdAt: "2026-11-01T00:00:00.000Z",
+    };
+
+    it("shows nothing when there are no requests", async () => {
+      const api = makeApi("owner", ownerGrants);
+      await render(api);
+      expect(byLabel("Requests")).toBeUndefined();
+    });
+
+    it("lists requests and approves or denies them through the decide procedure", async () => {
+      const api = makeApi("manager", ownerGrants);
+      api.requests.list.mockResolvedValue([pendingRequest]);
+      await render(api);
+      expect(byLabel("Requests")?.textContent).toContain("Rae Request");
+      await click(byLabel("Approve Rae Request"));
+      expect(api.requests.decide).toHaveBeenCalledWith({
+        employeeId: "emp-1",
+        requestId: "req-1",
+        decision: "approve",
+      });
+      await click(byLabel("Deny Rae Request"));
+      expect(api.requests.decide).toHaveBeenLastCalledWith({
+        employeeId: "emp-1",
+        requestId: "req-1",
+        decision: "deny",
+      });
+    });
+
+    it("keeps the access list when the inbox cannot be read", async () => {
+      const api = makeApi("owner", ownerGrants);
+      api.requests.list.mockRejectedValue(new Error("boom"));
+      await render(api);
+      expect(byLabel("Access")?.textContent).toContain("Ola Owner");
+      expect(byLabel("Requests")).toBeUndefined();
+    });
+
+    it("does not ask for requests when the person cannot manage access", async () => {
+      const api = makeApi("collaborator", ownerGrants);
+      await render(api);
+      expect(api.requests.list).not.toHaveBeenCalled();
+    });
   });
 
   it("changes a role and removes a grant through the grant procedures", async () => {

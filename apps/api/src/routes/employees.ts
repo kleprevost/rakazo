@@ -1,3 +1,9 @@
+import {
+  decideRequest,
+  listDirectory,
+  listRequests,
+  requestAccess,
+} from "../employee-directory.js";
 import { addInstance } from "../employee-instances.js";
 import {
   getEmployee,
@@ -28,6 +34,20 @@ export function employeesRoutes(ctx: RouterContext) {
       addInstance: authed.employees.addInstance.handler(({ context, input }) =>
         addInstance(deps, repos, context.actor, input),
       ),
+      directory: authed.employees.directory.handler(({ context }) =>
+        listDirectory(deps, context.actor),
+      ),
+      requests: {
+        create: authed.employees.requests.create.handler(({ context, input }) =>
+          requestAccess(deps, context.actor, input),
+        ),
+        list: authed.employees.requests.list.handler(({ context, input }) =>
+          listRequests(deps, context.actor, input),
+        ),
+        decide: authed.employees.requests.decide.handler(({ context, input }) =>
+          decideRequest(deps, context.actor, input),
+        ),
+      },
       versions: {
         saveDraft: authed.employees.versions.saveDraft.handler(({ context, input }) =>
           saveDraft(deps, context.actor, input),

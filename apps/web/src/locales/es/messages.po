@@ -511,6 +511,7 @@ msgstr "Actividad"
 
 #: src/components/integrations/plugin-marketplace.tsx
 #: src/components/SecretAskCard.tsx
+#: src/pages/Employees.tsx
 #: src/pages/McpServersOverlay.tsx
 #: src/pages/PluginsOverlay.tsx
 #: src/pages/ScratchpadSection.tsx
@@ -911,8 +912,14 @@ msgstr "Aprobaciones"
 #: src/pages/MessagingSettingsPanel.tsx
 #: src/pages/PluginSubmissionsPanel.tsx
 #: src/pages/shell/message-cards.tsx
+#: src/pages/shell/share-employee-dialog.tsx
 msgid "Approve"
 msgstr "Aprobar"
+
+#. placeholder {0}: request.requesterName
+#: src/pages/shell/share-employee-dialog.tsx
+msgid "Approve {0}"
+msgstr ""
 
 #: src/lib/call-session.ts
 msgid "Approve or deny it on screen."
@@ -1059,6 +1066,7 @@ msgstr "Estudio de avatares"
 #: src/pages/Auth.tsx
 #: src/pages/Board.tsx
 #: src/pages/Calendar.tsx
+#: src/pages/Employees.tsx
 #: src/pages/McpServersOverlay.tsx
 #: src/pages/NavLinkPage.tsx
 #: src/pages/PluginsOverlay.tsx
@@ -1204,6 +1212,10 @@ msgstr "Nombre del cerebro"
 #: src/components/integrations/skills-dialog.tsx
 msgid "Browse"
 msgstr "Explorar"
+
+#: src/pages/shell/bot-picker.tsx
+msgid "Browse employees"
+msgstr ""
 
 #: src/pages/PluginsOverlay.tsx
 msgid "Browse MCP servers"
@@ -1991,6 +2003,7 @@ msgstr "No se pudo borrar la conversación"
 
 #: src/components/ComputerUpdateProgress.tsx
 #: src/pages/Calendar.tsx
+#: src/pages/Employees.tsx
 #: src/pages/Today.tsx
 msgid "Could not complete action"
 msgstr "No se pudo completar la acción"
@@ -2815,8 +2828,14 @@ msgid "Denied"
 msgstr "Denegado"
 
 #: src/components/AskCard.tsx
+#: src/pages/shell/share-employee-dialog.tsx
 msgid "Deny"
 msgstr "Denegar"
+
+#. placeholder {0}: request.requesterName
+#: src/pages/shell/share-employee-dialog.tsx
+msgid "Deny {0}"
+msgstr ""
 
 #. placeholder {0}: settings.defaultProvider
 #: src/components/ComputerProviderSettings.tsx
@@ -3078,6 +3097,10 @@ msgstr "Enviarme un código por correo"
 #: src/lib/user-error.ts
 msgid "Email verification required"
 msgstr "Se requiere verificar el correo"
+
+#: src/pages/Employees.tsx
+msgid "Employees"
+msgstr ""
 
 #. placeholder {0}: humanizeTool(toolName)
 #: src/pages/shell/bot-panel.tsx
@@ -4589,6 +4612,10 @@ msgstr ""
 msgid "No bots match"
 msgstr "Ningún bot coincide"
 
+#: src/pages/Employees.tsx
+msgid "No employees yet"
+msgstr ""
+
 #: src/components/AskCard.tsx
 #: src/components/SecretAskCard.tsx
 msgid "No longer active"
@@ -5655,7 +5682,16 @@ msgstr "Respondiendo a {0}"
 msgid "Request a new code"
 msgstr "Solicita un código nuevo"
 
+#: src/pages/Employees.tsx
+msgid "Request access"
+msgstr ""
+
+#: src/pages/Employees.tsx
+msgid "Requested"
+msgstr ""
+
 #: src/pages/MessagingSettingsPanel.tsx
+#: src/pages/shell/share-employee-dialog.tsx
 msgid "Requests"
 msgstr "Solicitudes"
 
@@ -7072,6 +7108,7 @@ msgstr "Sitios de confianza"
 #: src/components/pages/PagesList.tsx
 #: src/pages/ActivityList.tsx
 #: src/pages/Calendar.tsx
+#: src/pages/Employees.tsx
 #: src/pages/Onboarding.tsx
 #: src/pages/SharedPage.tsx
 #: src/pages/SpaceSearch.tsx

@@ -947,6 +947,7 @@ function SpaceShell() {
         navigate={navigate}
         setNewSpaceOpen={dialogs.setNewSpaceOpen}
         setCreateBotOpen={dialogs.setCreateBotOpen}
+        sharedEmployeesEnabled={bootstrapMe?.sharedEmployeesEnabled === true}
         roster={
           <SidebarRoster
             mini={miniSidebar}
