@@ -111,8 +111,14 @@ async function runAfterFill(
     },
     routine: { findUnique: vi.fn(async () => ({ notify: false, nextRunAt: null })) },
     event: { count: vi.fn(async () => 0) },
+    quarantine: { findFirst: async () => null },
     bot: {
-      findUnique: async () => ({ suspendedAt: null, name: "Assistant" }),
+      findUnique: async () => ({
+        suspendedAt: null,
+        name: "Assistant",
+        spaceId: "space-1",
+        groupMembers: [],
+      }),
       findUniqueOrThrow: vi.fn(async () => ({
         id: run.botId,
         name: "Assistant",

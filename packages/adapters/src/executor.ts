@@ -8,7 +8,6 @@ import {
 } from "@rakazo/adapter-kit";
 import type { MessageBlock, ModelRoleChoice, RunStatus } from "@rakazo/contracts";
 import {
-  BOT_SUSPENDED_MESSAGE,
   BUDGET_REACHED_MESSAGE,
   disabledBuiltinToolSet,
   POLICY_DENIED_MESSAGE,
@@ -66,6 +65,7 @@ import {
   loadRunCodeRedactions,
   loadRunLoginRedactions,
 } from "./bot-secrets.js";
+import { botBlockedNow, botBlockMessage } from "./brokered-connector.js";
 import { createBrowserProvider } from "./browser-provider-factory.js";
 import { partitionTools } from "./builtin-tool-bridge.js";
 import { agentConnectionTools, builtinAgentTools } from "./builtin-tools.js";
@@ -895,9 +895,13 @@ export function createRunExecutor(executorDeps: ExecutorDeps) {
           }
         };
         // Every source of work ends here, so one check covers messages, routines, webhooks,
-        // messaging channels, delegation, ticket wakes and helpers. The routine is left as is.
-        if (bot.suspendedAt) {
-          await failRunBeforeModel(BOT_SUSPENDED_MESSAGE);
+        // messaging channels, delegation, ticket wakes and helpers, for suspension and quarantine
+        // alike. The routine is left as is.
+        const blocked = bot.suspendedAt
+          ? "suspended"
+          : (await botBlockedNow(deps.prisma, bot.id)).blocked;
+        if (blocked) {
+          await failRunBeforeModel(botBlockMessage(blocked));
           return;
         }
         // A routine or webhook the policy switched off is kept, but never runs.

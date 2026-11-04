@@ -153,7 +153,14 @@ async function failRun(scenario: Scenario) {
         computer: { id: "computer-1", scope: "dedicated" },
       })),
       findMany: vi.fn(async () => []),
+      findUnique: vi.fn(async () => ({
+        suspendedAt: scenario.suspended ? new Date(NOW) : null,
+        name: "Assistant",
+        spaceId: "space-1",
+        groupMembers: [],
+      })),
     },
+    quarantine: { findFirst: vi.fn(async () => null) },
     attempt: {
       create: vi.fn(async () => ({ id: "attempt-1" })),
       update: vi.fn(),

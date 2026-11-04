@@ -695,6 +695,7 @@ msgstr ""
 
 #: src/components/VaultSettings.tsx
 #: src/pages/admin/AdminAuditPage.tsx
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/PluginsOverlay.tsx
 msgid "All"
 msgstr ""
@@ -5215,9 +5216,23 @@ msgstr "Anbieter"
 msgid "Pull request"
 msgstr "Pull Request"
 
+#: src/pages/admin/AdminBotsPage.tsx
+msgid "Quarantine"
+msgstr "Unter Quarantäne stellen"
+
+#: src/pages/admin/AdminBotsPage.tsx
+msgid "Quarantine all"
+msgstr "Alle unter Quarantäne stellen"
+
+#: src/pages/admin/AdminBotsPage.tsx
 #: src/pages/admin/AdminComputersPage.tsx
 msgid "Quarantined"
 msgstr ""
+
+#. js-lingui-explicit-id
+#: src/lib/run-error.ts
+msgid "Quarantined by your organization"
+msgstr "Von deiner Organisation unter Quarantäne gestellt"
 
 #: src/pages/ActivityList.tsx
 msgid "Queued"
@@ -5406,6 +5421,10 @@ msgstr ""
 #: src/pages/PluginSubmissionsPanel.tsx
 msgid "Rejecting…"
 msgstr ""
+
+#: src/pages/admin/AdminBotsPage.tsx
+msgid "Release"
+msgstr "Freigeben"
 
 #: src/pages/shell/computer-release-actions.tsx
 msgid "Release control"

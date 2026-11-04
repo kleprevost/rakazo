@@ -512,6 +512,9 @@ describeWithDatabase("API authorization and resource isolation", () => {
       ["admin/bots/list"],
       ["admin/bots/suspend", { botId: "missing-bot" }],
       ["admin/bots/resume", { botId: "missing-bot" }],
+      ["admin/quarantine/list"],
+      ["admin/quarantine/start", { scopeKind: "bot", scopeId: "missing-bot" }],
+      ["admin/quarantine/lift", { id: "missing-quarantine" }],
       ["admin/computers/list"],
       ["admin/computers/get", { computerId: "missing-computer" }],
       ["admin/policy"],
@@ -2440,10 +2443,13 @@ describeWithDatabase("API authorization and resource isolation", () => {
         "admin/policy",
         "admin/users/list",
         "admin/bots/list",
+        "admin/quarantine/list",
         "admin/computers/list",
       ])
         await expectForbidden(app, cookie, path, {});
       await expectForbidden(app, cookie, "admin/computers/get", { computerId: "missing-computer" });
+      await expectForbidden(app, cookie, "admin/quarantine/start", { scopeKind: "all" });
+      await expectForbidden(app, cookie, "admin/quarantine/lift", { id: "missing-quarantine" });
       await expectForbidden(app, cookie, "admin/audit", {});
       await expectForbidden(app, cookie, "admin/users/endSessions", { userId: account.userId });
       await expectForbidden(app, cookie, "updater/status", {});

@@ -6,45 +6,61 @@ import type {
   ConnectorTool,
   ManagedConnectorProvider,
 } from "@rakazo/adapter-kit";
-import { BOT_SUSPENDED_MESSAGE } from "@rakazo/contracts";
+import { BOT_QUARANTINED_MESSAGE, BOT_SUSPENDED_MESSAGE } from "@rakazo/contracts";
 import { connectorKindFromToolName } from "@rakazo/core";
 import type { PrismaClient } from "@rakazo/db";
-import { recordAuditEvent } from "@rakazo/db";
+import { activeQuarantine, recordAuditEvent } from "@rakazo/db";
 import { getLogger } from "@rakazo/logging";
 import type { ConnectorRegistry } from "./composio-connector.js";
 import { assertConnectorAllowed } from "./policy-integrations.js";
 import { PolicyDeniedError } from "./policy-runtime.js";
 import { assertToolAllowed, policyBlockedToolMessage } from "./policy-tools.js";
 
-type BotReader = Pick<PrismaClient, "bot">;
+type BotReader = Pick<PrismaClient, "bot" | "quarantine">;
+
+export type BotBlock = "suspended" | "quarantined";
+
+/** The refusal a blocked bot gets, shared by every gate. */
+export const botBlockMessage = (blocked: BotBlock) =>
+  blocked === "quarantined" ? BOT_QUARANTINED_MESSAGE : BOT_SUSPENDED_MESSAGE;
 
 /**
- * Whether the bot is suspended right now. One primary-key read, never cached: the call it
- * protects is a network round trip, and a cached answer is how a suspended bot keeps acting.
+ * Whether the bot is suspended or quarantined right now. Reads the rows, never cached: the call
+ * it protects is a network round trip, and a cached answer is how a stopped bot keeps acting.
  * Fails closed: a missing bot or a failed read counts as suspended.
  */
-export async function botSuspendedNow(
+export async function botBlockedNow(
   prisma: BotReader,
   botId: string | undefined,
-): Promise<{ suspended: boolean; name: string }> {
-  if (!botId) return { suspended: true, name: "Bot" };
+): Promise<{ blocked: BotBlock | null; name: string }> {
+  if (!botId) return { blocked: "suspended", name: "Bot" };
   try {
     const bot = await prisma.bot.findUnique({
       where: { id: botId },
-      select: { suspendedAt: true, name: true },
+      select: {
+        suspendedAt: true,
+        name: true,
+        spaceId: true,
+        groupMembers: { select: { groupId: true } },
+      },
     });
-    return bot
-      ? { suspended: Boolean(bot.suspendedAt), name: bot.name }
-      : { suspended: true, name: "Bot" };
+    if (!bot) return { blocked: "suspended", name: "Bot" };
+    if (bot.suspendedAt) return { blocked: "suspended", name: bot.name };
+    const quarantine = await activeQuarantine(prisma, {
+      id: botId,
+      spaceId: bot.spaceId,
+      groupIds: bot.groupMembers.map((member) => member.groupId),
+    });
+    return { blocked: quarantine ? "quarantined" : null, name: bot.name };
   } catch (error) {
     getLogger().error("suspension check failed", error instanceof Error ? error.message : "error");
-    return { suspended: true, name: "Bot" };
+    return { blocked: "suspended", name: "Bot" };
   }
 }
 
 /**
  * The one enforcement point for connector tools. Every caller that reaches a connector goes
- * through `execute` here, runs and routine watches alike, so suspension and central policy
+ * through `execute` here, runs and routine watches alike, so suspension, quarantine and central policy
  * apply the same way to both: the bot is not suspended, the tool is not denied, and the
  * connected app is allowed.
  */
@@ -88,10 +104,10 @@ export class BrokeredConnector implements ConnectorProvider {
   }
 
   private async refusal(call: ConnectorCall, context: AdapterContext): Promise<string | undefined> {
-    const { suspended, name } = await botSuspendedNow(this.prisma, context.botId);
-    if (suspended) {
-      await this.audit(call, context, name, "suspended");
-      return BOT_SUSPENDED_MESSAGE;
+    const { blocked, name } = await botBlockedNow(this.prisma, context.botId);
+    if (blocked) {
+      await this.audit(call, context, name, blocked);
+      return botBlockMessage(blocked);
     }
     const audience = {
       userId: context.userId,

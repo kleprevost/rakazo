@@ -7,6 +7,7 @@ import {
   adminPolicy,
   adminUsers,
 } from "../admin-console.js";
+import { liftQuarantine, listQuarantines, startQuarantine } from "../bot-quarantine.js";
 import { resumeBot, suspendBot } from "../bot-suspension.js";
 import type { RouterContext } from "./context.js";
 
@@ -35,6 +36,17 @@ export function adminRoutes(ctx: RouterContext) {
         ),
         resume: authed.admin.bots.resume.handler(({ context, input }) =>
           resumeBot(deps, context.actor.userId, input.botId),
+        ),
+      },
+      quarantine: {
+        list: authed.admin.quarantine.list.handler(({ context }) =>
+          listQuarantines(deps, context.actor.userId),
+        ),
+        start: authed.admin.quarantine.start.handler(({ context, input }) =>
+          startQuarantine(deps, context.actor.userId, input),
+        ),
+        lift: authed.admin.quarantine.lift.handler(({ context, input }) =>
+          liftQuarantine(deps, context.actor.userId, input.id),
         ),
       },
       computers: {

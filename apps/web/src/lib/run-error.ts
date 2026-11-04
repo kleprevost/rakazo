@@ -42,6 +42,12 @@ export const translateRunError: RunErrorTranslator = (message, values) => {
         message: "Suspended by your organization",
         values,
       });
+    case "Quarantined by your organization":
+      return i18n._({
+        id: "Quarantined by your organization",
+        message: "Quarantined by your organization",
+        values,
+      });
     case "Monthly budget reached":
       return i18n._({
         id: "Monthly budget reached",

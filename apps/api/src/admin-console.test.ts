@@ -72,6 +72,8 @@ const bots = [
     modelId: "gpt-x",
     archivedAt: null,
     suspendedAt: new Date("2026-02-06T00:00:00Z"),
+    spaceId: "space-1",
+    groupMembers: [],
     space: { name: "Team space" },
   },
   {
@@ -82,6 +84,8 @@ const bots = [
     modelId: null,
     archivedAt: new Date(),
     suspendedAt: null,
+    spaceId: "space-1",
+    groupMembers: [],
     space: { name: "Team space" },
   },
 ];
@@ -128,6 +132,11 @@ function setup(options: { ssoAdmins?: string[] } = {}) {
       count: async () => bots.length,
       findMany: async ({ where, take }: IdFilter) =>
         bots.filter((bot) => !where?.id || where.id.in.includes(bot.id)).slice(0, take),
+    },
+    quarantine: {
+      findMany: async () => [
+        { scopeKind: "bot", scopeId: "bot-1", createdAt: new Date("2026-02-07T00:00:00Z") },
+      ],
     },
     run: {
       groupBy: async () => [
@@ -194,6 +203,9 @@ describe("admin console authorization", () => {
       () => member.bots.list({ limit: 10 }),
       () => member.bots.suspend({ botId: "bot-1" }),
       () => member.bots.resume({ botId: "bot-1" }),
+      () => member.quarantine.list(),
+      () => member.quarantine.start({ scopeKind: "all" }),
+      () => member.quarantine.lift({ id: "q-1" }),
       () => member.computers.list({ limit: 10 }),
       () => member.policy(),
       () => member.audit({ limit: 10 }),
@@ -306,6 +318,7 @@ describe("admin console data", () => {
         monthlySpendUsd: 4.25,
         archived: false,
         suspendedAt: "2026-02-06T00:00:00.000Z",
+        quarantinedAt: "2026-02-07T00:00:00.000Z",
       },
       {
         id: "bot-2",
@@ -318,6 +331,7 @@ describe("admin console data", () => {
         monthlySpendUsd: 0,
         archived: true,
         suspendedAt: null,
+        quarantinedAt: null,
       },
     ]);
   });

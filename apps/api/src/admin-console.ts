@@ -9,7 +9,7 @@ import type {
   AdminUserPage,
 } from "@rakazo/contracts";
 import { budgetPeriodStart } from "@rakazo/core";
-import { listSecurityEvents, recordSecurityEvent, runAsSystem } from "@rakazo/db";
+import { listSecurityEvents, quarantineCovers, recordSecurityEvent, runAsSystem } from "@rakazo/db";
 import { requireAdmin } from "./admins.js";
 import type { RouterDeps } from "./router.js";
 
@@ -168,6 +168,8 @@ export async function adminBots(
         modelId: true,
         archivedAt: true,
         suspendedAt: true,
+        spaceId: true,
+        groupMembers: { select: { groupId: true } },
         space: { select: { name: true } },
       },
       orderBy: [{ createdAt: "desc" }, { id: "desc" }],
@@ -177,8 +179,13 @@ export async function adminBots(
   );
   const page = rows.slice(0, input.limit);
   const botIds = page.map((bot) => bot.id);
-  const [owners, activity, spend] = await system("bot details", () =>
+  const [quarantines, owners, activity, spend] = await system("bot details", () =>
     Promise.all([
+      deps.prisma.quarantine.findMany({
+        where: { liftedAt: null },
+        select: { scopeKind: true, scopeId: true, createdAt: true },
+        orderBy: { createdAt: "asc" },
+      }),
       deps.prisma.user.findMany({
         where: { id: { in: [...new Set(page.map((bot) => bot.userId))] } },
         select: { id: true, name: true, email: true },
@@ -210,6 +217,16 @@ export async function adminBots(
       monthlySpendUsd: spent.get(bot.id) ?? 0,
       archived: bot.archivedAt !== null,
       suspendedAt: bot.suspendedAt?.toISOString() ?? null,
+      quarantinedAt:
+        quarantines
+          .find((quarantine) =>
+            quarantineCovers(quarantine, {
+              id: bot.id,
+              spaceId: bot.spaceId,
+              groupIds: bot.groupMembers.map((member) => member.groupId),
+            }),
+          )
+          ?.createdAt.toISOString() ?? null,
     })),
     nextCursor: rows.length > input.limit ? (page.at(-1)?.id ?? null) : null,
   };
