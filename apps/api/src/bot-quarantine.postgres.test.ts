@@ -67,6 +67,12 @@ describe.skipIf(!enabled)("quarantining AI employees (PostgreSQL)", () => {
       auth: { isSsoAdmin: async () => false },
     }) as unknown as Parameters<typeof startQuarantine>[0];
 
+  // The list is global and other files quarantine at the same time, so look only at this bot's.
+  const ownQuarantines = async () =>
+    (await listQuarantines(deps(), adminId)).quarantines.filter(
+      (item) => item.scopeId === identity.botId,
+    );
+
   const webhookDeps = () =>
     ({
       prisma,
@@ -324,7 +330,7 @@ describe.skipIf(!enabled)("quarantining AI employees (PostgreSQL)", () => {
       },
     });
     const { id } = await start({ scopeKind: "bot", scopeId: identity.botId });
-    expect((await listQuarantines(deps(), adminId)).quarantines).toEqual([
+    expect(await ownQuarantines()).toEqual([
       expect.objectContaining({ id, scopeKind: "bot", scopeName: "Assistant" }),
     ]);
     await liftQuarantine(deps(), adminId, id);
@@ -335,7 +341,7 @@ describe.skipIf(!enabled)("quarantining AI employees (PostgreSQL)", () => {
       runAsSystem("test", () => assertBotNotSuspended(prisma, identity.botId)),
     ).resolves.toBeUndefined();
     expect(await system.botSecret.count({ where: { botId: identity.botId } })).toBe(1);
-    expect((await listQuarantines(deps(), adminId)).quarantines).toEqual([]);
+    expect(await ownQuarantines()).toEqual([]);
     const types = (await system.securityEvent.findMany({ where: { userId: adminId } })).map(
       (event) => event.type,
     );
