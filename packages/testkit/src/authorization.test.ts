@@ -54,6 +54,7 @@ describeWithDatabase("API authorization and resource isolation", () => {
   let app: App;
   const stamp = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
   const dataDir = mkdtempSync(path.join(tmpdir(), "rakazo-authz-"));
+  const scimToken = "scim-test-token-".padEnd(40, "x");
 
   beforeAll(async () => {
     const { createApp } = await import("@rakazo/api/app");
@@ -68,12 +69,13 @@ describeWithDatabase("API authorization and resource isolation", () => {
       // Operator roles: accounts are created per test, with these emails and a verified address.
       adminEmails: [`role-platform-${stamp}@rakazo.test`],
       operatorEmails: {
-        security: [`role-security-${stamp}@rakazo.test`],
+        security: [`role-security-${stamp}@rakazo.test`, `offboarding-admin-${stamp}@rakazo.test`],
         fleet: [`role-fleet-${stamp}@rakazo.test`],
         auditor: [`role-auditor-${stamp}@rakazo.test`],
       },
       // Board procedures answer 404 before the session check while the board is off.
       ticketBoardEnabled: true,
+      scimBearerToken: scimToken,
       composio: new ComposioConnector({ client: new FakeComposioClient() }),
     });
     pushTokens = new PrismaPushTokenStore(handles.prisma, encryptionKey);
@@ -518,6 +520,8 @@ describeWithDatabase("API authorization and resource isolation", () => {
       ["admin/overview"],
       ["admin/users/list"],
       ["admin/users/endSessions", { userId: "missing-user" }],
+      ["admin/users/deprovision", { userId: "missing-user" }],
+      ["admin/users/reactivate", { userId: "missing-user" }],
       ["admin/bots/list"],
       ["admin/bots/suspend", { botId: "missing-bot" }],
       ["admin/bots/resume", { botId: "missing-bot" }],
@@ -2494,6 +2498,8 @@ describeWithDatabase("API authorization and resource isolation", () => {
       ["admin/overview", {}, ["security", "fleet", "auditor"]],
       ["admin/users/list", {}, ["security", "auditor"]],
       ["admin/users/endSessions", { userId: "missing-user" }, ["security"]],
+      ["admin/users/deprovision", { userId: "missing-user" }, ["security"]],
+      ["admin/users/reactivate", { userId: "missing-user" }, ["security"]],
       ["admin/bots/list", {}, ["security", "auditor"]],
       ["admin/bots/suspend", { botId: "missing-bot" }, ["security"]],
       ["admin/bots/resume", { botId: "missing-bot" }, ["security"]],
@@ -2533,6 +2539,128 @@ describeWithDatabase("API authorization and resource isolation", () => {
       }
       await expectForbidden(app, unverified, procedure, body);
     }
+  });
+
+  it("refuses a deprovisioned account on its next request and at sign-in, and reactivation restores sign-in", async () => {
+    const adminEmail = `offboarding-admin-${stamp}@rakazo.test`;
+    const admin = await signup(app, adminEmail, "Offboarding admin");
+    await db.user.update({ where: { email: adminEmail }, data: { emailVerified: true } });
+    const email = `leaver-${stamp}@rakazo.test`;
+    const leaver = await phoneSession(app, email);
+    const cookieMe = async (cookie: string) => (await raw(app, cookie, "me")).status;
+    const signIn = () =>
+      app.request("/api/auth/sign-in/email", {
+        method: "POST",
+        headers: { "content-type": "application/json", origin: "http://127.0.0.1:5173" },
+        body: JSON.stringify({ email, password: "password12" }),
+      });
+    expect(await cookieMe(leaver.cookie)).toBe(200);
+    expect(await leaver.me()).toBe(200);
+
+    const leaverActor = await rpc<Actor>(app, leaver.cookie, "me");
+    const created = await rpc<Bot>(
+      app,
+      leaver.cookie,
+      "bots/create",
+      botInput("Leaver"),
+      leaverActor.spaceId,
+    );
+    const bot = await db.bot.findUniqueOrThrow({ where: { id: created.id } });
+    const thread = await db.thread.findFirstOrThrow({ where: { botId: bot.id } });
+    const owner = {
+      spaceId: bot.spaceId,
+      botId: bot.id,
+      threadId: thread.id,
+      userId: leaver.userId,
+    };
+    const task = await db.task.create({ data: { ...owner, prompt: "work", status: "queued" } });
+    const run = await db.run.create({
+      data: { ...owner, taskId: task.id, status: "running", trigger: "user" },
+    });
+    const grant = await db.capabilityGrant.create({
+      data: {
+        botId: bot.id,
+        spaceId: bot.spaceId,
+        kind: "delegation",
+        scope: "calendar.read",
+        principalUserId: leaver.userId,
+        createdByUserId: leaver.userId,
+        createdVia: "owner",
+      },
+    });
+
+    const self = await raw(app, admin, "admin/users/deprovision", {
+      userId: (await rpc<Actor>(app, admin, "me")).userId,
+    });
+    expect(self.status).toBe(400);
+    const result = await rpc<Record<string, number>>(app, admin, "admin/users/deprovision", {
+      userId: leaver.userId,
+    });
+    expect(result).toMatchObject({ suspendedBots: 1, cancelledRuns: 1, revokedGrants: 1 });
+
+    // The session that existed before is refused on its next request, by cookie and by bearer.
+    expect(await cookieMe(leaver.cookie)).toBe(401);
+    expect(await leaver.me()).toBe(401);
+    expect((await signIn()).status).toBe(403);
+    expect(await (await signIn()).text()).toContain("ACCOUNT_DEACTIVATED");
+    expect((await db.bot.findUniqueOrThrow({ where: { id: bot.id } })).suspendedAt).not.toBeNull();
+    expect((await db.run.findUniqueOrThrow({ where: { id: run.id } })).status).toBe("cancelled");
+    expect(
+      (await db.capabilityGrant.findUniqueOrThrow({ where: { id: grant.id } })).revokedAt,
+    ).not.toBeNull();
+    const listed = await rpc<{ users: Array<{ id: string; deprovisionedAt: string | null }> }>(
+      app,
+      admin,
+      "admin/users/list",
+      { limit: 100 },
+    );
+    expect(listed.users.find((user) => user.id === leaver.userId)?.deprovisionedAt).not.toBeNull();
+
+    await rpc(app, admin, "admin/users/reactivate", { userId: leaver.userId });
+    const again = await signIn();
+    expect(again.status).toBe(200);
+    const cookie = sessionCookieHeader(again);
+    expect(await cookieMe(cookie)).toBe(200);
+    // Bots stay stopped until an admin resumes them.
+    expect((await db.bot.findUniqueOrThrow({ where: { id: bot.id } })).suspendedAt).not.toBeNull();
+
+    // A flag set without ending the session (a request already in flight, or Easy Auth, which
+    // has no revalidation) still stops the next request.
+    await db.user.update({ where: { id: leaver.userId }, data: { deprovisionedAt: new Date() } });
+    expect(await cookieMe(cookie)).toBe(401);
+    await db.user.update({ where: { id: leaver.userId }, data: { deprovisionedAt: null } });
+    expect(await cookieMe(cookie)).toBe(200);
+
+    // The provisioning endpoint does the same on a bearer token from configuration.
+    const scim = (path: string, init: RequestInit = {}, token = scimToken) =>
+      app.request(`/api/v1/scim/v2${path}`, {
+        ...init,
+        headers: { authorization: `Bearer ${token}`, "content-type": "application/scim+json" },
+      });
+    const filter = encodeURIComponent(`userName eq "${email}"`);
+    const found = (await (await scim(`/Users?filter=${filter}`)).json()) as {
+      Resources: Array<{ id: string; active: boolean }>;
+    };
+    expect(found.Resources).toEqual([expect.objectContaining({ id: leaver.userId, active: true })]);
+    const disable = (token?: string) =>
+      scim(
+        `/Users/${leaver.userId}`,
+        {
+          method: "PATCH",
+          body: JSON.stringify({ Operations: [{ op: "Replace", path: "active", value: "False" }] }),
+        },
+        token,
+      );
+    expect((await disable("wrong-token".padEnd(40, "x"))).status).toBe(401);
+    expect(await cookieMe(cookie)).toBe(200);
+    expect((await disable()).status).toBe(200);
+    expect(await cookieMe(cookie)).toBe(401);
+    expect((await signIn()).status).toBe(403);
+    await scim(`/Users/${leaver.userId}`, {
+      method: "PATCH",
+      body: JSON.stringify({ Operations: [{ op: "Replace", path: "active", value: "True" }] }),
+    });
+    expect((await signIn()).status).toBe(200);
   });
 
   it("denies server administration to every app account, including a stored former owner", async () => {
@@ -2584,6 +2712,8 @@ describeWithDatabase("API authorization and resource isolation", () => {
         employeeId: "missing-employee",
       });
       await expectForbidden(app, cookie, "admin/users/endSessions", { userId: account.userId });
+      await expectForbidden(app, cookie, "admin/users/deprovision", { userId: account.userId });
+      await expectForbidden(app, cookie, "admin/users/reactivate", { userId: account.userId });
       await expectForbidden(app, cookie, "updater/status", {});
       await expectForbidden(app, cookie, "updater/check", {});
       await expectForbidden(app, cookie, "updater/apply", {});
