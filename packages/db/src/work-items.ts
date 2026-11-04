@@ -128,10 +128,21 @@ export async function getTicketWork(
   prisma: PrismaClient,
   spaceId: string,
   ticket: { id: string; status: string },
+  /** Names the assignment only when this person owns it, so the link always opens. */
+  viewerUserId?: string,
 ): Promise<TicketWork> {
-  const { runs, artifacts } = await loadWorkRuns(prisma, spaceId, { ticketId: ticket.id });
+  const [{ runs, artifacts }, assignment] = await Promise.all([
+    loadWorkRuns(prisma, spaceId, { ticketId: ticket.id }),
+    viewerUserId
+      ? prisma.assignment.findFirst({
+          where: { ticketId: ticket.id, spaceId, userId: viewerUserId },
+          select: { id: true },
+        })
+      : null,
+  ]);
   return {
     ticketId: ticket.id,
+    assignmentId: assignment?.id ?? null,
     phase: workPhase(coerceTicketStatus(ticket.status), runs[0]?.status ?? null),
     runs,
     artifacts,

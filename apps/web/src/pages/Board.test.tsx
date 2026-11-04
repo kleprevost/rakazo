@@ -223,6 +223,7 @@ it("shows the runs and files that worked on a ticket", async () => {
   api.tickets.comments.mockResolvedValue([]);
   api.tickets.work.mockResolvedValue({
     ticketId: "ticket-1",
+    assignmentId: "assignment-1",
     phase: "waiting",
     runs: [
       { id: "run-2", status: "waiting_input", createdAt: "2026-10-10T10:00:00Z" },
@@ -244,7 +245,10 @@ it("shows the runs and files that worked on a ticket", async () => {
       "Waiting",
       "Failed",
     ]);
-    expect(work.querySelector("a")?.getAttribute("href")).toBe("/app/artifacts/artifact-1");
+    expect([...work.querySelectorAll("a")].map((link) => link.getAttribute("href"))).toEqual([
+      "/app/a/assignment-1",
+      "/app/artifacts/artifact-1",
+    ]);
   } finally {
     await page.cleanup();
   }

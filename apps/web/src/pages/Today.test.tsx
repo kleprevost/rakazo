@@ -30,7 +30,7 @@ vi.mock("../components/PageLoading", () => ({
 
 import { TodayPage } from "./Today";
 
-const bot = { botId: "bot-1", botName: "Maya", groupId: null };
+const bot = { botId: "bot-1", botName: "Maya", groupId: null, assignmentId: null };
 const at = new Date().toISOString();
 const empty: TodaySummary = {
   generatedAt: at,
@@ -58,6 +58,7 @@ const populated: TodaySummary = {
     {
       ...bot,
       kind: "question",
+      assignmentId: "assignment-1",
       key: "ask:m2",
       runId: "run-q",
       title: "Plan",
@@ -118,6 +119,7 @@ const populated: TodaySummary = {
       ref: "RAK-2",
       title: "Audit vendor list",
       phase: "review",
+      assignmentId: "assignment-1",
       botId: null,
       botName: null,
       at,
@@ -202,6 +204,9 @@ it("lists every section with links to the work behind each row", async () => {
   expect(hrefs).toContain("/app/g/group-1");
   expect(hrefs).toContain("/app/artifacts/artifact-1");
   expect(hrefs).toContain("/app/board?ticket=t1");
+  // An attention row and a work row of one assignment open the same page, not the chat or board.
+  expect(hrefs).toContain("/app/a/assignment-1");
+  expect(hrefs).not.toContain("/app/board?ticket=t2");
   expect(container.textContent).toContain("Draft the board deck");
   expect(container.textContent).toContain("Send the email to Dana?");
   expect(container.textContent).toContain("504: request timed out");

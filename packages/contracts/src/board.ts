@@ -216,6 +216,8 @@ export type WorkArtifact = z.infer<typeof WorkArtifactSchema>;
 
 export const TicketWorkSchema = z.object({
   ticketId: Id,
+  /** The ticket's assignment, when it has one. */
+  assignmentId: Id.nullable(),
   phase: WorkPhaseSchema,
   runs: z.array(WorkRunSchema),
   artifacts: z.array(WorkArtifactSchema),

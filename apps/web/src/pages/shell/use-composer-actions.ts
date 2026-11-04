@@ -50,6 +50,7 @@ export function useComposerActions({
   rpc,
   pageSession,
   activeId,
+  assignmentId,
   inGroup,
   groupId,
   activeBotId,
@@ -72,6 +73,8 @@ export function useComposerActions({
   /** The chat's open page, whose card a message sent from it replies to. */
   pageSession: PageSession;
   activeId: string | undefined;
+  /** Set on an assignment's page: sends, answers and stops address that assignment's thread. */
+  assignmentId?: string;
   inGroup: boolean;
   groupId: string | undefined;
   activeBotId: RefObject<string | undefined>;
@@ -219,7 +222,7 @@ export function useComposerActions({
       if (!botId && !groupId) return;
       clearReadBoundary();
       await rpc.threads.answer({
-        ...(groupId ? { groupId } : { botId: botId! }),
+        ...(groupId ? { groupId } : assignmentId ? { assignmentId } : { botId: botId! }),
         runId: message.runId ?? "",
         messageId: message.id,
         answer: text,
@@ -245,7 +248,7 @@ export function useComposerActions({
       if (!botId && !groupId) return;
       try {
         const result = await rpc.threads.react({
-          ...(groupId ? { groupId } : { botId: botId! }),
+          ...(groupId ? { groupId } : assignmentId ? { assignmentId } : { botId: botId! }),
           messageId: message.id,
           reaction,
           clientNonce: newClientId(),
@@ -371,7 +374,11 @@ export function useComposerActions({
         if (!plan.shouldSend) {
           if (plan.shouldRunRoutines) {
             await rpc.threads.sendWithRoutines({
-              ...(groupTarget ? { groupId: groupTarget } : { botId: botTarget! }),
+              ...(groupTarget
+                ? { groupId: groupTarget }
+                : assignmentId
+                  ? { assignmentId }
+                  : { botId: botTarget! }),
               clientNonce,
               routineIds: plan.routineIds,
             });
@@ -420,7 +427,11 @@ export function useComposerActions({
           artifactIds.push(artifact.id);
         }
         const payload = {
-          ...(groupTarget ? { groupId: groupTarget } : { botId: botTarget! }),
+          ...(groupTarget
+            ? { groupId: groupTarget }
+            : assignmentId
+              ? { assignmentId }
+              : { botId: botTarget! }),
           clientNonce,
           imageHandling: imageHandling ?? "confirm",
           text: trimmed || undefined,
@@ -538,7 +549,7 @@ export function useComposerActions({
       if (!botTarget) return;
       setSendError(null);
       try {
-        await rpc.threads.stop({ botId: botTarget });
+        await rpc.threads.stop(assignmentId ? { assignmentId } : { botId: botTarget });
       } catch (error) {
         if (activeBotId.current === botTarget) {
           setSendError(errorText(error, t`Failed to stop`));

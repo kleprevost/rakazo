@@ -532,6 +532,7 @@ msgstr "{0} 的操作"
 msgid "Actions for space"
 msgstr "空間操作"
 
+#: src/components/assignments/AssignmentsList.tsx
 #: src/pages/BillingSettingsPanel.tsx
 #: src/pages/RoutineEditor.tsx
 msgid "Active"
@@ -983,6 +984,7 @@ msgstr ""
 msgid "Apps"
 msgstr ""
 
+#: src/pages/Assignment.tsx
 #: src/pages/BotContextMenu.tsx
 msgid "Archive"
 msgstr "封存"
@@ -991,7 +993,9 @@ msgstr "封存"
 msgid "archived"
 msgstr "已封存"
 
+#: src/components/assignments/AssignmentsList.tsx
 #: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/Assignment.tsx
 #: src/pages/shell/archived-chats.tsx
 msgid "Archived"
 msgstr "已封存"
@@ -1019,6 +1023,10 @@ msgstr ""
 #: src/pages/shell/computer-panel.tsx
 msgid "Asleep"
 msgstr "休眠中"
+
+#: src/pages/shell/bot-panel.tsx
+msgid "Assignments"
+msgstr ""
 
 #. placeholder {0}: preset.time
 #: src/lib/cron.ts
@@ -1111,6 +1119,7 @@ msgstr "頭像工作室"
 #: src/components/integrations/skills-dialog.tsx
 #: src/components/vault/VaultPageHeader.tsx
 #: src/pages/admin/AdminShell.tsx
+#: src/pages/Assignment.tsx
 #: src/pages/Auth.tsx
 #: src/pages/Board.tsx
 #: src/pages/Calendar.tsx
@@ -1333,6 +1342,7 @@ msgstr "無法讀取影像"
 #: src/pages/AccountSettingsOverlay.tsx
 #: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/Artifacts.tsx
+#: src/pages/Assignment.tsx
 #: src/pages/KnowledgeSection.tsx
 #: src/pages/McpServersOverlay.tsx
 #: src/pages/model-settings/connection-controls.tsx
@@ -2059,6 +2069,7 @@ msgid "Could not clear conversation"
 msgstr "無法清空對話"
 
 #: src/components/ComputerUpdateProgress.tsx
+#: src/pages/Assignment.tsx
 #: src/pages/Calendar.tsx
 #: src/pages/Employees.tsx
 #: src/pages/Today.tsx
@@ -4486,6 +4497,7 @@ msgstr "每月額度"
 msgid "Monthly credits expire at renewal. Top-ups do not expire."
 msgstr "每月額度在續訂時到期。單次加值額度不會過期。"
 
+#: src/pages/Assignment.tsx
 #: src/pages/PluginsOverlay.tsx
 #: src/pages/shell/message-hover-actions.tsx
 msgid "More"
@@ -4999,6 +5011,7 @@ msgstr "僅限自己"
 #: src/components/markdown-link-prompt.tsx
 #: src/components/pages/PagesList.tsx
 #: src/pages/admin/AdminComputersPage.tsx
+#: src/pages/Board.tsx
 #: src/pages/PaymentWalletSettingsPanel.tsx
 #: src/pages/shell/computer-panel.tsx
 #: src/pages/shell/import-setup-card.tsx
@@ -5477,6 +5490,7 @@ msgstr "已被你的組織隔離"
 
 #: src/pages/ActivityList.tsx
 #: src/pages/admin/AdminFleetOperations.tsx
+#: src/pages/Assignment.tsx
 msgid "Queued"
 msgstr "排隊中"
 
@@ -5903,6 +5917,7 @@ msgid "Restarts"
 msgstr ""
 
 #: src/components/InstructionSettings.tsx
+#: src/pages/Assignment.tsx
 #: src/pages/shell/archived-chats.tsx
 msgid "Restore"
 msgstr "還原"
@@ -6443,6 +6458,7 @@ msgstr "顯示機器人"
 msgid "Show list"
 msgstr "顯示清單"
 
+#: src/components/assignments/AssignmentsList.tsx
 #: src/components/pages/PagesList.tsx
 #: src/pages/KnowledgeSection.tsx
 #: src/pages/PluginsOverlay.tsx

@@ -58,7 +58,7 @@ function loadRuns(
       task: { select: { prompt: true } },
       routine: { select: { name: true } },
       sourceMessage: { select: { blocks: true } },
-      thread: { select: { groupId: true } },
+      thread: { select: { groupId: true, assignment: { select: { id: true } } } },
     },
     orderBy: [{ [order]: "desc" }, { id: "desc" }],
     take,
@@ -71,6 +71,7 @@ function runBase(row: RunRow) {
     botId: row.botId,
     botName: row.bot.name,
     groupId: row.thread.groupId,
+    assignmentId: row.thread.assignment?.id ?? null,
   };
 }
 
@@ -282,6 +283,17 @@ async function workItems(prisma: PrismaClient, actor: Actor): Promise<TodayWorkI
       })
     : [];
   const names = new Map(bots.map((bot) => [bot.id, bot.name]));
+  const assignments = shown.length
+    ? await prisma.assignment.findMany({
+        where: {
+          spaceId: actor.spaceId,
+          userId: actor.userId,
+          ticketId: { in: shown.map((item) => item.id) },
+        },
+        select: { id: true, ticketId: true },
+      })
+    : [];
+  const assignmentOf = new Map(assignments.map((row) => [row.ticketId, row.id]));
   return shown.flatMap((item) =>
     item.phase === "running" ||
     item.phase === "waiting" ||
@@ -293,6 +305,7 @@ async function workItems(prisma: PrismaClient, actor: Actor): Promise<TodayWorkI
             ref: item.ref,
             title: item.title,
             phase: item.phase,
+            assignmentId: assignmentOf.get(item.id) ?? null,
             botId: item.assigneeBotId && names.has(item.assigneeBotId) ? item.assigneeBotId : null,
             botName: (item.assigneeBotId && names.get(item.assigneeBotId)) || null,
             at: item.updatedAt,

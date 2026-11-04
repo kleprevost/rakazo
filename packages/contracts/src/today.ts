@@ -30,6 +30,8 @@ export const TodayRunSchema = TodayBotRef.extend({
   /** The routine's name for a routine run, otherwise a one-line snippet of what was asked. */
   title: z.string(),
   routineId: Id.nullable(),
+  /** Set when the run belongs to an assignment; the link then opens that assignment. */
+  assignmentId: Id.nullable(),
   /** When the run last changed; for a finished run, when it finished. */
   at: IsoDate,
   artifacts: z.array(TodayArtifactSchema),
@@ -40,6 +42,7 @@ const AttentionBase = TodayBotRef.extend({
   /** Stable per item, so a list keeps its rows when the data refreshes. */
   key: z.string(),
   runId: Id,
+  assignmentId: Id.nullable(),
   title: z.string(),
   at: IsoDate,
 });
@@ -98,6 +101,8 @@ export const TodayWorkItemSchema = z.object({
   ref: z.string(),
   title: z.string(),
   phase: TodayWorkPhaseSchema,
+  /** The ticket's assignment, when it has one; the link then opens that assignment. */
+  assignmentId: Id.nullable(),
   /** The assignee when it is one of the user's own bots; never another person's bot. */
   botId: Id.nullable(),
   botName: z.string().nullable(),

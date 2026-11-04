@@ -41,6 +41,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Download, Settings, X } from "lucide-react";
 import type { ReactNode } from "react";
 import { Suspense, useEffect, useId, useRef, useState } from "react";
+import { AssignmentsList, useAnyAssignments } from "../../components/assignments/AssignmentsList";
 import { BotAccess } from "../../components/capabilities/BotAccess";
 import { ErrorBoundary, SectionLoadFailed } from "../../components/ErrorBoundary";
 import { InstructionSettings } from "../../components/InstructionSettings";
@@ -101,9 +102,9 @@ export function ComputerModePicker({
   );
 }
 
-export type BotPanelTab = "computer" | "routines" | "pages" | "settings";
+export type BotPanelTab = "computer" | "routines" | "pages" | "assignments" | "settings";
 
-/** A bot's profile above its Computer, Routines, Pages and Advanced tabs. */
+/** A bot's profile above its Computer, Routines, Pages, Assignments and Advanced tabs. */
 export function BotSettings({
   bot,
   tab = "settings",
@@ -151,6 +152,7 @@ export function BotSettings({
 }) {
   const { t } = useLingui();
   const ids = useId();
+  const hasAssignments = useAnyAssignments(bot.id);
   const modelRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (focusModel && tab === "settings") {
@@ -564,6 +566,11 @@ export function BotSettings({
           <TabsTrigger value="pages">
             <Trans>Pages</Trans>
           </TabsTrigger>
+          {hasAssignments || tab === "assignments" ? (
+            <TabsTrigger value="assignments">
+              <Trans>Assignments</Trans>
+            </TabsTrigger>
+          ) : null}
           <TabsTrigger value="settings">
             <Trans>Advanced</Trans>
           </TabsTrigger>
@@ -576,6 +583,9 @@ export function BotSettings({
         </TabsContent>
         <TabsContent value="pages" className="pt-4">
           {tab === "pages" ? <PagesList botId={bot.id} /> : null}
+        </TabsContent>
+        <TabsContent value="assignments" className="pt-4">
+          {tab === "assignments" ? <AssignmentsList botId={bot.id} /> : null}
         </TabsContent>
         {/* Stays mounted so scratchpad and knowledge drafts survive a tab switch. */}
         <TabsContent value="settings" keepMounted data-testid="bot-settings-advanced">

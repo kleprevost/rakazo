@@ -215,7 +215,7 @@ export function boardsRoutes(ctx: RouterContext) {
           id: input.ticketId,
         });
         if (!ticket) throw new IsolationError();
-        return getTicketWork(deps.prisma, context.actor.spaceId, ticket);
+        return getTicketWork(deps.prisma, context.actor.spaceId, ticket, context.actor.userId);
       }),
       comments: boardEnabled.tickets.comments.handler(async ({ context, input }) => {
         const board = await ensureBoard(deps.prisma, context.actor.spaceId);

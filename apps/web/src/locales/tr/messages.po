@@ -531,6 +531,7 @@ msgstr "{0} için işlemler"
 msgid "Actions for space"
 msgstr ""
 
+#: src/components/assignments/AssignmentsList.tsx
 #: src/pages/BillingSettingsPanel.tsx
 #: src/pages/RoutineEditor.tsx
 msgid "Active"
@@ -982,6 +983,7 @@ msgstr ""
 msgid "Apps"
 msgstr ""
 
+#: src/pages/Assignment.tsx
 #: src/pages/BotContextMenu.tsx
 msgid "Archive"
 msgstr "Arşivle"
@@ -990,7 +992,9 @@ msgstr "Arşivle"
 msgid "archived"
 msgstr "arşivlendi"
 
+#: src/components/assignments/AssignmentsList.tsx
 #: src/pages/admin/AdminBotsPage.tsx
+#: src/pages/Assignment.tsx
 #: src/pages/shell/archived-chats.tsx
 msgid "Archived"
 msgstr "Arşivlendi"
@@ -1018,6 +1022,10 @@ msgstr ""
 #: src/pages/shell/computer-panel.tsx
 msgid "Asleep"
 msgstr "Uykuda"
+
+#: src/pages/shell/bot-panel.tsx
+msgid "Assignments"
+msgstr ""
 
 #. placeholder {0}: preset.time
 #: src/lib/cron.ts
@@ -1110,6 +1118,7 @@ msgstr "Avatar Stüdyosu"
 #: src/components/integrations/skills-dialog.tsx
 #: src/components/vault/VaultPageHeader.tsx
 #: src/pages/admin/AdminShell.tsx
+#: src/pages/Assignment.tsx
 #: src/pages/Auth.tsx
 #: src/pages/Board.tsx
 #: src/pages/Calendar.tsx
@@ -1332,6 +1341,7 @@ msgstr "Görselleri okuyamaz"
 #: src/pages/AccountSettingsOverlay.tsx
 #: src/pages/admin/AdminComputersPage.tsx
 #: src/pages/Artifacts.tsx
+#: src/pages/Assignment.tsx
 #: src/pages/KnowledgeSection.tsx
 #: src/pages/McpServersOverlay.tsx
 #: src/pages/model-settings/connection-controls.tsx
@@ -2058,6 +2068,7 @@ msgid "Could not clear conversation"
 msgstr "Sohbet temizlenemedi"
 
 #: src/components/ComputerUpdateProgress.tsx
+#: src/pages/Assignment.tsx
 #: src/pages/Calendar.tsx
 #: src/pages/Employees.tsx
 #: src/pages/Today.tsx
@@ -4485,6 +4496,7 @@ msgstr ""
 msgid "Monthly credits expire at renewal. Top-ups do not expire."
 msgstr ""
 
+#: src/pages/Assignment.tsx
 #: src/pages/PluginsOverlay.tsx
 #: src/pages/shell/message-hover-actions.tsx
 msgid "More"
@@ -4998,6 +5010,7 @@ msgstr "Yalnızca siz"
 #: src/components/markdown-link-prompt.tsx
 #: src/components/pages/PagesList.tsx
 #: src/pages/admin/AdminComputersPage.tsx
+#: src/pages/Board.tsx
 #: src/pages/PaymentWalletSettingsPanel.tsx
 #: src/pages/shell/computer-panel.tsx
 #: src/pages/shell/import-setup-card.tsx
@@ -5476,6 +5489,7 @@ msgstr "Kuruluşunuz tarafından karantinaya alındı"
 
 #: src/pages/ActivityList.tsx
 #: src/pages/admin/AdminFleetOperations.tsx
+#: src/pages/Assignment.tsx
 msgid "Queued"
 msgstr "Kuyrukta"
 
@@ -5902,6 +5916,7 @@ msgid "Restarts"
 msgstr ""
 
 #: src/components/InstructionSettings.tsx
+#: src/pages/Assignment.tsx
 #: src/pages/shell/archived-chats.tsx
 msgid "Restore"
 msgstr "Geri yükle"
@@ -6442,6 +6457,7 @@ msgstr ""
 msgid "Show list"
 msgstr ""
 
+#: src/components/assignments/AssignmentsList.tsx
 #: src/components/pages/PagesList.tsx
 #: src/pages/KnowledgeSection.tsx
 #: src/pages/PluginsOverlay.tsx

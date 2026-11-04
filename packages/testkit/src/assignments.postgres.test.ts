@@ -248,6 +248,264 @@ describeWithDatabase("independent assignments on one employee", () => {
     expect(await db.assignment.count({ where: { clientNonce: `third-${stamp}` } })).toBe(0);
   });
 
+  const steer = (
+    assignment: Created,
+    instruction: string,
+    nonce = `${instruction}-${Math.random()}`,
+  ) =>
+    rpc<{ messageId: string; runId: string }>(app, cookie, "assignments/steer", {
+      assignmentId: assignment.id,
+      text: instruction,
+      clientNonce: nonce,
+    });
+  const steeringFor = (assignment: Created) =>
+    db.steeringMessage.findMany({ where: { message: { threadId: assignment.threadId } } });
+
+  it("queues an instruction for one job only and leaves the other job's instructions intact", async () => {
+    const a = await create(HANG);
+    const b = await create(HANG);
+    await until(
+      async () =>
+        ACTIVE_RUN_STATUSES.includes((await statusOf(a)) as never) &&
+        ACTIVE_RUN_STATUSES.includes((await statusOf(b)) as never),
+    );
+    const runA = (await runsOf(a))[0]!.id;
+    const runB = (await runsOf(b))[0]!.id;
+    const forB = await steer(b, `for-b-${stamp}`);
+    const forA = await steer(a, `for-a-${stamp}`);
+    expect(forA.runId).toBe(runA);
+    expect(forB.runId).toBe(runB);
+
+    const rowsA = await steeringFor(a);
+    const rowsB = await steeringFor(b);
+    expect(rowsA.map((row) => row.messageId)).toEqual([forA.messageId]);
+    expect(rowsB.map((row) => row.messageId)).toEqual([forB.messageId]);
+
+    // Each instruction is in its own conversation only.
+    const snapA = await rpc<Snap>(app, cookie, "threads/get", { assignmentId: a.id });
+    const snapB = await rpc<Snap>(app, cookie, "threads/get", { assignmentId: b.id });
+    const primary = await rpc<Snap>(app, cookie, "threads/get", { botId });
+    expect(text(snapA)).toContain(`for-a-${stamp}`);
+    expect(text(snapA)).not.toContain(`for-b-${stamp}`);
+    expect(text(snapB)).toContain(`for-b-${stamp}`);
+    expect(text(snapB)).not.toContain(`for-a-${stamp}`);
+    expect(text(primary)).not.toContain(`for-a-${stamp}`);
+    expect(text(primary)).not.toContain(`for-b-${stamp}`);
+
+    // Stopping A does not drop B's instruction or end B's run.
+    await rpc(app, cookie, "threads/stop", { assignmentId: a.id });
+    await until(async () => (await statusOf(a)) === "cancelled");
+    expect(ACTIVE_RUN_STATUSES.includes((await statusOf(b)) as never)).toBe(true);
+    expect((await steeringFor(b)).map((row) => row.messageId)).toEqual([forB.messageId]);
+    await rpc(app, cookie, "threads/stop", { assignmentId: b.id });
+  });
+
+  it("holds an instruction for a job waiting on a question until the question is answered", async () => {
+    const asking = await create(ASK);
+    await until(async () => (await statusOf(asking)) === "waiting_input");
+    const runId = (await runsOf(asking))[0]!.id;
+    const queued = await steer(asking, `also-weather-${stamp}`);
+    expect(queued.runId).toBe(runId);
+    // The text is not taken as the answer: the run still waits and the instruction is pending.
+    expect(await statusOf(asking)).toBe("waiting_input");
+    const [row] = await steeringFor(asking);
+    expect(row).toMatchObject({ messageId: queued.messageId, runId, claimedAt: null });
+
+    const waiting = await rpc<Snap>(app, cookie, "threads/get", { assignmentId: asking.id });
+    const card = waiting.messages.find((message) =>
+      message.blocks.some((block) => block.kind === "ask"),
+    );
+    await rpc(app, cookie, "threads/answer", {
+      assignmentId: asking.id,
+      runId,
+      messageId: card!.id,
+      answer: "Paris",
+    });
+    await until(
+      async () =>
+        !ACTIVE_RUN_STATUSES.includes((await statusOf(asking)) as never) &&
+        (await db.steeringMessage.count({
+          where: { message: { threadId: asking.threadId }, claimedAt: null },
+        })) === 0,
+    );
+  });
+
+  it("answers a repeated instruction with the first one", async () => {
+    const job = await create(HANG);
+    await until(async () => ACTIVE_RUN_STATUSES.includes((await statusOf(job)) as never));
+    const first = await steer(job, "tighten the summary", `steer-${stamp}`);
+    const again = await steer(job, "tighten the summary", `steer-${stamp}`);
+    expect(again).toEqual(first);
+    expect(await steeringFor(job)).toHaveLength(1);
+    expect(
+      await db.message.count({ where: { threadId: job.threadId, clientNonce: `steer-${stamp}` } }),
+    ).toBe(1);
+    await rpc(app, cookie, "threads/stop", { assignmentId: job.id });
+  });
+
+  it("starts one continuation when nothing is running, and refuses a stopped or archived job", async () => {
+    const job = await create("say hello");
+    await until(async () => (await statusOf(job)) === "completed");
+    const queued = await steer(job, "now say goodbye");
+    const run = await db.run.findUniqueOrThrow({ where: { id: queued.runId } });
+    expect(run.threadId).toBe(job.threadId);
+    expect(run.trigger).toBe("follow_up");
+    expect(await db.run.count({ where: { threadId: primaryThreadId, id: run.id } })).toBe(0);
+    await until(async () => (await statusOf(job)) === "completed");
+
+    await db.assignment.update({ where: { id: job.id }, data: { archivedAt: new Date() } });
+    const archived = await raw(app, cookie, "assignments/steer", {
+      assignmentId: job.id,
+      text: "again",
+      clientNonce: `again-${stamp}`,
+    });
+    expect(archived.status).toBe(409);
+    await db.assignment.update({
+      where: { id: job.id },
+      data: { archivedAt: null, cancelledAt: new Date() },
+    });
+    const stopped = await raw(app, cookie, "assignments/steer", {
+      assignmentId: job.id,
+      text: "again",
+      clientNonce: `again2-${stamp}`,
+    });
+    expect(stopped.status).toBe(409);
+  });
+
+  it("refuses an instruction for another person's job", async () => {
+    const job = await create(HANG);
+    const other = await signup(app, `assign-steer-${stamp}@rakazo.test`);
+    const res = await raw(app, other, "assignments/steer", {
+      assignmentId: job.id,
+      text: "take over",
+      clientNonce: `other-${stamp}`,
+    });
+    expect(res.status).toBeGreaterThanOrEqual(400);
+    expect(await steeringFor(job)).toHaveLength(0);
+    await rpc(app, cookie, "threads/stop", { assignmentId: job.id });
+  });
+
+  type Row = {
+    id: string;
+    phase: string;
+    cancelledAt: string | null;
+    archivedAt: string | null;
+    runs?: Array<{ id: string; status: string }>;
+    artifacts?: unknown[];
+  };
+  const get = (assignment: Created) =>
+    rpc<Row>(app, cookie, "assignments/get", { assignmentId: assignment.id });
+  const listed = async (state: "active" | "archived") =>
+    (
+      await rpc<{ items: Array<{ id: string }> }>(app, cookie, "assignments/list", {
+        botId,
+        state,
+        limit: 100,
+      })
+    ).items.map((item) => item.id);
+  const live = (assignment: Created) =>
+    statusOf(assignment).then((status) => ACTIVE_RUN_STATUSES.includes(status as never));
+
+  it("cancels one job's live runs and leaves the other job working", async () => {
+    const a = await create(HANG);
+    const b = await create(HANG);
+    await until(async () => (await live(a)) && (await live(b)));
+    const cancelled = await rpc<Row>(app, cookie, "assignments/cancel", { assignmentId: a.id });
+    expect(cancelled.phase).toBe("cancelled");
+    expect(cancelled.cancelledAt).not.toBeNull();
+    await until(async () => (await statusOf(a)) === "cancelled");
+    expect(await live(b)).toBe(true);
+    expect((await get(b)).cancelledAt).toBeNull();
+
+    // Two racing cancels end in one state: the first mark stays.
+    const first = (await get(a)).cancelledAt;
+    await Promise.all([
+      rpc(app, cookie, "assignments/cancel", { assignmentId: a.id }),
+      rpc(app, cookie, "assignments/cancel", { assignmentId: a.id }),
+    ]);
+    expect((await get(a)).cancelledAt).toBe(first);
+    await rpc(app, cookie, "threads/stop", { assignmentId: b.id });
+  });
+
+  it("refuses to archive a job with a live run, then archives and restores it keeping its data", async () => {
+    const job = await create(HANG);
+    await until(() => live(job));
+    const refused = await raw(app, cookie, "assignments/archive", { assignmentId: job.id });
+    expect(refused.status).toBe(409);
+    expect((await get(job)).archivedAt).toBeNull();
+
+    await rpc(app, cookie, "assignments/cancel", { assignmentId: job.id });
+    await until(async () => (await statusOf(job)) === "cancelled");
+    expect(await listed("active")).toContain(job.id);
+
+    const archived = await rpc<Row>(app, cookie, "assignments/archive", { assignmentId: job.id });
+    expect(archived.archivedAt).not.toBeNull();
+    expect(await listed("active")).not.toContain(job.id);
+    expect(await listed("archived")).toContain(job.id);
+    // Transcript, runs and files stay.
+    const kept = await get(job);
+    expect(kept.runs).toHaveLength(1);
+    expect(text(await rpc<Snap>(app, cookie, "threads/get", { assignmentId: job.id }))).toContain(
+      HANG,
+    );
+
+    // Two racing archives end in one state.
+    await Promise.all([
+      rpc(app, cookie, "assignments/archive", { assignmentId: job.id }),
+      rpc(app, cookie, "assignments/archive", { assignmentId: job.id }),
+    ]);
+    expect((await get(job)).archivedAt).toBe(archived.archivedAt);
+
+    const restored = await rpc<Row>(app, cookie, "assignments/unarchive", { assignmentId: job.id });
+    expect(restored.archivedAt).toBeNull();
+    expect(await listed("active")).toContain(job.id);
+  });
+
+  it("resumes a stopped job with a new run in the same thread", async () => {
+    const job = await create(HANG);
+    await until(() => live(job));
+    await rpc(app, cookie, "assignments/cancel", { assignmentId: job.id });
+    await until(async () => (await statusOf(job)) === "cancelled");
+    const before = (await runsOf(job)).map((run) => run.id);
+
+    const sent = await rpc<{ runId: string }>(app, cookie, "threads/send", {
+      assignmentId: job.id,
+      text: "say hello again",
+      clientNonce: `resume-${stamp}`,
+    });
+    expect(before).not.toContain(sent.runId);
+    const row = await db.run.findUniqueOrThrow({ where: { id: sent.runId } });
+    expect(row.threadId).toBe(job.threadId);
+    const resumed = await get(job);
+    expect(resumed.cancelledAt).toBeNull();
+    expect(resumed.runs?.map((run) => run.id)).toEqual(
+      expect.arrayContaining([...before, sent.runId]),
+    );
+    await until(async () => (await statusOf(job)) === "completed");
+
+    // A message to an archived job brings it back.
+    await rpc(app, cookie, "assignments/archive", { assignmentId: job.id });
+    await rpc(app, cookie, "threads/send", {
+      assignmentId: job.id,
+      text: "and once more",
+      clientNonce: `resume2-${stamp}`,
+    });
+    expect((await get(job)).archivedAt).toBeNull();
+    await until(async () => (await statusOf(job)) === "completed");
+  });
+
+  it("refuses to cancel or archive another person's job", async () => {
+    const job = await create("say hello");
+    const other = await signup(app, `assign-cancel-${stamp}@rakazo.test`);
+    for (const action of ["cancel", "archive", "unarchive"]) {
+      const res = await raw(app, other, `assignments/${action}`, { assignmentId: job.id });
+      expect(res.status).toBeGreaterThanOrEqual(400);
+    }
+    const row = await get(job);
+    expect(row.cancelledAt).toBeNull();
+    expect(row.archivedAt).toBeNull();
+  });
+
   it("wakes a ticket's employee in the ticket's own assignment, without the board needing a job first", async () => {
     const ticket = await rpc<{ id: string }>(app, cookie, "tickets/create", {
       title: "Tidy the notes",

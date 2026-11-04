@@ -6,6 +6,7 @@ import { exportContent } from "./content-export.js";
 import { provisionMessagingIdentity } from "./messaging.js";
 import { asSystem, runAsSystem, runAsTenant } from "./row-security.js";
 import { IsolationError } from "./scope.js";
+import { getTicketWork } from "./work-items.js";
 
 const databaseUrl = process.env.DATABASE_URL;
 const describePostgres =
@@ -229,6 +230,21 @@ describePostgres("assignments (PostgreSQL)", () => {
       failed: "failed",
       fresh: "ready",
     });
+  });
+
+  it("names a ticket's assignment in its work only to the person who owns it", async () => {
+    const job = await assignment(creator, { ticketStatus: "doing", runs: ["running"] });
+    const ticket = { id: job.row.ticketId!, status: "doing" };
+    const own = await asCreator(() =>
+      getTicketWork(prisma, creator.spaceId, ticket, creator.userId),
+    );
+    expect(own.assignmentId).toBe(job.row.id);
+    const other = await asCreator(() =>
+      getTicketWork(prisma, creator.spaceId, ticket, collaborator.userId),
+    );
+    expect(other.assignmentId).toBeNull();
+    const none = await asCreator(() => getTicketWork(prisma, creator.spaceId, ticket));
+    expect(none.assignmentId).toBeNull();
   });
 
   it("lists active and archived assignments in pages, filtered by employee", async () => {

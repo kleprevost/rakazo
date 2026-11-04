@@ -19,6 +19,7 @@ vi.mock("../../lib/rpc", () => {
       list: vi.fn().mockResolvedValue([]),
     },
     me: vi.fn().mockResolvedValue(null),
+    assignments: { list: vi.fn().mockResolvedValue({ items: [], nextCursor: null }) },
   };
   return {
     rpc,
@@ -251,6 +252,31 @@ afterEach(async () => {
   queryClient.clear();
   container.remove();
   vi.unstubAllGlobals();
+});
+
+it("offers the Assignments tab only once the employee has an assignment", async () => {
+  await render();
+  expect(container.textContent).not.toContain("Assignments");
+  vi.mocked(rpc.assignments.list).mockResolvedValueOnce({
+    items: [
+      {
+        id: "assignment-1",
+        botId: "bot-1",
+        threadId: "thread-2",
+        ticketId: null,
+        title: "Plan the offsite",
+        phase: "running",
+        cancelledAt: null,
+        archivedAt: null,
+        createdAt: "2026-09-01T00:00:00.000Z",
+        updatedAt: "2026-09-01T00:00:00.000Z",
+      },
+    ],
+    nextCursor: null,
+  });
+  queryClient.clear();
+  await render();
+  expect(container.textContent).toContain("Assignments");
 });
 
 it("shows the profile and the Advanced tab's controls", async () => {

@@ -26,6 +26,7 @@ import { skipToken, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ChevronLeft } from "lucide-react";
 import { useEffect, useId, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
+import { assignmentPath } from "../lib/assignment-path";
 import { useSpaceQueries } from "../lib/query";
 import { formatRelativeTime } from "../lib/relative-time";
 import { rpc } from "../lib/rpc";
@@ -377,7 +378,14 @@ function TicketDialog({
         </form>
         {work && work.runs.length > 0 ? (
           <div data-testid="ticket-work" className="space-y-2 border-t pt-3 text-sm">
-            <h3 className="font-medium">{phases[work.phase]}</h3>
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="font-medium">{phases[work.phase]}</h3>
+              {work.assignmentId ? (
+                <Link to={assignmentPath(work.assignmentId)} className="underline">
+                  <Trans>Open</Trans>
+                </Link>
+              ) : null}
+            </div>
             <ul className="space-y-1 text-xs text-muted-foreground">
               {work.runs.map((run) => (
                 <li key={run.id} className="flex justify-between gap-3">

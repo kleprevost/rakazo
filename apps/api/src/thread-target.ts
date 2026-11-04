@@ -37,6 +37,7 @@ import {
   appendEventInTransaction,
   clearEndedRunState,
   createGroupRepos,
+  createPendingSteeringRun,
   createRepos,
   createThreadMessageInTransaction,
   eligibleWaitingTextAnswer,
@@ -1259,6 +1260,86 @@ export async function sendThreadMessage(
   }
   await enqueueRunsNeedingContinue(deps.jobs, [...committed.routineRuns, ...committed.runs]);
   return sendResult(committed.message, committed.runs);
+}
+
+/**
+ * Queues an instruction for the work in one thread. It is a message in that thread and a pending
+ * steering row, so the thread's live run reads it on its next turn, and no other thread is
+ * touched. A run paused on a question or approval keeps it until the answer resumes the run: the
+ * text is never taken as that answer. With nothing live, one continuation starts for it. A repeated
+ * nonce returns the first answer.
+ */
+export async function steerThreadMessage(
+  deps: { prisma: PrismaClient; events: ThreadEvents; jobs: JobPublisher },
+  actor: Actor,
+  target: Extract<ThreadTarget, { kind: "bot" }>,
+  input: { text: string; clientNonce: string },
+): Promise<{ messageId: string; runId: string }> {
+  const { threadId, botId } = target;
+  const committed = await deps.prisma.$transaction(async (tx) => {
+    await tx.$queryRaw`SELECT id FROM threads WHERE id = ${threadId} FOR UPDATE`;
+    const existing = await tx.message.findUnique({
+      where: { threadId_clientNonce: { threadId, clientNonce: input.clientNonce } },
+      select: { id: true, runId: true },
+    });
+    if (existing?.runId)
+      return { messageId: existing.id, runId: existing.runId, fresh: false as const };
+    const live = await tx.run.findMany({
+      where: { threadId, botId, status: { in: [...ACTIVE_RUN_STATUSES] } },
+      select: { id: true, status: true, trigger: true },
+      orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+    });
+    // The creation intro reads no steering; a paused run reads it once it resumes.
+    const readers = live.filter((run) => run.trigger !== "created");
+    const reader = readers.find((run) => run.status !== "waiting_input") ?? readers[0];
+    const blocks = buildUserMessageBlocks(input.text, []);
+    const message = await createThreadMessageInTransaction(tx, {
+      threadId,
+      role: "user",
+      blocks,
+      clientNonce: input.clientNonce,
+    });
+    await tx.steeringMessage.create({
+      data: { messageId: message.id, botId, userId: actor.userId, runId: reader?.id ?? null },
+    });
+    const continuation =
+      live.length === 0
+        ? await createPendingSteeringRun(tx, { spaceId: actor.spaceId, threadId, botId })
+        : null;
+    const runId = reader?.id ?? continuation ?? live[0]?.id;
+    if (!runId) throw new IsolationError("Steering did not reach a run");
+    await tx.message.update({ where: { id: message.id }, data: { runId } });
+    const event = await appendEventInTransaction(tx, {
+      spaceId: actor.spaceId,
+      threadId,
+      botId,
+      type: "thread.message.created",
+      runId,
+      payload: {
+        messageId: message.id,
+        seq: message.seq,
+        role: "user",
+        blocks,
+        ...(continuation ? { runIds: [continuation] } : {}),
+      },
+    });
+    return {
+      messageId: message.id,
+      runId,
+      fresh: true as const,
+      eventSeq: event.seq,
+      continuation,
+    };
+  });
+  if (!committed.fresh) return { messageId: committed.messageId, runId: committed.runId };
+  await deps.events.notify(threadId, committed.eventSeq).catch((error) => {
+    // Subscribers catch up from the durable event cursor after a missed realtime wake.
+    getLogger().error("assignment steer realtime notification", error);
+  });
+  if (committed.continuation) {
+    await enqueueRunsNeedingContinue(deps.jobs, [{ id: committed.continuation, status: "queued" }]);
+  }
+  return { messageId: committed.messageId, runId: committed.runId };
 }
 
 const REACTION_TURN_COOLDOWN_MS = 30_000;
