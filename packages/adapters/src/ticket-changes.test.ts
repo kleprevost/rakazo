@@ -11,15 +11,27 @@ const change: TicketChange = {
   assigneeBotId: "bot-1",
   wakeAssignee: true,
 };
-function setup(ticketBoardEnabled: boolean, status = "todo") {
+function setup(
+  ticketBoardEnabled: boolean,
+  status = "todo",
+  existing: { id: string; botId: string; threadId: string } | null = null,
+) {
   const notify = vi.fn(async () => {});
   const enqueue = vi.fn(async () => {});
   const createRun = vi.fn(async () => ({ id: "run-1" }));
   const createTask = vi.fn(async () => ({ id: "task-1" }));
+  const createThread = vi.fn(async () => ({ id: "assignment-thread" }));
+  const createAssignment = vi.fn(async ({ data }: { data: { threadId: string } }) => ({
+    id: "assignment-new",
+    botId: "bot-1",
+    threadId: data.threadId,
+  }));
+  const updateAssignment = vi.fn(async () => ({}));
   const tx = withRunGates({
     ticket: {
       findFirst: vi.fn(async () => ({
         id: "ticket-1",
+        title: "Fix the thing",
         status,
         number: 1,
         board: { ticketPrefix: "RAK" },
@@ -27,7 +39,13 @@ function setup(ticketBoardEnabled: boolean, status = "todo") {
       update: vi.fn(async () => ({})),
     },
     bot: {
-      findFirst: vi.fn(async () => ({ id: "bot-1", userId: "user-1", thread: { id: "thread-1" } })),
+      findFirst: vi.fn(async () => ({ id: "bot-1", userId: "user-1", employeeId: null })),
+    },
+    thread: { create: createThread },
+    assignment: {
+      findUnique: vi.fn(async () => existing),
+      create: createAssignment,
+      update: updateAssignment,
     },
     task: { create: createTask },
     run: { create: createRun },
@@ -39,7 +57,17 @@ function setup(ticketBoardEnabled: boolean, status = "todo") {
     jobs: { enqueue } as never,
     boardEvents: { notify } as never,
   });
-  return { changes, notify, enqueue, createRun, createTask, transaction };
+  return {
+    changes,
+    notify,
+    enqueue,
+    createRun,
+    createTask,
+    transaction,
+    createThread,
+    createAssignment,
+    updateAssignment,
+  };
 }
 
 describe("ticket changes", () => {
@@ -91,5 +119,47 @@ describe("ticket changes", () => {
     const s = setup(true);
     await s.changes({ ...change, assigneeBotId: null });
     expect(s.transaction).not.toHaveBeenCalled();
+  });
+  it("runs a ticket's first wake in a new assignment thread, not the employee's chat", async () => {
+    const s = setup(true);
+    await s.changes(change);
+    expect(s.createThread).toHaveBeenCalledWith({
+      data: { spaceId: "space-1", userId: "user-1" },
+      select: { id: true },
+    });
+    expect(s.createAssignment).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        botId: "bot-1",
+        ticketId: "ticket-1",
+        threadId: "assignment-thread",
+        title: "Fix the thing",
+      }),
+    });
+    expect(s.createTask).toHaveBeenCalledWith({
+      data: expect.objectContaining({ threadId: "assignment-thread", ticketId: "ticket-1" }),
+    });
+    expect(s.createRun).toHaveBeenCalledWith({
+      data: expect.objectContaining({ threadId: "assignment-thread", trigger: "tickets" }),
+    });
+  });
+  it("wakes again in the ticket's existing assignment thread", async () => {
+    const s = setup(true, "doing", { id: "a-1", botId: "bot-1", threadId: "a-thread" });
+    await s.changes(change);
+    expect(s.createThread).not.toHaveBeenCalled();
+    expect(s.createAssignment).not.toHaveBeenCalled();
+    expect(s.createRun).toHaveBeenCalledWith({
+      data: expect.objectContaining({ threadId: "a-thread" }),
+    });
+  });
+  it("detaches a reassigned ticket's earlier assignment and starts a new one", async () => {
+    const s = setup(true, "doing", { id: "a-old", botId: "bot-2", threadId: "old-thread" });
+    await s.changes(change);
+    expect(s.updateAssignment).toHaveBeenCalledWith({
+      where: { id: "a-old" },
+      data: { ticketId: null },
+    });
+    expect(s.createRun).toHaveBeenCalledWith({
+      data: expect.objectContaining({ threadId: "assignment-thread" }),
+    });
   });
 });

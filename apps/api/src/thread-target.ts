@@ -67,6 +67,8 @@ export type ThreadTarget =
       botId: string;
       threadId: string;
       bot: Awaited<ReturnType<ReturnType<typeof createRepos>["getBot"]>>;
+      /** Set when the target is one assignment's own thread rather than the employee's chat. */
+      assignmentId?: string;
     }
   | {
       kind: "group";
@@ -332,11 +334,28 @@ export function sendTargetBotIds(
 export async function resolveThreadTarget(
   prisma: PrismaClient,
   actor: Actor,
-  input: { botId?: string; groupId?: string },
+  input: { botId?: string; groupId?: string; assignmentId?: string },
   options: { includeArchived?: boolean } = {},
 ): Promise<ThreadTarget> {
   const repos = createRepos(prisma);
   const groupRepos = createGroupRepos(prisma);
+  if (input.assignmentId) {
+    // The creator's own assignment; its thread is the target, so every send, stop and answer
+    // below is scoped to that thread and never reaches the employee's chat or another job.
+    const assignment = await prisma.assignment.findFirst({
+      where: { id: input.assignmentId, spaceId: actor.spaceId, userId: actor.userId },
+      select: { id: true, botId: true, threadId: true },
+    });
+    if (!assignment) throw new IsolationError();
+    const bot = await repos.getBot(actor, assignment.botId, options);
+    return {
+      kind: "bot",
+      botId: bot.id,
+      threadId: assignment.threadId,
+      bot,
+      assignmentId: assignment.id,
+    };
+  }
   if (input.botId) {
     const bot = await repos.getBot(actor, input.botId, options);
     if (!bot.thread) throw new IsolationError();

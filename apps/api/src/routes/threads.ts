@@ -93,6 +93,7 @@ export function takeoverReleaser(deps: RouterDeps, actor: Actor, target: ThreadT
 type SendThreadInput = Parameters<typeof sendThreadMessage>[3] & {
   botId?: string;
   groupId?: string;
+  assignmentId?: string;
 };
 
 /** The one user-message send: model, teaching and image checks, then message and run in one commit. */

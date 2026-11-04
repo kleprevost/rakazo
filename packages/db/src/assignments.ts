@@ -64,6 +64,60 @@ function parseCursor(cursor: string): { updatedAt: Date; id: string } {
 }
 
 /**
+ * The viewer's assignment for `clientNonce`, created with its own thread when there is none, so
+ * a repeated call returns the first one. The thread belongs to no bot; the employee reaches it
+ * through the assignment. Only the employee's owner may give it a job.
+ */
+export async function createAssignment(
+  prisma: PrismaClient,
+  viewer: Viewer,
+  input: { botId: string; title: string; clientNonce: string; ticketId?: string },
+): Promise<{ assignment: AssignmentRow; created: boolean }> {
+  const find = () =>
+    prisma.assignment.findFirst({
+      where: { spaceId: viewer.spaceId, userId: viewer.userId, clientNonce: input.clientNonce },
+    });
+  const existing = await find();
+  if (existing) return { assignment: existing, created: false };
+  try {
+    const assignment = await prisma.$transaction(async (tx) => {
+      const bot = await tx.bot.findFirst({
+        where: {
+          id: input.botId,
+          spaceId: viewer.spaceId,
+          userId: viewer.userId,
+          archivedAt: null,
+        },
+        select: { id: true, employeeId: true },
+      });
+      if (!bot) throw new IsolationError();
+      const thread = await tx.thread.create({
+        data: { spaceId: viewer.spaceId, userId: viewer.userId },
+        select: { id: true },
+      });
+      return tx.assignment.create({
+        data: {
+          spaceId: viewer.spaceId,
+          botId: bot.id,
+          userId: viewer.userId,
+          employeeId: bot.employeeId,
+          threadId: thread.id,
+          ticketId: input.ticketId,
+          title: input.title,
+          clientNonce: input.clientNonce,
+        },
+      });
+    });
+    return { assignment, created: true };
+  } catch (error) {
+    // A concurrent create with the same nonce won; its rows are the answer, ours rolled back.
+    const winner = await find();
+    if (winner) return { assignment: winner, created: false };
+    throw error;
+  }
+}
+
+/**
  * The viewer's assignments, newest activity first, with the derived phase. The viewer's own
  * rows only: a manager's wider read access to the table belongs to a later oversight surface.
  */
@@ -140,4 +194,18 @@ export async function getAssignmentWork(
     ),
     ...work,
   };
+}
+
+/** One of the viewer's assignments without its runs. */
+export async function getAssignment(
+  prisma: PrismaClient,
+  viewer: Viewer,
+  assignmentId: string,
+): Promise<Assignment> {
+  const {
+    runs: _runs,
+    artifacts: _artifacts,
+    ...assignment
+  } = await getAssignmentWork(prisma, viewer, assignmentId);
+  return assignment;
 }

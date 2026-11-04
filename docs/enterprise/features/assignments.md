@@ -1,6 +1,6 @@
 # Independent assignments per employee
 
-Roadmap Wave 4, item 2. Status: design; PR 1 (table, read model, audit) built. Today an employee has one chat; two jobs
+Roadmap Wave 4, item 2. Status: design; PR 1 (table, read model, audit) and PR 2 (create, thread targeting, ticket wake) built. Today an employee has one chat; two jobs
 given to it share that thread, its history and its single stream of approvals. This makes each job
 its own addressable unit while the employee, its memory and its tools stay one.
 
@@ -166,3 +166,25 @@ These replace the open questions the first draft carried.
     and notifications (they read `run.botId`).
   - Known gap, for the PR that turns creation on: account export and import cover bot and group
     threads only, so assignment threads are not yet exported.
+
+## PR 2 notes
+- `assignments.create` is two idempotent steps instead of one transaction: the assignment and its
+  empty thread commit first (unique `(spaceId, clientNonce)`), then the brief goes through the same
+  send every chat uses (message nonce `brief:<clientNonce>`), so there is one send implementation
+  for model checks, suspension, attachments, steering and enqueueing. A first send that is refused
+  removes the empty assignment; a retry with the same nonce finishes whatever the first call left.
+- `threadTarget.assignmentId` is accepted by `threads.head/get/messages/subscribe/send/
+  sendWithRoutines/react/stop/followUp/answer/markRead/markUnread`. The target resolves to the
+  employee as a bot target whose `threadId` is the assignment's thread, and every one of those
+  paths already scopes by thread. `clear`, calls and artifact uploads still take a bot or group.
+- A ticket wake runs in the ticket's assignment, creating it on the first wake. A reassigned
+  ticket detaches the earlier assignment (it keeps its history) and starts one for the new
+  employee. The run keeps trigger `tickets`, which the chat snapshot treats as background work
+  (only its waiting states surface); the assignment page in PR 3 lists these runs itself.
+- Concurrency: nothing new limits runs, but the design was wrong that a second thread runs in
+  parallel with no change. The executor takes one execution lease per (computer, bot), and the
+  default computer scope is `team`, so two jobs of one employee are both live and independently
+  addressable while the second run is requeued until the first finishes or pauses. This is the
+  "Queued" case of decision 4 and applies to dedicated computers too. Running them in parallel on
+  one computer would mean keying the lease by run, a non-additive change to an existing unique
+  index that the previous release still relies on, so it is left for its own PR.

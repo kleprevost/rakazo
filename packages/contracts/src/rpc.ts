@@ -15,7 +15,9 @@ import { AgentImportSetupStateInput, AgentImportSetupStateSchema } from "./agent
 import { AiConsentQuerySchema, AiConsentStatusSchema } from "./ai-consent.js";
 import { AnalyticsScreenInput } from "./analytics.js";
 import {
+  AssignmentSchema,
   AssignmentWorkSchema,
+  CreateAssignmentInput,
   GetAssignmentInput,
   ListAssignmentsInput,
   ListAssignmentsOutput,
@@ -212,6 +214,23 @@ const threadTarget = z
     }
   });
 
+/** A chat: an employee's, a group's, or one assignment's own conversation with an employee. */
+const chatTarget = z
+  .object({
+    botId: Id.optional(),
+    groupId: Id.optional(),
+    assignmentId: Id.optional(),
+  })
+  .superRefine((input, ctx) => {
+    if ([input.botId, input.groupId, input.assignmentId].filter(Boolean).length !== 1) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Provide exactly one of botId, groupId or assignmentId",
+        path: ["botId"],
+      });
+    }
+  });
+
 const structuredMentionTarget = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("bot"), id: Id }),
   z.object({ kind: z.literal("group"), id: Id }),
@@ -219,7 +238,7 @@ const structuredMentionTarget = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("connector"), id: Id }),
 ]);
 
-const threadSendFields = threadTarget.safeExtend({
+const threadSendFields = chatTarget.safeExtend({
   imageHandling: z.enum(["confirm", "file"]).optional(),
   text: z.string().optional(),
   artifactIds: z.array(Id).max(ATTACHMENT_COUNT_CEILING).optional(),
@@ -576,16 +595,16 @@ export const appContract = {
     ),
   },
   threads: {
-    head: oc.input(threadTarget).output(
+    head: oc.input(chatTarget).output(
       z.object({
         threadId: Id,
         cursor: z.number().int().min(-1),
       }),
     ),
-    get: oc.input(threadTarget).output(ThreadSnapshotSchema),
+    get: oc.input(chatTarget).output(ThreadSnapshotSchema),
     messages: oc
       .input(
-        threadTarget.safeExtend({
+        chatTarget.safeExtend({
           before: z.number().int().nonnegative().optional(),
           includePeerRuns: z.boolean().optional(),
           includePeerReceipts: z.boolean().optional(),
@@ -599,7 +618,7 @@ export const appContract = {
       )
       .output(ThreadMessagePageSchema),
     subscribe: oc
-      .input(threadTarget.safeExtend({ cursor: z.number().int().min(-1) }))
+      .input(chatTarget.safeExtend({ cursor: z.number().int().min(-1) }))
       .output(eventIterator(ProductEventSchema)),
     send: oc.input(threadSendInput).output(threadSendOutput),
     /**
@@ -612,17 +631,17 @@ export const appContract = {
       .output(z.object({ routineRunIds: z.array(Id), send: threadSendOutput.optional() })),
     react: oc
       .input(
-        threadTarget.safeExtend({
+        chatTarget.safeExtend({
           messageId: Id,
           reaction: MessageReactionSchema,
           clientNonce: z.string().min(1).max(200),
         }),
       )
       .output(z.object({ ok: z.literal(true), runIds: z.array(Id).optional() })),
-    stop: oc.input(threadTarget).output(z.object({ ok: z.literal(true) })),
+    stop: oc.input(chatTarget).output(z.object({ ok: z.literal(true) })),
     followUp: oc
       .input(
-        threadTarget.safeExtend({
+        chatTarget.safeExtend({
           text: z.string().min(1),
           /** Carries the call id, so a turn taken mid-run stays in the call's card. */
           clientNonce: z.string().min(1).max(200).optional(),
@@ -677,7 +696,7 @@ export const appContract = {
     clear: oc.input(threadTarget).output(z.object({ ok: z.literal(true) })),
     answer: oc
       .input(
-        threadTarget
+        chatTarget
           .safeExtend({
             runId: Id,
             messageId: Id,
@@ -713,11 +732,11 @@ export const appContract = {
       .output(z.object({ ok: z.literal(true) })),
     /** `unreadAfterSeq`: the seq read up to before this call, null when nothing was unread. */
     markRead: oc
-      .input(threadTarget)
+      .input(chatTarget)
       .output(z.object({ ok: z.literal(true), unreadAfterSeq: z.number().int().nullable() })),
     /** With `messageId`, the chat reads as unread from that message: the next open puts New above it. */
     markUnread: oc
-      .input(threadTarget.and(z.object({ messageId: Id.optional() })))
+      .input(chatTarget.and(z.object({ messageId: Id.optional() })))
       .output(z.object({ ok: z.literal(true) })),
   },
   computer: {
@@ -926,6 +945,7 @@ export const appContract = {
     work: oc.input(z.object({ ticketId: Id })).output(TicketWorkSchema),
   },
   assignments: {
+    create: oc.input(CreateAssignmentInput).output(AssignmentSchema),
     list: oc.input(ListAssignmentsInput).output(ListAssignmentsOutput),
     get: oc.input(GetAssignmentInput).output(AssignmentWorkSchema),
   },
